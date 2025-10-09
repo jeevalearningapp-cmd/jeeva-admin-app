@@ -44,14 +44,14 @@ export const LoginForm = () => {
         boxShadow: 1
       }}
     >
-      <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
         <Box
           component="img"
           src={logoLogin}
           alt="Jeeva Logo"
           sx={{ 
-            width: 120,
-            height: 120,
+            width: 210,
+            height: 210,
             objectFit: 'contain'
           }}
         />
