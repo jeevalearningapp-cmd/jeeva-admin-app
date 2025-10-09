@@ -17,6 +17,7 @@ import {
   DashboardHeroPage,
   ProfilePage,
 } from './pages'
+import { ModulesPage } from './pages/content/ModulesPage'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -88,6 +89,17 @@ function App() {
                 <ProtectedRoute allowedRoles={['superadmin', 'editor']}>
                   <MainLayout>
                     <ContentPage />
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+            
+            <Route
+              path="/content/modules"
+              element={
+                <ProtectedRoute allowedRoles={['superadmin', 'editor']}>
+                  <MainLayout>
+                    <ModulesPage />
                   </MainLayout>
                 </ProtectedRoute>
               }
