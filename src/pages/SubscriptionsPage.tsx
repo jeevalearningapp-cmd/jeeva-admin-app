@@ -27,7 +27,8 @@ import {
   InputLabel,
   Card,
   CardContent,
-  InputAdornment
+  InputAdornment,
+  FormHelperText
 } from '@mui/material'
 import {
   AddOutlined,
@@ -53,7 +54,7 @@ import {
   useSubscriptionAnalytics
 } from '@/hooks/useUserSubscriptions'
 import { PageLoader } from '@/components/common'
-import { SubscriptionPlan, CreateSubscriptionPlanInput, UserSubscription, UpdateUserSubscriptionInput } from '@/types/subscription'
+import { SubscriptionPlan, CreateSubscriptionPlanInput, UserSubscription, UpdateUserSubscriptionInput, CreateUserSubscriptionInput } from '@/types/subscription'
 import { format } from 'date-fns'
 
 export const SubscriptionsPage: React.FC = () => {
@@ -74,9 +75,18 @@ export const SubscriptionsPage: React.FC = () => {
     isActive: true,
     displayOrder: 0
   })
+
+  const [subFormData, setSubFormData] = useState<CreateUserSubscriptionInput>({
+    userId: '',
+    planId: '',
+    status: 'active',
+    autoRenew: true,
+    startDate: new Date().toISOString().split('T')[0]
+  })
   
   const [featureInput, setFeatureInput] = useState('')
   const [initialLoad, setInitialLoad] = useState(true)
+  const [subFormTouched, setSubFormTouched] = useState(false)
 
   const { data: plans, isLoading: plansLoading } = useSubscriptionPlans()
   const { data: subscriptions, isLoading: subsLoading } = useUserSubscriptions()
@@ -84,6 +94,7 @@ export const SubscriptionsPage: React.FC = () => {
   const createPlanMutation = useCreateSubscriptionPlan()
   const updatePlanMutation = useUpdateSubscriptionPlan()
   const deletePlanMutation = useDeleteSubscriptionPlan()
+  const createSubMutation = useCreateUserSubscription()
   const updateSubMutation = useUpdateUserSubscription()
   const deleteSubMutation = useDeleteUserSubscription()
 
@@ -193,6 +204,63 @@ export const SubscriptionsPage: React.FC = () => {
     }
   }
 
+  const handleOpenSubDialog = (subscription?: UserSubscription) => {
+    if (subscription) {
+      setEditingSubscription(subscription)
+      setSubFormData({
+        userId: subscription.userId,
+        planId: subscription.planId,
+        status: subscription.status,
+        autoRenew: subscription.autoRenew,
+        startDate: subscription.startDate.split('T')[0],
+        endDate: subscription.endDate?.split('T')[0],
+        paymentMethod: subscription.paymentMethod
+      })
+    } else {
+      setEditingSubscription(null)
+      setSubFormData({
+        userId: '',
+        planId: '',
+        status: 'active',
+        autoRenew: true,
+        startDate: new Date().toISOString().split('T')[0]
+      })
+    }
+    setSubFormTouched(false)
+    setSubDialogOpen(true)
+  }
+
+  const handleCloseSubDialog = () => {
+    setSubDialogOpen(false)
+    setEditingSubscription(null)
+    setSubFormTouched(false)
+  }
+
+  const handleSubmitSubscription = async () => {
+    // Validate required fields
+    setSubFormTouched(true)
+    if (!subFormData.userId || !subFormData.planId) {
+      return
+    }
+
+    if (editingSubscription) {
+      await updateSubMutation.mutateAsync({
+        id: editingSubscription.id,
+        input: {
+          planId: subFormData.planId,
+          status: subFormData.status,
+          autoRenew: subFormData.autoRenew,
+          startDate: subFormData.startDate,
+          endDate: subFormData.endDate,
+          paymentMethod: subFormData.paymentMethod
+        }
+      })
+    } else {
+      await createSubMutation.mutateAsync(subFormData)
+    }
+    handleCloseSubDialog()
+  }
+
   return (
     <Box>
       {/* Header */}
@@ -203,13 +271,23 @@ export const SubscriptionsPage: React.FC = () => {
             Manage subscription plans and user subscriptions
           </Typography>
         </Box>
-        {tabValue === 0 && (
+        {tabValue === 0 ? (
           <Button
             variant="contained"
             startIcon={<AddOutlined />}
             onClick={() => handleOpenPlanDialog()}
+            sx={{ borderRadius: '12px' }}
           >
             Add Plan
+          </Button>
+        ) : (
+          <Button
+            variant="contained"
+            startIcon={<AddOutlined />}
+            onClick={() => handleOpenSubDialog()}
+            sx={{ borderRadius: '12px' }}
+          >
+            Add Subscription
           </Button>
         )}
       </Box>
@@ -217,13 +295,13 @@ export const SubscriptionsPage: React.FC = () => {
       {/* Analytics Cards */}
       {analytics && (
         <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: 'repeat(4, 1fr)' }, gap: 3, mb: 3 }}>
-          <Card sx={{ bgcolor: 'background.paper' }}>
+          <Card sx={{ bgcolor: 'background.paper', border: '1px solid #E5E7EB', borderRadius: '16px' }}>
             <CardContent sx={{ p: 3 }}>
               <Box 
                 sx={{ 
                   width: 48, 
                   height: 48, 
-                  borderRadius: '12px',
+                  borderRadius: '16px',
                   display: 'flex', 
                   alignItems: 'center', 
                   justifyContent: 'center',
@@ -246,13 +324,13 @@ export const SubscriptionsPage: React.FC = () => {
             </CardContent>
           </Card>
 
-          <Card sx={{ bgcolor: 'background.paper' }}>
+          <Card sx={{ bgcolor: 'background.paper', border: '1px solid #E5E7EB', borderRadius: '16px' }}>
             <CardContent sx={{ p: 3 }}>
               <Box 
                 sx={{ 
                   width: 48, 
                   height: 48, 
-                  borderRadius: '12px',
+                  borderRadius: '16px',
                   display: 'flex', 
                   alignItems: 'center', 
                   justifyContent: 'center',
@@ -275,13 +353,13 @@ export const SubscriptionsPage: React.FC = () => {
             </CardContent>
           </Card>
 
-          <Card sx={{ bgcolor: 'background.paper' }}>
+          <Card sx={{ bgcolor: 'background.paper', border: '1px solid #E5E7EB', borderRadius: '16px' }}>
             <CardContent sx={{ p: 3 }}>
               <Box 
                 sx={{ 
                   width: 48, 
                   height: 48, 
-                  borderRadius: '12px',
+                  borderRadius: '16px',
                   display: 'flex', 
                   alignItems: 'center', 
                   justifyContent: 'center',
@@ -304,13 +382,13 @@ export const SubscriptionsPage: React.FC = () => {
             </CardContent>
           </Card>
 
-          <Card sx={{ bgcolor: 'background.paper' }}>
+          <Card sx={{ bgcolor: 'background.paper', border: '1px solid #E5E7EB', borderRadius: '16px' }}>
             <CardContent sx={{ p: 3 }}>
               <Box 
                 sx={{ 
                   width: 48, 
                   height: 48, 
-                  borderRadius: '12px',
+                  borderRadius: '16px',
                   display: 'flex', 
                   alignItems: 'center', 
                   justifyContent: 'center',
@@ -336,7 +414,7 @@ export const SubscriptionsPage: React.FC = () => {
       )}
 
       {/* Tabs */}
-      <Paper sx={{ bgcolor: 'background.paper', mb: 3 }}>
+      <Paper sx={{ bgcolor: 'background.paper', border: '1px solid #E5E7EB', borderRadius: '16px', mb: 3 }}>
         <Tabs value={tabValue} onChange={(_, v) => setTabValue(v)}>
           <Tab label="Subscription Plans" />
           <Tab label="User Subscriptions" />
@@ -345,7 +423,7 @@ export const SubscriptionsPage: React.FC = () => {
 
       {/* Subscription Plans Tab */}
       {tabValue === 0 && (
-        <TableContainer component={Paper} sx={{ bgcolor: 'background.paper' }}>
+        <TableContainer component={Paper} sx={{ bgcolor: 'background.paper', border: '1px solid #E5E7EB', borderRadius: '16px' }}>
           <Table>
             <TableHead>
               <TableRow>
@@ -455,7 +533,7 @@ export const SubscriptionsPage: React.FC = () => {
             </FormControl>
           </Box>
 
-          <TableContainer component={Paper} sx={{ bgcolor: 'background.paper' }}>
+          <TableContainer component={Paper} sx={{ bgcolor: 'background.paper', border: '1px solid #E5E7EB', borderRadius: '16px' }}>
             <Table>
               <TableHead>
                 <TableRow>
@@ -505,6 +583,13 @@ export const SubscriptionsPage: React.FC = () => {
                       />
                     </TableCell>
                     <TableCell align="right">
+                      <IconButton
+                        size="small"
+                        onClick={() => handleOpenSubDialog(sub)}
+                        sx={{ mr: 1 }}
+                      >
+                        <EditOutlined fontSize="small" />
+                      </IconButton>
                       <IconButton
                         size="small"
                         onClick={() => handleDeleteSubscription(sub.id)}
@@ -640,13 +725,117 @@ export const SubscriptionsPage: React.FC = () => {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClosePlanDialog}>Cancel</Button>
+          <Button onClick={handleClosePlanDialog} sx={{ borderRadius: '12px' }}>Cancel</Button>
           <Button
             onClick={handleSubmitPlan}
             variant="contained"
             disabled={!planFormData.name || !planFormData.description || planFormData.price <= 0}
+            sx={{ borderRadius: '12px' }}
           >
             {editingPlan ? 'Update' : 'Create'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Add/Edit User Subscription Dialog */}
+      <Dialog open={subDialogOpen} onClose={handleCloseSubDialog} maxWidth="md" fullWidth>
+        <DialogTitle>
+          {editingSubscription ? 'Edit User Subscription' : 'Add User Subscription'}
+        </DialogTitle>
+        <DialogContent>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
+            <TextField
+              label="User ID"
+              value={subFormData.userId}
+              onChange={(e) => setSubFormData({ ...subFormData, userId: e.target.value })}
+              fullWidth
+              required
+              disabled={!!editingSubscription}
+              helperText={
+                subFormTouched && !subFormData.userId 
+                  ? 'User ID is required' 
+                  : editingSubscription 
+                    ? 'User cannot be changed' 
+                    : 'Enter the user ID'
+              }
+              error={subFormTouched && !subFormData.userId}
+            />
+            <FormControl fullWidth required error={subFormTouched && !subFormData.planId}>
+              <InputLabel>Subscription Plan</InputLabel>
+              <Select
+                value={subFormData.planId}
+                onChange={(e) => setSubFormData({ ...subFormData, planId: e.target.value })}
+                label="Subscription Plan"
+              >
+                {(!plans || plans.filter(p => p.isActive).length === 0) && (
+                  <MenuItem disabled>No active plans available</MenuItem>
+                )}
+                {plans?.filter(p => p.isActive).map(plan => (
+                  <MenuItem key={plan.id} value={plan.id}>
+                    {plan.name} - ${plan.price} / {plan.billingCycle}
+                  </MenuItem>
+                ))}
+              </Select>
+              {subFormTouched && !subFormData.planId && (
+                <FormHelperText>Plan is required</FormHelperText>
+              )}
+            </FormControl>
+            <FormControl fullWidth>
+              <InputLabel>Status</InputLabel>
+              <Select
+                value={subFormData.status}
+                onChange={(e) => setSubFormData({ ...subFormData, status: e.target.value as any })}
+                label="Status"
+              >
+                <MenuItem value="active">Active</MenuItem>
+                <MenuItem value="trial">Trial</MenuItem>
+                <MenuItem value="cancelled">Cancelled</MenuItem>
+                <MenuItem value="expired">Expired</MenuItem>
+              </Select>
+            </FormControl>
+            <TextField
+              label="Start Date"
+              type="date"
+              value={subFormData.startDate}
+              onChange={(e) => setSubFormData({ ...subFormData, startDate: e.target.value })}
+              fullWidth
+              InputLabelProps={{ shrink: true }}
+            />
+            <TextField
+              label="End Date (optional)"
+              type="date"
+              value={subFormData.endDate || ''}
+              onChange={(e) => setSubFormData({ ...subFormData, endDate: e.target.value || undefined })}
+              fullWidth
+              InputLabelProps={{ shrink: true }}
+            />
+            <TextField
+              label="Payment Method (optional)"
+              value={subFormData.paymentMethod || ''}
+              onChange={(e) => setSubFormData({ ...subFormData, paymentMethod: e.target.value || undefined })}
+              fullWidth
+              placeholder="e.g., Credit Card, PayPal"
+            />
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={subFormData.autoRenew}
+                  onChange={(e) => setSubFormData({ ...subFormData, autoRenew: e.target.checked })}
+                />
+              }
+              label="Auto Renew"
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseSubDialog} sx={{ borderRadius: '12px' }}>Cancel</Button>
+          <Button
+            onClick={handleSubmitSubscription}
+            variant="contained"
+            disabled={!subFormData.userId || !subFormData.planId}
+            sx={{ borderRadius: '12px' }}
+          >
+            {editingSubscription ? 'Update' : 'Create'}
           </Button>
         </DialogActions>
       </Dialog>
