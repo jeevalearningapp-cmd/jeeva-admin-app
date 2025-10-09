@@ -63,7 +63,15 @@ The application uses protected routes with role-based access control:
   - Editor: Content creation and editing
   - Moderator: Content review and approval only
 - Protected route wrapper checks authentication status and role permissions
-- Environment variables store sensitive credentials (SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_KEY)
+- Environment variables store sensitive credentials (VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY)
+
+**Authentication Implementation:**
+- AuthContext (`/src/context/AuthContext.tsx`) manages global auth state
+- `useAuth()` hook provides access to user, session, login/logout functions
+- Login flow verifies user exists in `admin_users` table with `is_active = true`
+- ProtectedRoute component wraps routes requiring authentication
+- Role-based route protection using `allowedRoles` prop
+- See `/docs/authentication.md` for complete implementation guide
 
 **Data Architecture:**
 The application manages a complex relational data model with the following key entity relationships:
