@@ -18,6 +18,10 @@ import {
   ProfilePage,
 } from './pages'
 import { ModulesPage } from './pages/content/ModulesPage'
+import { TopicsPage } from './pages/content/TopicsPage'
+import { LessonsPage } from './pages/content/LessonsPage'
+import { QuestionsPage } from './pages/content/QuestionsPage'
+import { FlashcardsPage } from './pages/content/FlashcardsPage'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -100,6 +104,50 @@ function App() {
                 <ProtectedRoute allowedRoles={['superadmin', 'editor']}>
                   <MainLayout>
                     <ModulesPage />
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+            
+            <Route
+              path="/content/topics"
+              element={
+                <ProtectedRoute allowedRoles={['superadmin', 'editor']}>
+                  <MainLayout>
+                    <TopicsPage />
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+            
+            <Route
+              path="/content/lessons"
+              element={
+                <ProtectedRoute allowedRoles={['superadmin', 'editor']}>
+                  <MainLayout>
+                    <LessonsPage />
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+            
+            <Route
+              path="/content/questions"
+              element={
+                <ProtectedRoute allowedRoles={['superadmin', 'editor']}>
+                  <MainLayout>
+                    <QuestionsPage />
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+            
+            <Route
+              path="/content/flashcards"
+              element={
+                <ProtectedRoute allowedRoles={['superadmin', 'editor']}>
+                  <MainLayout>
+                    <FlashcardsPage />
                   </MainLayout>
                 </ProtectedRoute>
               }
