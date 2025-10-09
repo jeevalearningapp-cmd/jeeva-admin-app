@@ -4,9 +4,9 @@ export const getTheme = (mode: PaletteMode) => createTheme({
   palette: {
     mode,
     primary: { 
-      main: '#1976D2',
-      light: '#42A5F5',
-      dark: '#1565C0',
+      main: '#007aff',
+      light: '#3395ff',
+      dark: '#0051d5',
     },
     secondary: { 
       main: '#181C32',
