@@ -1,72 +1,145 @@
 import { ThemeProvider, CssBaseline } from '@mui/material'
-import { Box, Typography, Button, CircularProgress } from '@mui/material'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import theme from './theme'
-import { AuthProvider, useAuth } from './context'
+import { AuthProvider } from './context'
 import { LoginForm } from './components/auth/LoginForm'
-
-function AppContent() {
-  const { user, adminUser, loading, logout } = useAuth()
-
-  if (loading) {
-    return (
-      <Box
-        sx={{
-          minHeight: '100vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          bgcolor: 'background.default'
-        }}
-      >
-        <CircularProgress />
-      </Box>
-    )
-  }
-
-  if (!user || !adminUser) {
-    return <LoginForm />
-  }
-
-  return (
-    <Box
-      sx={{
-        minHeight: '100vh',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        bgcolor: 'background.default',
-        p: 3
-      }}
-    >
-      <Typography variant="h1" color="primary" gutterBottom>
-        Jeeva Admin Portal
-      </Typography>
-      <Typography variant="body1" color="text.secondary" gutterBottom>
-        Welcome, {adminUser.email}!
-      </Typography>
-      <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-        Role: <strong>{adminUser.role}</strong>
-      </Typography>
-      <Box sx={{ mt: 4 }}>
-        <Button 
-          variant="contained" 
-          color="primary"
-          onClick={logout}
-        >
-          Logout
-        </Button>
-      </Box>
-    </Box>
-  )
-}
+import { ProtectedRoute } from './components/auth/ProtectedRoute'
+import { MainLayout } from './components/layout'
+import {
+  DashboardPage,
+  UsersPage,
+  AdminUsersPage,
+  SubscriptionsPage,
+  ContentPage,
+  ApprovalsPage,
+  AnalyticsPage,
+  SettingsPage,
+  DashboardHeroPage,
+  ProfilePage,
+} from './pages'
 
 function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <AuthProvider>
-        <AppContent />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/login" element={<LoginForm />} />
+            
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute allowedRoles={['superadmin', 'editor', 'moderator']}>
+                  <MainLayout>
+                    <DashboardPage />
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+            
+            <Route
+              path="/users"
+              element={
+                <ProtectedRoute allowedRoles={['superadmin', 'editor']}>
+                  <MainLayout>
+                    <UsersPage />
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+            
+            <Route
+              path="/admin-users"
+              element={
+                <ProtectedRoute allowedRoles={['superadmin']}>
+                  <MainLayout>
+                    <AdminUsersPage />
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+            
+            <Route
+              path="/subscriptions"
+              element={
+                <ProtectedRoute allowedRoles={['superadmin', 'editor']}>
+                  <MainLayout>
+                    <SubscriptionsPage />
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+            
+            <Route
+              path="/content"
+              element={
+                <ProtectedRoute allowedRoles={['superadmin', 'editor']}>
+                  <MainLayout>
+                    <ContentPage />
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+            
+            <Route
+              path="/approvals"
+              element={
+                <ProtectedRoute allowedRoles={['superadmin', 'moderator']}>
+                  <MainLayout>
+                    <ApprovalsPage />
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+            
+            <Route
+              path="/analytics"
+              element={
+                <ProtectedRoute allowedRoles={['superadmin']}>
+                  <MainLayout>
+                    <AnalyticsPage />
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+            
+            <Route
+              path="/dashboard-hero"
+              element={
+                <ProtectedRoute allowedRoles={['superadmin', 'editor']}>
+                  <MainLayout>
+                    <DashboardHeroPage />
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+            
+            <Route
+              path="/settings"
+              element={
+                <ProtectedRoute allowedRoles={['superadmin']}>
+                  <MainLayout>
+                    <SettingsPage />
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+            
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <MainLayout>
+                    <ProfilePage />
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+            
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          </Routes>
+        </BrowserRouter>
       </AuthProvider>
     </ThemeProvider>
   )

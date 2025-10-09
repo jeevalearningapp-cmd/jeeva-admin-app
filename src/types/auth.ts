@@ -3,6 +3,7 @@ import { User, Session } from '@supabase/supabase-js'
 export interface AdminUser {
   id: string
   email: string
+  full_name?: string
   role: 'superadmin' | 'editor' | 'moderator'
   is_active: boolean
   created_at?: string
