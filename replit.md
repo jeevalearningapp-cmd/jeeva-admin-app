@@ -42,6 +42,13 @@ The application uses protected routes with role-based access control:
 - Role-adaptive menus that show/hide based on user permissions
 - Consistent color palette: Primary (#1976D2), Secondary (#181C32), with semantic colors for success, error, warning, and info states
 
+**Theme Configuration:**
+- MUI theme located at `/src/theme/theme.ts`
+- All components wrapped with ThemeProvider in App.tsx
+- CssBaseline applied for consistent baseline styles
+- Custom theme includes: color palette, typography (Inter font family), 8px border radius
+- See `/docs/theme.md` for complete theme specifications and usage guidelines
+
 ### Backend Architecture
 
 **Backend-as-a-Service:**
