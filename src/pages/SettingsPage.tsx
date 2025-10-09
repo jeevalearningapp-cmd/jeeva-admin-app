@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Box,
   Typography,
@@ -23,6 +23,7 @@ import {
 } from '@mui/icons-material'
 import { useSettings } from '@/hooks/useSettings'
 import type { UpdateSettingsInput } from '@/types'
+import { validateSettings, getValidationErrorMessage, type SettingsValidationResult } from '@/utils/settingsValidation'
 
 interface TabPanelProps {
   children?: React.ReactNode
@@ -41,6 +42,7 @@ const TabPanel: React.FC<TabPanelProps> = ({ children, value, index }) => {
 export const SettingsPage: React.FC = () => {
   const [tabValue, setTabValue] = React.useState(0)
   const { settings: backendSettings, isLoading, updateSettings, isUpdating } = useSettings()
+  const [validationResult, setValidationResult] = useState<SettingsValidationResult>({ isValid: true, errors: [] })
   
   const [localSettings, setLocalSettings] = React.useState<UpdateSettingsInput>({
     siteName: '',
@@ -116,6 +118,14 @@ export const SettingsPage: React.FC = () => {
   }
 
   const handleSave = () => {
+    // Validate settings before saving
+    const validation = validateSettings(localSettings)
+    setValidationResult(validation)
+
+    if (!validation.isValid) {
+      return
+    }
+
     if (backendSettings?.id) {
       updateSettings({
         id: backendSettings.id,
@@ -168,12 +178,21 @@ export const SettingsPage: React.FC = () => {
           </Typography>
           <Divider sx={{ mb: 3 }} />
 
+          {!validationResult.isValid && (
+            <Alert severity="error" sx={{ borderRadius: '12px', mb: 2 }}>
+              Please fix the validation errors before saving.
+            </Alert>
+          )}
+
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
             <TextField
               label="Site Name"
               value={localSettings.siteName || ''}
               onChange={handleChange('siteName')}
               fullWidth
+              required
+              error={!!getValidationErrorMessage('siteName', validationResult.errors)}
+              helperText={getValidationErrorMessage('siteName', validationResult.errors)}
               sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
             />
             
@@ -193,6 +212,9 @@ export const SettingsPage: React.FC = () => {
                 value={localSettings.contactEmail || ''}
                 onChange={handleChange('contactEmail')}
                 fullWidth
+                type="email"
+                error={!!getValidationErrorMessage('contactEmail', validationResult.errors)}
+                helperText={getValidationErrorMessage('contactEmail', validationResult.errors)}
                 sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
               />
               <TextField
@@ -200,6 +222,9 @@ export const SettingsPage: React.FC = () => {
                 value={localSettings.supportEmail || ''}
                 onChange={handleChange('supportEmail')}
                 fullWidth
+                type="email"
+                error={!!getValidationErrorMessage('supportEmail', validationResult.errors)}
+                helperText={getValidationErrorMessage('supportEmail', validationResult.errors)}
                 sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
               />
             </Box>
@@ -250,6 +275,9 @@ export const SettingsPage: React.FC = () => {
               value={localSettings.maxFileUploadSize || 0}
               onChange={handleChange('maxFileUploadSize')}
               fullWidth
+              inputProps={{ min: 1, max: 100 }}
+              error={!!getValidationErrorMessage('maxFileUploadSize', validationResult.errors)}
+              helperText={getValidationErrorMessage('maxFileUploadSize', validationResult.errors) || 'Range: 1-100 MB'}
               sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
             />
 
@@ -280,6 +308,9 @@ export const SettingsPage: React.FC = () => {
               value={localSettings.sessionTimeout || 0}
               onChange={handleChange('sessionTimeout')}
               fullWidth
+              inputProps={{ min: 5, max: 1440 }}
+              error={!!getValidationErrorMessage('sessionTimeout', validationResult.errors)}
+              helperText={getValidationErrorMessage('sessionTimeout', validationResult.errors) || 'Range: 5-1440 minutes'}
               sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
             />
 
@@ -294,6 +325,9 @@ export const SettingsPage: React.FC = () => {
               value={localSettings.passwordMinLength || 0}
               onChange={handleChange('passwordMinLength')}
               fullWidth
+              inputProps={{ min: 6, max: 128 }}
+              error={!!getValidationErrorMessage('passwordMinLength', validationResult.errors)}
+              helperText={getValidationErrorMessage('passwordMinLength', validationResult.errors) || 'Range: 6-128 characters'}
               sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
             />
 

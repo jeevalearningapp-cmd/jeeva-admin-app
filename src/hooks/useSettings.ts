@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useSnackbar } from 'notistack'
 import { getSettings, updateSettings } from '@/api/settings'
 import type { UpdateSettingsInput } from '@/types'
+import { ErrorHandler } from '@/utils/errorHandler'
 
 export const useSettings = () => {
   const { enqueueSnackbar } = useSnackbar()
@@ -25,9 +26,10 @@ export const useSettings = () => {
       enqueueSnackbar('Settings saved successfully!', { variant: 'success' })
     },
     onError: (error: Error) => {
-      enqueueSnackbar(`Failed to save settings: ${error.message}`, {
-        variant: 'error',
-      })
+      ErrorHandler.handle(
+        error,
+        'Failed to save settings. Please check your permissions and try again.'
+      )
     },
   })
 
