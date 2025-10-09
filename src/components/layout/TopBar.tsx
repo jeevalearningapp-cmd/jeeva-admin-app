@@ -11,7 +11,7 @@ import {
 } from '@mui/icons-material'
 import { useAuth, useThemeMode } from '@/context'
 import { useNavigate } from 'react-router-dom'
-import logoIcon from '@/assets/logo-icon.png'
+import logoHeader from '@/assets/logo-header.png'
 
 interface TopBarProps {
   onMenuClick: () => void
@@ -79,9 +79,9 @@ export const TopBar: React.FC<TopBarProps> = ({ onMenuClick, onSidebarToggle, si
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mr: 4 }}>
           <Box
             component="img"
-            src={logoIcon}
+            src={logoHeader}
             alt="Jeeva Logo"
-            sx={{ width: 32, height: 32 }}
+            sx={{ width: 40, height: 40 }}
           />
           <Typography variant="h6" component="div" sx={{ fontWeight: 600 }}>
             Jeeva Admin

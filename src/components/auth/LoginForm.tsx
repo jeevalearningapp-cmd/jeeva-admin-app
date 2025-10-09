@@ -1,9 +1,8 @@
 import { useState } from 'react'
 import { Box, TextField, Button, Typography, Alert } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
-import { useAuth, useThemeMode } from '@/context'
-import logoLight from '@/assets/logo-light.png'
-import logoDark from '@/assets/logo-dark.png'
+import { useAuth } from '@/context'
+import logoLogin from '@/assets/logo-login.png'
 
 export const LoginForm = () => {
   const [email, setEmail] = useState('')
@@ -11,7 +10,6 @@ export const LoginForm = () => {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const { login } = useAuth()
-  const { mode } = useThemeMode()
   const navigate = useNavigate()
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -49,11 +47,11 @@ export const LoginForm = () => {
       <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
         <Box
           component="img"
-          src={mode === 'dark' ? logoDark : logoLight}
+          src={logoLogin}
           alt="Jeeva Logo"
           sx={{ 
-            width: 'auto',
-            height: 120,
+            width: 80,
+            height: 80,
             objectFit: 'contain'
           }}
         />
