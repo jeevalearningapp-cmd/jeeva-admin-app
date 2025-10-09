@@ -1,10 +1,12 @@
 import { CssBaseline } from '@mui/material'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { SnackbarProvider } from 'notistack'
 import { AuthProvider, ThemeProvider } from './context'
 import { LoginForm } from './components/auth/LoginForm'
 import { ProtectedRoute } from './components/auth/ProtectedRoute'
 import { MainLayout } from './components/layout'
+import { ErrorBoundary } from './components/common'
 import {
   DashboardPage,
   UsersPage,
@@ -35,12 +37,18 @@ const queryClient = new QueryClient({
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <CssBaseline />
-        <AuthProvider>
-        <BrowserRouter>
-          <Routes>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <SnackbarProvider
+          maxSnack={3}
+          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+          autoHideDuration={3000}
+        >
+          <ThemeProvider>
+            <CssBaseline />
+            <AuthProvider>
+              <BrowserRouter>
+                <Routes>
             <Route path="/login" element={<LoginForm />} />
             
             <Route
@@ -209,11 +217,13 @@ function App() {
             />
             
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
-          </Routes>
-        </BrowserRouter>
-      </AuthProvider>
-    </ThemeProvider>
-    </QueryClientProvider>
+                </Routes>
+              </BrowserRouter>
+            </AuthProvider>
+          </ThemeProvider>
+        </SnackbarProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   )
 }
 
