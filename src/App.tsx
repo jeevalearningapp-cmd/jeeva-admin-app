@@ -1,7 +1,6 @@
-import { ThemeProvider, CssBaseline } from '@mui/material'
+import { CssBaseline } from '@mui/material'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import theme from './theme'
-import { AuthProvider } from './context'
+import { AuthProvider, ThemeProvider } from './context'
 import { LoginForm } from './components/auth/LoginForm'
 import { ProtectedRoute } from './components/auth/ProtectedRoute'
 import { MainLayout } from './components/layout'
@@ -20,7 +19,7 @@ import {
 
 function App() {
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider>
       <CssBaseline />
       <AuthProvider>
         <BrowserRouter>

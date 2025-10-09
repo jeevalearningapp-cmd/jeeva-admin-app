@@ -1,17 +1,27 @@
-import { createTheme } from '@mui/material/styles';
+import { createTheme, PaletteMode } from '@mui/material/styles';
 
-const theme = createTheme({
+export const getTheme = (mode: PaletteMode) => createTheme({
   palette: {
+    mode,
     primary: { 
-      main: '#1976D2' 
+      main: '#1976D2',
+      light: '#42A5F5',
+      dark: '#1565C0',
     },
     secondary: { 
-      main: '#181C32' 
+      main: '#181C32',
+      light: '#2C3142',
+      dark: '#0F1119',
     },
-    background: { 
-      default: '#F5F5F5', 
-      paper: '#FFFFFF' 
-    },
+    background: mode === 'light' 
+      ? { 
+          default: '#F5F5F5', 
+          paper: '#FFFFFF' 
+        }
+      : {
+          default: '#0F1119',
+          paper: '#181C32',
+        },
     success: { 
       main: '#4CAF50' 
     },
@@ -24,12 +34,18 @@ const theme = createTheme({
     info: { 
       main: '#0288D1' 
     },
-    divider: '#C1C7D0',
-    text: {
-      primary: '#181C32',
-      secondary: '#545454',
-      disabled: '#C1C7D0'
-    }
+    divider: mode === 'light' ? '#C1C7D0' : '#2C3142',
+    text: mode === 'light'
+      ? {
+          primary: '#181C32',
+          secondary: '#545454',
+          disabled: '#C1C7D0'
+        }
+      : {
+          primary: '#FFFFFF',
+          secondary: '#B0B0B0',
+          disabled: '#545454'
+        }
   },
   typography: {
     fontFamily: '"Inter", "Roboto", "Helvetica Neue", Arial, sans-serif',
@@ -70,7 +86,9 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           borderRadius: 8,
-          boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.05)',
+          boxShadow: mode === 'light' 
+            ? '0px 2px 4px rgba(0, 0, 0, 0.05)'
+            : '0px 2px 4px rgba(0, 0, 0, 0.3)',
         }
       }
     },
@@ -82,8 +100,35 @@ const theme = createTheme({
           }
         }
       }
+    },
+    MuiDrawer: {
+      styleOverrides: {
+        paper: {
+          borderRight: mode === 'light' ? '1px solid #C1C7D0' : '1px solid #2C3142',
+        }
+      }
+    },
+    MuiAppBar: {
+      styleOverrides: {
+        root: {
+          boxShadow: mode === 'light' 
+            ? '0px 1px 3px rgba(0, 0, 0, 0.08)'
+            : '0px 1px 3px rgba(0, 0, 0, 0.4)',
+        }
+      }
     }
-  }
+  },
+  transitions: {
+    duration: {
+      shortest: 150,
+      shorter: 200,
+      short: 250,
+      standard: 300,
+      complex: 375,
+      enteringScreen: 225,
+      leavingScreen: 195,
+    },
+  },
 });
 
-export default theme;
+export default getTheme('light');

@@ -8,7 +8,8 @@ import {
   ListItemText,
   Toolbar,
   Divider,
-  Box
+  Box,
+  Tooltip
 } from '@mui/material'
 import {
   Dashboard as DashboardIcon,
@@ -24,7 +25,8 @@ import {
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '@/context'
 
-const drawerWidth = 260
+const expandedWidth = 260
+const collapsedWidth = 72
 
 interface MenuItem {
   title: string
@@ -48,9 +50,10 @@ const menuItems: MenuItem[] = [
 interface SidebarNavProps {
   mobileOpen: boolean
   onMobileClose: () => void
+  collapsed?: boolean
 }
 
-export const SidebarNav: React.FC<SidebarNavProps> = ({ mobileOpen, onMobileClose }) => {
+export const SidebarNav: React.FC<SidebarNavProps> = ({ mobileOpen, onMobileClose, collapsed = false }) => {
   const navigate = useNavigate()
   const location = useLocation()
   const { adminUser } = useAuth()
@@ -72,35 +75,53 @@ export const SidebarNav: React.FC<SidebarNavProps> = ({ mobileOpen, onMobileClos
         {filteredMenuItems.map((item) => {
           const isActive = location.pathname === item.path || location.pathname.startsWith(item.path + '/')
           
+          const listItemButton = (
+            <ListItemButton
+              onClick={() => handleNavigation(item.path)}
+              selected={isActive}
+              sx={{
+                justifyContent: collapsed ? 'center' : 'flex-start',
+                px: collapsed ? 1 : 2,
+                '&.Mui-selected': {
+                  bgcolor: 'primary.main',
+                  color: 'white',
+                  '&:hover': {
+                    bgcolor: 'primary.dark',
+                  },
+                  '& .MuiListItemIcon-root': {
+                    color: 'white',
+                  }
+                },
+              }}
+            >
+              <ListItemIcon sx={{ 
+                color: isActive ? 'inherit' : 'text.secondary',
+                minWidth: collapsed ? 'auto' : 56,
+                justifyContent: 'center'
+              }}>
+                {item.icon}
+              </ListItemIcon>
+              {!collapsed && <ListItemText primary={item.title} />}
+            </ListItemButton>
+          )
+          
           return (
             <ListItem key={item.path} disablePadding>
-              <ListItemButton
-                onClick={() => handleNavigation(item.path)}
-                selected={isActive}
-                sx={{
-                  '&.Mui-selected': {
-                    bgcolor: 'primary.main',
-                    color: 'white',
-                    '&:hover': {
-                      bgcolor: 'primary.dark',
-                    },
-                    '& .MuiListItemIcon-root': {
-                      color: 'white',
-                    }
-                  },
-                }}
-              >
-                <ListItemIcon sx={{ color: isActive ? 'inherit' : 'text.secondary' }}>
-                  {item.icon}
-                </ListItemIcon>
-                <ListItemText primary={item.title} />
-              </ListItemButton>
+              {collapsed ? (
+                <Tooltip title={item.title} placement="right" arrow>
+                  {listItemButton}
+                </Tooltip>
+              ) : (
+                listItemButton
+              )}
             </ListItem>
           )
         })}
       </List>
     </Box>
   )
+
+  const drawerWidth = collapsed ? collapsedWidth : expandedWidth
 
   return (
     <>
@@ -113,7 +134,7 @@ export const SidebarNav: React.FC<SidebarNavProps> = ({ mobileOpen, onMobileClos
         }}
         sx={{
           display: { xs: 'block', sm: 'none' },
-          '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+          '& .MuiDrawer-paper': { boxSizing: 'border-box', width: expandedWidth },
         }}
       >
         {drawer}
@@ -128,6 +149,8 @@ export const SidebarNav: React.FC<SidebarNavProps> = ({ mobileOpen, onMobileClos
             width: drawerWidth,
             borderRight: '1px solid',
             borderColor: 'divider',
+            transition: 'width 0.3s',
+            overflowX: 'hidden',
           },
         }}
         open

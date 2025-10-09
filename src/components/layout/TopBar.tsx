@@ -1,15 +1,26 @@
 import React from 'react'
 import { AppBar, Toolbar, Typography, IconButton, Box, Avatar, Menu, MenuItem } from '@mui/material'
-import { Menu as MenuIcon, AccountCircle, Logout } from '@mui/icons-material'
-import { useAuth } from '@/context'
+import { 
+  Menu as MenuIcon, 
+  AccountCircle, 
+  Logout,
+  LightMode,
+  DarkMode,
+  ChevronLeft,
+  ChevronRight,
+} from '@mui/icons-material'
+import { useAuth, useThemeMode } from '@/context'
 import { useNavigate } from 'react-router-dom'
 
 interface TopBarProps {
   onMenuClick: () => void
+  onSidebarToggle: () => void
+  sidebarCollapsed: boolean
 }
 
-export const TopBar: React.FC<TopBarProps> = ({ onMenuClick }) => {
+export const TopBar: React.FC<TopBarProps> = ({ onMenuClick, onSidebarToggle, sidebarCollapsed }) => {
   const { adminUser, logout } = useAuth()
+  const { mode, toggleTheme } = useThemeMode()
   const navigate = useNavigate()
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
 
@@ -56,13 +67,24 @@ export const TopBar: React.FC<TopBarProps> = ({ onMenuClick }) => {
           <MenuIcon />
         </IconButton>
         
+        <IconButton
+          color="inherit"
+          onClick={onSidebarToggle}
+          sx={{ mr: 2, display: { xs: 'none', sm: 'block' } }}
+        >
+          {sidebarCollapsed ? <ChevronRight /> : <ChevronLeft />}
+        </IconButton>
+        
         <Typography variant="h6" component="div" sx={{ flexGrow: 0, mr: 4, fontWeight: 600 }}>
           Jeeva Admin
         </Typography>
 
         <Box sx={{ flexGrow: 1 }} />
 
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <IconButton onClick={toggleTheme} color="inherit">
+            {mode === 'dark' ? <LightMode /> : <DarkMode />}
+          </IconButton>
           <Box sx={{ textAlign: 'right', display: { xs: 'none', sm: 'block' } }}>
             <Typography variant="body2" sx={{ fontWeight: 500 }}>
               {adminUser?.full_name || adminUser?.email}

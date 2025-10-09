@@ -37,19 +37,26 @@ The application uses protected routes with role-based access control:
 - All protected routes wrapped with ProtectedRoute component and MainLayout
 
 **Navigation Components:**
-- **TopBar** (`/src/components/layout/TopBar.tsx`): Fixed app bar with branding, user info, and menu
+- **TopBar** (`/src/components/layout/TopBar.tsx`): Fixed app bar with branding, controls, and user info
+  - Light/Dark theme toggle button with icon (sun/moon)
+  - Sidebar collapse/expand toggle (desktop only)
   - User avatar with dropdown menu (Profile, Logout)
   - Mobile-responsive hamburger menu toggle
   - Displays admin user name and role
-- **SidebarNav** (`/src/components/layout/SidebarNav.tsx`): Persistent sidebar navigation
+- **SidebarNav** (`/src/components/layout/SidebarNav.tsx`): Persistent sidebar navigation with collapse support
+  - Collapsible sidebar: 260px (expanded) or 72px (collapsed, icon-only mode)
+  - Icon-only mode with tooltips when collapsed
   - Role-based menu filtering (shows only routes user has access to)
   - Active route highlighting with primary color
   - Responsive drawer (permanent on desktop, temporary on mobile)
+  - Smooth transitions for width changes (0.3s)
   - Navigation items with icons for Dashboard, Users, Admin Users, Subscriptions, Content, Approvals, Analytics, Dashboard Hero, Settings
 - **MainLayout** (`/src/components/layout/MainLayout.tsx`): Combines TopBar and SidebarNav
   - Wraps all protected page content
-  - Manages mobile drawer state
+  - Manages mobile drawer state and sidebar collapse state
+  - Persists sidebar collapse preference in localStorage
   - Provides consistent spacing and background
+  - Dynamic content area adjusts to sidebar width
 
 **UI/UX Approach:**
 - Material Design system with custom theming
@@ -59,10 +66,16 @@ The application uses protected routes with role-based access control:
 - Consistent color palette: Primary (#1976D2), Secondary (#181C32), with semantic colors for success, error, warning, and info states
 
 **Theme Configuration:**
-- MUI theme located at `/src/theme/theme.ts`
+- Theme system supports light and dark modes with dynamic switching
+- `getTheme()` function in `/src/theme/theme.ts` generates theme based on mode
+- **ThemeContext** (`/src/context/ThemeContext.tsx`) manages theme state
+  - `useThemeMode()` hook provides access to current mode and toggle function
+  - Theme preference persisted in localStorage (`jeeva-admin-theme`)
+  - Wraps MUI ThemeProvider with custom theme context
 - All components wrapped with ThemeProvider in App.tsx
 - CssBaseline applied for consistent baseline styles
-- Custom theme includes: color palette, typography (Inter font family), 8px border radius
+- Custom theme includes: color palette (adaptive for light/dark), typography (Inter font family), 8px border radius
+- Smooth transitions between theme modes
 - See `/docs/theme.md` for complete theme specifications and usage guidelines
 
 ### Backend Architecture
