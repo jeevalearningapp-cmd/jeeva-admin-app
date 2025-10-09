@@ -2,118 +2,7 @@
 
 ## Overview
 
-The Jeeva Admin Portal is a React-based web application for managing the Jeeva Learning ecosystem. Built with TypeScript and Vite, it provides administrators with tools to manage users, content (modules, topics, lessons, flashcards, questions), subscriptions, analytics, and platform settings. The portal supports role-based access control (superadmin, editor, moderator) and integrates with Supabase for backend services.
-
-## Recent Updates (Phase 7 - October 9, 2025)
-
-**Content Management System - Foundation:**
-- **Data Layer Complete:** Comprehensive TypeScript types for hierarchical content:
-  - Module → Topic → Lesson → Questions/Flashcards relationship structure
-  - Full CRUD input/output types for all entities
-  - Question options and flashcard media support
-
-- **API Layer Built:** Complete Supabase integration for all content types:
-  - Modules API with thumbnail upload functionality
-  - Topics API with module relationship (foreign key joins)
-  - Lessons API with topic relationship and video support
-  - Questions API with options management and image upload
-  - Flashcards API with image support
-  - Proper snake_case/camelCase data mapping for all entities
-
-- **React Query Hooks:** Optimized data fetching with proper cache invalidation:
-  - Module-specific topic queries with cache management
-  - Topic-specific lesson queries
-  - Lesson-specific questions and flashcards
-  - Mutation hooks with optimistic updates
-
-- **Modules Management Page:**
-  - Complete CRUD interface with table view
-  - Search functionality across title and description
-  - Add/Edit dialog with form validation
-  - Thumbnail upload (file + URL input)
-  - Delete with cascade warning
-  - Inline active status toggle
-  - Display order management
-
-- **Content Hub:**
-  - Visual navigation cards for all content types
-  - Icon-based categorization with color coding
-  - Quick access to Modules, Topics, Lessons, Questions, and Flashcards
-
-**Previous Updates (Phase 6 - October 9, 2025):**
-
-**Analytics & Dashboard Hero Implementation:**
-- **Analytics Page:** Full-featured analytics dashboard with:
-  - Date range filtering for custom time periods
-  - 6 key metric cards: Total Users, Retention Rate, Total Revenue, Content Views, Avg Completion Rate, ARPU
-  - User Engagement Trends line chart (active users, sessions over time)
-  - Conversion Metrics bar chart (signups vs conversions)
-  - Top Performing Content section with completion rates
-  - CSV export functionality for all analytics data
-  
-- **Dashboard Hero Management:** Complete CRUD system for hero sections:
-  - Hero sections table with image previews and status indicators
-  - Add/Edit dialog with comprehensive form validation
-  - Image upload functionality (file upload or URL input)
-  - Delete with confirmation prompt
-  - Inline active status toggle
-  - Display order management for controlling hero section sequence
-  - Proper snake_case/camelCase data mapping for Supabase integration
-  - Created hero_sections database table with indexes
-
-**Previous Updates (Phase 5 - October 9, 2025):**
-- Complete dashboard with real-time metrics (total users, active subscriptions, content items, DAU)
-- Data visualizations: User Growth line chart, Subscription Distribution pie chart, Content Engagement bar chart
-- Recent activity feed showing latest platform events
-- Quick actions panel with button-style cards for common admin tasks
-- System status panel showing server health and backup information
-
-**UI/UX Enhancements:**
-- Increased corner radius from 8px to 16px for Cards/Paper, 12px for Buttons/TextFields
-- All components now have clear white backgrounds (#FFFFFF) for better contrast
-- Added light grey borders (#E5E7EB) to all cards and papers for an outstanding professional look
-- Typography system standardized across app:
-  - h4 headings: 1.5rem, bold (700), tighter letter spacing for page titles
-  - h5 headings: 1.25rem, semi-bold (600)
-  - h6 headings: 1.125rem, semi-bold (600)
-  - Consistent bold headings across all pages
-- Metric cards redesigned with:
-  - Icons in colored badge containers (48x48px with 12px border radius)
-  - Better vertical layout with icon at top, title below, large number, and subtitle
-  - Improved spacing and typography hierarchy
-- Quick action cards transformed to button-style:
-  - Interactive cards with hover effects (lift up 2px, border color changes)
-  - Icon badges with different colors per action
-  - Clean horizontal layout with icon and text
-
-**Previous Updates (Phase 4 - October 9, 2025):**
-- Primary color updated to #007aff (iOS-style blue)
-- Font family confirmed as Inter
-- Light/dark theme system fully functional with localStorage persistence
-- All Material UI icons updated to outlined variant for modern, clean appearance
-
-**UI Enhancements:**
-- Login page modernized with improved spacing and layout:
-  - Reduced spacing between logo and heading for better visual flow
-  - Added proper spacing below Sign In button
-  - Enhanced shadows and modern design elements
-  - Larger form container (440px) with responsive design
-  - Prominent, larger Sign In button with improved padding
-- PageLoader component created with Material UI CircularProgress spinner:
-  - Full-page centered spinner for authentication loading states
-  - Integrated into ProtectedRoute for smooth authentication checks
-  - Added to UsersPage and AdminUsersPage for initial data loads
-  - Inline table spinners for subsequent searches/filters
-  - Smooth loading UX with proper state management
-
-**Data Management Implementation:**
-- Complete Supabase data access layer with TypeScript types, API services, and React Query hooks
-- QueryClientProvider configured with optimized caching and retry strategies
-- Fully functional Users page with data table, search, pagination, and user detail drawer
-- Fully functional Admin Users page with CRUD operations (create, read, update, delete)
-- Status management for both users and admin users with real-time UI updates
-- Role assignment and management for admin users
-- Comprehensive error handling and loading states
+The Jeeva Admin Portal is a React-based web application for managing the Jeeva Learning ecosystem. Built with TypeScript and Vite, it provides administrators with tools to manage users, content (modules, topics, lessons, flashcards, questions), subscriptions, analytics, and platform settings. The portal supports role-based access control (superadmin, editor, moderator) and integrates with Supabase for backend services. The business vision is to provide a comprehensive and intuitive platform for educational content and user management, aiming for significant market potential in online learning administration.
 
 ## User Preferences
 
@@ -125,141 +14,82 @@ Preferred communication style: Simple, everyday language.
 
 **Technology Stack:**
 - **Framework:** React 18 with TypeScript
-- **Build Tool:** Vite 5 for fast development and optimized builds with Hot Module Reloading
-- **UI Library:** Material-UI (MUI) v7 with Emotion for styling
-- **Routing:** React Router DOM v7 for client-side navigation
-- **State Management:** Zustand for global state management
-- **Data Fetching:** TanStack React Query (v5) for server state management and caching
-- **Notifications:** Notistack for toast notifications
-- **Utilities:** clsx for conditional classNames, date-fns for date manipulation
+- **Build Tool:** Vite 5
+- **UI Library:** Material-UI (MUI) v7 with Emotion
+- **Routing:** React Router DOM v7
+- **State Management:** Zustand
+- **Data Fetching:** TanStack React Query (v5)
+- **Notifications:** Notistack
+- **Utilities:** clsx, date-fns
 
 **Design Patterns:**
-- Component-based architecture organized by feature domains (auth, users, subscriptions, content, etc.)
-- Path aliases using `@/*` for cleaner imports
-- Strict TypeScript configuration with `strict: true` for type safety
-- CSS-in-JS using Emotion for component styling
+- Component-based architecture organized by feature domains.
+- Path aliases using `@/*`.
+- Strict TypeScript configuration.
+- CSS-in-JS using Emotion.
 
 **Routing Structure:**
-The application uses protected routes with role-based access control:
-- Public routes: `/login`
-- Protected routes: `/dashboard`, `/users`, `/admin-users`, `/subscriptions`, `/content/*`, `/approvals`, `/settings`, `/analytics`, `/dashboard-hero`, `/profile`
-- Nested routes for content management: modules, topics, subtopics, lessons, questions, flashcards
-- Dynamic routes with URL parameters for entity details (e.g., `/users/:id`, `/content/modules/:id`)
-- All protected routes wrapped with ProtectedRoute component and MainLayout
-
-**Navigation Components:**
-- **TopBar** (`/src/components/layout/TopBar.tsx`): Fixed app bar with branding, controls, and user info
-  - Light/Dark theme toggle button with icon (sun/moon)
-  - Sidebar collapse/expand toggle (desktop only)
-  - User avatar with dropdown menu (Profile, Logout)
-  - Mobile-responsive hamburger menu toggle
-  - Displays admin user name and role
-- **SidebarNav** (`/src/components/layout/SidebarNav.tsx`): Persistent sidebar navigation with collapse support
-  - Collapsible sidebar: 260px (expanded) or 72px (collapsed, icon-only mode)
-  - Icon-only mode with tooltips when collapsed
-  - Role-based menu filtering (shows only routes user has access to)
-  - Active route highlighting with primary color
-  - Responsive drawer (permanent on desktop, temporary on mobile)
-  - Smooth transitions for width changes (0.3s)
-  - Navigation items with icons for Dashboard, Users, Admin Users, Subscriptions, Content, Approvals, Analytics, Dashboard Hero, Settings
-- **MainLayout** (`/src/components/layout/MainLayout.tsx`): Combines TopBar and SidebarNav
-  - Wraps all protected page content
-  - Manages mobile drawer state and sidebar collapse state
-  - Persists sidebar collapse preference in localStorage
-  - Provides consistent spacing and background
-  - Dynamic content area adjusts to sidebar width
+- Public routes: `/login`.
+- Protected routes: `/dashboard`, `/users`, `/admin-users`, `/subscriptions`, `/content/*`, `/approvals`, `/settings`, `/analytics`, `/dashboard-hero`, `/profile`.
+- Nested routes for content management (modules, topics, lessons, questions, flashcards).
+- Dynamic routes for entity details.
+- All protected routes wrapped with `ProtectedRoute` component and `MainLayout`.
 
 **UI/UX Approach:**
-- Material Design system with custom theming
-- Responsive layout with persistent sidebar navigation and top bar
-- Modal/drawer overlays for detail views and forms
-- Role-adaptive menus that show/hide based on user permissions
-- Consistent color palette: Primary (#1976D2), Secondary (#181C32), with semantic colors for success, error, warning, and info states
+- Material Design system with custom theming.
+- Responsive layout with persistent sidebar navigation and top bar.
+- Modal/drawer overlays for detail views and forms.
+- Role-adaptive menus based on user permissions.
+- Consistent color palette with primary #007aff, secondary #181C32, and semantic colors.
+- Increased corner radius (16px for Cards/Paper, 12px for Buttons/TextFields).
+- White backgrounds and light grey borders for cards and papers.
+- Standardized typography with Inter font family.
+- Redesigned metric cards and quick action cards.
 
 **Theme Configuration:**
-- Theme system supports light and dark modes with dynamic switching
-- `getTheme()` function in `/src/theme/theme.ts` generates theme based on mode
-- **ThemeContext** (`/src/context/ThemeContext.tsx`) manages theme state
-  - `useThemeMode()` hook provides access to current mode and toggle function
-  - Theme preference persisted in localStorage (`jeeva-admin-theme`)
-  - Wraps MUI ThemeProvider with custom theme context
-- All components wrapped with ThemeProvider in App.tsx
-- CssBaseline applied for consistent baseline styles
-- Custom theme includes: color palette (adaptive for light/dark), typography (Inter font family), 8px border radius
-- Smooth transitions between theme modes
-- See `/docs/theme.md` for complete theme specifications and usage guidelines
+- Supports light and dark modes with dynamic switching and `localStorage` persistence.
+- `ThemeContext` manages theme state.
+- Custom theme includes adaptive color palette, typography (Inter font), and 8px border radius.
 
 ### Backend Architecture
 
 **Backend-as-a-Service:**
-- **Supabase** provides authentication, database, and real-time capabilities
-- Uses Supabase client SDK (`@supabase/supabase-js`) for all backend interactions
-- Row Level Security (RLS) policies enforce data access control at the database level
+- **Supabase:** Provides authentication, PostgreSQL database, and real-time capabilities.
+- Uses Supabase client SDK (`@supabase/supabase-js`).
+- Row Level Security (RLS) policies for data access control.
 
 **Authentication & Authorization:**
-- Supabase Auth handles user authentication
-- Role-based access control with three admin roles:
-  - Superadmin: Full system access
-  - Editor: Content creation and editing
-  - Moderator: Content review and approval only
-- Protected route wrapper checks authentication status and role permissions
-- Environment variables store sensitive credentials (VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY)
-
-**Authentication Implementation:**
-- AuthContext (`/src/context/AuthContext.tsx`) manages global auth state
-- `useAuth()` hook provides access to user, session, login/logout functions
-- Login flow verifies user exists in `admin_users` table with `is_active = true`
-- ProtectedRoute component wraps routes requiring authentication
-- Role-based route protection using `allowedRoles` prop
-- See `/docs/authentication.md` for complete implementation guide
+- Supabase Auth for user authentication.
+- Role-based access control with Superadmin, Editor, and Moderator roles.
+- `AuthContext` manages global auth state.
+- Login verifies user in `admin_users` table with `is_active = true`.
+- `ProtectedRoute` component enforces authentication and role-based permissions.
 
 **Data Architecture:**
-The application manages a complex relational data model with the following key entity relationships:
-- Users and user profiles (1:1)
-- Users and subscriptions (1:many)
-- Content hierarchy: modules → topics → subtopics → lessons → questions/flashcards
-- Practice sessions and results tracking
-- Mock exams and results
-- Learning completions and AI recommendations
-- Admin users with separate role management
-- Audit logging for compliance tracking
+- Relational data model including Users, Subscriptions, Content (modules, topics, lessons, questions, flashcards), Practice Sessions, Mock Exams, Learning Completions, AI Recommendations, and Admin Users.
+- All tables use UUID primary keys with foreign key relationships.
 
-### External Dependencies
+### Feature Specifications
+- **Subscription Management System:** CRUD for Subscription Plans and User Subscriptions, analytics (MRR, churn rate), and status tracking.
+- **Content Management System:** Hierarchical CRUD for Modules, Topics, Lessons, Questions, and Flashcards with media upload support.
+- **Analytics & Dashboard:** Date-range filtering, key metric cards (Total Users, Retention Rate, Revenue, etc.), trend charts, top content, CSV export.
+- **Dashboard Hero Management:** CRUD for hero sections with image upload and display order.
+- **User & Admin User Management:** Data tables, search, pagination, detail drawers, CRUD operations, status management, role assignment.
+- **Comprehensive Dashboard:** Real-time metrics, data visualizations (User Growth, Subscription Distribution, Content Engagement), recent activity, quick actions, system status.
+
+## External Dependencies
 
 **Third-Party Services:**
-- **Supabase:** Primary backend service providing:
-  - PostgreSQL database
-  - Authentication and user management
-  - Row Level Security for data access control
-  - Real-time subscriptions (potential use)
-  - Storage for media files (questions, flashcards)
+- **Supabase:** Primary backend service for PostgreSQL database, authentication, user management, RLS, and storage.
 
 **Key NPM Packages:**
-- **UI & Styling:**
-  - `@mui/material` & `@mui/icons-material`: Component library
-  - `@emotion/react` & `@emotion/styled`: CSS-in-JS styling
-  
-- **State & Data:**
-  - `zustand`: Global state management
-  - `@tanstack/react-query`: Server state and caching
-  - `@supabase/supabase-js`: Supabase client SDK
-
-- **Utilities:**
-  - `react-router-dom`: Client-side routing
-  - `notistack`: Toast notifications
-  - `date-fns`: Date formatting and manipulation
-  - `clsx`: Conditional className utility
-
-**Development Dependencies:**
-- TypeScript for type safety
-- Vite for build tooling and development server
-- React type definitions
+- **UI & Styling:** `@mui/material`, `@mui/icons-material`, `@emotion/react`, `@emotion/styled`.
+- **State & Data:** `zustand`, `@tanstack/react-query`, `@supabase/supabase-js`.
+- **Utilities:** `react-router-dom`, `notistack`, `date-fns`, `clsx`.
 
 **Environment Configuration:**
-The application requires environment variables for Supabase integration:
-- `SUPABASE_URL`: Supabase project URL
-- `SUPABASE_ANON_KEY`: Public/anonymous API key for client-side usage
-- `SUPABASE_SERVICE_KEY`: Admin/service key for server-side operations (optional, never exposed to client)
+- `SUPABASE_URL`
+- `SUPABASE_ANON_KEY`
 
 **Database Schema:**
-Supabase PostgreSQL database with tables including: users, user_profiles, subscriptions, admin_users, modules, topics, subtopics, lessons, flashcards, questions, question_options, question_media, practice_sessions, practice_results, lesson_quizzes, mock_exams, mock_exam_results, learning_completions, ai_recommendations, and learning_paths. All tables use UUID primary keys with foreign key relationships enforcing referential integrity.
+Supabase PostgreSQL database with tables like `users`, `user_profiles`, `subscriptions`, `admin_users`, `modules`, `topics`, `lessons`, `flashcards`, `questions`, `practice_sessions`, `mock_exams`, `learning_completions`, and `ai_recommendations`.
