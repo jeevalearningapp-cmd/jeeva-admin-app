@@ -82,6 +82,10 @@ export const SidebarNav: React.FC<SidebarNavProps> = ({ mobileOpen, onMobileClos
               sx={{
                 justifyContent: collapsed ? 'center' : 'flex-start',
                 px: collapsed ? 1 : 2,
+                py: collapsed ? 1.5 : 1,
+                my: collapsed ? 1 : 0.5,
+                mx: collapsed ? 1 : 0,
+                borderRadius: collapsed ? 2 : 0,
                 '&.Mui-selected': {
                   bgcolor: 'primary.main',
                   color: 'white',
@@ -101,12 +105,20 @@ export const SidebarNav: React.FC<SidebarNavProps> = ({ mobileOpen, onMobileClos
               }}>
                 {item.icon}
               </ListItemIcon>
-              {!collapsed && <ListItemText primary={item.title} />}
+              {!collapsed && (
+                <ListItemText 
+                  primary={item.title}
+                  primaryTypographyProps={{
+                    fontSize: '0.875rem',
+                    fontWeight: 500
+                  }}
+                />
+              )}
             </ListItemButton>
           )
           
           return (
-            <ListItem key={item.path} disablePadding>
+            <ListItem key={item.path} disablePadding sx={{ mb: collapsed ? 0 : 0 }}>
               {collapsed ? (
                 <Tooltip title={item.title} placement="right" arrow>
                   {listItemButton}
