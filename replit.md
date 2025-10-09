@@ -4,9 +4,28 @@
 
 The Jeeva Admin Portal is a React-based web application for managing the Jeeva Learning ecosystem. Built with TypeScript and Vite, it provides administrators with tools to manage users, content (modules, topics, lessons, flashcards, questions), subscriptions, analytics, and platform settings. The portal supports role-based access control (superadmin, editor, moderator) and integrates with Supabase for backend services.
 
-## Recent Updates (Phase 5 - October 9, 2025)
+## Recent Updates (Phase 6 - October 9, 2025)
 
-**Dashboard Implementation:**
+**Analytics & Dashboard Hero Implementation:**
+- **Analytics Page:** Full-featured analytics dashboard with:
+  - Date range filtering for custom time periods
+  - 6 key metric cards: Total Users, Retention Rate, Total Revenue, Content Views, Avg Completion Rate, ARPU
+  - User Engagement Trends line chart (active users, sessions over time)
+  - Conversion Metrics bar chart (signups vs conversions)
+  - Top Performing Content section with completion rates
+  - CSV export functionality for all analytics data
+  
+- **Dashboard Hero Management:** Complete CRUD system for hero sections:
+  - Hero sections table with image previews and status indicators
+  - Add/Edit dialog with comprehensive form validation
+  - Image upload functionality (file upload or URL input)
+  - Delete with confirmation prompt
+  - Inline active status toggle
+  - Display order management for controlling hero section sequence
+  - Proper snake_case/camelCase data mapping for Supabase integration
+  - Created hero_sections database table with indexes
+
+**Previous Updates (Phase 5 - October 9, 2025):**
 - Complete dashboard with real-time metrics (total users, active subscriptions, content items, DAU)
 - Data visualizations: User Growth line chart, Subscription Distribution pie chart, Content Engagement bar chart
 - Recent activity feed showing latest platform events
