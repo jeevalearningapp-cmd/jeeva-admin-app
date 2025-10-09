@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { Box, TextField, Button, Typography, Alert } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
-import { useAuth } from '@/context'
+import { useAuth, useThemeMode } from '@/context'
+import logoLight from '@/assets/logo-light.png'
+import logoDark from '@/assets/logo-dark.png'
 
 export const LoginForm = () => {
   const [email, setEmail] = useState('')
@@ -9,6 +11,7 @@ export const LoginForm = () => {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const { login } = useAuth()
+  const { mode } = useThemeMode()
   const navigate = useNavigate()
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -43,6 +46,19 @@ export const LoginForm = () => {
         boxShadow: 1
       }}
     >
+      <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+        <Box
+          component="img"
+          src={mode === 'dark' ? logoDark : logoLight}
+          alt="Jeeva Logo"
+          sx={{ 
+            width: 'auto',
+            height: 120,
+            objectFit: 'contain'
+          }}
+        />
+      </Box>
+
       <Typography variant="h4" component="h1" align="center" gutterBottom>
         Admin Login
       </Typography>
@@ -58,6 +74,7 @@ export const LoginForm = () => {
         onChange={(e) => setEmail(e.target.value)}
         required
         fullWidth
+        autoComplete="email"
       />
 
       <TextField
@@ -67,6 +84,7 @@ export const LoginForm = () => {
         onChange={(e) => setPassword(e.target.value)}
         required
         fullWidth
+        autoComplete="current-password"
       />
 
       <Button

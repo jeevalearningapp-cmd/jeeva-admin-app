@@ -11,6 +11,7 @@ import {
 } from '@mui/icons-material'
 import { useAuth, useThemeMode } from '@/context'
 import { useNavigate } from 'react-router-dom'
+import logoIcon from '@/assets/logo-icon.png'
 
 interface TopBarProps {
   onMenuClick: () => void
@@ -75,9 +76,17 @@ export const TopBar: React.FC<TopBarProps> = ({ onMenuClick, onSidebarToggle, si
           {sidebarCollapsed ? <ChevronRight /> : <ChevronLeft />}
         </IconButton>
         
-        <Typography variant="h6" component="div" sx={{ flexGrow: 0, mr: 4, fontWeight: 600 }}>
-          Jeeva Admin
-        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mr: 4 }}>
+          <Box
+            component="img"
+            src={logoIcon}
+            alt="Jeeva Logo"
+            sx={{ width: 32, height: 32 }}
+          />
+          <Typography variant="h6" component="div" sx={{ fontWeight: 600 }}>
+            Jeeva Admin
+          </Typography>
+        </Box>
 
         <Box sx={{ flexGrow: 1 }} />
 
