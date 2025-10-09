@@ -40,6 +40,7 @@ import {
 import { useAdminUsers, useCreateAdminUser, useUpdateAdminUser, useUpdateAdminUserStatus, useDeleteAdminUser } from '@/hooks'
 import { AdminUser } from '@/types'
 import { useSnackbar } from 'notistack'
+import { PageLoader } from '@/components/common'
 
 export const AdminUsersPage: React.FC = () => {
   const [page, setPage] = useState(0)
@@ -50,6 +51,7 @@ export const AdminUsersPage: React.FC = () => {
   const [editDrawerOpen, setEditDrawerOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [selectedAdmin, setSelectedAdmin] = useState<AdminUser | null>(null)
+  const [initialLoad, setInitialLoad] = useState(true)
   const [newAdmin, setNewAdmin] = useState({
     email: '',
     full_name: '',
@@ -63,6 +65,12 @@ export const AdminUsersPage: React.FC = () => {
     page: page + 1,
     limit: rowsPerPage,
   })
+
+  React.useEffect(() => {
+    if (!isLoading && initialLoad) {
+      setInitialLoad(false)
+    }
+  }, [isLoading, initialLoad])
 
   const createAdmin = useCreateAdminUser()
   const updateAdmin = useUpdateAdminUser()
@@ -175,6 +183,10 @@ export const AdminUsersPage: React.FC = () => {
       default:
         return 'default'
     }
+  }
+
+  if (isLoading && initialLoad) {
+    return <PageLoader />
   }
 
   if (error) {

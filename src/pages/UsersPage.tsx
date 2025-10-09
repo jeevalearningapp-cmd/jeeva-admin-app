@@ -30,12 +30,14 @@ import {
 import { useUsers, useUpdateUserStatus } from '@/hooks'
 import { UserWithProfile } from '@/types'
 import { useSnackbar } from 'notistack'
+import { PageLoader } from '@/components/common'
 
 export const UsersPage: React.FC = () => {
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(10)
   const [search, setSearch] = useState('')
   const [selectedUser, setSelectedUser] = useState<UserWithProfile | null>(null)
+  const [initialLoad, setInitialLoad] = useState(true)
   const { enqueueSnackbar } = useSnackbar()
 
   const { data, isLoading, error } = useUsers({
@@ -43,6 +45,12 @@ export const UsersPage: React.FC = () => {
     page: page + 1,
     limit: rowsPerPage,
   })
+
+  React.useEffect(() => {
+    if (!isLoading && initialLoad) {
+      setInitialLoad(false)
+    }
+  }, [isLoading, initialLoad])
 
   const updateStatus = useUpdateUserStatus()
 
@@ -89,6 +97,10 @@ export const UsersPage: React.FC = () => {
     } catch (error) {
       enqueueSnackbar('Failed to update user status', { variant: 'error' })
     }
+  }
+
+  if (isLoading && initialLoad) {
+    return <PageLoader />
   }
 
   if (error) {

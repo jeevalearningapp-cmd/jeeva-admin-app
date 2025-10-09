@@ -19,7 +19,12 @@ The Jeeva Admin Portal is a React-based web application for managing the Jeeva L
   - Enhanced shadows and modern design elements
   - Larger form container (440px) with responsive design
   - Prominent, larger Sign In button with improved padding
-- PageLoader component created with Material UI CircularProgress spinner
+- PageLoader component created with Material UI CircularProgress spinner:
+  - Full-page centered spinner for authentication loading states
+  - Integrated into ProtectedRoute for smooth authentication checks
+  - Added to UsersPage and AdminUsersPage for initial data loads
+  - Inline table spinners for subsequent searches/filters
+  - Smooth loading UX with proper state management
 
 **Data Management Implementation:**
 - Complete Supabase data access layer with TypeScript types, API services, and React Query hooks

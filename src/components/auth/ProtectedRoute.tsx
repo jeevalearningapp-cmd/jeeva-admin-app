@@ -1,6 +1,6 @@
 import { Navigate } from 'react-router-dom'
 import { useAuth } from '@/context'
-import { Box, CircularProgress } from '@mui/material'
+import { PageLoader } from '@/components/common'
 
 interface ProtectedRouteProps {
   children: React.ReactNode
@@ -11,19 +11,7 @@ export const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) 
   const { user, adminUser, loading } = useAuth()
 
   if (loading) {
-    return (
-      <Box
-        sx={{
-          minHeight: '100vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          bgcolor: 'background.default'
-        }}
-      >
-        <CircularProgress />
-      </Box>
-    )
+    return <PageLoader />
   }
 
   if (!user || !adminUser) {
