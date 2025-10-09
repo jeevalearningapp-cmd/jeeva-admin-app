@@ -9,9 +9,9 @@ export const useDashboardData = () => {
   })
 }
 
-export const useAnalyticsData = () => {
+export const useDashboardAnalyticsData = () => {
   return useQuery({
-    queryKey: ['analytics'],
+    queryKey: ['dashboard-analytics'],
     queryFn: dashboardApi.getAnalyticsData,
   })
 }

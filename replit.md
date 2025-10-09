@@ -76,6 +76,7 @@ Preferred communication style: Simple, everyday language.
 - **Dashboard Hero Management:** CRUD for hero sections with image upload and display order.
 - **User & Admin User Management:** Data tables, search, pagination, detail drawers, CRUD operations, status management, role assignment.
 - **Comprehensive Dashboard:** Real-time metrics, data visualizations (User Growth, Subscription Distribution, Content Engagement), recent activity, quick actions, system status.
+- **Content Approvals System:** Complete approval workflow with status management (pending, approved, rejected), reviewer assignment, approval/rejection actions with comments, approval stats dashboard, and filtering by status/type.
 
 ## External Dependencies
 
