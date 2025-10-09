@@ -34,6 +34,22 @@ The application uses protected routes with role-based access control:
 - Protected routes: `/dashboard`, `/users`, `/admin-users`, `/subscriptions`, `/content/*`, `/approvals`, `/settings`, `/analytics`, `/dashboard-hero`, `/profile`
 - Nested routes for content management: modules, topics, subtopics, lessons, questions, flashcards
 - Dynamic routes with URL parameters for entity details (e.g., `/users/:id`, `/content/modules/:id`)
+- All protected routes wrapped with ProtectedRoute component and MainLayout
+
+**Navigation Components:**
+- **TopBar** (`/src/components/layout/TopBar.tsx`): Fixed app bar with branding, user info, and menu
+  - User avatar with dropdown menu (Profile, Logout)
+  - Mobile-responsive hamburger menu toggle
+  - Displays admin user name and role
+- **SidebarNav** (`/src/components/layout/SidebarNav.tsx`): Persistent sidebar navigation
+  - Role-based menu filtering (shows only routes user has access to)
+  - Active route highlighting with primary color
+  - Responsive drawer (permanent on desktop, temporary on mobile)
+  - Navigation items with icons for Dashboard, Users, Admin Users, Subscriptions, Content, Approvals, Analytics, Dashboard Hero, Settings
+- **MainLayout** (`/src/components/layout/MainLayout.tsx`): Combines TopBar and SidebarNav
+  - Wraps all protected page content
+  - Manages mobile drawer state
+  - Provides consistent spacing and background
 
 **UI/UX Approach:**
 - Material Design system with custom theming
