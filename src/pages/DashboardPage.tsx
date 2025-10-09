@@ -20,7 +20,7 @@ import {
   PersonAddOutlined,
   AddOutlined,
 } from '@mui/icons-material'
-import { LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
+import { LineChart, Line, PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 import { useDashboardData } from '@/hooks/useDashboard'
 import { PageLoader } from '@/components/common'
 import { useNavigate } from 'react-router-dom'
@@ -108,22 +108,38 @@ export const DashboardPage: React.FC = () => {
       {/* Metric Cards */}
       <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: 'repeat(4, 1fr)' }, gap: 3, mb: 3 }}>
         {metricCards.map((metric) => (
-          <Card key={metric.title}>
-            <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <Box>
-                  <Typography variant="body2" color="text.secondary" gutterBottom>
-                    {metric.title}
-                  </Typography>
-                  <Typography variant="h4" sx={{ fontWeight: 600, mb: 0.5 }}>
-                    {metric.value.toLocaleString()}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    {metric.subtitle}
-                  </Typography>
+          <Card key={metric.title} sx={{ bgcolor: 'background.paper' }}>
+            <CardContent sx={{ p: 3 }}>
+              <Box sx={{ 
+                display: 'flex', 
+                alignItems: 'flex-start', 
+                justifyContent: 'space-between',
+                mb: 2 
+              }}>
+                <Box 
+                  sx={{ 
+                    width: 48, 
+                    height: 48, 
+                    borderRadius: '12px',
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center',
+                    bgcolor: `${metric.color}15`,
+                    color: metric.color
+                  }}
+                >
+                  {React.cloneElement(metric.icon, { sx: { fontSize: 28 } })}
                 </Box>
-                <Box sx={{ color: metric.color }}>{metric.icon}</Box>
               </Box>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1, fontSize: '0.875rem' }}>
+                {metric.title}
+              </Typography>
+              <Typography variant="h4" sx={{ fontWeight: 700, mb: 0.5, fontSize: '1.75rem' }}>
+                {metric.value.toLocaleString()}
+              </Typography>
+              <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.75rem' }}>
+                {metric.subtitle}
+              </Typography>
             </CardContent>
           </Card>
         ))}
@@ -131,8 +147,8 @@ export const DashboardPage: React.FC = () => {
 
       <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', lg: '2fr 1fr' }, gap: 3, mb: 3 }}>
         {/* User Growth Chart */}
-        <Paper sx={{ p: 3 }}>
-          <Typography variant="h6" gutterBottom>
+        <Paper sx={{ p: 3, bgcolor: 'background.paper' }}>
+          <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
             User Growth (Last 7 Days)
           </Typography>
           <ResponsiveContainer width="100%" height={300}>
@@ -149,8 +165,8 @@ export const DashboardPage: React.FC = () => {
         </Paper>
 
         {/* Subscription Distribution */}
-        <Paper sx={{ p: 3 }}>
-          <Typography variant="h6" gutterBottom>
+        <Paper sx={{ p: 3, bgcolor: 'background.paper' }}>
+          <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
             Subscription Distribution
           </Typography>
           <ResponsiveContainer width="100%" height={300}>
@@ -175,11 +191,133 @@ export const DashboardPage: React.FC = () => {
         </Paper>
       </Box>
 
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', lg: '2fr 1fr' }, gap: 3, mb: 3 }}>
+        {/* Content Engagement Chart */}
+        <Paper sx={{ p: 3, bgcolor: 'background.paper' }}>
+          <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
+            Content Engagement
+          </Typography>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={data?.contentEngagement || []}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="category" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="views" fill="#007aff" name="Views" />
+              <Bar dataKey="completions" fill="#34C759" name="Completions" />
+            </BarChart>
+          </ResponsiveContainer>
+        </Paper>
+
+        {/* Quick Actions */}
+        <Box>
+          <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 2 }}>
+            Quick Actions
+          </Typography>
+          <Stack spacing={2}>
+            <Card 
+              sx={{ 
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                '&:hover': { 
+                  transform: 'translateY(-2px)',
+                  borderColor: 'primary.main',
+                }
+              }}
+              onClick={() => navigate('/admin-users')}
+            >
+              <CardContent sx={{ p: 2.5, display: 'flex', alignItems: 'center', gap: 2 }}>
+                <Box 
+                  sx={{ 
+                    width: 40, 
+                    height: 40, 
+                    borderRadius: '10px',
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center',
+                    bgcolor: '#007aff15',
+                    color: 'primary.main'
+                  }}
+                >
+                  <PersonAddOutlined sx={{ fontSize: 22 }} />
+                </Box>
+                <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                  Add Admin User
+                </Typography>
+              </CardContent>
+            </Card>
+            <Card 
+              sx={{ 
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                '&:hover': { 
+                  transform: 'translateY(-2px)',
+                  borderColor: 'primary.main',
+                }
+              }}
+              onClick={() => navigate('/content')}
+            >
+              <CardContent sx={{ p: 2.5, display: 'flex', alignItems: 'center', gap: 2 }}>
+                <Box 
+                  sx={{ 
+                    width: 40, 
+                    height: 40, 
+                    borderRadius: '10px',
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center',
+                    bgcolor: '#34C75915',
+                    color: '#34C759'
+                  }}
+                >
+                  <AddOutlined sx={{ fontSize: 22 }} />
+                </Box>
+                <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                  Create Content
+                </Typography>
+              </CardContent>
+            </Card>
+            <Card 
+              sx={{ 
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                '&:hover': { 
+                  transform: 'translateY(-2px)',
+                  borderColor: 'primary.main',
+                }
+              }}
+              onClick={() => navigate('/subscriptions')}
+            >
+              <CardContent sx={{ p: 2.5, display: 'flex', alignItems: 'center', gap: 2 }}>
+                <Box 
+                  sx={{ 
+                    width: 40, 
+                    height: 40, 
+                    borderRadius: '10px',
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center',
+                    bgcolor: '#FF950015',
+                    color: '#FF9500'
+                  }}
+                >
+                  <SubscriptionsOutlined sx={{ fontSize: 22 }} />
+                </Box>
+                <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                  Manage Subscriptions
+                </Typography>
+              </CardContent>
+            </Card>
+          </Stack>
+        </Box>
+      </Box>
+
       <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', lg: '1fr 1fr' }, gap: 3 }}>
         {/* Recent Activity */}
-        <Paper sx={{ p: 3 }}>
+        <Paper sx={{ p: 3, bgcolor: 'background.paper' }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-            <Typography variant="h6">Recent Activity</Typography>
+            <Typography variant="h6" sx={{ fontWeight: 600 }}>Recent Activity</Typography>
             <Chip label={data?.recentActivity?.length || 0} size="small" color="primary" />
           </Box>
           <List>
@@ -202,36 +340,32 @@ export const DashboardPage: React.FC = () => {
           </List>
         </Paper>
 
-        {/* Quick Actions */}
-        <Paper sx={{ p: 3 }}>
-          <Typography variant="h6" gutterBottom>
-            Quick Actions
+        {/* System Status */}
+        <Paper sx={{ p: 3, bgcolor: 'background.paper' }}>
+          <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
+            System Status
           </Typography>
           <Stack spacing={2}>
-            <Button
-              variant="outlined"
-              startIcon={<PersonAddOutlined />}
-              onClick={() => navigate('/admin-users')}
-              fullWidth
-            >
-              Add Admin User
-            </Button>
-            <Button
-              variant="outlined"
-              startIcon={<AddOutlined />}
-              onClick={() => navigate('/content')}
-              fullWidth
-            >
-              Create Content
-            </Button>
-            <Button
-              variant="outlined"
-              startIcon={<SubscriptionsOutlined />}
-              onClick={() => navigate('/subscriptions')}
-              fullWidth
-            >
-              Manage Subscriptions
-            </Button>
+            <Box>
+              <Typography variant="body2" color="text.secondary" gutterBottom>
+                Server Status
+              </Typography>
+              <Chip label="Online" color="success" size="small" />
+            </Box>
+            <Box>
+              <Typography variant="body2" color="text.secondary" gutterBottom>
+                Database
+              </Typography>
+              <Chip label="Connected" color="success" size="small" />
+            </Box>
+            <Box>
+              <Typography variant="body2" color="text.secondary" gutterBottom>
+                Last Backup
+              </Typography>
+              <Typography variant="body2">
+                {format(new Date(), 'PPp')}
+              </Typography>
+            </Box>
           </Stack>
         </Paper>
       </Box>
