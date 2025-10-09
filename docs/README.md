@@ -1,0 +1,145 @@
+# Jeeva Learning App – Admin Portal
+
+## Overview
+
+The Jeeva Admin Portal is a modern, scalable React web application designed to manage every aspect of the Jeeva Learning ecosystem, including users, content, subscriptions, analytics, and more. Integrated with Supabase for backend, authentication, and data management, the portal ensures secure, role-based access and a responsive professional UI.
+
+---
+
+## Features
+
+- **Authentication & Role Management:**    
+  Secure Supabase Auth, supporting superadmin, editor, moderator, with complete RLS and access gating.  
+- **User & Subscription Management:**    
+  View, manage, filter users, handle subscriptions, process renewals/refunds.  
+- **Content Management:**    
+  CRUD for modules, topics, lessons, flashcards, MCQs, approval queue, drag-and-drop reordering.  
+- **Hero Banner & Dashboard Manager:**    
+  Create/manage hero entries with images, text, buttons.  
+- **Mock Exam Editor:**    
+  Build/edit mock exams, assign questions, publish/review analytics.  
+- **Content Approvals/Moderation:**    
+  Multi-role review, approval history and audit trail.  
+- **App Settings & Feature Flags:**    
+  Enable/disable major site/app features; edit global notices.  
+- **Analytics & Reports:**    
+  Usage, conversion funnel, engagement, AI recommendation analytics.  
+- **Support & Feedback:**    
+  Track and reply to user queries/issues, FAQ management.  
+- **Audit Logging:**    
+  All admin actions on users/content/settings are audit-logged for compliance.
+
+---
+
+## File Structure
+
+```
+jeeva-admin-portal/  
+ ├── public/  
+ │ └── index.html  
+ ├── src/  
+ │ ├── assets/  
+ │ ├── components/  
+ │ │ ├── auth/  
+ │ │ ├── dashboard/  
+ │ │ ├── users/  
+ │ │ ├── subscriptions/  
+ │ │ ├── content/  
+ │ │ │ ├── modules/  
+ │ │ │ ├── topics/  
+ │ │ │ ├── subtopics/  
+ │ │ │ ├── questions/  
+ │ │ │ ├── lessons/  
+ │ │ │ └── flashcards/  
+ │ ├── hero/  
+ │ ├── mockexams/  
+ │ ├── approvals/  
+ │ ├── settings/  
+ │ ├── analytics/  
+ │ ├── support/  
+ │ ├── layout/  
+ │ ├── App.js  
+ │ ├── index.js  
+ │ ├── routes/  
+ │ ├── context/  
+ │ ├── hooks/  
+ │ ├── utils/  
+ │ ├── api/  
+ │ ├── types/  
+ │ └── styles/  
+ ├── .env  
+ ├── package.json  
+ ├── README.md  
+ └── ...
+```
+
+---
+
+## Core Dependencies
+
+| Package                     | Purpose/Usage                     |  
+|-----------------------------|-----------------------------------|  
+| react (v18+)                | UI framework                      |  
+| @mui/material               | UI toolkit, theming               |  
+| @tanstack/react-query       | Server state, async data, caching |  
+| zustand                     | Client/UI state                   |  
+| @supabase/supabase-js       | API, authentication, RLS          |  
+| formik/yup or react-hook-form/zod | Forms and validation        |  
+| axios/fetch                 | HTTP requests                     |  
+| date-fns/dayjs              | Date utils                        |  
+| clsx/classnames             | Class helpers                     |  
+| notistack                   | Notifications (MUI)               |  
+
+---
+
+## Theme, Branding & UI
+
+- **Primary Color:** `#1976D2` (from student app branding, see theme.md)  
+- **Typography:** `"Inter", "Roboto", "Helvetica Neue", Arial, sans-serif"`  
+- **Consistent UI Components:** MUI Table, Modal, Toast, Card, Form, Button.
+
+---
+
+## Routing Structure
+
+- All routes (except `/login`) protected by Supabase Auth and role gates  
+- Route/Component breakdown, including modals, dynamic segments, and role-adaptive navigation (see Routing.md for full map).
+
+---
+
+## Authentication & Authorization
+
+- Supabase Auth (email/password) for admin portal  
+- admin_users table manages all roles (superadmin, editor, moderator)  
+- RLS policies enforced server-side on all sensitive actions  
+- Session management with security for inactive or demoted accounts
+
+---
+
+## Getting Started
+
+1. Clone repository  
+2. Add `.env` with Supabase keys  
+3. `npm install`  
+4. `npm run dev` for local development  
+5. Update Supabase tables/RLS as needed (see supabase.md)
+
+---
+
+## Developer Onboarding
+
+- See `src/context/README.md` and `src/hooks/README.md` for context, provider, and custom hook usage  
+- All global providers: Auth, Theme, Toast, TanStack Query  
+- Scaffold new features by adding folders/components, updating centralized configs  
+- Update README, theme.md, and routing docs as features/elements are added
+
+---
+
+## References
+
+- theme.md (MUI theme, color palette, branding)  
+- supabase.md (DB schema, RLS, role matrix)  
+- Routing.md (route/component/role breakdown)  
+- replit.md (environment, workspace, deployment)
+
+---
