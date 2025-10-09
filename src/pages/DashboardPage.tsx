@@ -200,7 +200,7 @@ export const DashboardPage: React.FC = () => {
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={data?.contentEngagement || []}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="category" />
+              <XAxis dataKey="contentType" />
               <YAxis />
               <Tooltip />
               <Legend />

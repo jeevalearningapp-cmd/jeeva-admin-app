@@ -56,6 +56,19 @@ export const getTheme = (mode: PaletteMode) => createTheme({
       fontSize: '2rem',
       fontWeight: 700
     },
+    h4: {
+      fontSize: '1.5rem',
+      fontWeight: 700,
+      letterSpacing: '-0.02em'
+    },
+    h5: {
+      fontSize: '1.25rem',
+      fontWeight: 600
+    },
+    h6: {
+      fontSize: '1.125rem',
+      fontWeight: 600
+    },
     body1: {
       fontSize: '1rem'
     },

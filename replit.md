@@ -17,6 +17,11 @@ The Jeeva Admin Portal is a React-based web application for managing the Jeeva L
 - Increased corner radius from 8px to 16px for Cards/Paper, 12px for Buttons/TextFields
 - All components now have clear white backgrounds (#FFFFFF) for better contrast
 - Added light grey borders (#E5E7EB) to all cards and papers for an outstanding professional look
+- Typography system standardized across app:
+  - h4 headings: 1.5rem, bold (700), tighter letter spacing for page titles
+  - h5 headings: 1.25rem, semi-bold (600)
+  - h6 headings: 1.125rem, semi-bold (600)
+  - Consistent bold headings across all pages
 - Metric cards redesigned with:
   - Icons in colored badge containers (48x48px with 12px border radius)
   - Better vertical layout with icon at top, title below, large number, and subtitle
