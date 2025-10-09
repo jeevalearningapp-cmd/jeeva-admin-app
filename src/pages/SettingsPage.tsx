@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import {
   Box,
   Typography,
@@ -12,6 +12,7 @@ import {
   Divider,
   Alert,
   Chip,
+  CircularProgress,
 } from '@mui/material'
 import {
   SaveOutlined,
@@ -20,6 +21,8 @@ import {
   NotificationsOutlined,
   SecurityOutlined,
 } from '@mui/icons-material'
+import { useSettings } from '@/hooks/useSettings'
+import type { UpdateSettingsInput } from '@/types'
 
 interface TabPanelProps {
   children?: React.ReactNode
@@ -37,31 +40,24 @@ const TabPanel: React.FC<TabPanelProps> = ({ children, value, index }) => {
 
 export const SettingsPage: React.FC = () => {
   const [tabValue, setTabValue] = React.useState(0)
-  const [settings, setSettings] = React.useState({
-    // General Settings
-    siteName: 'Jeeva Learning Platform',
-    siteDescription: 'Comprehensive learning management system for students',
-    contactEmail: 'contact@jeeva.com',
-    supportEmail: 'support@jeeva.com',
-    
-    // Feature Toggles
+  const { settings: backendSettings, isLoading, updateSettings, isUpdating } = useSettings()
+  
+  const [localSettings, setLocalSettings] = React.useState<UpdateSettingsInput>({
+    siteName: '',
+    siteDescription: '',
+    contactEmail: '',
+    supportEmail: '',
     maintenanceMode: false,
     registrationEnabled: true,
     emailVerificationRequired: true,
-    
-    // File Upload Settings
-    maxFileUploadSize: 5, // MB
+    maxFileUploadSize: 5,
     allowedFileTypes: ['image/jpeg', 'image/png', 'image/gif', 'video/mp4'],
-    
-    // Security Settings
-    sessionTimeout: 60, // minutes
+    sessionTimeout: 60,
     passwordMinLength: 8,
     passwordRequireUppercase: true,
     passwordRequireLowercase: true,
     passwordRequireNumbers: true,
     passwordRequireSpecialChars: true,
-    
-    // Notification Settings
     emailNotifications: true,
     pushNotifications: false,
     newUserSignup: true,
@@ -72,13 +68,41 @@ export const SettingsPage: React.FC = () => {
     subscriptionRenewed: true,
   })
 
-  const [isSaving, setIsSaving] = React.useState(false)
-  const [saveSuccess, setSaveSuccess] = React.useState(false)
+  // Sync backend settings to local state when loaded
+  useEffect(() => {
+    if (backendSettings) {
+      setLocalSettings({
+        siteName: backendSettings.siteName,
+        siteDescription: backendSettings.siteDescription,
+        contactEmail: backendSettings.contactEmail,
+        supportEmail: backendSettings.supportEmail,
+        maintenanceMode: backendSettings.maintenanceMode,
+        registrationEnabled: backendSettings.registrationEnabled,
+        emailVerificationRequired: backendSettings.emailVerificationRequired,
+        maxFileUploadSize: backendSettings.maxFileUploadSize,
+        allowedFileTypes: backendSettings.allowedFileTypes,
+        sessionTimeout: backendSettings.sessionTimeout,
+        passwordMinLength: backendSettings.passwordMinLength,
+        passwordRequireUppercase: backendSettings.passwordRequireUppercase,
+        passwordRequireLowercase: backendSettings.passwordRequireLowercase,
+        passwordRequireNumbers: backendSettings.passwordRequireNumbers,
+        passwordRequireSpecialChars: backendSettings.passwordRequireSpecialChars,
+        emailNotifications: backendSettings.emailNotifications,
+        pushNotifications: backendSettings.pushNotifications,
+        newUserSignup: backendSettings.newUserSignup,
+        contentSubmitted: backendSettings.contentSubmitted,
+        contentApproved: backendSettings.contentApproved,
+        contentRejected: backendSettings.contentRejected,
+        subscriptionExpiring: backendSettings.subscriptionExpiring,
+        subscriptionRenewed: backendSettings.subscriptionRenewed,
+      })
+    }
+  }, [backendSettings])
 
-  const handleChange = (field: string) => (
+  const handleChange = (field: keyof UpdateSettingsInput) => (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    let value: string | boolean | number
+    let value: string | boolean | number | string[]
     
     if (event.target.type === 'checkbox') {
       value = event.target.checked
@@ -88,23 +112,24 @@ export const SettingsPage: React.FC = () => {
       value = event.target.value
     }
     
-    setSettings({ ...settings, [field]: value })
-    setSaveSuccess(false)
+    setLocalSettings({ ...localSettings, [field]: value })
   }
 
-  const handleSave = async () => {
-    setIsSaving(true)
-    
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    
-    // TODO: Implement actual save to Supabase app_settings table
-    console.log('Saving settings:', settings)
-    
-    setIsSaving(false)
-    setSaveSuccess(true)
-    
-    setTimeout(() => setSaveSuccess(false), 3000)
+  const handleSave = () => {
+    if (backendSettings?.id) {
+      updateSettings({
+        id: backendSettings.id,
+        input: localSettings,
+      })
+    }
+  }
+
+  if (isLoading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '400px' }}>
+        <CircularProgress />
+      </Box>
+    )
   }
 
   return (
@@ -117,18 +142,12 @@ export const SettingsPage: React.FC = () => {
           variant="contained"
           startIcon={<SaveOutlined />}
           onClick={handleSave}
-          disabled={isSaving}
+          disabled={isUpdating}
           sx={{ borderRadius: '12px' }}
         >
-          {isSaving ? 'Saving...' : 'Save Changes'}
+          {isUpdating ? 'Saving...' : 'Save Changes'}
         </Button>
       </Box>
-
-      {saveSuccess && (
-        <Alert severity="success" sx={{ mb: 2, borderRadius: '12px' }}>
-          Settings saved successfully!
-        </Alert>
-      )}
 
       <Paper sx={{ borderRadius: '16px' }}>
         <Tabs
@@ -152,7 +171,7 @@ export const SettingsPage: React.FC = () => {
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
             <TextField
               label="Site Name"
-              value={settings.siteName}
+              value={localSettings.siteName || ''}
               onChange={handleChange('siteName')}
               fullWidth
               sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
@@ -160,7 +179,7 @@ export const SettingsPage: React.FC = () => {
             
             <TextField
               label="Site Description"
-              value={settings.siteDescription}
+              value={localSettings.siteDescription || ''}
               onChange={handleChange('siteDescription')}
               fullWidth
               multiline
@@ -171,14 +190,14 @@ export const SettingsPage: React.FC = () => {
             <Box sx={{ display: 'flex', gap: 2 }}>
               <TextField
                 label="Contact Email"
-                value={settings.contactEmail}
+                value={localSettings.contactEmail || ''}
                 onChange={handleChange('contactEmail')}
                 fullWidth
                 sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
               />
               <TextField
                 label="Support Email"
-                value={settings.supportEmail}
+                value={localSettings.supportEmail || ''}
                 onChange={handleChange('supportEmail')}
                 fullWidth
                 sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
@@ -193,7 +212,7 @@ export const SettingsPage: React.FC = () => {
             <FormControlLabel
               control={
                 <Switch
-                  checked={settings.maintenanceMode}
+                  checked={localSettings.maintenanceMode || false}
                   onChange={handleChange('maintenanceMode')}
                 />
               }
@@ -203,7 +222,7 @@ export const SettingsPage: React.FC = () => {
             <FormControlLabel
               control={
                 <Switch
-                  checked={settings.registrationEnabled}
+                  checked={localSettings.registrationEnabled || false}
                   onChange={handleChange('registrationEnabled')}
                 />
               }
@@ -213,7 +232,7 @@ export const SettingsPage: React.FC = () => {
             <FormControlLabel
               control={
                 <Switch
-                  checked={settings.emailVerificationRequired}
+                  checked={localSettings.emailVerificationRequired || false}
                   onChange={handleChange('emailVerificationRequired')}
                 />
               }
@@ -228,7 +247,7 @@ export const SettingsPage: React.FC = () => {
             <TextField
               label="Max File Upload Size (MB)"
               type="number"
-              value={settings.maxFileUploadSize}
+              value={localSettings.maxFileUploadSize || 0}
               onChange={handleChange('maxFileUploadSize')}
               fullWidth
               sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
@@ -239,7 +258,7 @@ export const SettingsPage: React.FC = () => {
                 Allowed File Types
               </Typography>
               <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                {settings.allowedFileTypes.map((type) => (
+                {(localSettings.allowedFileTypes || []).map((type) => (
                   <Chip key={type} label={type} size="small" />
                 ))}
               </Box>
@@ -258,7 +277,7 @@ export const SettingsPage: React.FC = () => {
             <TextField
               label="Session Timeout (minutes)"
               type="number"
-              value={settings.sessionTimeout}
+              value={localSettings.sessionTimeout || 0}
               onChange={handleChange('sessionTimeout')}
               fullWidth
               sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
@@ -272,7 +291,7 @@ export const SettingsPage: React.FC = () => {
             <TextField
               label="Minimum Password Length"
               type="number"
-              value={settings.passwordMinLength}
+              value={localSettings.passwordMinLength || 0}
               onChange={handleChange('passwordMinLength')}
               fullWidth
               sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
@@ -281,7 +300,7 @@ export const SettingsPage: React.FC = () => {
             <FormControlLabel
               control={
                 <Switch
-                  checked={settings.passwordRequireUppercase}
+                  checked={localSettings.passwordRequireUppercase || false}
                   onChange={handleChange('passwordRequireUppercase')}
                 />
               }
@@ -291,7 +310,7 @@ export const SettingsPage: React.FC = () => {
             <FormControlLabel
               control={
                 <Switch
-                  checked={settings.passwordRequireLowercase}
+                  checked={localSettings.passwordRequireLowercase || false}
                   onChange={handleChange('passwordRequireLowercase')}
                 />
               }
@@ -301,7 +320,7 @@ export const SettingsPage: React.FC = () => {
             <FormControlLabel
               control={
                 <Switch
-                  checked={settings.passwordRequireNumbers}
+                  checked={localSettings.passwordRequireNumbers || false}
                   onChange={handleChange('passwordRequireNumbers')}
                 />
               }
@@ -311,7 +330,7 @@ export const SettingsPage: React.FC = () => {
             <FormControlLabel
               control={
                 <Switch
-                  checked={settings.passwordRequireSpecialChars}
+                  checked={localSettings.passwordRequireSpecialChars || false}
                   onChange={handleChange('passwordRequireSpecialChars')}
                 />
               }
@@ -336,7 +355,7 @@ export const SettingsPage: React.FC = () => {
             <FormControlLabel
               control={
                 <Switch
-                  checked={settings.emailNotifications}
+                  checked={localSettings.emailNotifications || false}
                   onChange={handleChange('emailNotifications')}
                 />
               }
@@ -346,7 +365,7 @@ export const SettingsPage: React.FC = () => {
             <FormControlLabel
               control={
                 <Switch
-                  checked={settings.pushNotifications}
+                  checked={localSettings.pushNotifications || false}
                   onChange={handleChange('pushNotifications')}
                 />
               }
@@ -361,7 +380,7 @@ export const SettingsPage: React.FC = () => {
             <FormControlLabel
               control={
                 <Switch
-                  checked={settings.newUserSignup}
+                  checked={localSettings.newUserSignup || false}
                   onChange={handleChange('newUserSignup')}
                 />
               }
@@ -371,7 +390,7 @@ export const SettingsPage: React.FC = () => {
             <FormControlLabel
               control={
                 <Switch
-                  checked={settings.contentSubmitted}
+                  checked={localSettings.contentSubmitted || false}
                   onChange={handleChange('contentSubmitted')}
                 />
               }
@@ -381,7 +400,7 @@ export const SettingsPage: React.FC = () => {
             <FormControlLabel
               control={
                 <Switch
-                  checked={settings.contentApproved}
+                  checked={localSettings.contentApproved || false}
                   onChange={handleChange('contentApproved')}
                 />
               }
@@ -391,7 +410,7 @@ export const SettingsPage: React.FC = () => {
             <FormControlLabel
               control={
                 <Switch
-                  checked={settings.contentRejected}
+                  checked={localSettings.contentRejected || false}
                   onChange={handleChange('contentRejected')}
                 />
               }
@@ -401,7 +420,7 @@ export const SettingsPage: React.FC = () => {
             <FormControlLabel
               control={
                 <Switch
-                  checked={settings.subscriptionExpiring}
+                  checked={localSettings.subscriptionExpiring || false}
                   onChange={handleChange('subscriptionExpiring')}
                 />
               }
@@ -411,7 +430,7 @@ export const SettingsPage: React.FC = () => {
             <FormControlLabel
               control={
                 <Switch
-                  checked={settings.subscriptionRenewed}
+                  checked={localSettings.subscriptionRenewed || false}
                   onChange={handleChange('subscriptionRenewed')}
                 />
               }
