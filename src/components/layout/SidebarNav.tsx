@@ -12,15 +12,15 @@ import {
   Tooltip
 } from '@mui/material'
 import {
-  Dashboard as DashboardIcon,
-  People as PeopleIcon,
-  AdminPanelSettings as AdminIcon,
-  Subscriptions as SubscriptionsIcon,
-  LibraryBooks as ContentIcon,
-  CheckCircle as ApprovalsIcon,
-  Settings as SettingsIcon,
-  Analytics as AnalyticsIcon,
-  Star as HeroIcon,
+  DashboardOutlined as DashboardIcon,
+  PeopleOutlined as PeopleIcon,
+  AdminPanelSettingsOutlined as AdminIcon,
+  SubscriptionsOutlined as SubscriptionsIcon,
+  LibraryBooksOutlined as ContentIcon,
+  CheckCircleOutlined as ApprovalsIcon,
+  SettingsOutlined as SettingsIcon,
+  AnalyticsOutlined as AnalyticsIcon,
+  StarOutlined as HeroIcon,
 } from '@mui/icons-material'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '@/context'

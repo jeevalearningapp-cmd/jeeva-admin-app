@@ -31,11 +31,11 @@ import {
   Drawer,
 } from '@mui/material'
 import {
-  Search as SearchIcon,
-  Add as AddIcon,
-  Edit as EditIcon,
-  Delete as DeleteIcon,
-  Close as CloseIcon,
+  SearchOutlined as SearchIcon,
+  AddOutlined as AddIcon,
+  EditOutlined as EditIcon,
+  DeleteOutlined as DeleteIcon,
+  CloseOutlined as CloseIcon,
 } from '@mui/icons-material'
 import { useAdminUsers, useCreateAdminUser, useUpdateAdminUser, useUpdateAdminUserStatus, useDeleteAdminUser } from '@/hooks'
 import { AdminUser } from '@/types'

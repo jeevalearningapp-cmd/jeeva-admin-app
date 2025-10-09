@@ -1,13 +1,13 @@
 import React from 'react'
 import { AppBar, Toolbar, Typography, IconButton, Box, Avatar, Menu, MenuItem } from '@mui/material'
 import { 
-  Menu as MenuIcon, 
-  AccountCircle, 
-  Logout,
-  LightMode,
-  DarkMode,
-  ChevronLeft,
-  ChevronRight,
+  MenuOutlined as MenuIcon, 
+  AccountCircleOutlined as AccountCircle, 
+  LogoutOutlined as Logout,
+  LightModeOutlined as LightMode,
+  DarkModeOutlined as DarkMode,
+  ChevronLeftOutlined as ChevronLeft,
+  ChevronRightOutlined as ChevronRight,
 } from '@mui/icons-material'
 import { useAuth, useThemeMode } from '@/context'
 import { useNavigate } from 'react-router-dom'

@@ -23,9 +23,9 @@ import {
   FormControlLabel,
 } from '@mui/material'
 import {
-  Search as SearchIcon,
-  Visibility as VisibilityIcon,
-  Close as CloseIcon,
+  SearchOutlined as SearchIcon,
+  VisibilityOutlined as VisibilityIcon,
+  CloseOutlined as CloseIcon,
 } from '@mui/icons-material'
 import { useUsers, useUpdateUserStatus } from '@/hooks'
 import { UserWithProfile } from '@/types'
