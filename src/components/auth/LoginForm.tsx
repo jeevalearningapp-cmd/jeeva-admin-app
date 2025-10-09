@@ -34,17 +34,19 @@ export const LoginForm = () => {
       sx={{
         display: 'flex',
         flexDirection: 'column',
-        gap: 2,
-        maxWidth: 400,
+        maxWidth: 440,
+        width: '100%',
         mx: 'auto',
-        mt: 8,
-        p: 3,
+        mt: { xs: 4, sm: 8 },
+        p: { xs: 3, sm: 4 },
         bgcolor: 'background.paper',
-        borderRadius: 2,
-        boxShadow: 1
+        borderRadius: 3,
+        boxShadow: mode => mode.palette.mode === 'light' 
+          ? '0 4px 20px rgba(0, 0, 0, 0.08)' 
+          : '0 4px 20px rgba(0, 0, 0, 0.3)'
       }}
     >
-      <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'center', mb: 1 }}>
         <Box
           component="img"
           src={logoLogin}
@@ -57,12 +59,21 @@ export const LoginForm = () => {
         />
       </Box>
 
-      <Typography variant="h4" component="h1" align="center" gutterBottom>
+      <Typography 
+        variant="h4" 
+        component="h1" 
+        align="center" 
+        sx={{ 
+          mb: 4,
+          fontWeight: 600,
+          fontSize: { xs: '1.75rem', sm: '2rem' }
+        }}
+      >
         Admin Login
       </Typography>
 
       {error && (
-        <Alert severity="error">{error}</Alert>
+        <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>
       )}
 
       <TextField
@@ -73,6 +84,7 @@ export const LoginForm = () => {
         required
         fullWidth
         autoComplete="email"
+        sx={{ mb: 2.5 }}
       />
 
       <TextField
@@ -83,6 +95,7 @@ export const LoginForm = () => {
         required
         fullWidth
         autoComplete="current-password"
+        sx={{ mb: 3 }}
       />
 
       <Button
@@ -91,6 +104,13 @@ export const LoginForm = () => {
         color="primary"
         disabled={loading}
         fullWidth
+        size="large"
+        sx={{ 
+          py: 1.5,
+          fontSize: '1rem',
+          fontWeight: 600,
+          mb: 2
+        }}
       >
         {loading ? 'Signing in...' : 'Sign In'}
       </Button>
