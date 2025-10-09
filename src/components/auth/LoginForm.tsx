@@ -50,8 +50,8 @@ export const LoginForm = () => {
           src={logoLogin}
           alt="Jeeva Logo"
           sx={{ 
-            width: 80,
-            height: 80,
+            width: 120,
+            height: 120,
             objectFit: 'contain'
           }}
         />
