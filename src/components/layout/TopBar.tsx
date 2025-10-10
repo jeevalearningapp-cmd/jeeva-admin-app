@@ -1,5 +1,5 @@
 import React from 'react'
-import { AppBar, Toolbar, Typography, IconButton, Box, Avatar, Menu, MenuItem, Chip } from '@mui/material'
+import { AppBar, Toolbar, Typography, IconButton, Box, Avatar, Menu, MenuItem } from '@mui/material'
 import { 
   MenuOutlined as MenuIcon, 
   AccountCircleOutlined as AccountCircle, 
@@ -103,20 +103,6 @@ export const TopBar: React.FC<TopBarProps> = ({ onMenuClick, onSidebarToggle, si
           >
             {mode === 'dark' ? <LightModeIcon /> : <DarkModeIcon />}
           </IconButton>
-
-          <Chip
-            label={adminUser?.role || 'Admin'}
-            size="small"
-            sx={{ 
-              display: { xs: 'none', sm: 'flex' },
-              textTransform: 'capitalize',
-              fontWeight: 600,
-              bgcolor: mode === 'dark' ? 'primary.dark' : 'primary.light',
-              color: mode === 'dark' ? 'primary.light' : 'primary.dark',
-              borderRadius: '8px',
-              px: 1,
-            }}
-          />
           
           <IconButton 
             onClick={handleMenuOpen} 
