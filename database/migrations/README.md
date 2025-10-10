@@ -15,6 +15,7 @@ To run these migrations in your Supabase project:
 
 - `create_app_settings.sql` - Creates the app_settings table for platform configuration
 - `create_content_tables.sql` - Creates content management tables (modules, topics, lessons, flashcards, questions, question_options) with RLS policies
+- `create_learning_completions.sql` - Creates learning_completions table to track user progress and power analytics dashboard
 
 ## Notes
 

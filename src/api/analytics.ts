@@ -24,10 +24,10 @@ export const analyticsAPI = {
 
     if (subsError) throw subsError
 
-    // Content Engagement
+    // Content Engagement - Query through proper hierarchy: completions → lessons → topics → modules
     const { data: completions, error: completionsError } = await supabase
       .from('learning_completions')
-      .select('*, lessons(id, title, modules(id, title))')
+      .select('*, lessons(id, title, topics(id, title, modules(id, title)))')
       .gte('completed_at', startDate)
       .lte('completed_at', endDate)
 
@@ -43,11 +43,11 @@ export const analyticsAPI = {
       return sum + (prices[sub.plan_type] || 0)
     }, 0) || 0
 
-    // Top content
+    // Top content - Access module through topic
     const moduleViews: Record<string, { name: string; views: number; completions: number }> = {}
     completions?.forEach((comp: any) => {
-      const moduleId = comp.lessons?.modules?.id
-      const moduleName = comp.lessons?.modules?.title
+      const moduleId = comp.lessons?.topics?.modules?.id
+      const moduleName = comp.lessons?.topics?.modules?.title
       if (moduleId) {
         if (!moduleViews[moduleId]) {
           moduleViews[moduleId] = { name: moduleName, views: 0, completions: 0 }
