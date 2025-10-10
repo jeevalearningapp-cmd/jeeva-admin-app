@@ -8,6 +8,11 @@ The Jeeva Admin Portal is a React-based web application for managing the Jeeva L
 
 Preferred communication style: Simple, everyday language.
 
+### UI/UX Customizations
+- **Header Design**: Modern, professional dashboard header with role badge display
+- **Theme Icons**: WbSunnyOutlined (Light mode), ContrastOutlined (Dark mode)
+- **User Display**: Shows only user role (not name), displayed as a styled chip/badge
+
 ## System Architecture
 
 ### Frontend Architecture
