@@ -153,13 +153,13 @@ export const SettingsPage: React.FC = () => {
           startIcon={<SaveOutlined />}
           onClick={handleSave}
           disabled={isUpdating}
-          sx={{ borderRadius: '12px' }}
+          sx={{ borderRadius: 0 }}
         >
           {isUpdating ? 'Saving...' : 'Save Changes'}
         </Button>
       </Box>
 
-      <Paper sx={{ borderRadius: '16px' }}>
+      <Paper sx={{ borderRadius: 0 }}>
         <Tabs
           value={tabValue}
           onChange={(_, newValue) => setTabValue(newValue)}
@@ -179,7 +179,7 @@ export const SettingsPage: React.FC = () => {
           <Divider sx={{ mb: 3 }} />
 
           {!validationResult.isValid && (
-            <Alert severity="error" sx={{ borderRadius: '12px', mb: 2 }}>
+            <Alert severity="error" sx={{ borderRadius: 0, mb: 2 }}>
               Please fix the validation errors before saving.
             </Alert>
           )}
@@ -193,7 +193,7 @@ export const SettingsPage: React.FC = () => {
               required
               error={!!getValidationErrorMessage('siteName', validationResult.errors)}
               helperText={getValidationErrorMessage('siteName', validationResult.errors)}
-              sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+              sx={{ '& .MuiOutlinedInput-root': { borderRadius: 0 } }}
             />
             
             <TextField
@@ -203,7 +203,7 @@ export const SettingsPage: React.FC = () => {
               fullWidth
               multiline
               rows={3}
-              sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+              sx={{ '& .MuiOutlinedInput-root': { borderRadius: 0 } }}
             />
 
             <Box sx={{ display: 'flex', gap: 2 }}>
@@ -215,7 +215,7 @@ export const SettingsPage: React.FC = () => {
                 type="email"
                 error={!!getValidationErrorMessage('contactEmail', validationResult.errors)}
                 helperText={getValidationErrorMessage('contactEmail', validationResult.errors)}
-                sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+                sx={{ '& .MuiOutlinedInput-root': { borderRadius: 0 } }}
               />
               <TextField
                 label="Support Email"
@@ -225,7 +225,7 @@ export const SettingsPage: React.FC = () => {
                 type="email"
                 error={!!getValidationErrorMessage('supportEmail', validationResult.errors)}
                 helperText={getValidationErrorMessage('supportEmail', validationResult.errors)}
-                sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+                sx={{ '& .MuiOutlinedInput-root': { borderRadius: 0 } }}
               />
             </Box>
 
@@ -278,7 +278,7 @@ export const SettingsPage: React.FC = () => {
               inputProps={{ min: 1, max: 100 }}
               error={!!getValidationErrorMessage('maxFileUploadSize', validationResult.errors)}
               helperText={getValidationErrorMessage('maxFileUploadSize', validationResult.errors) || 'Range: 1-100 MB'}
-              sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+              sx={{ '& .MuiOutlinedInput-root': { borderRadius: 0 } }}
             />
 
             <Box>
@@ -311,7 +311,7 @@ export const SettingsPage: React.FC = () => {
               inputProps={{ min: 5, max: 1440 }}
               error={!!getValidationErrorMessage('sessionTimeout', validationResult.errors)}
               helperText={getValidationErrorMessage('sessionTimeout', validationResult.errors) || 'Range: 5-1440 minutes'}
-              sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+              sx={{ '& .MuiOutlinedInput-root': { borderRadius: 0 } }}
             />
 
             <Typography variant="h6" sx={{ mt: 2 }}>
@@ -328,7 +328,7 @@ export const SettingsPage: React.FC = () => {
               inputProps={{ min: 6, max: 128 }}
               error={!!getValidationErrorMessage('passwordMinLength', validationResult.errors)}
               helperText={getValidationErrorMessage('passwordMinLength', validationResult.errors) || 'Range: 6-128 characters'}
-              sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+              sx={{ '& .MuiOutlinedInput-root': { borderRadius: 0 } }}
             />
 
             <FormControlLabel
@@ -480,7 +480,7 @@ export const SettingsPage: React.FC = () => {
           </Typography>
           <Divider sx={{ mb: 3 }} />
 
-          <Alert severity="info" sx={{ borderRadius: '12px' }}>
+          <Alert severity="info" sx={{ borderRadius: 0 }}>
             Email template management coming soon. Configure templates for welcome emails, 
             password resets, content approvals, and subscription notifications.
           </Alert>
