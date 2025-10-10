@@ -79,13 +79,13 @@ export const getTheme = (mode: PaletteMode) => createTheme({
     }
   },
   shape: { 
-    borderRadius: 16 
+    borderRadius: 0 
   },
   components: {
     MuiButton: {
       styleOverrides: {
         root: {
-          borderRadius: 12,
+          borderRadius: 0,
         },
         contained: {
           boxShadow: 'none',
@@ -98,7 +98,7 @@ export const getTheme = (mode: PaletteMode) => createTheme({
     MuiCard: {
       styleOverrides: {
         root: {
-          borderRadius: 16,
+          borderRadius: 0,
           boxShadow: 'none',
           border: mode === 'light' 
             ? '1px solid #E5E7EB'
@@ -110,7 +110,7 @@ export const getTheme = (mode: PaletteMode) => createTheme({
     MuiPaper: {
       styleOverrides: {
         root: {
-          borderRadius: 16,
+          borderRadius: 0,
           boxShadow: 'none',
           border: mode === 'light' 
             ? '1px solid #E5E7EB'
@@ -123,7 +123,7 @@ export const getTheme = (mode: PaletteMode) => createTheme({
       styleOverrides: {
         root: {
           '& .MuiOutlinedInput-root': {
-            borderRadius: 12,
+            borderRadius: 0,
           }
         }
       }
@@ -151,6 +151,29 @@ export const getTheme = (mode: PaletteMode) => createTheme({
           boxShadow: mode === 'light'
             ? '0px 4px 20px rgba(0, 0, 0, 0.1)'
             : '0px 4px 20px rgba(0, 0, 0, 0.5)',
+        }
+      }
+    },
+    MuiChip: {
+      styleOverrides: {
+        root: {
+          borderRadius: 0,
+        }
+      }
+    },
+    MuiAlert: {
+      styleOverrides: {
+        root: {
+          borderRadius: 0,
+        }
+      }
+    },
+    MuiSelect: {
+      styleOverrides: {
+        root: {
+          '& .MuiOutlinedInput-notchedOutline': {
+            borderRadius: 0,
+          }
         }
       }
     }
