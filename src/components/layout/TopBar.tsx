@@ -1,5 +1,5 @@
 import React from 'react'
-import { AppBar, Toolbar, Typography, IconButton, Box, Avatar, Menu, MenuItem } from '@mui/material'
+import { AppBar, Toolbar, IconButton, Box, Avatar, Menu, MenuItem } from '@mui/material'
 import { 
   MenuOutlined as MenuIcon, 
   AccountCircleOutlined as AccountCircle, 
@@ -11,7 +11,6 @@ import {
 } from '@mui/icons-material'
 import { useAuth, useThemeMode } from '@/context'
 import { useNavigate } from 'react-router-dom'
-import logoHeader from '@/assets/logo-header.png'
 
 interface TopBarProps {
   onMenuClick: () => void
@@ -48,14 +47,20 @@ export const TopBar: React.FC<TopBarProps> = ({ onMenuClick, onSidebarToggle, si
     handleMenuClose()
   }
 
+  const sidebarWidth = sidebarCollapsed ? 72 : 260
+
   return (
     <AppBar 
       position="fixed" 
       sx={{ 
-        zIndex: (theme) => theme.zIndex.drawer + 1,
+        width: { xs: '100%', sm: `calc(100% - ${sidebarWidth}px)` },
+        ml: { xs: 0, sm: `${sidebarWidth}px` },
+        zIndex: (theme) => theme.zIndex.drawer - 1,
         bgcolor: 'background.paper',
         color: 'text.primary',
-        boxShadow: 1
+        boxShadow: 1,
+        borderRadius: 0,
+        transition: 'margin 0.3s, width 0.3s',
       }}
     >
       <Toolbar>
@@ -75,18 +80,6 @@ export const TopBar: React.FC<TopBarProps> = ({ onMenuClick, onSidebarToggle, si
         >
           {sidebarCollapsed ? <ChevronRight /> : <ChevronLeft />}
         </IconButton>
-        
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mr: 4 }}>
-          <Box
-            component="img"
-            src={logoHeader}
-            alt="Jeeva Logo"
-            sx={{ width: 40, height: 40 }}
-          />
-          <Typography variant="h6" component="div" sx={{ fontWeight: 600 }}>
-            Jeeva Admin
-          </Typography>
-        </Box>
 
         <Box sx={{ flexGrow: 1 }} />
 

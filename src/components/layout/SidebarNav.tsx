@@ -6,10 +6,10 @@ import {
   ListItemButton, 
   ListItemIcon, 
   ListItemText,
-  Toolbar,
   Divider,
   Box,
-  Tooltip
+  Tooltip,
+  Typography
 } from '@mui/material'
 import {
   DashboardOutlined as DashboardIcon,
@@ -24,6 +24,7 @@ import {
 } from '@mui/icons-material'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '@/context'
+import logoHeader from '@/assets/logo-header.png'
 
 const expandedWidth = 260
 const collapsedWidth = 72
@@ -68,10 +69,36 @@ export const SidebarNav: React.FC<SidebarNavProps> = ({ mobileOpen, onMobileClos
   )
 
   const drawer = (
-    <Box>
-      <Toolbar />
+    <Box sx={{ 
+      height: '100vh', 
+      display: 'flex', 
+      flexDirection: 'column',
+      bgcolor: 'background.paper'
+    }}>
+      <Box sx={{ 
+        p: collapsed ? 2 : 3, 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: collapsed ? 'center' : 'flex-start',
+        minHeight: 80,
+        gap: 1.5
+      }}>
+        <Box
+          component="img"
+          src={logoHeader}
+          alt="Jeeva Logo"
+          sx={{ width: 40, height: 40, flexShrink: 0 }}
+        />
+        {!collapsed && (
+          <Typography variant="h6" component="div" sx={{ fontWeight: 600, color: 'text.primary' }}>
+            Jeeva Admin
+          </Typography>
+        )}
+      </Box>
+      
       <Divider />
-      <List>
+      
+      <List sx={{ pt: 3, px: 1.5, flexGrow: 1 }}>
         {filteredMenuItems.map((item) => {
           const isActive = location.pathname === item.path || location.pathname.startsWith(item.path + '/')
           
@@ -84,8 +111,8 @@ export const SidebarNav: React.FC<SidebarNavProps> = ({ mobileOpen, onMobileClos
                 px: collapsed ? 1 : 2,
                 py: collapsed ? 1.5 : 1,
                 my: collapsed ? 1 : 0.5,
-                mx: collapsed ? 1 : 0,
-                borderRadius: collapsed ? 2 : 0,
+                mx: 0,
+                borderRadius: 0,
                 '&.Mui-selected': {
                   bgcolor: 'primary.main',
                   color: 'white',
@@ -163,6 +190,7 @@ export const SidebarNav: React.FC<SidebarNavProps> = ({ mobileOpen, onMobileClos
             borderColor: 'divider',
             transition: 'width 0.3s',
             overflowX: 'hidden',
+            borderRadius: 0,
           },
         }}
         open
