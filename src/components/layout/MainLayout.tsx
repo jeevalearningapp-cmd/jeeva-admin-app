@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Box, Toolbar } from '@mui/material'
 import { TopBar } from './TopBar'
 import { SidebarNav } from './SidebarNav'
+import { Footer } from './Footer'
 
 interface MainLayoutProps {
   children: React.ReactNode
@@ -42,7 +43,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         component="main"
         sx={{
           flexGrow: 1,
-          p: { xs: 2, sm: 3 },
+          display: 'flex',
+          flexDirection: 'column',
           width: { xs: '100%', sm: `calc(100% - ${sidebarWidth}px)` },
           minHeight: '100vh',
           bgcolor: 'background.default',
@@ -51,7 +53,10 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           transition: 'margin 0.3s, width 0.3s',
         }}
       >
-        {children}
+        <Box sx={{ flexGrow: 1, p: { xs: 2, sm: 3 } }}>
+          {children}
+        </Box>
+        <Footer />
       </Box>
     </Box>
   )
