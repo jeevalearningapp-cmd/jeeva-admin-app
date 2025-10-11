@@ -30,16 +30,22 @@ import {
   EditOutlined,
   DeleteOutlined,
   SearchOutlined,
-  VideoLibraryOutlined
+  VideoLibraryOutlined,
+  UploadFileOutlined
 } from '@mui/icons-material'
 import { Alert } from '@mui/material'
 import { useLessons, useCreateLesson, useUpdateLesson, useDeleteLesson } from '@/hooks/useLessons'
 import { useTopics } from '@/hooks/useTopics'
 import { PageLoader } from '@/components/common'
 import { Lesson, CreateLessonInput } from '@/types/content'
+import { CSVUpload } from '@/components/common/CSVUpload'
+import { lessonTemplate } from '@/utils/csvTemplates'
+import { useBulkUpload } from '@/hooks/useBulkUpload'
 
 export const LessonsPage: React.FC = () => {
   const [dialogOpen, setDialogOpen] = useState(false)
+  const [csvUploadOpen, setCsvUploadOpen] = useState(false)
+  const [bulkTopicId, setBulkTopicId] = useState<string>('')
   const [editingLesson, setEditingLesson] = useState<Lesson | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [topicFilter, setTopicFilter] = useState<string>('all')
@@ -48,6 +54,7 @@ export const LessonsPage: React.FC = () => {
     title: '',
     content: '',
     videoUrl: '',
+    audioUrl: '',
     duration: 0,
     isActive: true,
     displayOrder: 0
@@ -61,6 +68,7 @@ export const LessonsPage: React.FC = () => {
   const createMutation = useCreateLesson()
   const updateMutation = useUpdateLesson()
   const deleteMutation = useDeleteLesson()
+  const { uploadLessons } = useBulkUpload()
 
   React.useEffect(() => {
     if (!isLoading && initialLoad) {
@@ -87,6 +95,7 @@ export const LessonsPage: React.FC = () => {
         title: lesson.title,
         content: lesson.content,
         videoUrl: lesson.videoUrl,
+        audioUrl: lesson.audioUrl || '',
         duration: lesson.duration,
         isActive: lesson.isActive,
         displayOrder: lesson.displayOrder
@@ -98,6 +107,7 @@ export const LessonsPage: React.FC = () => {
         title: '',
         content: '',
         videoUrl: '',
+        audioUrl: '',
         duration: 0,
         isActive: true,
         displayOrder: 0
@@ -170,14 +180,24 @@ export const LessonsPage: React.FC = () => {
             Manage lesson content and videos
           </Typography>
         </Box>
-        <Button
-          variant="contained"
-          startIcon={<AddOutlined />}
-          onClick={() => handleOpenDialog()}
-          sx={{ borderRadius: '12px' }}
-        >
-          Add Lesson
-        </Button>
+        <Box sx={{ display: 'flex', gap: 2 }}>
+          <Button
+            variant="contained"
+            startIcon={<AddOutlined />}
+            onClick={() => handleOpenDialog()}
+            sx={{ borderRadius: '12px' }}
+          >
+            Add Lesson
+          </Button>
+          <Button
+            variant="outlined"
+            startIcon={<UploadFileOutlined />}
+            onClick={() => setCsvUploadOpen(true)}
+            sx={{ borderRadius: '12px' }}
+          >
+            Bulk Upload
+          </Button>
+        </Box>
       </Box>
 
       {/* Search and Filter */}
@@ -350,6 +370,14 @@ export const LessonsPage: React.FC = () => {
               placeholder="https://www.youtube.com/watch?v=..."
             />
             <TextField
+              label="Audio URL (MP3, WAV)"
+              value={formData.audioUrl}
+              onChange={(e) => setFormData({ ...formData, audioUrl: e.target.value })}
+              fullWidth
+              placeholder="https://example.com/audio.mp3"
+              helperText="Optional: Add audio/podcast content for this lesson"
+            />
+            <TextField
               label="Duration (minutes)"
               type="number"
               value={formData.duration}
@@ -386,6 +414,61 @@ export const LessonsPage: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* CSV Bulk Upload - Topic Selection */}
+      <Dialog open={csvUploadOpen} onClose={() => { setCsvUploadOpen(false); setBulkTopicId('') }} maxWidth="sm" fullWidth>
+        <DialogTitle>Select Topic for Bulk Upload</DialogTitle>
+        <DialogContent>
+          <Box sx={{ mt: 2 }}>
+            <Typography variant="body2" color="text.secondary" mb={2}>
+              Choose which topic these lessons should be added to:
+            </Typography>
+            <FormControl fullWidth>
+              <InputLabel>Topic</InputLabel>
+              <Select
+                value={bulkTopicId}
+                onChange={(e) => setBulkTopicId(e.target.value)}
+                label="Topic"
+              >
+                {topics?.filter(t => t.isActive).map(topic => (
+                  <MenuItem key={topic.id} value={topic.id}>{topic.title}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => { setCsvUploadOpen(false); setBulkTopicId('') }}>Cancel</Button>
+          <Button
+            variant="contained"
+            onClick={() => {
+              if (bulkTopicId) {
+                setCsvUploadOpen(false)
+              }
+            }}
+            disabled={!bulkTopicId}
+          >
+            Continue to Upload
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* CSV Bulk Upload Component - Shown after topic selection */}
+      {bulkTopicId && !csvUploadOpen && (
+        <Box sx={{ position: 'fixed', bottom: 20, right: 20, zIndex: 1000 }}>
+          <CSVUpload
+            template={lessonTemplate}
+            onUpload={async (data) => {
+              const result = await uploadLessons(data, bulkTopicId)
+              if (result) {
+                setBulkTopicId('') // Reset topic after successful upload
+              }
+              return result
+            }}
+            contentType="lesson"
+          />
+        </Box>
+      )}
     </Box>
   )
 }

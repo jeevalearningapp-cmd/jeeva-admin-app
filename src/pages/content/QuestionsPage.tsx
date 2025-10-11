@@ -30,16 +30,22 @@ import {
   EditOutlined,
   DeleteOutlined,
   SearchOutlined,
-  ImageOutlined
+  ImageOutlined,
+  UploadFileOutlined
 } from '@mui/icons-material'
 import { Alert } from '@mui/material'
 import { useQuestions, useCreateQuestion, useUpdateQuestion, useDeleteQuestion, useUploadQuestionImage } from '@/hooks/useQuestions'
 import { useLessons } from '@/hooks/useLessons'
 import { PageLoader } from '@/components/common'
 import { Question, CreateQuestionInput, QuestionOption } from '@/types/content'
+import { CSVUpload } from '@/components/common/CSVUpload'
+import { questionTemplate } from '@/utils/csvTemplates'
+import { useBulkUpload } from '@/hooks/useBulkUpload'
 
 export const QuestionsPage: React.FC = () => {
   const [dialogOpen, setDialogOpen] = useState(false)
+  const [csvUploadOpen, setCsvUploadOpen] = useState(false)
+  const [bulkLessonId, setBulkLessonId] = useState<string>('')
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [lessonFilter, setLessonFilter] = useState<string>('all')
@@ -65,6 +71,7 @@ export const QuestionsPage: React.FC = () => {
   const updateMutation = useUpdateQuestion()
   const deleteMutation = useDeleteQuestion()
   const uploadMutation = useUploadQuestionImage()
+  const { uploadQuestions } = useBulkUpload()
 
   React.useEffect(() => {
     if (!isLoading && initialLoad) {
@@ -214,14 +221,24 @@ export const QuestionsPage: React.FC = () => {
             Manage quiz questions and assessments
           </Typography>
         </Box>
-        <Button
-          variant="contained"
-          startIcon={<AddOutlined />}
-          onClick={() => handleOpenDialog()}
-          sx={{ borderRadius: '12px' }}
-        >
-          Add Question
-        </Button>
+        <Box sx={{ display: 'flex', gap: 2 }}>
+          <Button
+            variant="contained"
+            startIcon={<AddOutlined />}
+            onClick={() => handleOpenDialog()}
+            sx={{ borderRadius: '12px' }}
+          >
+            Add Question
+          </Button>
+          <Button
+            variant="outlined"
+            startIcon={<UploadFileOutlined />}
+            onClick={() => setCsvUploadOpen(true)}
+            sx={{ borderRadius: '12px' }}
+          >
+            Bulk Upload
+          </Button>
+        </Box>
       </Box>
 
       {/* Search and Filter */}
@@ -511,6 +528,57 @@ export const QuestionsPage: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* CSV Bulk Upload - Lesson Selection */}
+      <Dialog open={csvUploadOpen} onClose={() => { setCsvUploadOpen(false); setBulkLessonId('') }} maxWidth="sm" fullWidth>
+        <DialogTitle>Select Lesson for Bulk Upload (Optional)</DialogTitle>
+        <DialogContent>
+          <Box sx={{ mt: 2 }}>
+            <Typography variant="body2" color="text.secondary" mb={2}>
+              Choose a lesson to link these questions to (optional):
+            </Typography>
+            <FormControl fullWidth>
+              <InputLabel>Lesson</InputLabel>
+              <Select
+                value={bulkLessonId}
+                onChange={(e) => setBulkLessonId(e.target.value)}
+                label="Lesson"
+              >
+                <MenuItem value="">None (Standalone Questions)</MenuItem>
+                {lessons?.filter(l => l.isActive).map(lesson => (
+                  <MenuItem key={lesson.id} value={lesson.id}>{lesson.title}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => { setCsvUploadOpen(false); setBulkLessonId('') }}>Cancel</Button>
+          <Button
+            variant="contained"
+            onClick={() => setCsvUploadOpen(false)}
+          >
+            Continue to Upload
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* CSV Bulk Upload Component - Shown after lesson selection */}
+      {!csvUploadOpen && bulkLessonId !== null && (
+        <Box sx={{ position: 'fixed', bottom: 20, right: 20, zIndex: 1000 }}>
+          <CSVUpload
+            template={questionTemplate}
+            onUpload={async (data) => {
+              const result = await uploadQuestions(data, bulkLessonId || undefined)
+              if (result) {
+                setBulkLessonId(null as any) // Reset lesson after successful upload
+              }
+              return result
+            }}
+            contentType="question"
+          />
+        </Box>
+      )}
     </Box>
   )
 }

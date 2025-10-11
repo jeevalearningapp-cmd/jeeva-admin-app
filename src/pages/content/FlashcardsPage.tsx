@@ -30,16 +30,22 @@ import {
   EditOutlined,
   DeleteOutlined,
   SearchOutlined,
-  ImageOutlined
+  ImageOutlined,
+  UploadFileOutlined
 } from '@mui/icons-material'
 import { Alert } from '@mui/material'
 import { useFlashcards, useCreateFlashcard, useUpdateFlashcard, useDeleteFlashcard, useUploadFlashcardImage } from '@/hooks/useFlashcards'
 import { useLessons } from '@/hooks/useLessons'
 import { PageLoader } from '@/components/common'
 import { Flashcard, CreateFlashcardInput } from '@/types/content'
+import { CSVUpload } from '@/components/common/CSVUpload'
+import { flashcardTemplate } from '@/utils/csvTemplates'
+import { useBulkUpload } from '@/hooks/useBulkUpload'
 
 export const FlashcardsPage: React.FC = () => {
   const [dialogOpen, setDialogOpen] = useState(false)
+  const [csvUploadOpen, setCsvUploadOpen] = useState(false)
+  const [bulkLessonId, setBulkLessonId] = useState<string>('')
   const [editingFlashcard, setEditingFlashcard] = useState<Flashcard | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [lessonFilter, setLessonFilter] = useState<string>('all')
@@ -62,6 +68,7 @@ export const FlashcardsPage: React.FC = () => {
   const updateMutation = useUpdateFlashcard()
   const deleteMutation = useDeleteFlashcard()
   const uploadMutation = useUploadFlashcardImage()
+  const { uploadFlashcards } = useBulkUpload()
 
   React.useEffect(() => {
     if (!isLoading && initialLoad) {
@@ -182,14 +189,24 @@ export const FlashcardsPage: React.FC = () => {
             Manage study flashcards for learning
           </Typography>
         </Box>
-        <Button
-          variant="contained"
-          startIcon={<AddOutlined />}
-          onClick={() => handleOpenDialog()}
-          sx={{ borderRadius: '12px' }}
-        >
-          Add Flashcard
-        </Button>
+        <Box sx={{ display: 'flex', gap: 2 }}>
+          <Button
+            variant="contained"
+            startIcon={<AddOutlined />}
+            onClick={() => handleOpenDialog()}
+            sx={{ borderRadius: '12px' }}
+          >
+            Add Flashcard
+          </Button>
+          <Button
+            variant="outlined"
+            startIcon={<UploadFileOutlined />}
+            onClick={() => setCsvUploadOpen(true)}
+            sx={{ borderRadius: '12px' }}
+          >
+            Bulk Upload
+          </Button>
+        </Box>
       </Box>
 
       {/* Search and Filter */}
@@ -412,6 +429,61 @@ export const FlashcardsPage: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* CSV Bulk Upload - Lesson Selection */}
+      <Dialog open={csvUploadOpen} onClose={() => { setCsvUploadOpen(false); setBulkLessonId('') }} maxWidth="sm" fullWidth>
+        <DialogTitle>Select Lesson for Bulk Upload</DialogTitle>
+        <DialogContent>
+          <Box sx={{ mt: 2 }}>
+            <Typography variant="body2" color="text.secondary" mb={2}>
+              Choose which lesson these flashcards should be added to:
+            </Typography>
+            <FormControl fullWidth>
+              <InputLabel>Lesson</InputLabel>
+              <Select
+                value={bulkLessonId}
+                onChange={(e) => setBulkLessonId(e.target.value)}
+                label="Lesson"
+              >
+                {lessons?.filter(l => l.isActive).map(lesson => (
+                  <MenuItem key={lesson.id} value={lesson.id}>{lesson.title}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => { setCsvUploadOpen(false); setBulkLessonId('') }}>Cancel</Button>
+          <Button
+            variant="contained"
+            onClick={() => {
+              if (bulkLessonId) {
+                setCsvUploadOpen(false)
+              }
+            }}
+            disabled={!bulkLessonId}
+          >
+            Continue to Upload
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* CSV Bulk Upload Component - Shown after lesson selection */}
+      {bulkLessonId && !csvUploadOpen && (
+        <Box sx={{ position: 'fixed', bottom: 20, right: 20, zIndex: 1000 }}>
+          <CSVUpload
+            template={flashcardTemplate}
+            onUpload={async (data) => {
+              const result = await uploadFlashcards(data, bulkLessonId)
+              if (result) {
+                setBulkLessonId('') // Reset lesson after successful upload
+              }
+              return result
+            }}
+            contentType="flashcard"
+          />
+        </Box>
+      )}
     </Box>
   )
 }
