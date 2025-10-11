@@ -19,6 +19,7 @@ import {
   DashboardHeroPage,
   ProfilePage,
 } from './pages'
+import { SplashScreen } from './pages/SplashScreen'
 import { ModulesPage } from './pages/content/ModulesPage'
 import { TopicsPage } from './pages/content/TopicsPage'
 import { LessonsPage } from './pages/content/LessonsPage'
@@ -49,6 +50,7 @@ function App() {
             <AuthProvider>
               <BrowserRouter>
                 <Routes>
+            <Route path="/" element={<SplashScreen />} />
             <Route path="/login" element={<LoginForm />} />
             
             <Route
@@ -215,8 +217,6 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
                 </Routes>
               </BrowserRouter>
             </AuthProvider>
