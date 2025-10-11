@@ -79,13 +79,13 @@ export const getTheme = (mode: PaletteMode) => createTheme({
     }
   },
   shape: { 
-    borderRadius: 0 
+    borderRadius: 8 
   },
   components: {
     MuiButton: {
       styleOverrides: {
         root: {
-          borderRadius: 0,
+          borderRadius: 8,
         },
         contained: {
           boxShadow: 'none',
@@ -98,7 +98,7 @@ export const getTheme = (mode: PaletteMode) => createTheme({
     MuiCard: {
       styleOverrides: {
         root: {
-          borderRadius: 0,
+          borderRadius: 8,
           boxShadow: 'none',
           border: mode === 'light' 
             ? '1px solid #E5E7EB'
@@ -110,7 +110,7 @@ export const getTheme = (mode: PaletteMode) => createTheme({
     MuiPaper: {
       styleOverrides: {
         root: {
-          borderRadius: 0,
+          borderRadius: 8,
           boxShadow: 'none',
           border: mode === 'light' 
             ? '1px solid #E5E7EB'
@@ -123,7 +123,7 @@ export const getTheme = (mode: PaletteMode) => createTheme({
       styleOverrides: {
         root: {
           '& .MuiOutlinedInput-root': {
-            borderRadius: 0,
+            borderRadius: 8,
           }
         }
       }
@@ -147,7 +147,7 @@ export const getTheme = (mode: PaletteMode) => createTheme({
     MuiDialog: {
       styleOverrides: {
         paper: {
-          borderRadius: 0,
+          borderRadius: 8,
           boxShadow: mode === 'light'
             ? '0px 4px 20px rgba(0, 0, 0, 0.1)'
             : '0px 4px 20px rgba(0, 0, 0, 0.5)',
@@ -157,14 +157,14 @@ export const getTheme = (mode: PaletteMode) => createTheme({
     MuiChip: {
       styleOverrides: {
         root: {
-          borderRadius: 0,
+          borderRadius: 8,
         }
       }
     },
     MuiAlert: {
       styleOverrides: {
         root: {
-          borderRadius: 0,
+          borderRadius: 8,
         }
       }
     },
@@ -172,7 +172,7 @@ export const getTheme = (mode: PaletteMode) => createTheme({
       styleOverrides: {
         root: {
           '& .MuiOutlinedInput-notchedOutline': {
-            borderRadius: 0,
+            borderRadius: 8,
           }
         }
       }
