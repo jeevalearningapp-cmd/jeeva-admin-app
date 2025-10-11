@@ -25,6 +25,7 @@ import { TopicsPage } from './pages/content/TopicsPage'
 import { LessonsPage } from './pages/content/LessonsPage'
 import { QuestionsPage } from './pages/content/QuestionsPage'
 import { FlashcardsPage } from './pages/content/FlashcardsPage'
+import { EmailTestPage } from './pages/EmailTestPage'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -202,6 +203,17 @@ function App() {
                 <ProtectedRoute allowedRoles={['superadmin']}>
                   <MainLayout>
                     <SettingsPage />
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+            
+            <Route
+              path="/email-test"
+              element={
+                <ProtectedRoute allowedRoles={['superadmin']}>
+                  <MainLayout>
+                    <EmailTestPage />
                   </MainLayout>
                 </ProtectedRoute>
               }
