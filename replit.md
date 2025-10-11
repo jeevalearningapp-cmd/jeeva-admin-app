@@ -171,7 +171,13 @@ Supabase PostgreSQL database with tables like `users`, `user_profiles`, `subscri
    - **Paper:** Subtle shadows for depth
    - Premium visual depth and polish throughout
 
-**Design Philosophy:** Modern, polished interface with subtle rounded corners (8px), optimized density, refined typography, and premium visual effects creating an advanced web application experience.
+6. **Main Content Area Spacing:**
+   - Increased main section padding for better breathing room
+   - Mobile padding: 16px → 24px (50% increase)
+   - Desktop padding: 24px → 32px (33% increase)
+   - Content no longer feels cramped against edges
+
+**Design Philosophy:** Modern, polished interface with subtle rounded corners (8px), optimized density, refined typography, spacious content areas, and premium visual effects creating an advanced web application experience.
 
 ### Content Management Database Migration
 - Created comprehensive SQL migration for content management system
