@@ -62,6 +62,7 @@ export interface Lesson {
   title: string
   content: string
   videoUrl?: string
+  audioUrl?: string
   duration?: number
   isActive: boolean
   displayOrder: number
@@ -75,6 +76,7 @@ export interface CreateLessonInput {
   title: string
   content: string
   videoUrl?: string
+  audioUrl?: string
   duration?: number
   isActive?: boolean
   displayOrder?: number
@@ -85,6 +87,7 @@ export interface UpdateLessonInput {
   title?: string
   content?: string
   videoUrl?: string
+  audioUrl?: string
   duration?: number
   isActive?: boolean
   displayOrder?: number
