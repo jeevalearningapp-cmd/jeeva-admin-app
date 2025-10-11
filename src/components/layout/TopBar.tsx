@@ -58,7 +58,10 @@ export const TopBar: React.FC<TopBarProps> = ({ onMenuClick, onSidebarToggle, si
         zIndex: (theme) => theme.zIndex.drawer - 1,
         bgcolor: 'background.paper',
         color: 'text.primary',
-        boxShadow: 1,
+        boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.05)',
+        borderBottom: (theme) => theme.palette.mode === 'light' 
+          ? '1px solid rgba(193, 199, 208, 0.5)' 
+          : '1px solid rgba(44, 49, 66, 0.5)',
         borderRadius: 0,
         transition: 'margin 0.3s, width 0.3s',
       }}

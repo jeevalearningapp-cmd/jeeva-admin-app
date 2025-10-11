@@ -96,8 +96,6 @@ export const SidebarNav: React.FC<SidebarNavProps> = ({ mobileOpen, onMobileClos
         )}
       </Box>
       
-      <Divider />
-      
       <List sx={{ pt: 3, px: 1.5, flexGrow: 1 }}>
         {filteredMenuItems.map((item) => {
           const isActive = location.pathname === item.path || location.pathname.startsWith(item.path + '/')
