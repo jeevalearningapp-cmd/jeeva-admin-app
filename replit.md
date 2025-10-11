@@ -105,5 +105,7 @@ Supabase PostgreSQL database with tables such as `users`, `user_profiles`, `subs
 **Email System:**
 - Utilizes an Express.js backend API server (`server/index.ts`) on port 3001 for secure email sending via Resend.
 - Frontend API client at `src/api/email.ts` interacts with the backend.
+- Vite proxy configured: `/api/email` → `http://localhost:3001` (enables frontend-backend communication in Replit cloud environment).
 - Available email templates: Test, Welcome, Subscription Confirmation, Payment Receipt, Subscription Expiring.
 - Email templates are stored in the `email_templates` Supabase table.
+- Test page: `/email-test` (Superadmin only) - Quick email sending test interface.
