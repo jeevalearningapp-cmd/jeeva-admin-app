@@ -62,20 +62,24 @@ export const getTheme = (mode: PaletteMode) => createTheme({
       letterSpacing: '-0.02em'
     },
     h5: {
-      fontSize: '1.25rem',
-      fontWeight: 600
-    },
-    h6: {
       fontSize: '1.125rem',
       fontWeight: 600
     },
+    h6: {
+      fontSize: '1rem',
+      fontWeight: 600
+    },
     body1: {
-      fontSize: '1rem'
+      fontSize: '0.9375rem'
+    },
+    body2: {
+      fontSize: '0.875rem'
     },
     button: {
-      fontWeight: 700,
-      letterSpacing: 0.5,
-      textTransform: 'none'
+      fontWeight: 600,
+      letterSpacing: 0.3,
+      textTransform: 'none',
+      fontSize: '0.9375rem'
     }
   },
   shape: { 
@@ -160,6 +164,30 @@ export const getTheme = (mode: PaletteMode) => createTheme({
           boxShadow: mode === 'light'
             ? '0px 4px 20px rgba(0, 0, 0, 0.1)'
             : '0px 4px 20px rgba(0, 0, 0, 0.5)',
+        }
+      }
+    },
+    MuiDialogTitle: {
+      styleOverrides: {
+        root: {
+          fontSize: '1.125rem',
+          fontWeight: 600,
+          padding: '16px 24px',
+        }
+      }
+    },
+    MuiDialogContent: {
+      styleOverrides: {
+        root: {
+          fontSize: '0.9375rem',
+          padding: '20px 24px',
+        }
+      }
+    },
+    MuiDialogActions: {
+      styleOverrides: {
+        root: {
+          padding: '12px 24px',
         }
       }
     },
