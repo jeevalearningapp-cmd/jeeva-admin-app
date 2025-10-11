@@ -74,6 +74,19 @@ The Jeeva Learning platform uses **Supabase PostgreSQL** as its database, shared
 │  │content_approvals │                                           │
 │  └──────────────────┘                                           │
 └─────────────────────────────────────────────────────────────────┘
+                                │
+                                │
+┌─────────────────────────────────────────────────────────────────┐
+│                      AI & CHAT (Phase 1)                         │
+│  ┌──────────────────┐    ┌─────────────────┐                   │
+│  │chat_             │────│chat_messages    │                   │
+│  │conversations     │    │                 │                   │
+│  └──────────────────┘    └─────────────────┘                   │
+│                                                                  │
+│  ┌──────────────────┐                                           │
+│  │ai_usage_stats    │                                           │
+│  └──────────────────┘                                           │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -111,6 +124,11 @@ The Jeeva Learning platform uses **Supabase PostgreSQL** as its database, shared
 - `dashboard_hero` - Dashboard banners
 - `content_approvals` - Content review queue
 - `email_templates` - Email template storage
+
+### 6. AI & Chat (Phase 1)
+- `chat_conversations` - AI chatbot conversation threads
+- `chat_messages` - Individual chat messages
+- `ai_usage_stats` - AI usage tracking and rate limiting
 
 ---
 
@@ -503,6 +521,98 @@ The Jeeva Learning platform uses **Supabase PostgreSQL** as its database, shared
   "longestStreak": 15
 }
 ```
+
+---
+
+### 3.1. AI & Chat (Phase 1)
+
+#### Table: `chat_conversations`
+**Purpose:** AI chatbot conversation threads
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY | Conversation ID |
+| `user_id` | UUID | FK → users.id | User reference |
+| `title` | TEXT | DEFAULT 'New Conversation' | Conversation title |
+| `context_data` | JSONB | | User context for AI |
+| `created_at` | TIMESTAMP | DEFAULT NOW() | Creation time |
+| `updated_at` | TIMESTAMP | DEFAULT NOW() | Last update time |
+
+**Foreign Keys:**
+- `user_id` → `users.id` (ON DELETE CASCADE)
+
+**Indexes:**
+- `idx_chat_conversations_user` on `user_id`
+- `idx_chat_conversations_created` on `created_at DESC`
+
+**JSONB Structure (`context_data`):**
+```json
+{
+  "currentLesson": {
+    "id": "uuid",
+    "title": "Introduction to Physics",
+    "moduleId": "uuid"
+  },
+  "userLevel": "intermediate",
+  "recentTopics": ["mechanics", "thermodynamics"]
+}
+```
+
+---
+
+#### Table: `chat_messages`
+**Purpose:** Individual messages in chat conversations
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY | Message ID |
+| `conversation_id` | UUID | FK → chat_conversations.id | Parent conversation |
+| `role` | TEXT | CHECK (role IN ('user', 'assistant')) | Message sender |
+| `content` | TEXT | NOT NULL | Message text |
+| `metadata` | JSONB | | AI metadata |
+| `created_at` | TIMESTAMP | DEFAULT NOW() | Creation time |
+
+**Foreign Keys:**
+- `conversation_id` → `chat_conversations.id` (ON DELETE CASCADE)
+
+**Indexes:**
+- `idx_chat_messages_conversation` on `conversation_id`
+- `idx_chat_messages_created` on `created_at DESC`
+
+**JSONB Structure (`metadata`):**
+```json
+{
+  "model": "gemini-1.5-flash",
+  "tokensUsed": 245,
+  "responseTime": 1.2,
+  "confidenceScore": 0.87
+}
+```
+
+---
+
+#### Table: `ai_usage_stats`
+**Purpose:** Track AI usage for rate limiting and cost control
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY | Stat ID |
+| `user_id` | UUID | FK → users.id | User reference |
+| `date` | DATE | DEFAULT CURRENT_DATE | Usage date |
+| `message_count` | INTEGER | DEFAULT 0 | Messages sent |
+| `total_tokens` | INTEGER | DEFAULT 0 | Tokens consumed |
+| `created_at` | TIMESTAMP | DEFAULT NOW() | Creation time |
+| `updated_at` | TIMESTAMP | DEFAULT NOW() | Last update |
+
+**Foreign Keys:**
+- `user_id` → `users.id` (ON DELETE CASCADE)
+
+**Indexes:**
+- `idx_ai_usage_user_date` on `(user_id, date)`
+- Unique constraint on `(user_id, date)`
+
+**Usage:**
+Used to enforce daily message limits (e.g., 50 messages/day per user) and track API costs.
 
 ---
 

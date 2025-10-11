@@ -1175,9 +1175,346 @@ const purchase = await InAppPurchases.purchaseItemAsync('premium_monthly')
 
 ---
 
-## 9️⃣ AI Recommendations
+## 9️⃣ AI Chatbot - JeevaBot (Phase 1)
 
-### 9.1 Personalized Learning Path
+### 9.1 AI Assistant Chat Interface
+
+**User Story:**  
+*As a student, I want to chat with an AI assistant so that I can get instant help with my studies and doubts.*
+
+**Acceptance Criteria:**
+- [ ] Access chat from anywhere in the app
+- [ ] Send text messages to JeevaBot
+- [ ] Receive AI-generated responses
+- [ ] View conversation history
+- [ ] Context-aware responses based on current lesson
+- [ ] Personalized based on study progress
+- [ ] Daily message limit (50 messages/day)
+- [ ] Fallback responses when AI unavailable
+- [ ] Error handling with friendly messages
+
+**UI Components:**
+- Chat screen with message list
+- Message input field
+- User message bubble (blue, right-aligned)
+- AI message bubble (gray, left-aligned)
+- Floating "Ask AI" button on lesson screens
+- Chat history list
+- Empty state with welcome message
+- Loading indicator while AI responds
+- Error banner for failures
+
+**Technical Implementation:**
+```typescript
+// Chat Message Interface
+interface ChatMessage {
+  id: string
+  conversation_id: string
+  role: 'user' | 'assistant'
+  content: string
+  metadata?: {
+    model: string
+    tokensUsed: number
+    responseTime: number
+  }
+  created_at: string
+}
+
+// Conversation Interface
+interface ChatConversation {
+  id: string
+  user_id: string
+  title: string
+  context_data: {
+    currentLesson?: {
+      id: string
+      title: string
+    }
+    userLevel?: string
+    recentTopics?: string[]
+  }
+  created_at: string
+  updated_at: string
+}
+```
+
+---
+
+### 9.2 Context-Aware AI Responses
+
+**User Story:**  
+*As a student, I want the AI to understand my current learning context so that it gives relevant help.*
+
+**Acceptance Criteria:**
+- [ ] AI knows which lesson user is currently studying
+- [ ] AI references recent practice performance
+- [ ] AI suggests relevant practice topics
+- [ ] AI provides encouraging support for low scores
+- [ ] AI maintains conversation history (last 10 messages)
+- [ ] AI uses simple, student-friendly language
+- [ ] Response length under 200 words (concise)
+
+**Context Building:**
+```typescript
+// AI Context Builder
+const buildContext = async (userId: string) => {
+  // Get current lesson
+  const currentLesson = await getCurrentLesson(userId)
+  
+  // Get recent practice scores
+  const recentPractice = await getRecentPractice(userId, 5)
+  
+  // Build AI prompt
+  return `You are JeevaBot, an AI tutor for medical students.
+  
+Student Context:
+- Currently studying: ${currentLesson?.title}
+- Recent scores: ${recentPractice.map(p => p.score).join(', ')}
+
+Instructions:
+1. Give clear medical exam-focused explanations
+2. Reference current lesson when relevant
+3. Encourage if student is struggling
+4. Keep responses under 200 words
+`
+}
+```
+
+**AI Prompt Examples:**
+
+**User:** "I don't understand Newton's Third Law"  
+**Context:** Currently studying Physics Module  
+**AI Response:** "Newton's Third Law states that for every action, there's an equal and opposite reaction. Since you're studying Physics, here's a medical example: When you press a stethoscope against a patient's chest, the chest pushes back with equal force. This principle also applies to blood flow and heart mechanics. Would you like to practice some questions on this?"
+
+---
+
+### 9.3 Rate Limiting & Cost Control
+
+**User Story:**  
+*As a platform owner, I want to control AI costs so that the service remains sustainable.*
+
+**Acceptance Criteria:**
+- [ ] 50 messages per user per day limit
+- [ ] Track daily usage in database
+- [ ] Show remaining messages to user
+- [ ] Clear error message when limit reached
+- [ ] Reset counter at midnight (UTC)
+- [ ] Admin dashboard shows AI usage stats
+- [ ] Cost estimation tracking (tokens used)
+
+**Daily Limit Implementation:**
+```typescript
+const checkDailyLimit = async (userId: string): Promise<boolean> => {
+  const today = new Date().toISOString().split('T')[0]
+  
+  const stats = await supabase
+    .from('ai_usage_stats')
+    .select('message_count')
+    .eq('user_id', userId)
+    .eq('date', today)
+    .single()
+  
+  const maxMessages = 50
+  const currentCount = stats?.message_count || 0
+  
+  if (currentCount >= maxMessages) {
+    throw new Error('Daily message limit reached. Try again tomorrow!')
+  }
+  
+  return true
+}
+```
+
+**Cost Tracking:**
+- Track tokens used per message
+- Calculate daily costs (tokens × price)
+- Admin view: total costs per day/month
+- Alert if costs exceed threshold
+
+---
+
+### 9.4 Error Handling & Fallbacks
+
+**User Story:**  
+*As a student, I want helpful messages when the AI isn't working so that I know what to do.*
+
+**Acceptance Criteria:**
+- [ ] Graceful degradation when AI API fails
+- [ ] Fallback response shown to user
+- [ ] Retry logic (max 3 attempts)
+- [ ] Alternative help suggestions
+- [ ] Error logging for admin review
+- [ ] Network timeout handling (30s)
+
+**Fallback Responses:**
+
+**API Failure:**
+```
+I'm currently experiencing technical difficulties. Here are alternatives:
+
+1. Check the lesson content for answers
+2. Review practice question explanations  
+3. Contact support for personalized help
+4. Try again in a few moments
+
+Sorry for the inconvenience!
+```
+
+**Rate Limit Reached:**
+```
+You've reached your daily message limit (50 messages).
+
+Your limit resets at midnight. In the meantime:
+- Review your lessons
+- Practice with questions
+- Check your progress dashboard
+
+See you tomorrow! 😊
+```
+
+**Network Error:**
+```
+Connection issue detected. Please check your internet and try again.
+```
+
+---
+
+### 9.5 Chat History & Conversations
+
+**User Story:**  
+*As a student, I want to review past conversations so that I can revisit AI explanations.*
+
+**Acceptance Criteria:**
+- [ ] Save all conversations to database
+- [ ] List of past conversations with titles
+- [ ] Tap to open conversation history
+- [ ] Search through chat history
+- [ ] Delete individual conversations
+- [ ] Auto-title conversations based on first message
+- [ ] Persist across app restarts
+
+**UI Components:**
+- Chat history screen
+- Conversation list with:
+  - Title (first 50 chars of first message)
+  - Last message preview
+  - Timestamp
+- Swipe to delete conversation
+- Search bar to filter conversations
+- Empty state: "No conversations yet"
+
+**Database Schema:**
+```sql
+-- Conversations table
+CREATE TABLE chat_conversations (
+  id UUID PRIMARY KEY,
+  user_id UUID REFERENCES users(id),
+  title TEXT,
+  context_data JSONB,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Messages table
+CREATE TABLE chat_messages (
+  id UUID PRIMARY KEY,
+  conversation_id UUID REFERENCES chat_conversations(id),
+  role TEXT CHECK (role IN ('user', 'assistant')),
+  content TEXT NOT NULL,
+  metadata JSONB,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Usage tracking
+CREATE TABLE ai_usage_stats (
+  id UUID PRIMARY KEY,
+  user_id UUID REFERENCES users(id),
+  date DATE DEFAULT CURRENT_DATE,
+  message_count INTEGER DEFAULT 0,
+  total_tokens INTEGER DEFAULT 0,
+  UNIQUE(user_id, date)
+);
+```
+
+---
+
+### 9.6 AI Integration - Google Gemini
+
+**Technical Details:**
+
+**API Provider:** Google AI Studio (Gemini)  
+**Model:** gemini-1.5-flash  
+**API Key Storage:** Replit Secrets (GEMINI_API_KEY)  
+**Cost:** ~$0.0005 per message  
+**Daily Budget:** ~$10 (20,000 messages)
+
+**Configuration:**
+```typescript
+import { GoogleGenerativeAI } from '@google/generative-ai'
+
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)  // Backend only!
+
+const chatModel = genAI.getGenerativeModel({
+  model: 'gemini-1.5-flash',
+  generationConfig: {
+    temperature: 0.7,    // Balanced creativity
+    topK: 40,           // Diverse responses
+    topP: 0.95,         // High quality
+    maxOutputTokens: 1024  // ~200 words max
+  }
+})
+```
+
+**Environment Variables:**
+```env
+# Backend (Admin Portal) ONLY:
+GEMINI_API_KEY=AIza...
+AI_MAX_MESSAGES_PER_DAY=50
+
+# Mobile App:
+EXPO_PUBLIC_BACKEND_URL=https://your-backend.replit.app
+```
+
+---
+
+### 9.7 Testing Scenarios
+
+**Test Cases:**
+
+1. **Happy Path:**
+   - User asks question → AI responds with relevant answer
+   - ✅ Context includes current lesson
+   - ✅ Response is under 200 words
+   - ✅ Message saved to database
+
+2. **Rate Limiting:**
+   - User sends 51st message of the day
+   - ✅ Shows "Daily limit reached" error
+   - ✅ Suggests alternatives
+
+3. **API Failure:**
+   - Gemini API returns error
+   - ✅ Shows fallback message
+   - ✅ Logs error for admin
+   - ✅ Doesn't crash app
+
+4. **Long Conversation:**
+   - User sends 20+ messages in one conversation
+   - ✅ History maintained correctly
+   - ✅ Context window limited to last 10 messages
+   - ✅ Older messages still visible in UI
+
+5. **Offline Mode:**
+   - User has no internet connection
+   - ✅ Shows network error message
+   - ✅ Suggests checking connection
+   - ✅ Queues message for retry (optional)
+
+---
+
+## 🔟 AI Recommendations (Phase 3)
+
+### 10.1 Personalized Learning Path
 
 **User Story:**  
 *As a user, I want AI-powered recommendations so that I know what to study next.*

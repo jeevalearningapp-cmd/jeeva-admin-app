@@ -1242,6 +1242,455 @@ interface Subscription {
 
 ---
 
+## 🤖 AI & Chat APIs (Phase 1)
+
+### Overview
+
+The JeevaBot chatbot uses Google's Gemini AI Studio API for conversational AI support. All chat data is stored in Supabase for history and context.
+
+---
+
+### Chat Conversations
+
+#### Get User Conversations
+
+```typescript
+const getUserConversations = async (userId: string) => {
+  const { data, error } = await supabase
+    .from('chat_conversations')
+    .select('*')
+    .eq('user_id', userId)
+    .order('updated_at', { ascending: false })
+  
+  if (error) throw error
+  return data
+}
+```
+
+**Response:**
+```typescript
+interface ChatConversation {
+  id: string
+  user_id: string
+  title: string
+  context_data: {
+    currentLesson?: {
+      id: string
+      title: string
+      moduleId: string
+    }
+    userLevel?: string
+    recentTopics?: string[]
+  }
+  created_at: string
+  updated_at: string
+}
+```
+
+---
+
+#### Create Conversation
+
+```typescript
+const createConversation = async (userId: string, title: string = 'New Conversation') => {
+  const { data, error } = await supabase
+    .from('chat_conversations')
+    .insert({
+      user_id: userId,
+      title,
+      context_data: {}
+    })
+    .select()
+    .single()
+  
+  if (error) throw error
+  return data
+}
+```
+
+---
+
+#### Get Conversation Messages
+
+```typescript
+const getConversationMessages = async (conversationId: string) => {
+  const { data, error } = await supabase
+    .from('chat_messages')
+    .select('*')
+    .eq('conversation_id', conversationId)
+    .order('created_at', { ascending: true })
+  
+  if (error) throw error
+  return data
+}
+```
+
+**Response:**
+```typescript
+interface ChatMessage {
+  id: string
+  conversation_id: string
+  role: 'user' | 'assistant'
+  content: string
+  metadata?: {
+    model?: string
+    tokensUsed?: number
+    responseTime?: number
+    confidenceScore?: number
+  }
+  created_at: string
+}
+```
+
+---
+
+#### Send Message
+
+```typescript
+import { getModelResponse } from '@/lib/gemini'
+import { buildChatContext } from '@/utils/chatContext'
+
+const sendMessage = async (
+  conversationId: string,
+  userId: string,
+  content: string
+) => {
+  // 1. Save user message
+  const { data: userMsg, error: userError } = await supabase
+    .from('chat_messages')
+    .insert({
+      conversation_id: conversationId,
+      role: 'user',
+      content
+    })
+    .select()
+    .single()
+  
+  if (userError) throw userError
+  
+  // 2. Build context from user data
+  const context = await buildChatContext(userId)
+  
+  // 3. Get conversation history
+  const history = await getConversationMessages(conversationId)
+  const conversationHistory = history.map(m => ({
+    role: m.role,
+    content: m.content
+  }))
+  
+  // 4. Call Gemini API
+  const aiResponse = await getModelResponse(
+    `${context}\n\nStudent Question: ${content}`,
+    conversationHistory
+  )
+  
+  // 5. Save AI response
+  const { data: aiMsg, error: aiError } = await supabase
+    .from('chat_messages')
+    .insert({
+      conversation_id: conversationId,
+      role: 'assistant',
+      content: aiResponse,
+      metadata: {
+        model: 'gemini-1.5-flash',
+        tokensUsed: Math.ceil(aiResponse.length / 4),
+        responseTime: 0 // Populate from actual timing
+      }
+    })
+    .select()
+    .single()
+  
+  if (aiError) throw aiError
+  
+  return { userMsg, aiMsg }
+}
+```
+
+---
+
+### AI Usage Tracking
+
+#### Check Daily Message Limit
+
+```typescript
+const checkMessageLimit = async (userId: string): Promise<boolean> => {
+  const today = new Date().toISOString().split('T')[0]
+  
+  const { data, error } = await supabase
+    .from('ai_usage_stats')
+    .select('message_count')
+    .eq('user_id', userId)
+    .eq('date', today)
+    .single()
+  
+  if (error && error.code !== 'PGRST116') throw error
+  
+  const maxMessages = 50 // Daily limit
+  const currentCount = data?.message_count || 0
+  
+  return currentCount < maxMessages
+}
+```
+
+---
+
+#### Update Usage Stats
+
+```typescript
+const updateUsageStats = async (userId: string, tokensUsed: number = 0) => {
+  const today = new Date().toISOString().split('T')[0]
+  
+  await supabase.rpc('increment_ai_usage', {
+    p_user_id: userId,
+    p_date: today,
+    p_message_count: 1,
+    p_tokens: tokensUsed
+  })
+}
+```
+
+**Database Function:**
+```sql
+CREATE OR REPLACE FUNCTION increment_ai_usage(
+  p_user_id UUID,
+  p_date DATE,
+  p_message_count INTEGER DEFAULT 1,
+  p_tokens INTEGER DEFAULT 0
+)
+RETURNS VOID AS $$
+BEGIN
+  INSERT INTO ai_usage_stats (user_id, date, message_count, total_tokens)
+  VALUES (p_user_id, p_date, p_message_count, p_tokens)
+  ON CONFLICT (user_id, date)
+  DO UPDATE SET
+    message_count = ai_usage_stats.message_count + p_message_count,
+    total_tokens = ai_usage_stats.total_tokens + p_tokens,
+    updated_at = NOW();
+END;
+$$ LANGUAGE plpgsql;
+```
+
+---
+
+#### Get Usage Stats
+
+```typescript
+const getUserUsageStats = async (userId: string, days: number = 30) => {
+  const { data, error } = await supabase
+    .from('ai_usage_stats')
+    .select('*')
+    .eq('user_id', userId)
+    .gte('date', new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString())
+    .order('date', { ascending: false })
+  
+  if (error) throw error
+  return data
+}
+```
+
+**Response:**
+```typescript
+interface AIUsageStats {
+  id: string
+  user_id: string
+  date: string
+  message_count: number
+  total_tokens: number
+  created_at: string
+  updated_at: string
+}
+```
+
+---
+
+### Gemini AI Integration
+
+#### Initialize Gemini Client
+
+```typescript
+import { GoogleGenerativeAI } from '@google/generative-ai'
+
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || ''  // Backend only!
+
+export const genAI = new GoogleGenerativeAI(GEMINI_API_KEY)
+
+export const chatModel = genAI.getGenerativeModel({ 
+  model: 'gemini-1.5-flash',
+  generationConfig: {
+    temperature: 0.7,
+    topK: 40,
+    topP: 0.95,
+    maxOutputTokens: 1024,
+  },
+})
+```
+
+---
+
+#### Get AI Response
+
+```typescript
+export const getModelResponse = async (
+  prompt: string,
+  conversationHistory: { role: string; content: string }[] = []
+): Promise<string> => {
+  try {
+    const chat = chatModel.startChat({
+      history: conversationHistory.map(msg => ({
+        role: msg.role === 'user' ? 'user' : 'model',
+        parts: [{ text: msg.content }],
+      })),
+    })
+
+    const result = await chat.sendMessage(prompt)
+    const response = result.response
+    return response.text()
+  } catch (error) {
+    console.error('Gemini API Error:', error)
+    
+    // Fallback response
+    return "I'm having trouble connecting right now. Please try again in a moment."
+  }
+}
+```
+
+---
+
+#### Build User Context
+
+```typescript
+export const buildChatContext = async (userId: string): Promise<string> => {
+  // Get user's current lesson
+  const { data: currentLesson } = await supabase
+    .from('learning_completions')
+    .select('lesson:lessons(*), module:modules(*)')
+    .eq('user_id', userId)
+    .order('updated_at', { ascending: false })
+    .limit(1)
+    .single()
+
+  // Get recent practice performance
+  const { data: recentPractice } = await supabase
+    .from('practice_sessions')
+    .select('score, topic:topics(title)')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(5)
+
+  // Build context string
+  let context = `You are JeevaBot, an AI tutor for medical exam preparation.
+
+Student Context:
+`
+
+  if (currentLesson) {
+    context += `- Currently studying: ${currentLesson.lesson?.title} in ${currentLesson.module?.title}\n`
+  }
+
+  if (recentPractice && recentPractice.length > 0) {
+    context += `- Recent practice scores:\n`
+    recentPractice.forEach(p => {
+      context += `  * ${p.topic?.title}: ${p.score}%\n`
+    })
+  }
+
+  context += `
+Instructions:
+1. Provide clear, concise explanations suitable for medical students
+2. Reference the student's current lesson when relevant
+3. If the student is struggling (low scores), offer encouraging support
+4. Use simple language and break down complex concepts
+5. Suggest relevant practice topics when appropriate
+6. Keep responses under 200 words unless detailed explanation is requested
+
+Remember: You're a supportive tutor, not just an information source.`
+
+  return context
+}
+```
+
+---
+
+### React Hook Example
+
+```typescript
+import { useState, useCallback } from 'react'
+import { supabase } from '@/lib/supabase'
+import { getModelResponse } from '@/lib/gemini'
+import { buildChatContext } from '@/utils/chatContext'
+
+export const useChatbot = (conversationId?: string) => {
+  const [messages, setMessages] = useState<ChatMessage[]>([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const sendMessage = useCallback(async (content: string, userId: string) => {
+    if (!userId || !content.trim()) return
+
+    setLoading(true)
+    setError(null)
+
+    try {
+      // Check rate limit
+      const canSend = await checkMessageLimit(userId)
+      if (!canSend) {
+        throw new Error('Daily message limit reached')
+      }
+
+      // Create/get conversation
+      let convId = conversationId
+      if (!convId) {
+        const conv = await createConversation(userId, content.substring(0, 50))
+        convId = conv.id
+      }
+
+      // Send message and get response
+      const { userMsg, aiMsg } = await sendMessage(convId, userId, content)
+
+      // Update UI
+      setMessages(prev => [...prev, userMsg, aiMsg])
+
+      // Track usage
+      await updateUsageStats(userId, aiMsg.metadata?.tokensUsed)
+
+    } catch (err: any) {
+      setError(err.message || 'Failed to send message')
+    } finally {
+      setLoading(false)
+    }
+  }, [conversationId])
+
+  return { messages, loading, error, sendMessage }
+}
+```
+
+---
+
+### Error Handling
+
+```typescript
+// Graceful degradation when AI fails
+const getAIResponseWithFallback = async (prompt: string): Promise<string> => {
+  try {
+    return await getModelResponse(prompt)
+  } catch (error) {
+    console.error('AI Error:', error)
+    
+    // Return helpful fallback message
+    return `I'm currently experiencing technical difficulties. Here are some alternatives:
+    
+1. Check the lesson content for answers
+2. Review practice question explanations
+3. Contact support for personalized help
+4. Try again in a few moments
+
+Sorry for the inconvenience!`
+  }
+}
+```
+
+---
+
 ## 🚀 Quick Start Example
 
 ```typescript
