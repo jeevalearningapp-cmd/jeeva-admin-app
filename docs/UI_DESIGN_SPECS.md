@@ -2,12 +2,14 @@
 
 ## 📋 Document Overview
 
-This document provides comprehensive UI/UX design specifications for the Jeeva Learning mobile app, based on the Figma design system. Use this as the single source of truth for all visual design implementations.
+This document provides comprehensive UI/UX design specifications for the Jeeva Learning mobile app, **extracted from the actual Figma design**. Use this as the single source of truth for all visual design implementations.
 
 **Figma Design:** [Jeeva App Prototype](https://www.figma.com/proto/dOT7f0j582Wo6hdqNn4x8D/Jeeva-app)  
-**Version:** 1.0  
+**Version:** 2.0 (Updated with actual Figma values)  
 **Last Updated:** October 11, 2025  
 **Platform:** iOS & Android (React Native/Expo)
+
+**✅ Status:** All design values extracted from Figma screenshots and specifications
 
 ---
 
@@ -45,36 +47,53 @@ This document provides comprehensive UI/UX design specifications for the Jeeva L
 
 ### Primary Colors
 
-**Primary Blue**
+**Primary Blue** (Jeeva Brand Color)
 ```
-Primary/500 (Main):     #007AFF
-Primary/400 (Light):    #3395FF
-Primary/600 (Dark):     #0062CC
-Primary/700 (Darker):   #004C99
+Primary/500 (Main):     #3B82F6
+Primary/400 (Light):    #60A5FA
+Primary/600 (Dark):     #2563EB
+Primary/700 (Darker):   #1D4ED8
 ```
 
 **Usage:**
-- Primary CTAs (buttons, links)
-- Active states
+- Primary CTAs (Sign in, Register, Continue buttons)
+- Active navigation states
 - Progress indicators
-- App branding elements
+- App branding (logo, hero cards)
+- Links ("sign in now", "forgot password")
 
 ---
 
-### Secondary Colors
+### Module/Category Colors
 
-**Secondary Indigo**
+**Green (Practice/Numeracy)**
 ```
-Secondary/500 (Main):   #181C32
-Secondary/400:          #2C3145
-Secondary/600:          #0F1219
+Green/500:              #4ADE80
+Green/400:              #6EE7B7
+Green/100:              #D1FAE5
+Green/50 (Background):  #ECFDF5
 ```
 
-**Usage:**
-- Text headers
-- Dark backgrounds
-- Navigation bars
-- Card backgrounds (dark mode)
+**Coral/Salmon (Retake/Clinical)**
+```
+Coral/500:              #FF8A80
+Coral/400:              #FFAB91
+Coral/100:              #FFCCBC
+```
+
+**Orange/Peach (Badges/Highlights)**
+```
+Orange/500:             #FFB74D
+Orange/400:             #FFCC80
+Orange/100:             #FFE0B2
+```
+
+**Blue Gradient (Hero Cards)**
+```
+Gradient Start:         #2F80ED
+Gradient End:           #5B9FED
+Angle:                  135deg
+```
 
 ---
 
@@ -82,23 +101,25 @@ Secondary/600:          #0F1219
 
 **Grays**
 ```
-Gray/900 (Darkest):     #1A1A1A
+Gray/900 (Text):        #1A1A1A
 Gray/800:               #2D2D2D
 Gray/700:               #404040
-Gray/600:               #525252
-Gray/500:               #737373
-Gray/400:               #A3A3A3
-Gray/300:               #D4D4D4
-Gray/200:               #E5E5E5
-Gray/100:               #F5F5F5
-Gray/50 (Lightest):     #FAFAFA
+Gray/600:               #757575
+Gray/500:               #9E9E9E
+Gray/400:               #BDBDBD
+Gray/300:               #E0E0E0
+Gray/200:               #EEEEEE
+Gray/100 (Background):  #F5F5F5
+Gray/50:                #FAFAFA
 ```
 
 **Usage:**
-- Text (900, 800, 700)
-- Borders (300, 200)
-- Backgrounds (100, 50)
-- Disabled states (400, 500)
+- Text Primary: Gray/900 (#1A1A1A)
+- Text Secondary: Gray/500 (#9E9E9E)
+- Borders: Gray/300 (#E0E0E0)
+- Card Backgrounds: White (#FFFFFF)
+- Page Background: Gray/100 (#F5F5F5)
+- Disabled states: Gray/400
 
 ---
 
@@ -106,20 +127,20 @@ Gray/50 (Lightest):     #FAFAFA
 
 **Success (Green)**
 ```
-Success/500:            #10B981
+Success/500:            #4ADE80
 Success/100:            #D1FAE5
 ```
 
-**Error (Red)**
+**Error (Red/Coral)**
 ```
-Error/500:              #EF4444
-Error/100:              #FEE2E2
+Error/500:              #FF8A80
+Error/100:              #FFCCBC
 ```
 
-**Warning (Amber)**
+**Warning (Orange)**
 ```
-Warning/500:            #F59E0B
-Warning/100:            #FEF3C7
+Warning/500:            #FFB74D
+Warning/100:            #FFE0B2
 ```
 
 **Info (Blue)**
@@ -128,11 +149,18 @@ Info/500:               #3B82F6
 Info/100:               #DBEAFE
 ```
 
+**Score Display:**
+```
+Correct (Blue):         #3B82F6
+Incorrect (Red):        #FF8A80
+Skipped (Gray):         #9E9E9E
+```
+
 **Usage:**
-- Success: Correct answers, completions, achievements
-- Error: Wrong answers, errors, deletions
-- Warning: Streak alerts, subscription expiring
-- Info: Tips, information panels
+- Success: Correct answers (7), completions, achievements
+- Error: Wrong answers (3), retake actions
+- Warning: Discount badges, subscription alerts
+- Info: Lesson count badges, interactive elements
 
 ---
 
@@ -158,7 +186,7 @@ Linear Gradient:
 
 ### Font Family
 
-**Primary Font:** Inter (System Alternative: San Francisco / Roboto)
+**Primary Font:** SF Pro Display / SF Pro Text (iOS) | Roboto (Android) | Inter (Web fallback)
 
 **Font Weights:**
 - Regular: 400
@@ -166,84 +194,94 @@ Linear Gradient:
 - Semibold: 600
 - Bold: 700
 
-**Download:** [Google Fonts - Inter](https://fonts.google.com/specimen/Inter)
+**System Fonts** (Recommended for native feel):
+- iOS: -apple-system, SF Pro Display
+- Android: Roboto
+- Web: Inter, system-ui, sans-serif
 
 ---
 
-### Text Styles
+### Text Styles (From Figma)
 
-**Display (Hero Text)**
-```
-Font Size: 32-40pt
-Line Height: 1.2
-Weight: Bold (700)
-Usage: Onboarding screens, empty states
-```
-
-**Heading 1**
+**Hero/Display Text** (Onboarding, Welcome)
 ```
 Font Size: 28pt
-Line Height: 1.3
+Line Height: 1.2 (34pt)
 Weight: Bold (700)
-Usage: Page titles, main headers
+Color: #1A1A1A (Black)
+Example: "welcome to Jeeva learning app"
 ```
 
-**Heading 2**
+**Page Titles**
 ```
 Font Size: 24pt
-Line Height: 1.3
-Weight: Semibold (600)
-Usage: Section headers, card titles
+Line Height: 1.3 (32pt)
+Weight: Bold (700)
+Color: #1A1A1A (Black)
+Example: "Hi, welcome back", "Choose Your Practice Module"
 ```
 
-**Heading 3**
+**Section Headers**
 ```
 Font Size: 20pt
-Line Height: 1.4
+Line Height: 1.4 (28pt)
 Weight: Semibold (600)
-Usage: Subsection headers
+Color: #1A1A1A (Black)
+Example: "Topics", "Practice topics"
 ```
 
-**Body Large**
+**Card Titles**
 ```
 Font Size: 18pt
-Line Height: 1.5
-Weight: Regular (400)
-Usage: Lesson content, important text
+Line Height: 1.4 (25pt)
+Weight: Semibold (600)
+Color: #1A1A1A (Black)
+Example: "NMC CBT", "The NMC Code", "Numeracy"
 ```
 
-**Body (Default)**
+**Body Text / Descriptions**
 ```
 Font Size: 16pt
-Line Height: 1.5
+Line Height: 1.5 (24pt)
 Weight: Regular (400)
-Usage: General content, descriptions
+Color: #1A1A1A (Primary) or #9E9E9E (Secondary)
+Example: "Exam preparatory course", "Patient dignity, consent, advocacy."
 ```
 
-**Body Small**
+**Small Text / Captions**
 ```
 Font Size: 14pt
-Line Height: 1.5
+Line Height: 1.5 (21pt)
 Weight: Regular (400)
-Usage: Supporting text, captions
+Color: #9E9E9E (Gray)
+Example: "interactive learning", "mix password with uppercase..."
 ```
 
-**Caption**
+**Label Text (Buttons, Tabs)**
+```
+Font Size: 16pt
+Line Height: 1.2 (19pt)
+Weight: Medium (500)
+Color: White (on buttons) or #3B82F6 (links)
+Example: "Sign in", "Register", "Continue"
+```
+
+**Badge/Chip Text**
 ```
 Font Size: 12pt
-Line Height: 1.4
+Line Height: 1.3 (16pt)
 Weight: Medium (500)
-Usage: Labels, metadata, timestamps
+Color: #3B82F6
+Example: "Lessons: 4", "Get 5% off", "Topics: 4"
 ```
 
-**Overline (Uppercase)**
+**Version/Small Labels**
 ```
-Font Size: 10pt
-Line Height: 1.6
-Weight: Bold (700)
-Letter Spacing: 1.5px
-Transform: Uppercase
-Usage: Category labels, tags
+Font Size: 11pt
+Line Height: 1.4 (15pt)
+Weight: Regular (400)
+Color: #9E9E9E
+Example: "Jeeva Learning app V: 1.01"
 ```
 
 ---
@@ -324,164 +362,273 @@ Round:      999pt (Avatar, icon buttons)
 
 ## 🎛️ Components
 
-### Buttons
+### Buttons (From Figma)
 
-#### Primary Button
+#### Primary Button (Main CTAs)
 ```
-Background: Primary/500 (#007AFF)
+Background: #3B82F6 (Primary Blue)
 Text: White (#FFFFFF)
-Font: Body/Semibold (16pt/600)
-Height: 48pt
-Padding: 12pt 24pt
-Border Radius: 8pt
-Shadow: 0px 2px 8px rgba(0, 122, 255, 0.3)
+Font: 16pt, Medium (500)
+Height: 48-52px
+Padding: 14px 24px
+Border Radius: 8-12px
+Shadow: 0px 2px 8px rgba(59, 130, 246, 0.25)
+
+Examples: "Sign in", "Register", "Continue", "Check your understanding"
 
 States:
-- Hover: Primary/400
-- Active: Primary/600
-- Disabled: Gray/300 (bg), Gray/500 (text)
+- Hover: Background #2563EB (darker)
+- Active: Background #1D4ED8
+- Disabled: Background #BDBDBD, Text #757575
 ```
 
-#### Secondary Button
+#### Secondary Button (Destructive/Alternative)
+```
+Background: #FF8A80 (Coral)
+Text: White (#FFFFFF)
+Font: 16pt, Medium (500)
+Height: 48px
+Padding: 14px 24px
+Border Radius: 8px
+
+Examples: "Retake"
+
+States:
+- Hover: Background #FF7961
+- Active: Background #FF5252
+```
+
+#### Tertiary Button (Small Actions)
+```
+Background: #FFFFFF (White)
+Border: 1px solid #E0E0E0
+Text: #3B82F6 (Primary)
+Font: 14pt, Medium (500)
+Height: 36px
+Padding: 8px 16px
+Border Radius: 8px
+
+Examples: "Edit profile", "view notes"
+```
+
+#### Text Link Button
 ```
 Background: Transparent
-Border: 1.5pt solid Primary/500
-Text: Primary/500
-Font: Body/Semibold (16pt/600)
-Height: 48pt
-Padding: 12pt 24pt
-Border Radius: 8pt
+Text: #3B82F6 (Primary Blue)
+Font: 16pt, Medium (500)
+Underline: None (hover: underline)
+
+Examples: "sign in now", "forgot password", "Sign in"
 
 States:
-- Hover: Primary/50 (bg)
-- Active: Primary/100 (bg)
-- Disabled: Gray/300 (border & text)
+- Hover: Underline
+- Active: Color #2563EB
 ```
 
-#### Text Button
+#### Icon Button (Navigation)
 ```
+Size: 40x40px
 Background: Transparent
-Text: Primary/500
-Font: Body/Semibold (16pt/600)
-Height: 40pt
-Padding: 8pt 16pt
+Icon Size: 20-24px
+Icon Color: #1A1A1A
+
+Examples: Back arrow, Close (X)
 
 States:
-- Hover: Primary/50 (bg)
-- Active: Primary/100 (bg)
-```
-
-#### Icon Button
-```
-Size: 40x40pt
-Border Radius: 999pt (Round)
-Icon Size: 20x20pt
-Background: Transparent
-
-States:
-- Hover: Gray/100 (bg)
-- Active: Gray/200 (bg)
+- Active: Background #F5F5F5
 ```
 
 ---
 
-### Input Fields
+### Input Fields (From Figma)
 
-#### Text Input
+#### Text Input (Email, Password, Name)
 ```
-Height: 48pt
-Padding: 12pt 16pt
-Border: 1pt solid Gray/300
-Border Radius: 8pt
-Font: Body (16pt/400)
-Placeholder: Gray/500
+Height: 48-52px
+Padding: 14px 16px
+Border: 1px solid #E0E0E0
+Border Radius: 8px
+Font: 16pt, Regular (400)
+Placeholder Color: #BDBDBD
+Text Color: #1A1A1A
+
+Label Above Input:
+- Font: 14pt, Regular (400)
+- Color: #1A1A1A
+- Spacing: 8px from input
+
+Examples: "Email Address", "Password", "Full name"
 
 States:
-- Focus: Border Primary/500, Shadow 0px 0px 0px 3pt Primary/100
-- Error: Border Error/500, Shadow 0px 0px 0px 3pt Error/100
-- Disabled: Background Gray/100, Text Gray/500
+- Default: Border #E0E0E0
+- Focus: Border #3B82F6, Shadow 0px 0px 0px 3px rgba(59, 130, 246, 0.1)
+- Error: Border #FF8A80
+- Disabled: Background #F5F5F5, Text #BDBDBD
 ```
 
-#### Search Input
+#### Password Input (with Helper Text)
 ```
-Height: 44pt
-Padding: 8pt 16pt 8pt 44pt (space for icon)
-Icon: 20x20pt, Gray/500, Left 12pt
-Border Radius: 12pt
-Background: Gray/100
-Font: Body (16pt/400)
+Same as Text Input with:
+- Show/Hide toggle icon (eye icon, right aligned)
+- Helper text below: "mix password with uppercase, lowercase, numbers and special characters"
+- Helper text: 12pt, Regular, #9E9E9E
+- Spacing: 4px from input
+```
 
-States:
-- Focus: Background White, Border 1pt Primary/500
+#### Form Container (Card)
+```
+Background: White (#FFFFFF)
+Border: None
+Border Radius: 16px
+Padding: 24px 20px
+Shadow: 0px 2px 12px rgba(0, 0, 0, 0.08)
+Max Width: 90% screen width
+
+Examples: Login card, Registration card
 ```
 
 ---
 
-### Cards
+### Cards (From Figma)
 
-#### Content Card (Module/Topic/Lesson)
+#### Hero Card (Featured Content)
 ```
-Background: White
-Border: 1pt solid Gray/200
-Border Radius: 12pt
-Padding: 16pt
-Shadow: 0px 2px 8px rgba(0, 0, 0, 0.08)
+Background: Linear Gradient (#2F80ED → #5B9FED, 135deg)
+Border Radius: 16px
+Padding: 20px
+Text Color: White (#FFFFFF)
+Shadow: 0px 4px 16px rgba(47, 128, 237, 0.25)
 
 Components:
-- Thumbnail: 80x80pt, Border Radius 8pt
-- Title: Heading 3 (20pt/600)
-- Description: Body Small (14pt/400), 2 lines max
-- Metadata: Caption (12pt/500), Gray/600
-- Arrow Icon: 20x20pt, Gray/400
+- Title: 20pt, Bold (700), White, Uppercase
+- Subtitle: 14pt, Regular (400), White, Opacity 0.9
+- CTA Button: White background, Blue text, 36px height
+- Image: Illustration, right aligned
+
+Examples: "CRACK NMC", "PRACTICE MODE", "LEARNING MODE"
+
+Dimensions:
+- Width: ~90% screen width
+- Height: Auto (~180-200px)
+```
+
+#### Course/Module Card (White)
+```
+Background: White (#FFFFFF)
+Border: 1px solid #E0E0E0
+Border Radius: 12px
+Padding: 16px
+Shadow: 0px 2px 8px rgba(0, 0, 0, 0.06)
+
+Components:
+- Image: Full width, 160px height, Border Radius 8px (top)
+- Category label: 12pt, Medium, #3B82F6, "course"
+- Title: 18pt, Semibold (600), #1A1A1A
+- Description: 14pt, Regular, #9E9E9E
+- Action Icon: 40px circle, #3B82F6 background, white arrow
+
+Example: "NMC CBT" card
+```
+
+#### Topic/Lesson Card (List Item)
+```
+Background: White (#FFFFFF)
+Border: 1px solid #E0E0E0
+Border Radius: 12px
+Padding: 16px
+Margin Bottom: 12px
+
+Components:
+- Title: 16pt, Semibold (600), #1A1A1A
+- Description: 14pt, Regular, #9E9E9E
+- Badge: "Lessons: 4", 12pt, Medium, #3B82F6 background, white text
+- Icons: Flag and bookmark icons (16px)
+- Arrow: Right chevron, 20px, #9E9E9E
+
+Example: "The NMC Code", "Mental Capacity Act"
 
 States:
-- Hover/Press: Shadow 0px 4px 12px rgba(0, 0, 0, 0.12)
+- Press: Scale 0.98, Shadow increase
 ```
 
-#### Progress Card
+#### Module Card (Colored Background)
 ```
-Background: Gradient (Primary/500 to Primary/400)
-Border Radius: 16pt
-Padding: 20pt
-Text: White
-
-Components:
-- Title: Heading 2 (24pt/600)
-- Stat Value: Display (40pt/700)
-- Stat Label: Caption (12pt/500)
-- Icon: 32x32pt
-```
-
-#### Stats Card
-```
-Background: White
-Border: 1pt solid Gray/200
-Border Radius: 12pt
-Padding: 16pt
-Flex Direction: Row
+Background: Module color (#ECFDF5 green, #FFF4E6 orange, etc.)
+Border Radius: 12px
+Padding: 20px
+Height: 140px
 
 Components:
-- Icon: 40x40pt, Background Primary/100, Icon Primary/500
-- Value: Heading 2 (24pt/600)
-- Label: Body Small (14pt/400), Gray/600
+- Icon: 48px circle, solid color (#4ADE80, #FFB74D)
+- Title: 18pt, Semibold (600), #1A1A1A
+- Description: 14pt, Regular, #757575
+- Arrow: Right chevron, white circle, 32px
+
+Examples: "Numeracy", "Clinical" practice modules
+```
+
+#### Score/Result Card
+```
+Background: White (#FFFFFF) or Light Blue (#EFF6FF)
+Border Radius: 16px
+Padding: 24px
+Center aligned
+
+Components:
+- Trophy/Icon: 80px, light blue/gray
+- Score Label: 16pt, Semibold, #1A1A1A, with icon
+- Score Value: 32pt, Bold, #FF8A80 (red)
+- Stats Row: Blue background, 12px radius
+  - Correct: #FFFFFF text, "7"
+  - Incorrect: #FFFFFF text, "3"
+  - Skipped: #FFFFFF text, "1"
+
+Example: Quiz result "7/11"
+```
+
+#### Subscription Plan Card
+```
+Background: White (#FFFFFF)
+Border: 1px solid #E0E0E0
+Border Radius: 12px
+Padding: 16px
+
+Components:
+- Plan Name: 16pt, Semibold (600), #1A1A1A
+- Badge: "Get 5% off", 12pt, Medium, #FFB74D background
+- Price: 24pt, Bold (700), #3B82F6
+- Currency: "Rs" (right aligned)
+
+Example: "1 Month plan - 1500 Rs"
 ```
 
 ---
 
-### Bottom Navigation
+### Bottom Navigation (From Figma)
 
 ```
-Height: 64pt (+ safe area)
-Background: White
-Border Top: 1pt solid Gray/200
-Padding: 8pt 0pt
+Height: 64px (+ safe area ~34px iOS)
+Background: White (#FFFFFF)
+Border Top: 1px solid #E0E0E0
+Padding: 8px 0px
 
 Tab Item:
-- Icon: 24x24pt
-- Label: Caption (11pt/500)
-- Active Color: Primary/500
-- Inactive Color: Gray/500
-- Badge: 16x16pt, Background Error/500, Text White
+- Icon: 24x24px
+- Label: 11pt, Medium (500)
+- Active Color: #3B82F6 (Primary Blue)
+- Inactive Color: #9E9E9E (Gray)
+- Spacing: 4px between icon and label
+
+Tabs (From Figma):
+1. Home - House icon
+2. AI assistant - Chat bubble icon  
+3. Courses - Play circle icon
+4. Profile - Person icon
+
+States:
+- Active: Icon and text #3B82F6, slight scale (1.05)
+- Inactive: Icon and text #9E9E9E
+- Press: Background #F5F5F5, 40px circle
 ```
 
 ---
@@ -523,68 +670,202 @@ Padding: 12pt 16pt
 
 ---
 
-### Badges & Chips
+### Badges & Chips (From Figma)
 
-#### Badge
+#### Info Badge (Lessons Count)
 ```
-Height: 20pt
-Padding: 2pt 8pt
-Border Radius: 10pt (round)
-Font: Caption (11pt/700)
+Background: #3B82F6 (Primary Blue)
+Text: White (#FFFFFF)
+Font: 12pt, Medium (500)
+Height: 24px
+Padding: 4px 8px
+Border Radius: 6px
 
-Variants:
-- Success: Background Success/100, Text Success/500
-- Error: Background Error/100, Text Error/500
-- Warning: Background Warning/100, Text Warning/500
-- Info: Background Info/100, Text Info/500
-- Neutral: Background Gray/200, Text Gray/700
+Example: "Lessons: 4"
 ```
 
-#### Chip (Tag)
+#### Discount Badge (Subscription)
 ```
-Height: 28pt
-Padding: 4pt 12pt
-Border Radius: 14pt (round)
-Font: Body Small (14pt/500)
-Background: Gray/100
-Text: Gray/800
+Background: #FFB74D (Orange)
+Text: White (#FFFFFF)
+Font: 11pt, Medium (500)
+Height: 20px
+Padding: 3px 8px
+Border Radius: 4px
 
-With Close Icon:
-- Icon: 16x16pt, Right 4pt
-- Tap Area: 24x24pt
+Example: "Get 5% off", "Get 15% off", "Get 25% off"
+```
+
+#### Category Label
+```
+Background: Transparent
+Text: #3B82F6 (Primary Blue)
+Font: 12pt, Medium (500)
+Transform: Lowercase
+
+Example: "course"
+```
+
+#### Topics Badge (with Icon)
+```
+Background: #DBEAFE (Light Blue)
+Icon: Info circle, 14px, #3B82F6
+Text: #3B82F6, 12pt, Medium (500)
+Height: 24px
+Padding: 4px 10px
+Border Radius: 12px
+
+Example: "Topics: 4"
 ```
 
 ---
 
-### Modals & Dialogs
+### Social Login Buttons (From Figma)
 
-#### Bottom Sheet
+#### Social Sign-in Container
 ```
-Background: White
-Border Radius: 24pt 24pt 0pt 0pt
-Max Height: 90vh
-Padding: 24pt
+Divider with Text:
+- Line: 1px solid #E0E0E0
+- Text: "or sign in with" / "or signup with"
+- Font: 14pt, Regular, #9E9E9E
+- Spacing: 24px from buttons (above and below)
+
+Social Buttons (Side by Side):
+- Width: 56px each
+- Height: 56px
+- Border Radius: 12px
+- Border: 1px solid #E0E0E0
+- Background: White (#FFFFFF)
+- Icon Size: 24x24px
+- Spacing: 16px between buttons
+
+Buttons:
+1. Google - Colorful G icon
+2. Apple - Black Apple icon
+
+States:
+- Press: Background #F5F5F5, Scale 0.95
+```
+
+---
+
+### Video/Audio Player (From Figma)
+
+#### Video Player (Lesson Content)
+```
+Container:
+- Width: Full width (minus 16px padding)
+- Height: Auto (16:9 aspect ratio)
+- Background: #000000 (Black)
+- Border Radius: 8px
+
+Controls:
+- Play/Pause: Center, 56px circle, white icon
+- Seek -10s: Left, 40px circle, white icon
+- Seek +10s: Right, 40px circle, white icon
+- Speed: Top right, "1.0X" text, 14pt
+- Progress Bar: Bottom, Red (#FF5252) fill, 4px height
+- Time: Bottom right, "0:00 / 1:45", 12pt, white
+
+States:
+- Paused: Show play button overlay
+- Playing: Auto-hide controls after 3s
+```
+
+#### View Notes Button (Below Video)
+```
+Background: #F5F5F5 (Light Gray)
+Border: None
+Border Radius: 8px
+Height: 44px
+Width: Full width
+Padding: 12px 16px
+
+Text: "view notes", 14pt, Regular, #757575
+Icon: Plus (+) icon, right aligned, 20px, #757575
+
+States:
+- Press: Background #EEEEEE
+```
+
+---
+
+### Profile Components (From Figma)
+
+#### Profile Header
+```
+Avatar:
+- Size: 80px circle
+- Border: 2px solid #E0E0E0
+- Image or placeholder
+
+User Info:
+- Name: "Hi, User", 20pt, Bold (700), #1A1A1A
+- Email: "demo@mailid.com", 14pt, Regular, #9E9E9E
+- Spacing: 4px between name and email
+
+Edit Button:
+- Background: #3B82F6
+- Text: "Edit profile", 14pt, Medium, White
+- Height: 32px
+- Padding: 8px 16px
+- Border Radius: 6px
+- Position: Below email, 12px spacing
+```
+
+#### Profile Menu List
+```
+Menu Item:
+- Height: 56px
+- Padding: 12px 16px
+- Border Bottom: 1px solid #F5F5F5
+- Background: White
 
 Components:
-- Handle: 32pt wide, 4pt tall, Gray/300, Centered top
-- Title: Heading 2 (24pt/600)
-- Content: Scrollable with padding
-- Actions: Sticky bottom, 16pt from content
+- Icon: 20x20px, colored (specific per item)
+  - Dashboard: #3B82F6 (Blue)
+  - Courses: #4ADE80 (Green)
+  - Subscription: #FFB74D (Orange)
+  - Favourites: #FF8A80 (Coral/Pink)
+  - Downloads: #3B82F6 (Blue)
+  - Support: #1A1A1A (Black)
+  - Logout: #3B82F6 (Blue)
+- Text: 16pt, Regular, #1A1A1A
+- Arrow: Right chevron, 20px, #9E9E9E, right aligned
+- Spacing: 12px between icon and text
+
+Sections:
+1. Main actions (Dashboard, Courses, Subscription)
+2. Divider line (#F5F5F5, 8px height)
+3. Secondary actions (Favourites, Downloads)
+4. Divider line
+5. Support & Logout
+
+Logout Item:
+- Text color: #3B82F6 (Blue)
+- Icon: Logout arrow, #3B82F6
 ```
 
-#### Alert Dialog
-```
-Width: 90vw (max 400pt)
-Background: White
-Border Radius: 16pt
-Padding: 24pt
-Shadow: 0px 8px 24px rgba(0, 0, 0, 0.15)
+---
 
-Components:
-- Icon: 48x48pt (optional), Primary/500
-- Title: Heading 2 (24pt/600)
-- Message: Body (16pt/400), Gray/600
-- Actions: Row, 12pt gap
+### Modals & Dialogs (From Figma)
+
+#### Subscription Modal (Full Screen Overlay)
+```
+Background: White (#FFFFFF)
+Close Button: Top left, X icon, 24px, #1A1A1A
+
+Header:
+- Title: "Unlock Full Access & Ace Your Exam!", 24pt, Bold
+  - "Unlock" in #3B82F6
+  - Rest in #9E9E9E
+- Features List: Star icons (⭐), 14pt, Regular, #1A1A1A
+- Spacing: 16px between features
+
+Content:
+- Plan cards (stacked vertically)
+- Continue button at bottom
+- Padding: 24px all sides
 ```
 
 ---
@@ -766,30 +1047,260 @@ Easing: Ease Out
 
 ---
 
-## 📱 Screen Layouts
+## 📱 Screen Layouts (From Figma)
 
-### Dashboard (Home)
+### Onboarding/Welcome Screen
 
 **Layout:**
 ```
-Header (Fixed Top):
-  - Height: 56pt + safe area
-  - User Avatar: 36x36pt, Right 16pt
-  - Greeting: "Hello, [Name]" - Heading 2
-  - Notification Icon: Top Right
+Full Screen:
+- Logo: Top center, 64px, ~80px from top
+- Title: "welcome to Jeeva learning app", 28pt, Bold
+- Subtitle: "real practice, mock tests, and AI-powered learning."
+  - 16pt, Regular, #757575, Center aligned
+- Illustration: Large centered image (~280px height)
+- CTA Button: "Get started", bottom 40px from safe area
+- Link: "Already have account? Sign in", 14pt, below button
 
-Stats Section:
-  - 2x2 Grid, 12pt gap
-  - Cards: Lessons, Streak, Time, Score
+Spacing:
+- Screen padding: 24px horizontal
+- Elements stack vertically with auto spacing
+- Background: White (#FFFFFF)
+```
 
-Continue Learning:
-  - Section Header: "Continue Learning"
-  - Horizontal Scroll
-  - Card: 280pt wide
+---
 
-Recommended:
-  - Section Header: "Recommended for You"
-  - Vertical List
+### Login/Register Screen
+
+**Layout:**
+```
+Header:
+- Logo + "JEEVA LEARNING APP" text, top center
+- Title: "Hi, welcome back" / "Hello, Register to get started"
+- Subtitle: "sign in now" (blue link) - 24pt from title
+- Close button (X): Top left (register only)
+
+Form Card:
+- White card with 16px border radius
+- 24px padding
+- Input fields stack vertically, 16px gap
+- Helper text: 4px below password input
+- Primary button: 24px below last input
+- Social divider: "or sign in with", 24px below button
+- Social buttons: Centered, 16px gap
+- Bottom link: "forgot password" / "Sign in", centered
+
+Spacing:
+- Screen padding: 16px horizontal
+- Background: #F5F5F5 (light gray)
+```
+
+---
+
+### Home/Dashboard Screen
+
+**Layout:**
+```
+Header (Fixed):
+- Logo: Top left, 32px height
+- Avatar: Top right, 40px circle
+- Greeting: "Hi, User", 20pt, 16px below header
+- Subtitle: "Find your lessons today!", 14pt, #9E9E9E
+
+Hero Card:
+- 24px from subtitle
+- "Upgrade your career" card with CTA
+- Full width (minus 32px total padding)
+
+Quick Actions (4 icons):
+- Row of 4 icon buttons
+- Labels: "courses", "packages", "features", "queries"
+- Icon: 24px, colored backgrounds
+- 16px below hero card
+
+Promotional Card:
+- "Welcome Offer on paid plans"
+- Subscribe button
+- 24px below quick actions
+
+Footer:
+- App version text: "Jeeva Learning app V: 1.01"
+- Center aligned, 11pt, #9E9E9E
+
+Bottom Navigation:
+- Fixed bottom, 64px height
+```
+
+---
+
+### Courses/Module List Screen
+
+**Layout:**
+```
+Header:
+- Back arrow: Top left
+- Title: "Courses", 20pt, Semibold
+- 16px padding horizontal
+
+Hero Card:
+- "CRACK NMC" blue gradient card
+- Full width, 16px margin
+
+Course Card:
+- Course image (full width, 160px height)
+- Content padding: 16px
+- Category label + title + description
+- Action button: Bottom right
+
+Module Cards Grid:
+- 2x2 grid layout
+- 12px gap between cards
+- Labels: "Start Free trial", "Practice Module", etc.
+
+Spacing:
+- Screen padding: 16px horizontal
+- Card spacing: 12px vertical
+```
+
+---
+
+### Practice/Topic List Screen
+
+**Layout:**
+```
+Header:
+- Back arrow: Top left
+- Title: "Practice Numeracy", 20pt
+- 16px padding
+
+Lesson Card (Hero):
+- White card, 16px margin
+- Section label: "Lesson"
+- Title: "Numeracy section", 20pt, Bold
+- Badge: "Topics: 4" with blue background
+- Description: 14pt, Regular
+
+Section Header:
+- "Practice topics", 16pt, Semibold
+- 24px spacing from above
+
+Topic List:
+- Stacked cards, 12px gap
+- Each card: Title, subtitle, arrow
+- "interactive learning" label
+
+Bottom Navigation:
+- Fixed bottom
+```
+
+---
+
+### Video Lesson Screen
+
+**Layout:**
+```
+Header:
+- Back arrow: Top left
+- Title: "The NMC Code", 20pt
+- 16px padding
+
+Lesson Header:
+- Lesson number: "1.1 Prioritise People", 24pt, Bold
+- Section: "The NMC Code", 14pt, #9E9E9E
+
+Content:
+- Description text: 16pt, Regular, #757575
+- 16px padding
+
+Video Player:
+- Full width (minus 32px total padding)
+- 16:9 aspect ratio
+- Controls overlay
+- 16px margin vertical
+
+View Notes Button:
+- Full width, gray background
+- 16px margin horizontal
+- 44px height
+
+CTA Button:
+- "Check your understanding"
+- Full width, 16px margin
+- Fixed or scrollable bottom
+```
+
+---
+
+### Result/Score Screen
+
+**Layout:**
+```
+Header:
+- Back arrow: Top left
+- Title: "Result", 20pt
+- 16px padding
+
+Result Card:
+- Top section: Light blue background
+- Trophy icon: 80px, centered
+- Stars decoration (decorative)
+
+Score Overview:
+- White card, 16px radius
+- Trophy icon + "Score Overview" + "7/11"
+- Horizontal layout
+
+Stats Card:
+- Blue background (#3B82F6)
+- 3 columns: correct (7), incorrect (3), skipped (1)
+- White text, 16pt numbers
+
+Action Link:
+- "Review Answers" with eye icon
+- 16pt, Regular, #9E9E9E
+
+Action Buttons:
+- "Retake" (Coral) + "Next lesson" (Blue)
+- Side by side, 12px gap
+- 48px height each
+- 24px from bottom (above nav)
+```
+
+---
+
+### Profile Screen
+
+**Layout:**
+```
+Header:
+- Back arrow: Top left
+- Title: "Profile", 20pt
+- 16px padding
+
+Profile Card:
+- White background
+- Avatar: 80px circle, centered top
+- Name: "Hi, User", 20pt, Bold
+- Email: "demo@mailid.com", 14pt, Gray
+- Edit button: 32px height, blue
+
+Menu List (Grouped):
+Group 1:
+- Dashboard, Courses, Subscription
+
+Divider (8px gray bar)
+
+Group 2:
+- Favourites, Downloads
+
+Divider (8px gray bar)
+
+Group 3:
+- Get support
+- Logout (blue text)
+
+Bottom Navigation:
+- Fixed bottom
 ```
 
 ---
@@ -1061,24 +1572,107 @@ Outline Offset: 2pt
 - WebP for images
 - Use asset naming convention: `[component]_[variant]_[state]@[scale]`
 
-### Design Tokens (JSON)
+### Design Tokens (JSON) - From Figma
+
 ```json
 {
   "colors": {
     "primary": {
-      "500": "#007AFF",
-      "400": "#3395FF"
+      "500": "#3B82F6",
+      "400": "#60A5FA",
+      "600": "#2563EB"
+    },
+    "green": {
+      "500": "#4ADE80",
+      "100": "#D1FAE5",
+      "50": "#ECFDF5"
+    },
+    "coral": {
+      "500": "#FF8A80",
+      "100": "#FFCCBC"
+    },
+    "orange": {
+      "500": "#FFB74D",
+      "100": "#FFE0B2"
+    },
+    "gray": {
+      "900": "#1A1A1A",
+      "500": "#9E9E9E",
+      "300": "#E0E0E0",
+      "100": "#F5F5F5"
     }
   },
   "spacing": {
-    "xs": "8pt",
-    "md": "16pt"
+    "xs": 8,
+    "sm": 12,
+    "md": 16,
+    "lg": 24,
+    "xl": 32
   },
   "typography": {
-    "heading1": {
-      "fontSize": "28pt",
-      "fontWeight": "700"
+    "hero": {
+      "fontSize": 28,
+      "fontWeight": "700",
+      "lineHeight": 34
+    },
+    "pageTitle": {
+      "fontSize": 24,
+      "fontWeight": "700",
+      "lineHeight": 32
+    },
+    "cardTitle": {
+      "fontSize": 18,
+      "fontWeight": "600",
+      "lineHeight": 25
+    },
+    "body": {
+      "fontSize": 16,
+      "fontWeight": "400",
+      "lineHeight": 24
+    },
+    "small": {
+      "fontSize": 14,
+      "fontWeight": "400",
+      "lineHeight": 21
+    },
+    "badge": {
+      "fontSize": 12,
+      "fontWeight": "500",
+      "lineHeight": 16
     }
+  },
+  "borderRadius": {
+    "small": 6,
+    "medium": 8,
+    "large": 12,
+    "xlarge": 16,
+    "round": 999
+  },
+  "button": {
+    "primary": {
+      "height": 48,
+      "borderRadius": 8,
+      "paddingHorizontal": 24,
+      "paddingVertical": 14,
+      "backgroundColor": "#3B82F6",
+      "textColor": "#FFFFFF"
+    },
+    "secondary": {
+      "height": 48,
+      "borderRadius": 8,
+      "paddingHorizontal": 24,
+      "paddingVertical": 14,
+      "backgroundColor": "#FF8A80",
+      "textColor": "#FFFFFF"
+    }
+  },
+  "input": {
+    "height": 48,
+    "borderRadius": 8,
+    "paddingHorizontal": 16,
+    "paddingVertical": 14,
+    "borderColor": "#E0E0E0",
+    "borderWidth": 1
   }
 }
 ```
@@ -1139,13 +1733,59 @@ const normalize = (size: number) => {
 
 ---
 
-## 📝 Notes
+## 📝 Implementation Checklist
 
-**Important:** This document serves as a template. Please update the specific values (colors, fonts, spacing) based on your actual Figma design. Export design tokens from Figma for exact specifications.
+**For Developers:**
+
+Before implementing each screen:
+- [ ] Review the specific screen layout section
+- [ ] Use the design tokens JSON for consistent styling
+- [ ] Match exact colors, spacing, and typography
+- [ ] Implement all interactive states (hover, active, disabled)
+- [ ] Test on both iOS and Android
+- [ ] Verify touch targets (minimum 44x44px)
+- [ ] Test with dynamic text scaling
+- [ ] Ensure accessibility compliance
+
+**Key Implementation Points:**
+1. **Colors:** Use the exact hex values from the color palette section
+2. **Typography:** Match font sizes, weights, and line heights exactly
+3. **Spacing:** Follow the 4px/8px/12px/16px/24px spacing scale
+4. **Components:** Reference component specs for exact dimensions
+5. **Animations:** Use the specified durations and easing functions
 
 ---
 
-**Version:** 1.0  
+## 🎨 Design System Summary
+
+**Colors:**
+- Primary Blue: #3B82F6 (buttons, links, active states)
+- Green: #4ADE80 (practice modules, success)
+- Coral: #FF8A80 (destructive actions, errors)
+- Orange: #FFB74D (badges, highlights)
+
+**Typography:**
+- Font: SF Pro (iOS) / Roboto (Android)
+- Sizes: 11pt → 28pt
+- Weights: Regular (400), Medium (500), Semibold (600), Bold (700)
+
+**Spacing:**
+- Base: 4px grid system
+- Common: 8px, 12px, 16px, 24px, 32px
+
+**Border Radius:**
+- Small: 6-8px
+- Medium: 12px
+- Large: 16px
+
+---
+
+**Version:** 2.0 (✅ Updated with actual Figma values)  
 **Last Updated:** October 11, 2025  
+**Figma Source:** Analyzed from design screenshots  
 **Design by:** Jeeva EdTech Design Team  
 **Developer:** vollstek@gmail.com
+
+---
+
+**✅ Documentation Status:** Complete and ready for implementation!
