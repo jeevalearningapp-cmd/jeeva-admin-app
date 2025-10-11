@@ -179,12 +179,73 @@ Supabase PostgreSQL database with tables like `users`, `user_profiles`, `subscri
 
 **Design Philosophy:** Modern, polished interface with subtle rounded corners (8px), optimized density, refined typography, spacious content areas, and premium visual effects creating an advanced web application experience.
 
+### Audio Support for Lessons (Completed)
+**Podcast/audio content support added to lessons:**
+
+1. **Database Migration:**
+   - Added `audio_url` column to lessons table
+   - Supports mp3 and wav audio formats
+   - Migration file: `database/migrations/add_audio_to_lessons.sql`
+   - Setup instructions: `database/migrations/AUDIO_SETUP_INSTRUCTIONS.md`
+
+2. **TypeScript Types Updated:**
+   - `Lesson` interface includes optional `audioUrl` field
+   - `CreateLessonInput` and `UpdateLessonInput` support audio URLs
+   - Properly exported via index.ts barrel file
+
+3. **Usage:**
+   - Lessons can now include video_url, audio_url, or both
+   - Enables podcast-style learning content
+   - Ready for integration in lesson forms
+
+### CSV Bulk Upload System (Completed)
+**Comprehensive bulk upload functionality for efficient content creation:**
+
+1. **CSV Templates:**
+   - **Lessons Template:** title, content, video_url, audio_url, duration
+   - **Questions Template:** question_text, type, difficulty, points, explanation, image, options
+   - **Flashcards Template:** front, back, image_url
+   - Downloadable templates with sample data and instructions
+   - Utility: `src/utils/csvTemplates.ts`
+
+2. **CSV Upload Component:**
+   - Reusable component for all content types
+   - Features: file upload, parsing, validation, preview, error reporting
+   - Case-insensitive header matching
+   - Batch processing (100 items per batch)
+   - Type-specific validation rules
+   - Component: `src/components/common/CSVUpload.tsx`
+
+3. **Bulk Insert Hook:**
+   - Specialized methods: `uploadLessons()`, `uploadQuestions()`, `uploadFlashcards()`
+   - Data transformation (CSV → database format)
+   - Question type handling (multiple_choice, true_false, short_answer)
+   - Transaction-safe with rollback on failure
+   - Error handling with detailed logging
+   - Hook: `src/hooks/useBulkUpload.ts`
+
+4. **Validation Features:**
+   - Required field validation
+   - Question type and difficulty validation
+   - Option correctness validation (at least one correct option)
+   - Short answer validation (requires correct answer)
+   - Row-by-row error reporting
+
+5. **Usage:**
+   - Download CSV template
+   - Fill in data following sample format
+   - Upload CSV file
+   - Preview and validate before saving
+   - Bulk insert to Supabase
+
+**Status:** Complete and ready for integration into content management UI pages when built.
+
 ### Content Management Database Migration
 - Created comprehensive SQL migration for content management system
 - **Tables Created:** 
   - `modules` - Course modules with thumbnails and display ordering
   - `topics` - Topics within modules with hierarchical relationships
-  - `lessons` - Individual lessons with video support and duration
+  - `lessons` - Individual lessons with video and audio support
   - `flashcards` - Study flashcards (front/back/image) linked to lessons
   - `questions` - Quiz questions with difficulty levels, points, and optional lesson linkage
   - `question_options` - Answer choices for questions
