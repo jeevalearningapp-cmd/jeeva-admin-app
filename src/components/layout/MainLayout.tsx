@@ -53,7 +53,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           transition: 'margin 0.3s, width 0.3s',
         }}
       >
-        <Box sx={{ flexGrow: 1, p: { xs: 2, sm: 3 } }}>
+        <Box sx={{ flexGrow: 1, p: { xs: 3, sm: 4 } }}>
           {children}
         </Box>
         <Footer />
