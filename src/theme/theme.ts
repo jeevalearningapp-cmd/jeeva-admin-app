@@ -124,7 +124,16 @@ export const getTheme = (mode: PaletteMode) => createTheme({
         root: {
           '& .MuiOutlinedInput-root': {
             borderRadius: 8,
-          }
+          },
+          '& .MuiOutlinedInput-input': {
+            padding: '10px 14px',
+          },
+          '& .MuiInputLabel-outlined': {
+            transform: 'translate(14px, 11px) scale(1)',
+            '&.MuiInputLabel-shrink': {
+              transform: 'translate(14px, -9px) scale(0.75)',
+            },
+          },
         }
       }
     },
@@ -173,6 +182,19 @@ export const getTheme = (mode: PaletteMode) => createTheme({
         root: {
           '& .MuiOutlinedInput-notchedOutline': {
             borderRadius: 8,
+          }
+        },
+        select: {
+          padding: '10px 14px',
+        }
+      }
+    },
+    MuiAutocomplete: {
+      styleOverrides: {
+        inputRoot: {
+          padding: '4px !important',
+          '& .MuiOutlinedInput-input': {
+            padding: '6px 14px !important',
           }
         }
       }
