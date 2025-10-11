@@ -103,11 +103,20 @@ export const getTheme = (mode: PaletteMode) => createTheme({
       styleOverrides: {
         root: {
           borderRadius: 8,
-          boxShadow: 'none',
           border: mode === 'light' 
             ? '1px solid #E5E7EB'
             : '1px solid #2C3142',
           backgroundColor: mode === 'light' ? '#FFFFFF' : '#181C32',
+          boxShadow: mode === 'light'
+            ? '0px 2px 8px rgba(0, 0, 0, 0.06), 0px 1px 3px rgba(0, 0, 0, 0.04)'
+            : '0px 2px 8px rgba(0, 0, 0, 0.4), 0px 1px 3px rgba(0, 0, 0, 0.3)',
+          transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
+          '&:hover': {
+            transform: 'translateY(-2px)',
+            boxShadow: mode === 'light'
+              ? '0px 4px 16px rgba(0, 0, 0, 0.1), 0px 2px 6px rgba(0, 0, 0, 0.06)'
+              : '0px 4px 16px rgba(0, 0, 0, 0.5), 0px 2px 6px rgba(0, 0, 0, 0.4)',
+          }
         }
       }
     },
@@ -115,11 +124,13 @@ export const getTheme = (mode: PaletteMode) => createTheme({
       styleOverrides: {
         root: {
           borderRadius: 8,
-          boxShadow: 'none',
           border: mode === 'light' 
             ? '1px solid #E5E7EB'
             : '1px solid #2C3142',
           backgroundColor: mode === 'light' ? '#FFFFFF' : '#181C32',
+          boxShadow: mode === 'light'
+            ? '0px 1px 4px rgba(0, 0, 0, 0.05)'
+            : '0px 1px 4px rgba(0, 0, 0, 0.3)',
         }
       }
     },
@@ -145,6 +156,12 @@ export const getTheme = (mode: PaletteMode) => createTheme({
       styleOverrides: {
         paper: {
           borderRight: mode === 'light' ? '1px solid #C1C7D0' : '1px solid #2C3142',
+          backgroundImage: mode === 'light'
+            ? 'linear-gradient(to right, #FFFFFF, #FAFBFC)'
+            : 'linear-gradient(to right, #1E2139, #181C32)',
+          boxShadow: mode === 'light'
+            ? '4px 0px 16px rgba(0, 0, 0, 0.08)'
+            : '4px 0px 16px rgba(0, 0, 0, 0.4)',
         }
       }
     },
@@ -162,8 +179,20 @@ export const getTheme = (mode: PaletteMode) => createTheme({
         paper: {
           borderRadius: 8,
           boxShadow: mode === 'light'
-            ? '0px 4px 20px rgba(0, 0, 0, 0.1)'
-            : '0px 4px 20px rgba(0, 0, 0, 0.5)',
+            ? '0px 8px 32px rgba(0, 0, 0, 0.12), 0px 2px 8px rgba(0, 0, 0, 0.08)'
+            : '0px 8px 32px rgba(0, 0, 0, 0.6), 0px 2px 8px rgba(0, 0, 0, 0.4)',
+          backgroundImage: mode === 'light'
+            ? 'linear-gradient(to bottom, #FFFFFF, #FAFBFC)'
+            : 'linear-gradient(to bottom, #1E2139, #181C32)',
+        }
+      }
+    },
+    MuiBackdrop: {
+      styleOverrides: {
+        root: {
+          backgroundColor: mode === 'light'
+            ? 'rgba(0, 0, 0, 0.4)'
+            : 'rgba(0, 0, 0, 0.7)',
         }
       }
     },
