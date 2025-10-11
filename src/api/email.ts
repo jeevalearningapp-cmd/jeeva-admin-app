@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3001/api/email'
+const API_URL = '/api/email'
 
 interface SendEmailParams {
   to: string | string[]
