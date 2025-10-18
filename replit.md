@@ -104,7 +104,7 @@ Preferred communication style: Simple, everyday language.
 - **Discount/Coupon Management:** Create and manage discount codes (percentage/fixed), set expiry dates, usage limits, and track redemption statistics.
 - **Dashboard Hero Management:** CRUD for mobile app hero sections with image upload, CTA configuration, and display order management.
 - **CSV Bulk Upload System:** Bulk upload for Lessons, Questions, and Flashcards with downloadable templates, parsing, validation, preview, and error reporting.
-- **Analytics & Dashboard:** Real-time metrics, date-range filtering, key metric cards, trend charts, top content, CSV export.
+- **Analytics & Dashboard:** Real-time metrics with 100% real data from Supabase (zero mock values), optimized RPC functions for performance, date-range filtering, key metric cards, trend charts, top content analysis, CSV export. Uses `analytics_sessions` table for engagement tracking and PostgreSQL functions for efficient distinct user counting.
 - **Admin User Management:** Data tables, search, pagination, detail drawers, CRUD operations, status management, role assignment (Superadmin/Editor/Moderator).
 - **Content Approvals System:** Full approval workflow with status management, reviewer assignment, and approval stats.
 - **Settings Management:** Platform configuration UI for general, security, and notification settings, including email templates.
@@ -158,6 +158,8 @@ Supabase PostgreSQL database with tables:
 - **AI & Recommendations:** `ai_recommendations`, `chatbot_conversations`
 - **Payments:** `subscriptions`, `discount_coupons` (with usage tracking)
 - **Platform:** `hero_sections` (mobile app banners), `email_templates`
+- **Analytics:** `analytics_sessions` (engagement tracking for metrics, separate from auth-focused user_sessions), `daily_stats` (aggregated daily metrics)
+- **PostgreSQL RPC Functions:** `count_distinct_active_users(days_ago)`, `count_distinct_users_by_day(target_date)` for optimized performance
 - Comprehensive RLS policies implemented across all content tables for secure data access.
 
 **Email System:**
