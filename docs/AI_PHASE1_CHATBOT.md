@@ -2,12 +2,13 @@
 
 ## 📋 Document Overview
 
-This guide covers **Phase 1** of Jeeva's AI integration: implementing JeevaBot, an AI-powered chatbot using Google's Gemini AI Studio API. This provides students with instant doubt-solving, context-aware help, and personalized study assistance.
+This guide covers **Phase 1** of Jeeva's AI integration: implementing JeevaBot, an AI-powered chatbot using Google's Gemini AI Studio API. JeevaBot helps Indian nurses preparing for the UK NMC CBT exam with instant doubt-solving, context-aware nursing guidance, medication dosage calculations, and UK healthcare protocol explanations.
 
-**Version:** 1.0  
-**Last Updated:** October 11, 2025  
+**Version:** 2.0  
+**Last Updated:** October 18, 2025  
 **AI Service:** Google AI Studio API (Gemini)  
-**Target Platform:** React Native/Expo Mobile App
+**Target Platform:** React Native/Expo Mobile App  
+**Exam Focus:** UK NMC CBT (Nursing and Midwifery Council Computer-Based Test)
 
 ---
 
@@ -134,11 +135,12 @@ CREATE INDEX idx_chat_conversations_created ON chat_conversations(created_at DES
 {
   "currentLesson": {
     "id": "uuid",
-    "title": "Introduction to Physics",
+    "title": "Medication Dosage Calculations",
     "moduleId": "uuid"
   },
   "userLevel": "intermediate",
-  "recentTopics": ["mechanics", "thermodynamics"]
+  "recentTopics": ["numeracy", "clinical_knowledge", "nmc_code"],
+  "examFocus": "UK NMC CBT"
 }
 ```
 
@@ -355,7 +357,7 @@ export const buildChatContext = async (userId: string): Promise<string> => {
     .limit(5);
 
   // Build context string for AI
-  let context = `You are JeevaBot, an AI tutor for medical exam preparation.
+  let context = `You are JeevaBot, an AI tutor helping Indian nurses prepare for the UK NMC CBT (Nursing and Midwifery Council Computer-Based Test) exam.
 
 Student Context:
 `;
@@ -372,15 +374,22 @@ Student Context:
   }
 
   context += `
-Instructions:
-1. Provide clear, concise explanations suitable for medical students
-2. Reference the student's current lesson when relevant
-3. If the student is struggling (low scores), offer encouraging support
-4. Use simple language and break down complex concepts
-5. Suggest relevant practice topics when appropriate
-6. Keep responses under 200 words unless detailed explanation is requested
+Exam Focus Areas:
+- Numeracy: Medication dosage calculations, IV flow rates, unit conversions, fluid balance
+- Clinical Knowledge: UK-specific nursing care, patient safety, infection control, wound care
+- NMC Code (Professional Standards): UK healthcare ethics, accountability, patient advocacy
 
-Remember: You're a supportive tutor, not just an information source.`;
+Instructions:
+1. Provide clear, concise explanations relevant to UK nursing practice and NMC CBT exam
+2. For numeracy questions, show step-by-step calculations with units
+3. For clinical scenarios, reference UK protocols and NMC Code principles where applicable
+4. Be culturally aware - mention differences between Indian and UK healthcare systems when relevant
+5. If the student is struggling (low scores), offer encouraging support and study tips
+6. Use simple language and break down complex nursing concepts
+7. Suggest relevant practice topics aligned with NMC CBT exam format
+8. Keep responses under 250 words unless detailed explanation is requested
+
+Remember: You're a supportive nursing tutor helping students transition from Indian nursing education to UK healthcare standards. Focus on exam-relevant, practical nursing knowledge.`;
 
   return context;
 };
@@ -583,20 +592,20 @@ export default function ChatScreen({ route }) {
     >
       <View style={styles.header}>
         <Text style={styles.headerTitle}>JeevaBot</Text>
-        <Text style={styles.headerSubtitle}>Your AI Study Assistant</Text>
+        <Text style={styles.headerSubtitle}>Your NMC CBT Nursing Tutor</Text>
       </View>
 
       {messages.length === 0 ? (
         <View style={styles.emptyState}>
           <Text style={styles.emptyTitle}>👋 Hi! I'm JeevaBot</Text>
           <Text style={styles.emptyText}>
-            Ask me anything about your studies. I can help with:
+            Your AI tutor for UK NMC CBT exam prep. I can help with:
           </Text>
           <Text style={styles.emptyList}>
-            • Explaining difficult concepts{'\n'}
-            • Practice question tips{'\n'}
-            • Study recommendations{'\n'}
-            • Exam strategies
+            • Medication dosage calculations (Numeracy){'\n'}
+            • UK clinical scenarios & protocols{'\n'}
+            • NMC Code & professional standards{'\n'}
+            • Practice question tips & exam strategies
           </Text>
         </View>
       ) : (
