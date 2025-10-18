@@ -72,7 +72,7 @@ function App() {
               element={
                 <ProtectedRoute allowedRoles={['superadmin', 'editor']}>
                   <MainLayout>
-                    <UsersPage />
+                    <StudentsPage />
                   </MainLayout>
                 </ProtectedRoute>
               }
@@ -95,6 +95,17 @@ function App() {
                 <ProtectedRoute allowedRoles={['superadmin', 'editor']}>
                   <MainLayout>
                     <SubscriptionsPage />
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+            
+            <Route
+              path="/discount-coupons"
+              element={
+                <ProtectedRoute allowedRoles={['superadmin', 'editor']}>
+                  <MainLayout>
+                    <DiscountCouponsPage />
                   </MainLayout>
                 </ProtectedRoute>
               }

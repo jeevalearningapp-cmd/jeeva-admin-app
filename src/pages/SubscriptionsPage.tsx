@@ -345,7 +345,7 @@ export const SubscriptionsPage: React.FC = () => {
                 Monthly Revenue
               </Typography>
               <Typography variant="h4" sx={{ fontWeight: 700, fontSize: '1.75rem' }}>
-                ${analytics.monthlyRecurringRevenue.toFixed(2)}
+                ${(analytics?.monthlyRecurringRevenue || 0).toFixed(2)}
               </Typography>
               <Typography variant="caption" color="text.secondary">
                 MRR
@@ -374,7 +374,7 @@ export const SubscriptionsPage: React.FC = () => {
                 Avg Value
               </Typography>
               <Typography variant="h4" sx={{ fontWeight: 700, fontSize: '1.75rem' }}>
-                ${analytics.averageSubscriptionValue.toFixed(2)}
+                ${(analytics?.averageSubscriptionValue || 0).toFixed(2)}
               </Typography>
               <Typography variant="caption" color="text.secondary">
                 per subscription
@@ -403,7 +403,7 @@ export const SubscriptionsPage: React.FC = () => {
                 Churn Rate
               </Typography>
               <Typography variant="h4" sx={{ fontWeight: 700, fontSize: '1.75rem' }}>
-                {analytics.churnRate.toFixed(1)}%
+                {(analytics?.churnRate || 0).toFixed(1)}%
               </Typography>
               <Typography variant="caption" color="text.secondary">
                 cancellation rate
@@ -447,7 +447,7 @@ export const SubscriptionsPage: React.FC = () => {
                       {plan.description}
                     </Typography>
                   </TableCell>
-                  <TableCell>${plan.price.toFixed(2)}</TableCell>
+                  <TableCell>${(plan?.price || 0).toFixed(2)}</TableCell>
                   <TableCell>
                     <Chip label={plan.billingCycle} size="small" />
                   </TableCell>
