@@ -6,8 +6,8 @@ The Jeeva Learning platform uses **Supabase PostgreSQL** as its database, shared
 
 **Database Type:** PostgreSQL 15+  
 **Provider:** Supabase  
-**Total Tables:** 20+  
-**Authentication:** Supabase Auth with RLS
+**Total Tables:** 24  
+**Authentication:** Supabase Auth with RLS + OAuth (Google, Apple)
 
 ---
 
@@ -62,12 +62,17 @@ The Jeeva Learning platform uses **Supabase PostgreSQL** as its database, shared
 ┌─────────────────────────────────────────────────────────────────┐
 │                  SUBSCRIPTIONS & SETTINGS                        │
 │  ┌──────────────────┐    ┌─────────────────┐                   │
-│  │subscription_     │    │subscriptions    │                   │
-│  │plans             │────│                 │                   │
+│  │subscription_     │────│subscriptions    │                   │
+│  │plans             │    │                 │                   │
+│  └──────────────────┘    └─────────────────┘                   │
+│                                │                                 │
+│  ┌──────────────────┐    ┌─────────────────┐                   │
+│  │discount_coupons  │────│                 │                   │
+│  │                  │    │                 │                   │
 │  └──────────────────┘    └─────────────────┘                   │
 │                                                                  │
 │  ┌──────────────────┐    ┌─────────────────┐                   │
-│  │app_settings      │    │dashboard_hero   │                   │
+│  │app_settings      │    │hero_sections    │                   │
 │  └──────────────────┘    └─────────────────┘                   │
 │                                                                  │
 │  ┌──────────────────┐                                           │
@@ -115,13 +120,14 @@ The Jeeva Learning platform uses **Supabase PostgreSQL** as its database, shared
 - `ai_recommendations` - AI-generated suggestions
 - `user_analytics` - User engagement metrics
 
-### 4. Subscriptions
-- `subscription_plans` - Available subscription plans
+### 4. Subscriptions & Payments
+- `subscription_plans` - Duration-based plans (30/60/90/120 days)
 - `subscriptions` - User subscription records
+- `discount_coupons` - Discount/coupon codes
 
 ### 5. System & Settings
 - `app_settings` - Application configuration
-- `dashboard_hero` - Dashboard banners
+- `hero_sections` - Dashboard hero/banner sections
 - `content_approvals` - Content review queue
 - `email_templates` - Email template storage
 
@@ -145,32 +151,53 @@ The Jeeva Learning platform uses **Supabase PostgreSQL** as its database, shared
 | `email` | TEXT | UNIQUE, NOT NULL | User email address |
 | `role` | TEXT | DEFAULT 'student' | User role |
 | `is_active` | BOOLEAN | DEFAULT true | Account status |
+| `oauth_provider` | VARCHAR(20) | DEFAULT 'email' | Authentication method |
+| `oauth_id` | TEXT | | OAuth provider user ID |
 | `created_at` | TIMESTAMP | DEFAULT NOW() | Account creation time |
 | `updated_at` | TIMESTAMP | DEFAULT NOW() | Last update time |
+
+**OAuth Providers:**
+- `email` - Email/password authentication (default)
+- `google` - Google Sign-In
+- `apple` - Apple ID Sign-In
 
 **Indexes:**
 - Primary Key: `id`
 - Unique: `email`
+- Index: `oauth_provider` for analytics
 
 **RLS Policy:** Users can read/update their own data
 
 ---
 
 #### Table: `user_profiles`
-**Purpose:** Extended user profile information
+**Purpose:** Extended user profile information for nursing students
 
 | Column | Type | Constraints | Description |
 |--------|------|-------------|-------------|
-| `id` | UUID | PRIMARY KEY | Profile ID |
-| `user_id` | UUID | FK → users.id | User reference |
-| `full_name` | TEXT | | User's full name |
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Profile ID |
+| `user_id` | UUID | FK → users.id, NOT NULL | User reference |
+| `full_name` | TEXT | NOT NULL | User's full name |
 | `phone_number` | TEXT | | Contact number |
-| `date_of_birth` | TEXT | | Birth date |
+| `country_code` | TEXT | | Phone country code |
+| `date_of_birth` | DATE | | Birth date |
+| `gender` | TEXT | | Gender |
+| `current_country` | TEXT | | Current country (for payment routing) |
+| `nmc_attempts` | INTEGER | NOT NULL, DEFAULT 0 | Number of NMC CBT exam attempts |
+| `uses_coaching` | BOOLEAN | NOT NULL, DEFAULT false | Whether attending coaching |
+| `nursing_id_url` | TEXT | | Nursing license/ID upload URL |
+| `profile_completed` | BOOLEAN | NOT NULL, DEFAULT false | Onboarding completion flag |
 | `created_at` | TIMESTAMP | DEFAULT NOW() | Profile creation |
 | `updated_at` | TIMESTAMP | DEFAULT NOW() | Last update |
 
 **Foreign Keys:**
 - `user_id` → `users.id` (ON DELETE CASCADE)
+
+**Business Logic:**
+- `current_country` determines payment gateway routing (India → Razorpay, Others → Stripe)
+- `profile_completed` tracks onboarding flow (false → show profile completion screen)
+- `nmc_attempts` helps personalize study recommendations
+- `nursing_id_url` for identity verification if needed
 
 **RLS Policy:** Users can only access their own profile
 
@@ -619,33 +646,40 @@ Used to enforce daily message limits (e.g., 50 messages/day per user) and track 
 ### 4. Subscriptions
 
 #### Table: `subscription_plans`
-**Purpose:** Available subscription plans
+**Purpose:** Duration-based subscription plans for NMC CBT exam preparation
 
 | Column | Type | Constraints | Description |
 |--------|------|-------------|-------------|
 | `id` | UUID | PRIMARY KEY | Plan ID |
-| `name` | TEXT | NOT NULL | Plan name |
+| `name` | TEXT | NOT NULL | Plan name (e.g., "30 Days Plan") |
 | `description` | TEXT | | Plan description |
-| `price` | NUMERIC | NOT NULL | Price amount |
-| `billing_cycle` | TEXT | NOT NULL | Billing frequency |
+| `price_usd` | NUMERIC | NOT NULL | Price in USD |
+| `duration_days` | INTEGER | NOT NULL | Access duration in days |
 | `features` | TEXT[] | | Feature list |
-| `max_users` | INTEGER | | User limit |
 | `is_active` | BOOLEAN | DEFAULT true | Availability |
 | `display_order` | INTEGER | DEFAULT 0 | Sort order |
 | `created_at` | TIMESTAMP | DEFAULT NOW() | Creation time |
 | `updated_at` | TIMESTAMP | DEFAULT NOW() | Last update |
 
-**Enums:**
-- `billing_cycle`: 'monthly' | 'yearly' | 'lifetime'
+**Duration Options:**
+- 30 days - Short-term preparation
+- 60 days - Medium-term preparation  
+- 90 days - Standard preparation (recommended)
+- 120 days - Extended preparation
+
+**Pricing Model:**
+- All prices in USD (converted by payment gateways)
+- Non-recurring (expires after duration)
+- Trial plan: 0 USD, limited features
 
 **Example Data:**
 ```json
 {
   "id": "uuid-1",
-  "name": "Premium",
-  "price": 999.00,
-  "billing_cycle": "monthly",
-  "features": ["All Content", "Offline Mode", "Priority Support"]
+  "name": "90 Days Access",
+  "price_usd": 119.00,
+  "duration_days": 90,
+  "features": ["All Modules", "Mock Exams", "AI JeevaBot", "Analytics"]
 }
 ```
 
@@ -660,23 +694,80 @@ Used to enforce daily message limits (e.g., 50 messages/day per user) and track 
 | `user_id` | UUID | FK → users.id | User reference |
 | `plan_id` | UUID | FK → subscription_plans.id | Plan reference |
 | `status` | TEXT | NOT NULL | Subscription status |
-| `start_date` | TEXT | NOT NULL | Start date |
-| `end_date` | TEXT | | End date |
-| `auto_renew` | BOOLEAN | DEFAULT true | Auto-renewal |
-| `payment_method` | TEXT | | Payment type |
-| `last_payment_date` | TEXT | | Last payment |
-| `next_payment_date` | TEXT | | Next billing |
+| `start_date` | TIMESTAMP | NOT NULL | Start date |
+| `end_date` | TIMESTAMP | NOT NULL | End date (start + duration) |
+| `payment_gateway` | TEXT | | Gateway used (stripe/razorpay) |
+| `payment_method` | TEXT | | Payment type (card/upi) |
+| `amount_paid_usd` | NUMERIC | | Amount in USD |
+| `coupon_code` | TEXT | FK → discount_coupons.code | Applied coupon |
+| `discount_amount` | NUMERIC | DEFAULT 0 | Discount applied |
+| `transaction_id` | TEXT | | Payment transaction ID |
 | `created_at` | TIMESTAMP | DEFAULT NOW() | Creation time |
 | `updated_at` | TIMESTAMP | DEFAULT NOW() | Last update |
 
 **Enums:**
-- `status`: 'active' | 'cancelled' | 'expired' | 'trial'
+- `status`: 'trial' | 'active' | 'expired' | 'cancelled'
+- `payment_gateway`: 'stripe' | 'razorpay'
 
 **Foreign Keys:**
 - `user_id` → `users.id` (ON DELETE CASCADE)
 - `plan_id` → `subscription_plans.id` (ON DELETE RESTRICT)
+- `coupon_code` → `discount_coupons.code` (ON DELETE SET NULL)
+
+**Business Logic:**
+- Trial users: status='trial', amount_paid_usd=0, limited access
+- Subscription expires when `end_date` < NOW() → status='expired'
+- Payment gateway selected based on `user_profiles.current_country`
 
 **RLS Policy:** Users can read their own subscriptions
+
+---
+
+#### Table: `discount_coupons`
+**Purpose:** Subscription discount/coupon management
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PRIMARY KEY | Coupon ID |
+| `code` | TEXT | UNIQUE, NOT NULL | Coupon code (e.g., "FIRST20") |
+| `description` | TEXT | | Coupon description |
+| `discount_type` | TEXT | NOT NULL | Type of discount |
+| `discount_value` | NUMERIC | NOT NULL | Discount amount/percentage |
+| `applicable_plans` | UUID[] | | Plan IDs (null = all plans) |
+| `usage_limit` | INTEGER | | Max redemptions (null = unlimited) |
+| `usage_count` | INTEGER | DEFAULT 0 | Times used |
+| `valid_from` | TIMESTAMP | NOT NULL | Start date |
+| `valid_until` | TIMESTAMP | NOT NULL | Expiry date |
+| `is_active` | BOOLEAN | DEFAULT true | Active status |
+| `created_at` | TIMESTAMP | DEFAULT NOW() | Creation time |
+| `updated_at` | TIMESTAMP | DEFAULT NOW() | Last update |
+
+**Enums:**
+- `discount_type`: 'percentage' | 'fixed_amount'
+
+**Validation:**
+- `discount_type = 'percentage'` → `discount_value` between 1-100
+- `discount_type = 'fixed_amount'` → `discount_value` in USD
+
+**Example Data:**
+```json
+{
+  "code": "FIRST20",
+  "discount_type": "percentage",
+  "discount_value": 20,
+  "applicable_plans": null,
+  "usage_limit": 500,
+  "valid_until": "2025-12-31"
+}
+```
+
+**Business Logic:**
+- Check: coupon is_active AND NOW() BETWEEN valid_from AND valid_until
+- Check: usage_count < usage_limit (if limit exists)
+- Check: plan_id IN applicable_plans (if specified)
+- Increment usage_count on successful application
+
+**RLS Policy:** Public read (for validation), admin write
 
 ---
 
@@ -699,21 +790,42 @@ Used to enforce daily message limits (e.g., 50 messages/day per user) and track 
 
 ---
 
-#### Table: `dashboard_hero`
-**Purpose:** Dashboard banner/hero sections
+#### Table: `hero_sections`
+**Purpose:** Dashboard hero/banner sections for mobile app
 
 | Column | Type | Constraints | Description |
 |--------|------|-------------|-------------|
-| `id` | UUID | PRIMARY KEY | Hero ID |
+| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Hero ID |
 | `title` | TEXT | NOT NULL | Hero title |
-| `description` | TEXT | | Hero description |
-| `image_url` | TEXT | | Banner image |
-| `cta_text` | TEXT | | Call-to-action text |
-| `cta_link` | TEXT | | CTA link |
-| `is_active` | BOOLEAN | DEFAULT true | Visibility |
-| `display_order` | INTEGER | DEFAULT 0 | Sort order |
+| `subtitle` | TEXT | | Hero subtitle/description |
+| `image_url` | TEXT | | Banner image URL |
+| `cta_text` | TEXT | | Call-to-action button text |
+| `cta_link` | TEXT | | CTA destination link/route |
+| `is_active` | BOOLEAN | DEFAULT true | Visibility status |
+| `display_order` | INTEGER | DEFAULT 0 | Sort order (ascending) |
 | `created_at` | TIMESTAMP | DEFAULT NOW() | Creation time |
 | `updated_at` | TIMESTAMP | DEFAULT NOW() | Last update |
+
+**Mobile App Display:**
+- Displays at top of dashboard/home screen
+- First active hero (lowest display_order) shown prominently
+- Swipeable carousel if multiple active heroes exist
+- CTA links can be internal routes or external URLs
+
+**Example Data:**
+```json
+{
+  "title": "NMC CBT Exam Tips",
+  "subtitle": "Master clinical scenarios with our new video lessons",
+  "image_url": "https://storage.../hero-banner.jpg",
+  "cta_text": "Start Learning",
+  "cta_link": "/learning/clinical-knowledge",
+  "is_active": true,
+  "display_order": 1
+}
+```
+
+**RLS Policy:** Public read, admin write
 
 ---
 
@@ -996,6 +1108,14 @@ GROUP BY q.id;
 
 ---
 
-**Database Version:** 1.0  
-**Last Updated:** October 11, 2025  
+**Database Version:** 2.0  
+**Last Updated:** October 18, 2025  
 **Maintained by:** vollstek@gmail.com
+
+**Recent Changes (v2.0):**
+- Added OAuth authentication support (Google, Apple)
+- Enhanced `user_profiles` with NMC-specific fields
+- Added `discount_coupons` table for subscription offers
+- Updated `subscription_plans` to duration-based model (30/60/90/120 days)
+- Renamed `dashboard_hero` to `hero_sections`
+- Added payment gateway tracking in subscriptions

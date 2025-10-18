@@ -1044,7 +1044,524 @@ Track these KPIs:
 
 ---
 
-## 🔄 11. Next Steps (Phase 2)
+## 📊 11. AI-Powered Performance Analysis & Recommendations
+
+### Feature Overview
+
+Beyond reactive chat support, JeevaBot proactively analyzes student performance and generates **personalized weekly study plans** based on their learning patterns, practice results, and mock exam scores.
+
+**Purpose:**
+- Identify weak areas automatically
+- Generate actionable study recommendations
+- Create personalized weekly schedules
+- Motivate students with progress insights
+- Improve exam readiness scores
+
+---
+
+### Database Schema
+
+**Table: `ai_recommendations`** (already exists)
+
+```sql
+CREATE TABLE ai_recommendations (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  recommendation_data JSONB NOT NULL,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX idx_ai_recommendations_user ON ai_recommendations(user_id);
+CREATE INDEX idx_ai_recommendations_created ON ai_recommendations(created_at DESC);
+```
+
+**JSONB Structure:**
+```json
+{
+  "generated_at": "2025-10-18T10:00:00Z",
+  "analysis_period": "last_7_days",
+  "exam_readiness": 68,
+  "urgent_topics": [
+    {
+      "topic": "Pharmacology",
+      "accuracy": 65,
+      "priority": "high",
+      "recommended_lessons": ["drug-interactions", "anticoagulants"],
+      "practice_target": 20
+    }
+  ],
+  "strong_areas": [
+    { "topic": "Infection Control", "accuracy": 92 }
+  ],
+  "weekly_schedule": {
+    "monday": "Pharmacology review + 20 practice MCQs",
+    "tuesday": "Pharmacology continued",
+    "wednesday": "IV calculations (Numeracy)",
+    "thursday": "Numeracy practice",
+    "friday": "Numeracy practice",
+    "saturday": "Mock exam attempt",
+    "sunday": "Review mistakes from mock exam"
+  },
+  "motivational_message": "You're close! Just 2 more weeks of focused study and you'll be exam-ready!",
+  "days_until_subscription_ends": 45
+}
+```
+
+---
+
+### Backend Implementation
+
+**Recommendation Generator (`server/utils/generateRecommendations.ts`):**
+
+```typescript
+import { supabase } from '../lib/supabase';
+import { getModelResponse } from '../lib/gemini';
+
+interface PerformanceData {
+  userId: string;
+  practiceStats: any[];
+  mockExams: any[];
+  learningProgress: any;
+  subscription: any;
+}
+
+export async function generateRecommendations(userId: string) {
+  // Fetch performance data
+  const data = await fetchPerformanceData(userId);
+  
+  // Build AI prompt
+  const prompt = buildRecommendationPrompt(data);
+  
+  // Call Gemini API
+  const aiResponse = await getModelResponse(prompt);
+  
+  // Parse and structure response
+  const recommendation = parseAIRecommendation(aiResponse, data);
+  
+  // Save to database
+  await supabase.from('ai_recommendations').insert({
+    user_id: userId,
+    recommendation_data: recommendation,
+  });
+  
+  return recommendation;
+}
+
+async function fetchPerformanceData(userId: string): Promise<PerformanceData> {
+  // Get practice stats
+  const { data: practiceStats } = await supabase
+    .from('practice_sessions')
+    .select(`
+      *,
+      practice_results (*)
+    `)
+    .eq('user_id', userId)
+    .gte('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
+    .order('created_at', { ascending: false });
+  
+  // Get mock exam results
+  const { data: mockExams } = await supabase
+    .from('mock_exams')
+    .select(`
+      *,
+      mock_exam_results (*)
+    `)
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(5);
+  
+  // Get learning progress
+  const { data: learningProgress } = await supabase
+    .from('learning_completions')
+    .select('*, lessons (*)')
+    .eq('user_id', userId);
+  
+  // Get subscription info
+  const { data: subscription } = await supabase
+    .from('subscriptions')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .single();
+  
+  // Calculate topic-wise accuracy
+  const topicAccuracy = calculateTopicAccuracy(practiceStats);
+  
+  return {
+    userId,
+    practiceStats: topicAccuracy,
+    mockExams,
+    learningProgress,
+    subscription,
+  };
+}
+
+function buildRecommendationPrompt(data: PerformanceData): string {
+  const weakTopics = data.practiceStats.filter(t => t.accuracy < 0.70);
+  const daysRemaining = Math.ceil(
+    (new Date(data.subscription.end_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+  );
+  
+  return `You are an NMC CBT exam preparation expert for nursing students.
+Analyze this student's performance and generate a personalized study plan.
+
+STUDENT PERFORMANCE DATA:
+${JSON.stringify(data, null, 2)}
+
+WEAK TOPICS (< 70% accuracy):
+${weakTopics.map(t => `- ${t.topic_name}: ${t.accuracy}%`).join('\n')}
+
+MOCK EXAM SCORES:
+${data.mockExams.map(m => `- Part ${m.part}: ${m.score}/${m.total_questions}`).join('\n')}
+
+SUBSCRIPTION:
+- Days remaining: ${daysRemaining}
+- Plan: ${data.subscription.plan_name}
+
+TASK:
+Generate a JSON response with:
+1. exam_readiness: Overall readiness percentage (0-100)
+2. urgent_topics: Top 3 weak areas that need immediate attention
+3. strong_areas: Topics where student is performing well (>85%)
+4. weekly_schedule: Day-by-day study plan (Mon-Sun)
+5. motivational_message: Encouraging message based on progress
+6. practice_targets: Specific daily practice question goals
+
+RULES:
+- Be realistic and achievable
+- Prioritize weak areas but don't overwhelm
+- Include rest days if needed
+- Consider days remaining in subscription
+- If exam_readiness < 60%, recommend intensive 2-week sprint
+- If exam_readiness > 85%, focus on maintaining and fine-tuning
+
+Return only valid JSON, no markdown formatting.`;
+}
+
+function parseAIRecommendation(aiResponse: string, data: PerformanceData): any {
+  try {
+    // Remove markdown code blocks if present
+    const cleanResponse = aiResponse.replace(/```json\n?/g, '').replace(/```\n?/g, '');
+    const parsed = JSON.parse(cleanResponse);
+    
+    // Add metadata
+    return {
+      ...parsed,
+      generated_at: new Date().toISOString(),
+      analysis_period: 'last_7_days',
+      days_until_subscription_ends: Math.ceil(
+        (new Date(data.subscription.end_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+      ),
+    };
+  } catch (error) {
+    console.error('Failed to parse AI recommendation:', error);
+    // Return fallback recommendation
+    return generateFallbackRecommendation(data);
+  }
+}
+
+function generateFallbackRecommendation(data: PerformanceData): any {
+  const weakTopics = data.practiceStats.filter(t => t.accuracy < 0.70);
+  
+  return {
+    generated_at: new Date().toISOString(),
+    analysis_period: 'last_7_days',
+    exam_readiness: 60,
+    urgent_topics: weakTopics.slice(0, 3).map(t => ({
+      topic: t.topic_name,
+      accuracy: t.accuracy,
+      priority: 'high',
+      recommended_lessons: [],
+      practice_target: 20,
+    })),
+    strong_areas: data.practiceStats
+      .filter(t => t.accuracy > 0.85)
+      .map(t => ({ topic: t.topic_name, accuracy: t.accuracy })),
+    weekly_schedule: {
+      monday: 'Review weak topics',
+      tuesday: 'Practice sessions',
+      wednesday: 'Continue practice',
+      thursday: 'Mock exam preparation',
+      friday: 'Practice sessions',
+      saturday: 'Mock exam attempt',
+      sunday: 'Review and rest',
+    },
+    motivational_message: 'Keep practicing! Focus on your weak areas and you\'ll improve.',
+  };
+}
+```
+
+---
+
+### API Endpoint
+
+**Route: `POST /api/ai/generate-recommendations`**
+
+```typescript
+// server/routes/ai.ts
+import express from 'express';
+import { generateRecommendations } from '../utils/generateRecommendations';
+
+const router = express.Router();
+
+router.post('/generate-recommendations', async (req, res) => {
+  try {
+    const { userId } = req.body;
+    
+    // Verify authentication
+    const { data: { user }, error: authError } = await supabase.auth.getUser(
+      req.headers.authorization?.replace('Bearer ', '')
+    );
+    
+    if (authError || !user || user.id !== userId) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    
+    // Generate recommendations
+    const recommendation = await generateRecommendations(userId);
+    
+    res.json({ success: true, recommendation });
+    
+  } catch (error) {
+    console.error('Error generating recommendations:', error);
+    res.status(500).json({ error: 'Failed to generate recommendations' });
+  }
+});
+
+export default router;
+```
+
+---
+
+### Mobile App Integration
+
+**Hook: `useAIRecommendations.ts`**
+
+```typescript
+import { useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/context/AuthContext';
+
+const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
+
+export function useAIRecommendations() {
+  const { user, session } = useAuth();
+  const [recommendation, setRecommendation] = useState(null);
+  const [loading, setLoading] = useState(false);
+  
+  // Fetch latest recommendation
+  useEffect(() => {
+    if (user) {
+      fetchLatestRecommendation();
+    }
+  }, [user]);
+  
+  const fetchLatestRecommendation = async () => {
+    const { data } = await supabase
+      .from('ai_recommendations')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single();
+    
+    if (data) {
+      setRecommendation(data.recommendation_data);
+    }
+  };
+  
+  const generateNewRecommendation = async () => {
+    setLoading(true);
+    
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/ai/generate-recommendations`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session?.access_token}`,
+        },
+        body: JSON.stringify({ userId: user.id }),
+      });
+      
+      const { recommendation: newRec } = await response.json();
+      setRecommendation(newRec);
+      
+    } catch (error) {
+      console.error('Error generating recommendation:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  return {
+    recommendation,
+    loading,
+    generateNewRecommendation,
+    refresh: fetchLatestRecommendation,
+  };
+}
+```
+
+**UI Component: `AIRecommendationsCard.tsx`**
+
+```typescript
+import { View, Text, Button } from 'react-native';
+import { useAIRecommendations } from '@/hooks/useAIRecommendations';
+
+export function AIRecommendationsCard() {
+  const { recommendation, loading, generateNewRecommendation } = useAIRecommendations();
+  
+  if (!recommendation) {
+    return (
+      <View>
+        <Text>Get Your Personalized Study Plan</Text>
+        <Button 
+          title="Generate Plan" 
+          onPress={generateNewRecommendation}
+          disabled={loading}
+        />
+      </View>
+    );
+  }
+  
+  return (
+    <View style={{ padding: 16, backgroundColor: '#f5f5f5', borderRadius: 8 }}>
+      <Text style={{ fontSize: 20, fontWeight: 'bold' }}>
+        🤖 Your Study Plan
+      </Text>
+      
+      <View style={{ marginTop: 12 }}>
+        <Text style={{ fontSize: 16 }}>
+          🎯 Exam Readiness: {recommendation.exam_readiness}%
+        </Text>
+        <ProgressBar value={recommendation.exam_readiness} />
+      </View>
+      
+      <View style={{ marginTop: 16 }}>
+        <Text style={{ fontSize: 16, fontWeight: 'bold' }}>
+          🚨 Urgent - Fix These First:
+        </Text>
+        {recommendation.urgent_topics.map((topic, idx) => (
+          <View key={idx} style={{ marginTop: 8 }}>
+            <Text>
+              {idx + 1}. {topic.topic} ({topic.accuracy}%)
+            </Text>
+            <Text style={{ color: '#666' }}>
+              → Practice {topic.practice_target} MCQs daily
+            </Text>
+          </View>
+        ))}
+      </View>
+      
+      <View style={{ marginTop: 16 }}>
+        <Text style={{ fontSize: 16, fontWeight: 'bold' }}>
+          💪 Strong Areas:
+        </Text>
+        {recommendation.strong_areas.map((area, idx) => (
+          <Text key={idx}>✓ {area.topic} ({area.accuracy}%)</Text>
+        ))}
+      </View>
+      
+      <View style={{ marginTop: 16 }}>
+        <Text style={{ fontSize: 16, fontWeight: 'bold' }}>
+          📅 This Week:
+        </Text>
+        {Object.entries(recommendation.weekly_schedule).map(([day, plan]) => (
+          <Text key={day}>
+            {day.charAt(0).toUpperCase() + day.slice(1)}: {plan}
+          </Text>
+        ))}
+      </View>
+      
+      <Text style={{ marginTop: 16, fontStyle: 'italic', color: '#007aff' }}>
+        {recommendation.motivational_message}
+      </Text>
+      
+      <Button 
+        title="Generate New Plan" 
+        onPress={generateNewRecommendation}
+        disabled={loading}
+      />
+    </View>
+  );
+}
+```
+
+---
+
+### Automation: Weekly Regeneration
+
+**Cron Job (Backend):**
+
+```typescript
+// server/jobs/weeklyRecommendations.ts
+import { supabase } from '../lib/supabase';
+import { generateRecommendations } from '../utils/generateRecommendations';
+
+export async function generateWeeklyRecommendations() {
+  console.log('[Cron] Starting weekly recommendations generation...');
+  
+  // Get all active users
+  const { data: activeUsers } = await supabase
+    .from('subscriptions')
+    .select('user_id')
+    .in('status', ['active', 'trial'])
+    .gte('end_date', new Date().toISOString());
+  
+  if (!activeUsers) return;
+  
+  let successCount = 0;
+  let errorCount = 0;
+  
+  for (const { user_id } of activeUsers) {
+    try {
+      await generateRecommendations(user_id);
+      successCount++;
+    } catch (error) {
+      console.error(`Error generating for user ${user_id}:`, error);
+      errorCount++;
+    }
+    
+    // Rate limit: 1 request per second to avoid API throttling
+    await new Promise(resolve => setTimeout(resolve, 1000));
+  }
+  
+  console.log(`[Cron] Completed: ${successCount} success, ${errorCount} errors`);
+}
+
+// Run every Sunday at 6 AM
+// Add to your cron scheduler (e.g., node-cron)
+```
+
+---
+
+### Cost Estimation
+
+**Per Recommendation:**
+- Input tokens: ~1000 (performance data)
+- Output tokens: ~500 (structured recommendation)
+- Total: ~1500 tokens
+- Cost: ~$0.001 (0.1 cents per recommendation)
+
+**Monthly for 1000 users:**
+- 1000 users × 4 weeks = 4000 recommendations
+- Cost: ~$4/month
+
+**Very affordable for significant value!**
+
+---
+
+### Display Locations in App
+
+1. **Profile Tab** - Main recommendations card
+2. **Dashboard** - "Your Study Plan This Week" widget
+3. **After Mock Exam** - "Improve Your Score" section with targeted recommendations
+4. **Push Notification** - "Your new study plan is ready!" (Sundays)
+
+---
+
+## 🔄 12. Next Steps (Phase 2)
 
 After Phase 1 is stable, plan for:
 
@@ -1089,7 +1606,16 @@ After Phase 1 is stable, plan for:
 
 ---
 
-**Version:** 1.0  
+**Version:** 2.0  
+**Last Updated:** October 18, 2025  
 **Status:** ✅ Ready for Implementation  
 **Estimated Time:** 2-3 weeks for full Phase 1  
 **Next Review:** After Phase 1 launch, before Phase 2 planning
+
+**Recent Updates (v2.0):**
+- Added AI-powered performance analysis & recommendations feature
+- Added weekly personalized study plan generation
+- Added exam readiness scoring algorithm
+- Added weak area identification and remediation suggestions
+- Added automated weekly recommendation generation (cron job)
+- Updated for NMC CBT nursing exam context

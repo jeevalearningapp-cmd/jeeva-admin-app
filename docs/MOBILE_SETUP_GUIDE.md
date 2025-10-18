@@ -1067,7 +1067,637 @@ Before submitting PR:
 
 ---
 
-## 1️⃣3️⃣ Next Steps
+## 1️⃣3️⃣ OAuth Authentication (Google & Apple)
+
+### 13.1 Google Sign-In Setup
+
+**Install Dependencies:**
+```bash
+npm install @react-native-google-signin/google-signin
+npx expo install expo-auth-session expo-crypto
+```
+
+**Configure Supabase:**
+1. Go to Supabase Dashboard → Authentication → Providers
+2. Enable Google provider
+3. Add OAuth credentials:
+   - **Client ID** (from Google Cloud Console)
+   - **Client Secret** (from Google Cloud Console)
+4. Set redirect URL: `https://your-project.supabase.co/auth/v1/callback`
+
+**Google Cloud Console Setup:**
+1. Go to [console.cloud.google.com](https://console.cloud.google.com)
+2. Create new project or select existing
+3. Enable Google+ API
+4. Go to Credentials → Create OAuth 2.0 Client ID
+5. Configure consent screen
+6. Create credentials:
+   - **Web client** - For Supabase redirect
+   - **iOS client** - For iOS app
+   - **Android client** - For Android app
+7. Copy Client IDs and add to Supabase + app config
+
+**Implementation:**
+```typescript
+// src/services/auth.ts
+import { supabase } from '@/lib/supabase'
+import * as Google from 'expo-auth-session/providers/google'
+import * as WebBrowser from 'expo-web-browser'
+
+WebBrowser.maybeCompleteAuthSession()
+
+export async function signInWithGoogle() {
+  try {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: 'jeevalearning://auth/callback',
+        skipBrowserRedirect: true,
+      },
+    })
+    
+    if (error) throw error
+    
+    // Open OAuth URL
+    const result = await WebBrowser.openAuthSessionAsync(
+      data.url,
+      'jeevalearning://auth/callback'
+    )
+    
+    if (result.type === 'success') {
+      // Extract tokens from URL
+      const { url } = result
+      // Handle session...
+    }
+  } catch (error) {
+    console.error('Google sign-in error:', error)
+  }
+}
+```
+
+---
+
+### 13.2 Apple Sign-In Setup
+
+**Install Dependencies:**
+```bash
+npx expo install expo-apple-authentication
+```
+
+**Configure Supabase:**
+1. Go to Supabase Dashboard → Authentication → Providers
+2. Enable Apple provider
+3. Configure Apple Developer settings (Services ID, Team ID, Key ID)
+
+**Apple Developer Setup:**
+1. Go to [developer.apple.com](https://developer.apple.com)
+2. Certificates, IDs & Profiles → Identifiers
+3. Create App ID (if not exists)
+4. Enable "Sign In with Apple" capability
+5. Create Services ID:
+   - Identifier: com.jeeva.learning.signin
+   - Return URLs: `https://your-project.supabase.co/auth/v1/callback`
+6. Create Key for Sign In with Apple
+7. Download key file (.p8)
+
+**Update app.json:**
+```json
+{
+  "expo": {
+    "ios": {
+      "usesAppleSignIn": true
+    },
+    "plugins": [
+      "expo-apple-authentication"
+    ]
+  }
+}
+```
+
+**Implementation:**
+```typescript
+// src/services/auth.ts
+import * as AppleAuthentication from 'expo-apple-authentication'
+import { supabase } from '@/lib/supabase'
+
+export async function signInWithApple() {
+  try {
+    const credential = await AppleAuthentication.signInAsync({
+      requestedScopes: [
+        AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+        AppleAuthentication.AppleAuthenticationScope.EMAIL,
+      ],
+    })
+    
+    // Sign in to Supabase with Apple token
+    const { data, error } = await supabase.auth.signInWithIdToken({
+      provider: 'apple',
+      token: credential.identityToken!,
+      nonce: credential.nonce,
+    })
+    
+    if (error) throw error
+    
+    // Update user profile with Apple data
+    const { user } = data
+    await supabase.from('user_profiles').upsert({
+      user_id: user.id,
+      full_name: credential.fullName 
+        ? `${credential.fullName.givenName} ${credential.fullName.familyName}`
+        : '',
+    })
+    
+  } catch (error) {
+    console.error('Apple sign-in error:', error)
+  }
+}
+```
+
+**UI Component:**
+```typescript
+// src/components/auth/AppleSignInButton.tsx
+import * as AppleAuthentication from 'expo-apple-authentication'
+import { Platform } from 'react-native'
+
+export function AppleSignInButton({ onSuccess }: { onSuccess: () => void }) {
+  // Apple Sign-In only available on iOS
+  if (Platform.OS !== 'ios') return null
+  
+  return (
+    <AppleAuthentication.AppleAuthenticationButton
+      buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
+      buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
+      cornerRadius={8}
+      style={{ width: '100%', height: 50 }}
+      onPress={async () => {
+        await signInWithApple()
+        onSuccess()
+      }}
+    />
+  )
+}
+```
+
+---
+
+### 13.3 OAuth Provider Tracking
+
+**Update User Record:**
+```typescript
+// After successful OAuth sign-in
+async function updateUserProvider(userId: string, provider: 'google' | 'apple') {
+  await supabase
+    .from('users')
+    .update({ 
+      oauth_provider: provider,
+      oauth_id: user.id // From OAuth provider
+    })
+    .eq('id', userId)
+}
+```
+
+---
+
+## 1️⃣4️⃣ Profile Completion Flow
+
+### 14.1 Profile Completion Screen
+
+**Purpose:** Collect essential user information after first-time registration.
+
+**Required Fields:**
+- Full Name
+- Phone Number (with country code)
+- Current Country (for payment gateway routing)
+- Date of Birth
+- Gender
+- NMC Attempts (0 if first time)
+- Using coaching? (Yes/No)
+
+**Navigation Logic:**
+```typescript
+// src/navigation/AuthNavigator.tsx
+import { useAuth } from '@/hooks/useAuth'
+
+export function RootNavigator() {
+  const { user, profile } = useAuth()
+  
+  if (!user) {
+    return <AuthStack /> // Login/Signup screens
+  }
+  
+  if (!profile?.profile_completed) {
+    return <ProfileCompletionScreen />
+  }
+  
+  return <MainApp /> // Dashboard and main features
+}
+```
+
+**Profile Completion UI:**
+```typescript
+// src/screens/ProfileCompletionScreen.tsx
+import { useState } from 'react'
+import { View, TextInput, Button, Picker } from 'react-native'
+import { supabase } from '@/lib/supabase'
+
+export function ProfileCompletionScreen() {
+  const [formData, setFormData] = useState({
+    full_name: '',
+    phone_number: '',
+    country_code: '+91',
+    current_country: 'India',
+    date_of_birth: '',
+    gender: '',
+    nmc_attempts: 0,
+    uses_coaching: false,
+  })
+  
+  const handleSubmit = async () => {
+    const { data: { user } } = await supabase.auth.getUser()
+    
+    await supabase.from('user_profiles').upsert({
+      user_id: user!.id,
+      ...formData,
+      profile_completed: true, // Mark as completed
+    })
+    
+    // Navigate to dashboard
+  }
+  
+  return (
+    <View>
+      <TextInput
+        placeholder="Full Name"
+        value={formData.full_name}
+        onChangeText={(text) => setFormData({ ...formData, full_name: text })}
+      />
+      
+      <TextInput
+        placeholder="Phone Number"
+        value={formData.phone_number}
+        keyboardType="phone-pad"
+        onChangeText={(text) => setFormData({ ...formData, phone_number: text })}
+      />
+      
+      <Picker
+        selectedValue={formData.current_country}
+        onValueChange={(value) => setFormData({ ...formData, current_country: value })}
+      >
+        <Picker.Item label="India" value="India" />
+        <Picker.Item label="United Kingdom" value="UK" />
+        <Picker.Item label="United States" value="USA" />
+        <Picker.Item label="Canada" value="Canada" />
+        <Picker.Item label="Australia" value="Australia" />
+        {/* Add more countries */}
+      </Picker>
+      
+      <Button title="Complete Profile" onPress={handleSubmit} />
+    </View>
+  )
+}
+```
+
+---
+
+## 1️⃣5️⃣ Payment Integration (Stripe & Razorpay)
+
+### 15.1 Install Payment SDKs
+
+**Stripe:**
+```bash
+npm install @stripe/stripe-react-native
+```
+
+**Razorpay:**
+```bash
+npm install react-native-razorpay
+```
+
+**Update app.json:**
+```json
+{
+  "expo": {
+    "plugins": [
+      "@stripe/stripe-react-native"
+    ]
+  }
+}
+```
+
+---
+
+### 15.2 Stripe Integration
+
+**Setup Stripe Provider:**
+```typescript
+// App.tsx
+import { StripeProvider } from '@stripe/stripe-react-native'
+
+export default function App() {
+  return (
+    <StripeProvider publishableKey={process.env.EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY!}>
+      {/* Your app */}
+    </StripeProvider>
+  )
+}
+```
+
+**Payment Screen:**
+```typescript
+// src/screens/PaymentScreen.tsx
+import { useStripe } from '@stripe/stripe-react-native'
+
+export function PaymentScreen({ planId, couponCode }: Props) {
+  const { initPaymentSheet, presentPaymentSheet } = useStripe()
+  
+  const handleStripePayment = async () => {
+    // Call backend to create checkout session
+    const response = await fetch(`${API_URL}/api/stripe/create-checkout`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ planId, couponCode }),
+    })
+    
+    const { sessionId, clientSecret } = await response.json()
+    
+    // Initialize payment sheet
+    const { error: initError } = await initPaymentSheet({
+      paymentIntentClientSecret: clientSecret,
+      merchantDisplayName: 'Jeeva Learning',
+    })
+    
+    if (initError) {
+      Alert.alert('Error', initError.message)
+      return
+    }
+    
+    // Present payment sheet
+    const { error: presentError } = await presentPaymentSheet()
+    
+    if (!presentError) {
+      Alert.alert('Success', 'Payment successful!')
+      // Navigate to dashboard
+    }
+  }
+  
+  return <Button title="Pay with Stripe" onPress={handleStripePayment} />
+}
+```
+
+---
+
+### 15.3 Razorpay Integration
+
+**Payment Screen:**
+```typescript
+// src/screens/PaymentScreen.tsx
+import RazorpayCheckout from 'react-native-razorpay'
+
+export function PaymentScreen({ planId, couponCode, user }: Props) {
+  const handleRazorpayPayment = async () => {
+    // Call backend to create order
+    const response = await fetch(`${API_URL}/api/razorpay/create-order`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ planId, couponCode }),
+    })
+    
+    const { orderId, amount, currency } = await response.json()
+    
+    // Open Razorpay checkout
+    const options = {
+      description: 'NMC CBT Exam Preparation',
+      image: 'https://your-logo-url.png',
+      currency: currency,
+      key: process.env.EXPO_PUBLIC_RAZORPAY_KEY_ID,
+      amount: amount,
+      name: 'Jeeva Learning',
+      order_id: orderId,
+      prefill: {
+        email: user.email,
+        contact: user.phone_number,
+        name: user.full_name,
+      },
+      theme: { color: '#007aff' },
+    }
+    
+    RazorpayCheckout.open(options)
+      .then(async (data) => {
+        // Payment successful
+        // Verify on backend
+        await fetch(`${API_URL}/api/razorpay/verify-payment`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            orderId: orderId,
+            paymentId: data.razorpay_payment_id,
+            signature: data.razorpay_signature,
+          }),
+        })
+        
+        Alert.alert('Success', 'Payment successful!')
+      })
+      .catch((error) => {
+        Alert.alert('Payment Failed', error.description)
+      })
+  }
+  
+  return <Button title="Pay with Razorpay" onPress={handleRazorpayPayment} />
+}
+```
+
+---
+
+### 15.4 Payment Gateway Routing
+
+**Auto-select gateway based on country:**
+```typescript
+// src/utils/payment.ts
+export function selectPaymentGateway(country: string): 'stripe' | 'razorpay' {
+  return country === 'India' ? 'razorpay' : 'stripe'
+}
+
+// Usage in payment screen
+const PaymentScreen = ({ plan, user }: Props) => {
+  const gateway = selectPaymentGateway(user.current_country)
+  
+  return (
+    <View>
+      <PlanCard plan={plan} />
+      
+      {gateway === 'stripe' ? (
+        <StripePaymentButton plan={plan} />
+      ) : (
+        <RazorpayPaymentButton plan={plan} />
+      )}
+    </View>
+  )
+}
+```
+
+---
+
+## 1️⃣6️⃣ Trial Mode & Content Gating
+
+### 16.1 Subscription Status Hook
+
+**Create custom hook:**
+```typescript
+// src/hooks/useSubscription.ts
+import { useEffect, useState } from 'react'
+import { supabase } from '@/lib/supabase'
+
+export function useSubscription(userId: string) {
+  const [subscription, setSubscription] = useState(null)
+  const [loading, setLoading] = useState(true)
+  
+  useEffect(() => {
+    fetchSubscription()
+  }, [userId])
+  
+  const fetchSubscription = async () => {
+    const { data } = await supabase
+      .from('subscriptions')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single()
+    
+    setSubscription(data)
+    setLoading(false)
+  }
+  
+  const hasAccess = (contentType: string, contentId?: string) => {
+    if (!subscription) return false
+    
+    // Check if subscription is active
+    if (subscription.status === 'active' && new Date(subscription.end_date) > new Date()) {
+      return true
+    }
+    
+    // Trial mode restrictions
+    if (subscription.status === 'trial') {
+      // Allow 1 learning module and 1 practice module
+      const trialContent = {
+        learning: ['module-id-1'],
+        practice: ['topic-id-1'],
+      }
+      
+      if (contentType === 'learning' && trialContent.learning.includes(contentId)) {
+        return true
+      }
+      
+      if (contentType === 'practice' && trialContent.practice.includes(contentId)) {
+        return true
+      }
+      
+      if (contentType === 'mock_exam') {
+        return false // Mock exams locked in trial
+      }
+    }
+    
+    return false
+  }
+  
+  return { subscription, loading, hasAccess }
+}
+```
+
+---
+
+### 16.2 Content Gating Component
+
+**Lock indicator:**
+```typescript
+// src/components/ContentLock.tsx
+import { View, Text, TouchableOpacity } from 'react-native'
+import { useNavigation } from '@react-navigation/native'
+
+export function ContentLock({ type }: { type: 'upgrade' | 'renew' }) {
+  const navigation = useNavigation()
+  
+  return (
+    <View style={{ padding: 20, alignItems: 'center' }}>
+      <Text style={{ fontSize: 48 }}>🔒</Text>
+      <Text style={{ fontSize: 18, fontWeight: 'bold', marginTop: 10 }}>
+        {type === 'upgrade' ? 'Upgrade to Access' : 'Subscription Expired'}
+      </Text>
+      <Text style={{ color: '#666', marginTop: 5 }}>
+        {type === 'upgrade' 
+          ? 'Unlock all content with a premium plan' 
+          : 'Renew your subscription to continue'}
+      </Text>
+      <TouchableOpacity
+        style={{ 
+          backgroundColor: '#007aff', 
+          padding: 15, 
+          borderRadius: 8,
+          marginTop: 20 
+        }}
+        onPress={() => navigation.navigate('SubscriptionPlans')}
+      >
+        <Text style={{ color: 'white', fontWeight: 'bold' }}>
+          {type === 'upgrade' ? 'View Plans' : 'Renew Now'}
+        </Text>
+      </TouchableOpacity>
+    </View>
+  )
+}
+```
+
+**Usage in screens:**
+```typescript
+// src/screens/LessonScreen.tsx
+import { useSubscription } from '@/hooks/useSubscription'
+import { ContentLock } from '@/components/ContentLock'
+
+export function LessonScreen({ route }: Props) {
+  const { lessonId, moduleId } = route.params
+  const { user } = useAuth()
+  const { hasAccess } = useSubscription(user.id)
+  
+  if (!hasAccess('learning', moduleId)) {
+    return <ContentLock type="upgrade" />
+  }
+  
+  return <LessonContent lessonId={lessonId} />
+}
+```
+
+---
+
+### 16.3 Trial Badge UI
+
+**Show trial badge on free content:**
+```typescript
+// src/components/TrialBadge.tsx
+import { View, Text } from 'react-native'
+
+export function TrialBadge() {
+  return (
+    <View style={{
+      backgroundColor: '#34C759',
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      borderRadius: 4,
+    }}>
+      <Text style={{ color: 'white', fontSize: 12, fontWeight: 'bold' }}>
+        FREE TRIAL
+      </Text>
+    </View>
+  )
+}
+
+// Usage in module cards
+<ModuleCard module={module}>
+  {isTrial && <TrialBadge />}
+</ModuleCard>
+```
+
+---
+
+## 1️⃣7️⃣ Next Steps
 
 After setup is complete:
 
@@ -1079,14 +1709,20 @@ After setup is complete:
    ```
 
 2. **Follow Documentation:**
+   - [MOBILE_APP_FEATURES.md](./MOBILE_APP_FEATURES.md) - Complete feature specs
+   - [PAYMENT_INTEGRATION.md](./PAYMENT_INTEGRATION.md) - Payment setup details
    - [Authentication Flow](./AUTHENTICATION_FLOW.md)
    - [API Documentation](./API_DOCUMENTATION.md)
-   - [Feature Specifications](./FEATURE_SPECIFICATIONS.md)
    - [UI Design Specs](./UI_DESIGN_SPECS.md)
 
 3. **Start Building:**
-   - Implement authentication screens
-   - Set up navigation
+   - Implement authentication screens (Email, Google, Apple)
+   - Create profile completion flow
+   - Set up navigation (Bottom tabs, Stack navigators)
+   - Build 3 core modules (Practice, Learning, Mock Exam)
+   - Integrate payment gateways (Stripe, Razorpay)
+   - Implement trial mode and content gating
+   - Add AI JeevaBot chat interface
    - Create reusable components
    - Integrate Supabase APIs
 
@@ -1164,9 +1800,16 @@ Before starting development, verify:
 
 ---
 
-**Version:** 1.0  
-**Last Updated:** October 11, 2025  
+**Version:** 2.0  
+**Last Updated:** October 18, 2025  
 **Maintained by:** vollstek@gmail.com
+
+**Recent Updates (v2.0):**
+- Added OAuth authentication setup (Google & Apple Sign-In)
+- Added profile completion flow implementation
+- Added dual payment gateway integration (Stripe & Razorpay)
+- Added trial mode & content gating implementation
+- Updated environment setup for new features
 
 ---
 
