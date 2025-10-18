@@ -96,7 +96,7 @@ export const StudentsPage: React.FC = () => {
         subscription_status: student.subscription_status,
         subscription_end_date: student.subscription_end_date,
         days_remaining: student.days_remaining
-      })))
+      }))
 
       if (search) {
         const searchLower = search.toLowerCase()
