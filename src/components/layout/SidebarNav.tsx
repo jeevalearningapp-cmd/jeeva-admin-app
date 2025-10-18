@@ -21,6 +21,8 @@ import {
   SettingsOutlined as SettingsIcon,
   AnalyticsOutlined as AnalyticsIcon,
   StarOutlined as HeroIcon,
+  SchoolOutlined as StudentsIcon,
+  LocalOfferOutlined as CouponIcon,
 } from '@mui/icons-material'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '@/context'
@@ -39,8 +41,10 @@ interface MenuItem {
 const menuItems: MenuItem[] = [
   { title: 'Dashboard', path: '/dashboard', icon: <DashboardIcon />, roles: ['superadmin', 'editor', 'moderator'] },
   { title: 'Users', path: '/users', icon: <PeopleIcon />, roles: ['superadmin', 'editor'] },
+  { title: 'Students', path: '/students', icon: <StudentsIcon />, roles: ['superadmin', 'editor'] },
   { title: 'Admin Users', path: '/admin-users', icon: <AdminIcon />, roles: ['superadmin'] },
   { title: 'Subscriptions', path: '/subscriptions', icon: <SubscriptionsIcon />, roles: ['superadmin', 'editor'] },
+  { title: 'Discount Coupons', path: '/discount-coupons', icon: <CouponIcon />, roles: ['superadmin', 'editor'] },
   { title: 'Content', path: '/content', icon: <ContentIcon />, roles: ['superadmin', 'editor'] },
   { title: 'Approvals', path: '/approvals', icon: <ApprovalsIcon />, roles: ['superadmin', 'moderator'] },
   { title: 'Analytics', path: '/analytics', icon: <AnalyticsIcon />, roles: ['superadmin'] },

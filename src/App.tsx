@@ -18,6 +18,8 @@ import {
   SettingsPage,
   DashboardHeroPage,
   ProfilePage,
+  StudentsPage,
+  DiscountCouponsPage,
 } from './pages'
 import { SplashScreen } from './pages/SplashScreen'
 import { ModulesPage } from './pages/content/ModulesPage'
@@ -203,6 +205,28 @@ function App() {
                 <ProtectedRoute allowedRoles={['superadmin']}>
                   <MainLayout>
                     <SettingsPage />
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+            
+            <Route
+              path="/students"
+              element={
+                <ProtectedRoute allowedRoles={['superadmin', 'editor']}>
+                  <MainLayout>
+                    <StudentsPage />
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+            
+            <Route
+              path="/discount-coupons"
+              element={
+                <ProtectedRoute allowedRoles={['superadmin', 'editor']}>
+                  <MainLayout>
+                    <DiscountCouponsPage />
                   </MainLayout>
                 </ProtectedRoute>
               }

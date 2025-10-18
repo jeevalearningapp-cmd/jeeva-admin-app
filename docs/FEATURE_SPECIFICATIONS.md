@@ -1692,6 +1692,404 @@ const syncOfflineData = async () => {
 
 ---
 
+## 💳 Payment Integration & Subscriptions
+
+### Dual Payment Gateway Support
+
+**User Story:**  
+*As a user, I want to purchase a subscription using my preferred payment method so that I can access premium content.*
+
+**Acceptance Criteria:**
+- [ ] Stripe integration for international students
+- [ ] Razorpay integration for Indian students
+- [ ] Auto-select gateway based on user's country
+- [ ] Support for multiple payment methods (cards, UPI, wallets)
+- [ ] Secure payment processing (PCI compliant)
+- [ ] Payment success/failure handling
+- [ ] Transaction receipt generation
+
+**Payment Gateway Routing:**
+```typescript
+function selectGateway(country: string) {
+  return country === 'India' ? 'razorpay' : 'stripe'
+}
+```
+
+**Subscription Plans:**
+- 30 Days Access: $49 USD
+- 60 Days Access: $89 USD  
+- 90 Days Access: $119 USD (Most Popular)
+- 120 Days Access: $149 USD
+
+**Technical Implementation:**
+```typescript
+// Stripe
+import { StripeProvider } from '@stripe/stripe-react-native'
+
+// Razorpay
+import RazorpayCheckout from 'react-native-razorpay'
+
+// Backend endpoints
+POST /api/stripe/create-checkout
+POST /api/razorpay/create-order
+POST /api/razorpay/verify-payment
+```
+
+---
+
+### Discount & Coupon System
+
+**User Story:**  
+*As a user, I want to apply a discount code during checkout so that I can save money on my subscription.*
+
+**Acceptance Criteria:**
+- [ ] Coupon code input field on payment screen
+- [ ] Real-time validation of coupon codes
+- [ ] Display discount amount before payment
+- [ ] Support percentage and fixed amount discounts
+- [ ] One-time use and multi-use coupons
+- [ ] Expiry date enforcement
+- [ ] Usage limit tracking
+
+**Coupon Types:**
+1. Percentage Discount (e.g., FIRST20 = 20% off)
+2. Fixed Amount Discount (e.g., SAVE10 = $10 off)
+
+**UI Components:**
+- Coupon code input field
+- "Apply" button
+- Discount success message
+- Updated price display
+- Remove coupon button
+
+**Validation Rules:**
+- Active coupon (is_active = true)
+- Valid date range (NOW BETWEEN valid_from AND valid_until)
+- Usage limit not exceeded
+- Applicable to selected plan
+
+---
+
+### Trial Mode & Content Gating
+
+**User Story:**  
+*As a new user, I want to try the app for free so that I can decide if it's worth purchasing.*
+
+**Acceptance Criteria:**
+- [ ] Free trial on signup (no payment required)
+- [ ] Access to 1 learning module  
+- [ ] Access to 1 practice module
+- [ ] Mock exams locked (premium only)
+- [ ] Clear upgrade prompts on locked content
+- [ ] Trial badge on free content
+- [ ] "Upgrade" CTA throughout app
+
+**Free Trial Access:**
+```typescript
+trial_features = {
+  learning_modules: 1,
+  practice_modules: 1,
+  mock_exams: 0,
+  ai_chatbot: 10 // messages per day
+}
+```
+
+**Content Lock UI:**
+- 🔒 Lock icon on premium content
+- "Upgrade to Unlock" overlay
+- Benefits of upgrading
+- Direct link to subscription plans
+
+---
+
+### Profile Completion Flow
+
+**User Story:**  
+*As a first-time user, I want to complete my profile so that I can personalize my experience.*
+
+**Acceptance Criteria:**
+- [ ] Mandatory after first signup
+- [ ] Cannot access app until completed
+- [ ] Collect essential information
+- [ ] Country selection for payment routing
+- [ ] Progress indicator (e.g., Step 2 of 3)
+- [ ] Validation on all fields
+- [ ] Save and continue
+
+**Required Fields:**
+- Full Name (text)
+- Phone Number (with country code picker)
+- Current Country (dropdown - determines payment gateway)
+- Date of Birth (date picker)
+- Gender (radio buttons: Male/Female/Other)
+- NMC Attempts (number: 0, 1, 2+)
+- Using Coaching? (toggle: Yes/No)
+
+**Flow:**
+```
+Signup → Email Verification → Profile Completion → Dashboard
+                                     ↓
+                              profile_completed = true
+```
+
+**UI Screens:**
+1. Welcome screen ("Let's personalize your experience")
+2. Personal details form
+3. Preferences form  
+4. Completion success ("You're all set!")
+
+---
+
+## 🤖 AI-Powered Features
+
+### Performance Analysis & Recommendations
+
+**User Story:**  
+*As a student, I want AI-generated study recommendations so that I can improve efficiently.*
+
+**Acceptance Criteria:**
+- [ ] Weekly personalized study plan generated
+- [ ] Exam readiness score displayed (0-100%)
+- [ ] Weak areas automatically identified
+- [ ] Specific lesson recommendations
+- [ ] Daily practice targets
+- [ ] Motivational messages
+- [ ] "Generate New Plan" button
+
+**Recommendation Components:**
+1. **Exam Readiness Score:** Overall preparedness percentage
+2. **Urgent Topics:** Top 3 weak areas (< 70% accuracy)
+3. **Strong Areas:** Topics performing well (> 85%)
+4. **Weekly Schedule:** Day-by-day study plan (Mon-Sun)
+5. **Practice Targets:** Specific daily question goals
+6. **Motivational Message:** Personalized encouragement
+
+**Data Sources:**
+- Practice session results (topic-wise accuracy)
+- Mock exam scores
+- Learning completions
+- Study patterns
+- Days until subscription expires
+
+**UI Component:**
+```
+┌────────────────────────────┐
+│ 🤖 Your Study Plan         │
+│                            │
+│ 🎯 Exam Readiness: 68%     │
+│ ██████░░░░                 │
+│                            │
+│ 🚨 Urgent - Fix First:     │
+│ 1. Pharmacology (65%)      │
+│    → 20 practice MCQs daily│
+│                            │
+│ 💪 Strong Areas:           │
+│ ✓ Infection Control (92%)  │
+│                            │
+│ 📅 This Week:              │
+│ Mon: Pharmacology review   │
+│ Tue: Practice sessions     │
+│ ...                        │
+│                            │
+│ [Generate New Plan]        │
+└────────────────────────────┘
+```
+
+**Technical Implementation:**
+```typescript
+POST /api/ai/generate-recommendations
+
+// Uses Gemini AI to analyze:
+- practice_sessions
+- mock_exams  
+- learning_completions
+- subscription end date
+
+// Returns structured JSON recommendation
+```
+
+**Frequency:**
+- Auto-generated weekly (Sundays at 6 AM)
+- On-demand: User clicks "Generate New Plan"
+- After completing mock exam
+
+---
+
+### JeevaBot Chatbot Integration
+
+**User Story:**  
+*As a student, I want to ask questions to an AI tutor so that I can get instant help.*
+
+**Acceptance Criteria:**
+- [ ] Floating "Ask JeevaBot" button on all screens
+- [ ] Chat interface with message history
+- [ ] Context-aware responses (knows current lesson)
+- [ ] 50 messages/day limit
+- [ ] Conversation history persists
+- [ ] Typing indicator while AI thinks
+- [ ] Error handling with friendly messages
+
+**Use Cases:**
+1. Clinical doubt clearing
+2. NMC Code explanations
+3. Practice question help
+4. Exam strategy tips
+5. Motivation and encouragement
+
+**Context Data Provided to AI:**
+- Current lesson being studied
+- Recent practice performance
+- Weak topics
+- Mock exam scores
+
+---
+
+## 🛠️ Admin Portal Features
+
+### Student User Management
+
+**User Story:**  
+*As an admin, I want to view and manage all student users so that I can support them effectively.*
+
+**Acceptance Criteria:**
+- [ ] View all registered students in table
+- [ ] Search by name, email, phone
+- [ ] Filter by: Profile completion, OAuth provider, subscription status
+- [ ] Sort by: Registration date, last active, subscription end date
+- [ ] View student details in drawer/modal
+- [ ] See student performance metrics
+- [ ] Manually adjust subscription if needed
+- [ ] Export student data to CSV
+
+**Table Columns:**
+- Name
+- Email
+- Country
+- Registration Date
+- OAuth Provider (Email/Google/Apple)
+- Profile Completed (✓/✗)
+- Subscription Status (Trial/Active/Expired)
+- Days Remaining
+- Actions (View Details)
+
+**Student Detail View:**
+- Personal information
+- Subscription history
+- Learning progress
+- Practice performance
+- Mock exam results
+- AI chat usage stats
+
+**Technical Implementation:**
+```typescript
+// API endpoint
+GET /api/admin/students
+GET /api/admin/students/:id
+
+// Queries user_profiles table
+// Joins with subscriptions, practice_sessions, mock_exams
+```
+
+---
+
+### Discount/Coupon Management
+
+**User Story:**  
+*As an admin, I want to create and manage discount codes so that I can run promotions.*
+
+**Acceptance Criteria:**
+- [ ] Create new coupon codes
+- [ ] Edit existing coupons
+- [ ] Activate/deactivate coupons
+- [ ] View usage statistics
+- [ ] Set expiry dates
+- [ ] Set usage limits
+- [ ] Apply to specific plans or all plans
+- [ ] Delete unused coupons
+
+**Coupon Form Fields:**
+- Code (e.g., "FIRST20")
+- Description
+- Discount Type (Percentage/Fixed Amount)
+- Discount Value
+- Applicable Plans (multiselect)
+- Usage Limit (optional)
+- Valid From (date)
+- Valid Until (date)
+- Active Status (toggle)
+
+**Coupon Management Table:**
+- Code
+- Type
+- Value
+- Usage (e.g., 45/100)
+- Expiry Date
+- Status (Active/Inactive/Expired)
+- Actions (Edit, Delete, View Stats)
+
+**Analytics Dashboard:**
+- Total coupons created
+- Active vs inactive
+- Most used coupons
+- Revenue impact
+- Conversion rate with coupons
+
+**Technical Implementation:**
+```typescript
+// API endpoints
+GET /api/admin/coupons
+POST /api/admin/coupons
+PUT /api/admin/coupons/:id
+DELETE /api/admin/coupons/:id
+
+// CRUD operations on discount_coupons table
+```
+
+---
+
+### Dashboard Hero Management
+
+**User Story:**  
+*As an admin, I want to manage dashboard hero sections so that I can promote content in the mobile app.*
+
+**Acceptance Criteria:**
+- [ ] Create new hero sections
+- [ ] Upload hero images
+- [ ] Set title and subtitle
+- [ ] Configure CTA button text and link
+- [ ] Set display order
+- [ ] Activate/deactivate heroes
+- [ ] Preview how it looks in mobile app
+- [ ] Delete heroes
+
+**Hero Form Fields:**
+- Title (text)
+- Subtitle (textarea)
+- Image Upload (JPG/PNG, max 2MB)
+- CTA Button Text (e.g., "Start Learning")
+- CTA Link (internal route or URL)
+- Display Order (number)
+- Active Status (toggle)
+
+**Mobile App Display:**
+- Shown at top of dashboard/home screen
+- Swipeable carousel if multiple active
+- First hero (lowest display_order) shown by default
+
+**Technical Implementation:**
+```typescript
+// Table: hero_sections
+GET /api/admin/hero-sections
+POST /api/admin/hero-sections
+PUT /api/admin/hero-sections/:id  
+DELETE /api/admin/hero-sections/:id
+
+// Mobile app fetches active heroes
+GET /api/hero-sections?is_active=true&order=display_order.asc
+```
+
+---
+
 ## 🔐 Security & Privacy
 
 ### Data Protection
@@ -1808,6 +2206,16 @@ const syncOfflineData = async () => {
 
 ---
 
-**Version:** 1.0  
-**Last Updated:** October 11, 2025  
+**Version:** 2.0  
+**Last Updated:** October 18, 2025  
 **Author:** vollstek@gmail.com
+
+**Recent Updates (v2.0):**
+- Added OAuth authentication (Google & Apple Sign-In)
+- Added profile completion flow for new users
+- Added dual payment gateway integration (Stripe & Razorpay)
+- Added subscription discount/coupon system
+- Added trial mode & content gating specifications
+- Added AI-powered performance recommendations
+- Added admin portal features (Student Management, Coupon Management, Hero Management)
+- Updated for NMC CBT nursing exam preparation focus
