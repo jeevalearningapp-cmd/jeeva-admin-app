@@ -2,10 +2,18 @@ import { Router } from 'express'
 import { Resend } from 'resend'
 
 const router = Router()
-const resend = new Resend(process.env.RESEND_API_KEY)
+const resend = process.env.RESEND_API_KEY 
+  ? new Resend(process.env.RESEND_API_KEY)
+  : null
 
 router.post('/send', async (req, res) => {
   try {
+    if (!resend) {
+      return res.status(503).json({ 
+        error: 'Email service not configured. Please set RESEND_API_KEY environment variable.' 
+      })
+    }
+
     const { to, subject, html, from = 'Jeeva Learning <noreply@yourdomain.com>' } = req.body
 
     if (!to || !subject || !html) {
@@ -35,6 +43,12 @@ router.post('/send', async (req, res) => {
 
 router.post('/welcome', async (req, res) => {
   try {
+    if (!resend) {
+      return res.status(503).json({ 
+        error: 'Email service not configured. Please set RESEND_API_KEY environment variable.' 
+      })
+    }
+
     const { to, userName, confirmationUrl } = req.body
 
     const html = `
@@ -110,6 +124,12 @@ router.post('/welcome', async (req, res) => {
 
 router.post('/subscription-confirmation', async (req, res) => {
   try {
+    if (!resend) {
+      return res.status(503).json({ 
+        error: 'Email service not configured. Please set RESEND_API_KEY environment variable.' 
+      })
+    }
+
     const { to, userName, planName, price, billingCycle, startDate, nextBillingDate, appUrl } = req.body
 
     const html = `
@@ -189,6 +209,12 @@ router.post('/subscription-confirmation', async (req, res) => {
 
 router.post('/test', async (req, res) => {
   try {
+    if (!resend) {
+      return res.status(503).json({ 
+        error: 'Email service not configured. Please set RESEND_API_KEY environment variable.' 
+      })
+    }
+
     const { to } = req.body
 
     if (!to) {
