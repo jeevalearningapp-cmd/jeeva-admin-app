@@ -1,5 +1,14 @@
 # Learning Module Seed Data Instructions
 
+## ⚠️ IMPORTANT: Two-Step Process
+
+You must run **TWO SQL scripts** in this order:
+
+1. **FIRST**: `setup_schema.sql` - Creates database tables
+2. **SECOND**: `seed_learning_complete.sql` - Loads the content
+
+Do not skip step 1!
+
 ## Overview
 
 The seed data includes:
@@ -20,9 +29,11 @@ Each subtopic gets:
 1. Question about key principles (with 4 options)
 2. Question about nurse responsibilities (with 4 options)
 
-## How to Run the Seed Script
+## How to Run the Seed Scripts
 
 ### Option 1: Supabase SQL Editor (Recommended)
+
+#### STEP 1: Create Database Schema
 
 1. **Open your Supabase Dashboard**
    - Go to [https://supabase.com/dashboard](https://supabase.com/dashboard)
@@ -34,8 +45,8 @@ Each subtopic gets:
 3. **Create a new query**
    - Click "New Query"
 
-4. **Copy the seed SQL**
-   - Open `scripts/seed_learning_complete.sql`
+4. **Copy the schema SQL**
+   - Open `scripts/setup_schema.sql`
    - Copy the entire contents
 
 5. **Paste and Run**
@@ -43,14 +54,35 @@ Each subtopic gets:
    - Click "Run" or press `Ctrl+Enter` (Windows) / `Cmd+Enter` (Mac)
 
 6. **Verify Success**
-   - You should see success messages
-   - Check the "Table Editor" to confirm lessons and questions were created
+   - You should see: "Database schema created successfully!"
+   - Check the "Table Editor" - you should now see tables: modules, topics, lessons, questions, question_options, flashcards
+
+#### STEP 2: Load Seed Data
+
+7. **Create another new query**
+   - Click "New Query" again
+
+8. **Copy the seed SQL**
+   - Open `scripts/seed_learning_complete.sql`
+   - Copy the entire contents
+
+9. **Paste and Run**
+   - Paste into the SQL Editor
+   - Click "Run" or press `Ctrl+Enter` (Windows) / `Cmd+Enter` (Mac)
+
+10. **Verify Success**
+    - You should see success messages
+    - Check the "Table Editor" to confirm lessons and questions were created
 
 ### Option 2: Using psql Command Line
 
 If you have direct database access:
 
 ```bash
+# Step 1: Create schema
+psql YOUR_DATABASE_CONNECTION_STRING < scripts/setup_schema.sql
+
+# Step 2: Load seed data
 psql YOUR_DATABASE_CONNECTION_STRING < scripts/seed_learning_complete.sql
 ```
 
