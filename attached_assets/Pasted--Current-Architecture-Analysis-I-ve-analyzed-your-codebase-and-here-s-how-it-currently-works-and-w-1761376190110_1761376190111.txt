@@ -1,0 +1,150 @@
+📊 Current Architecture Analysis
+I've analyzed your codebase and here's how it currently works and what needs to change:
+
+CURRENT IMPLEMENTATION
+1. Module Fetching (Dynamic):
+
+Files: src/api/modules.ts, app/(tabs)/courses.tsx, app/(tabs)/practice/index.tsx, app/(tabs)/learning/index.tsx
+Pattern: Fetches all active modules from database via getModules()
+Usage: Practice, Learning, and Mock Exam screens all dynamically load modules
+2. Question Retrieval (Lesson-Based):
+
+Files: src/api/practice.ts, app/(tabs)/practice/quiz.tsx, app/(tabs)/mockexam/index.tsx
+Pattern:
+getQuestionsByLesson(lessonId) - filters by lesson_id
+getQuestionsByTopic(topicId) - joins with lessons table to filter by topic_id
+Problem: Tightly coupled to lesson hierarchy - won't work with tag-based filtering
+3. Flashcard Organization (Lesson-Based):
+
+Files: src/api/modules.ts (lines 149-175)
+Pattern:
+getFlashcardsByLesson(lessonId) - filters by lesson_id
+getFlashcardsByTopic(topicId) - joins lessons table
+Interface: lesson_id: string (line 55)
+Problem: Hardcoded to lessons instead of topic categories
+4. Learning Progress (Lesson-Based):
+
+Files: src/api/modules.ts (lines 177-257), src/api/learning.ts
+Tables: learning_completions table with lesson_id foreign key
+Pattern: Tracks completion per lesson, calculates topic progress by counting completed lessons
+Problem: No quiz passing requirements or topic-based progress tracking
+REQUIRED CHANGES FOR NEW STRUCTURE
+🔧 Files Requiring Updates
+1. API Layer (src/api/)
+src/api/modules.ts - Major refactor needed:
+
+✅ Keep: getModules() but modify to return hardcoded 3 modules
+❌ Remove: Dynamic module fetching logic
+🔄 Update:
+Flashcard interfaces to use topic_category instead of lesson_id
+getFlashcardsByTopic() to filter by category tag
+Topic interfaces to support Learning Module's 8 fixed topics
+Progress tracking to support quiz passing requirements
+src/api/practice.ts - Complete rewrite needed:
+
+❌ Remove: getQuestionsByLesson() (no longer relevant)
+🔄 Replace: getQuestionsByTopic() with tag-based filtering:
+// Old: joins with lessons table
+.eq('lessons.topic_id', topicId)
+// New: filter by tags
+.eq('module_type', 'practice')
+.contains('category', [categoryId])
+✨ Add: New question filtering functions:
+getQuestionsByModule(moduleType, limit)
+getQuestionsByCategory(category, limit)
+getQuestionsBySubdivision(subdivision, limit)
+getQuestionsByExamPart(examPart, limit)
+New file: src/api/constants.ts - Hardcoded module UUIDs:
+
+export const MODULES = {
+  PRACTICE: 'uuid-practice-module',
+  LEARNING: 'uuid-learning-module',
+  MOCK_EXAM: 'uuid-mock-exam-module'
+}
+export const LEARNING_TOPICS = [
+  { id: 'topic-1-uuid', title: 'Topic 1', quizPassThreshold: 80 },
+  // ... 7 more fixed topics
+]
+2. React Query Hooks (src/hooks/)
+src/hooks/useModules.ts - Simplify:
+
+🔄 Update: useModules() to return hardcoded modules (no need for database call)
+🔄 Update: useTopicsByModule() for Learning Module to return 8 fixed topics
+❌ Remove: Dynamic lesson fetching hooks
+✨ Add: useFlashcardsByCategory(category) hook
+src/hooks/usePractice.ts - Major refactor:
+
+❌ Remove: useQuestionsByLesson()
+🔄 Replace: useQuestionsByTopic() with tag-based filtering
+✨ Add: New hooks:
+useQuestionsByModule(moduleType, limit)
+useQuestionsByTags(filters)
+useLearningTopicQuiz(topicId) - with 80% pass requirement logic
+3. Screen Components
+app/(tabs)/practice/index.tsx (lines 106-154):
+
+Current: Dynamically loads modules from database
+Change: Use hardcoded Practice module UUID, display Practice module only
+Update: Remove module fetching loop, use tag-based category selection
+app/(tabs)/learning/index.tsx (lines 57-97):
+
+Current: Fetches first module's topics dynamically
+Change: Display 8 fixed Learning topics from constants
+Update: Add quiz completion tracking (80% pass requirement)
+Add: Topic unlock logic based on previous topic completion
+app/(tabs)/mockexam/index.tsx (lines 52-154):
+
+Current: Fetches questions via topic joins with lessons table
+Change: Use tag-based filtering (module_type: 'mock_exam')
+Update: Comprehensive mode to aggregate questions across all categories/subdivisions
+app/(tabs)/practice/quiz.tsx:
+
+Update: Replace getQuestionsByTopic() with tag-based question fetching
+Add: Category/subdivision/exam-part filtering options
+app/(tabs)/learning/lesson.tsx:
+
+Major Refactor: Remove lesson-based flow
+Change: Display topic content + embedded quiz
+Add: 80% pass requirement validation before marking topic complete
+4. TypeScript Interfaces
+Update interfaces in:
+
+src/api/modules.ts
+src/api/practice.ts
+// OLD
+interface Flashcard {
+  lesson_id: string;  // ❌ Remove
+  // ...
+}
+interface Question {
+  lesson_id?: string;  // ❌ Remove
+  // ...
+}
+// NEW
+interface Flashcard {
+  topic_category: string;  // ✨ Add
+  subdivision?: string;
+  // ...
+}
+interface Question {
+  module_type: 'practice' | 'learning' | 'mock_exam';  // ✨ Add
+  category: string[];  // Tag array
+  subdivision?: string;
+  exam_part?: string;
+  // ...
+}
+5. Progress Tracking Tables
+New table/API needed: topic_quiz_completions
+
+CREATE TABLE topic_quiz_completions (
+  id UUID PRIMARY KEY,
+  user_id UUID REFERENCES users(id),
+  topic_id UUID NOT NULL,  -- References fixed Learning topics
+  quiz_score INTEGER NOT NULL,
+  passed BOOLEAN,  -- TRUE if score >= 80%
+  completed_at TIMESTAMP
+);
+Update: src/api/learning.ts
+
+Add markTopicQuizComplete(userId, topicId, score)
+Add isTopicUnlocked(userId, topicId) - checks previous topic pass status
