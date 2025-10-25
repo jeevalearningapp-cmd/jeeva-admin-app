@@ -12,7 +12,7 @@ import {
   UsersPage,
   AdminUsersPage,
   SubscriptionsPage,
-  ContentPage,
+  ContentManagementPage,
   ApprovalsPage,
   AnalyticsPage,
   SettingsPage,
@@ -22,11 +22,6 @@ import {
   DiscountCouponsPage,
 } from './pages'
 import { SplashScreen } from './pages/SplashScreen'
-import { ModulesPage } from './pages/content/ModulesPage'
-import { TopicsPage } from './pages/content/TopicsPage'
-import { LessonsPage } from './pages/content/LessonsPage'
-import { QuestionsPage } from './pages/content/QuestionsPage'
-import { FlashcardsPage } from './pages/content/FlashcardsPage'
 import { EmailTestPage } from './pages/EmailTestPage'
 
 const queryClient = new QueryClient({
@@ -116,62 +111,7 @@ function App() {
               element={
                 <ProtectedRoute allowedRoles={['superadmin', 'editor']}>
                   <MainLayout>
-                    <ContentPage />
-                  </MainLayout>
-                </ProtectedRoute>
-              }
-            />
-            
-            <Route
-              path="/content/modules"
-              element={
-                <ProtectedRoute allowedRoles={['superadmin', 'editor']}>
-                  <MainLayout>
-                    <ModulesPage />
-                  </MainLayout>
-                </ProtectedRoute>
-              }
-            />
-            
-            <Route
-              path="/content/topics"
-              element={
-                <ProtectedRoute allowedRoles={['superadmin', 'editor']}>
-                  <MainLayout>
-                    <TopicsPage />
-                  </MainLayout>
-                </ProtectedRoute>
-              }
-            />
-            
-            <Route
-              path="/content/lessons"
-              element={
-                <ProtectedRoute allowedRoles={['superadmin', 'editor']}>
-                  <MainLayout>
-                    <LessonsPage />
-                  </MainLayout>
-                </ProtectedRoute>
-              }
-            />
-            
-            <Route
-              path="/content/questions"
-              element={
-                <ProtectedRoute allowedRoles={['superadmin', 'editor']}>
-                  <MainLayout>
-                    <QuestionsPage />
-                  </MainLayout>
-                </ProtectedRoute>
-              }
-            />
-            
-            <Route
-              path="/content/flashcards"
-              element={
-                <ProtectedRoute allowedRoles={['superadmin', 'editor']}>
-                  <MainLayout>
-                    <FlashcardsPage />
+                    <ContentManagementPage />
                   </MainLayout>
                 </ProtectedRoute>
               }
