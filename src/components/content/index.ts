@@ -1,3 +1,4 @@
 export { QuestionManager } from './QuestionManager'
 export { CSVBulkUpload } from './CSVBulkUpload'
 export { FlashcardManager } from './FlashcardManager'
+export { FlashcardCSVUpload } from './FlashcardCSVUpload'

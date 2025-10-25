@@ -32,7 +32,7 @@ import {
   ModuleType,
   ExamPart
 } from '@/types/content'
-import { QuestionManager, CSVBulkUpload, FlashcardManager } from '@/components/content'
+import { QuestionManager, CSVBulkUpload, FlashcardManager, FlashcardCSVUpload } from '@/components/content'
 
 interface TabPanelProps {
   children?: React.ReactNode
@@ -302,6 +302,9 @@ export const ContentManagementPage: React.FC = () => {
               <FlashcardManager
                 category={selectedTopic}
               />
+              <Box sx={{ mt: 4, pt: 4, borderTop: 1, borderColor: 'divider' }}>
+                <FlashcardCSVUpload category={selectedTopic} />
+              </Box>
             </TabPanel>
           )}
 
