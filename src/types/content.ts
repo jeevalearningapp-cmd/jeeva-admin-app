@@ -232,7 +232,8 @@ export interface LessonQuizResult {
 // Flashcard Types
 export interface Flashcard {
   id: string
-  lessonId: string
+  lessonId?: string
+  category?: string
   front: string
   back: string
   imageUrl?: string
@@ -243,7 +244,8 @@ export interface Flashcard {
 }
 
 export interface CreateFlashcardInput {
-  lessonId: string
+  lessonId?: string
+  category?: string
   front: string
   back: string
   imageUrl?: string
@@ -253,6 +255,7 @@ export interface CreateFlashcardInput {
 
 export interface UpdateFlashcardInput {
   lessonId?: string
+  category?: string
   front?: string
   back?: string
   imageUrl?: string

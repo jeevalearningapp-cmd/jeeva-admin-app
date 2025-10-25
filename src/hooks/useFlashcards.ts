@@ -18,6 +18,14 @@ export const useFlashcardsByLesson = (lessonId: string) => {
   })
 }
 
+export const useFlashcardsByCategory = (category: string) => {
+  return useQuery({
+    queryKey: ['flashcards', 'category', category],
+    queryFn: () => flashcardsAPI.getByCategory(category),
+    enabled: !!category,
+  })
+}
+
 export const useFlashcard = (id: string) => {
   return useQuery({
     queryKey: ['flashcards', id],

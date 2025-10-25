@@ -4,6 +4,7 @@ import { Flashcard, CreateFlashcardInput, UpdateFlashcardInput } from '@/types/c
 const mapToFlashcard = (data: any): Flashcard => ({
   id: data.id,
   lessonId: data.lesson_id,
+  category: data.category,
   front: data.front,
   back: data.back,
   imageUrl: data.image_url,
@@ -35,6 +36,17 @@ export const flashcardsAPI = {
     return (data || []).map(mapToFlashcard)
   },
 
+  async getByCategory(category: string): Promise<Flashcard[]> {
+    const { data, error } = await supabase
+      .from('flashcards')
+      .select('*')
+      .eq('category', category)
+      .order('display_order', { ascending: true })
+
+    if (error) throw error
+    return (data || []).map(mapToFlashcard)
+  },
+
   async getById(id: string): Promise<Flashcard> {
     const { data, error } = await supabase
       .from('flashcards')
@@ -51,6 +63,7 @@ export const flashcardsAPI = {
       .from('flashcards')
       .insert([{
         lesson_id: input.lessonId,
+        category: input.category,
         front: input.front,
         back: input.back,
         image_url: input.imageUrl,
@@ -67,6 +80,7 @@ export const flashcardsAPI = {
   async update(id: string, input: UpdateFlashcardInput): Promise<Flashcard> {
     const updateData: any = {}
     if (input.lessonId !== undefined) updateData.lesson_id = input.lessonId
+    if (input.category !== undefined) updateData.category = input.category
     if (input.front !== undefined) updateData.front = input.front
     if (input.back !== undefined) updateData.back = input.back
     if (input.imageUrl !== undefined) updateData.image_url = input.imageUrl

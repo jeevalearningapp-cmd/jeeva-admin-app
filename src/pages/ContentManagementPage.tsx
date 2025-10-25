@@ -32,7 +32,7 @@ import {
   ModuleType,
   ExamPart
 } from '@/types/content'
-import { QuestionManager, CSVBulkUpload } from '@/components/content'
+import { QuestionManager, CSVBulkUpload, FlashcardManager } from '@/components/content'
 
 interface TabPanelProps {
   children?: React.ReactNode
@@ -281,6 +281,7 @@ export const ContentManagementPage: React.FC = () => {
         <Paper sx={{ p: 3 }}>
           <Tabs value={tabValue} onChange={(_, newValue) => setTabValue(newValue)}>
             <Tab label="Questions" />
+            {selectedModule === 'learning' && <Tab label="Flashcards" />}
             {selectedModule === 'learning' && <Tab label="Lessons" />}
             <Tab label="Bulk Upload" />
           </Tabs>
@@ -295,9 +296,18 @@ export const ContentManagementPage: React.FC = () => {
             />
           </TabPanel>
 
-          {/* Lessons Tab (Learning Module only) */}
+          {/* Flashcards Tab (Learning Module only) */}
           {selectedModule === 'learning' && (
             <TabPanel value={tabValue} index={1}>
+              <FlashcardManager
+                category={selectedTopic}
+              />
+            </TabPanel>
+          )}
+
+          {/* Lessons Tab (Learning Module only) */}
+          {selectedModule === 'learning' && (
+            <TabPanel value={tabValue} index={2}>
               <Alert severity="info">
                 Lesson management (video URL, audio URL, text content) will be here
               </Alert>
@@ -305,7 +315,7 @@ export const ContentManagementPage: React.FC = () => {
           )}
 
           {/* Bulk Upload Tab */}
-          <TabPanel value={tabValue} index={selectedModule === 'learning' ? 2 : 1}>
+          <TabPanel value={tabValue} index={selectedModule === 'learning' ? 3 : 1}>
             <CSVBulkUpload
               moduleType={selectedModule}
               category={selectedCategory}
