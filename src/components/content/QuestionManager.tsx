@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Box,
   Button,
@@ -27,7 +27,8 @@ import {
   List,
   ListItem,
   ListItemText,
-  ListItemSecondaryAction
+  ListItemSecondaryAction,
+  CircularProgress
 } from '@mui/material'
 import {
   EditOutlined,
@@ -36,6 +37,12 @@ import {
   CloseOutlined
 } from '@mui/icons-material'
 import { Question, CreateQuestionInput, QuestionOption, ModuleType, ExamPart } from '@/types/content'
+import { 
+  useQuestionsByFilters, 
+  useCreateQuestion, 
+  useUpdateQuestion, 
+  useDeleteQuestion 
+} from '@/hooks/useQuestions'
 
 interface QuestionManagerProps {
   moduleType: ModuleType
@@ -54,6 +61,8 @@ export const QuestionManager: React.FC<QuestionManagerProps> = ({
 }) => {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null)
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
+  const [questionToDelete, setQuestionToDelete] = useState<string | null>(null)
   const [formData, setFormData] = useState<CreateQuestionInput>({
     questionText: '',
     questionType: 'multiple_choice',
@@ -70,7 +79,25 @@ export const QuestionManager: React.FC<QuestionManagerProps> = ({
   })
   const [optionText, setOptionText] = useState('')
 
-  const mockQuestions: Question[] = []
+  const { data: questions = [], isLoading } = useQuestionsByFilters({
+    moduleType,
+    category,
+    subdivision,
+    examPart
+  })
+  const createMutation = useCreateQuestion()
+  const updateMutation = useUpdateQuestion()
+  const deleteMutation = useDeleteQuestion()
+
+  useEffect(() => {
+    setFormData(prev => ({
+      ...prev,
+      moduleType,
+      category,
+      subdivision,
+      examPart
+    }))
+  }, [moduleType, category, subdivision, examPart])
 
   const handleOpenDialog = (question?: Question) => {
     if (question) {
@@ -149,10 +176,30 @@ export const QuestionManager: React.FC<QuestionManagerProps> = ({
     setFormData({ ...formData, options: updatedOptions })
   }
 
-  const handleSubmit = () => {
-    console.log('Submitting question:', formData)
+  const handleSubmit = async () => {
+    if (editingQuestion) {
+      await updateMutation.mutateAsync({
+        id: editingQuestion.id,
+        input: formData
+      })
+    } else {
+      await createMutation.mutateAsync(formData)
+    }
     handleCloseDialog()
     onQuestionAdded?.()
+  }
+
+  const handleDeleteClick = (questionId: string) => {
+    setQuestionToDelete(questionId)
+    setDeleteConfirmOpen(true)
+  }
+
+  const handleDeleteConfirm = async () => {
+    if (questionToDelete) {
+      await deleteMutation.mutateAsync(questionToDelete)
+      setDeleteConfirmOpen(false)
+      setQuestionToDelete(null)
+    }
   }
 
   const getDifficultyColor = (difficulty: string) => {
@@ -179,7 +226,11 @@ export const QuestionManager: React.FC<QuestionManagerProps> = ({
         </Button>
       </Box>
 
-      {mockQuestions.length === 0 ? (
+      {isLoading ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
+          <CircularProgress />
+        </Box>
+      ) : questions.length === 0 ? (
         <Alert severity="info">
           No questions found for this {moduleType === 'practice' ? 'subdivision' : moduleType === 'learning' ? 'topic' : 'exam part'}.
           <br />
@@ -199,7 +250,7 @@ export const QuestionManager: React.FC<QuestionManagerProps> = ({
               </TableRow>
             </TableHead>
             <TableBody>
-              {mockQuestions.map((question) => (
+              {questions.map((question) => (
                 <TableRow key={question.id}>
                   <TableCell sx={{ maxWidth: 400 }}>
                     {question.questionText.length > 100
@@ -228,7 +279,7 @@ export const QuestionManager: React.FC<QuestionManagerProps> = ({
                     <IconButton size="small" onClick={() => handleOpenDialog(question)}>
                       <EditOutlined />
                     </IconButton>
-                    <IconButton size="small" color="error">
+                    <IconButton size="small" color="error" onClick={() => handleDeleteClick(question.id)}>
                       <DeleteOutlined />
                     </IconButton>
                   </TableCell>
@@ -390,6 +441,22 @@ export const QuestionManager: React.FC<QuestionManagerProps> = ({
             disabled={!formData.questionText || (formData.questionType === 'multiple_choice' && (!formData.options || formData.options.length === 0))}
           >
             {editingQuestion ? 'Update' : 'Create'} Question
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteConfirmOpen} onClose={() => setDeleteConfirmOpen(false)}>
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Are you sure you want to delete this question? This action cannot be undone.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteConfirmOpen(false)}>Cancel</Button>
+          <Button onClick={handleDeleteConfirm} color="error" variant="contained">
+            Delete
           </Button>
         </DialogActions>
       </Dialog>

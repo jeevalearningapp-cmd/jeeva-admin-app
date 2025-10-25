@@ -10,6 +10,19 @@ export const useQuestions = () => {
   })
 }
 
+export const useQuestionsByFilters = (filters: {
+  moduleType?: string
+  category?: string
+  subdivision?: string
+  examPart?: string
+}) => {
+  return useQuery({
+    queryKey: ['questions', 'filters', filters],
+    queryFn: () => questionsAPI.getByFilters(filters),
+    enabled: !!filters.moduleType,
+  })
+}
+
 export const useQuestionsByLesson = (lessonId: string) => {
   return useQuery({
     queryKey: ['questions', 'lesson', lessonId],
@@ -88,6 +101,22 @@ export const useUploadQuestionImage = () => {
     mutationFn: (file: File) => questionsAPI.uploadImage(file),
     onError: (error: any) => {
       enqueueSnackbar(error.message || 'Failed to upload image', { variant: 'error' })
+    },
+  })
+}
+
+export const useBulkCreateQuestions = () => {
+  const queryClient = useQueryClient()
+  const { enqueueSnackbar } = useSnackbar()
+
+  return useMutation({
+    mutationFn: (inputs: CreateQuestionInput[]) => questionsAPI.bulkCreate(inputs),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['questions'] })
+      enqueueSnackbar(`${data.length} questions created successfully`, { variant: 'success' })
+    },
+    onError: (error: any) => {
+      enqueueSnackbar(error.message || 'Failed to create questions', { variant: 'error' })
     },
   })
 }

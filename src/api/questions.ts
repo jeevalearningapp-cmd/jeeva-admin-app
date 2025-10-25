@@ -11,6 +11,10 @@ const mapToQuestion = (data: any): Question => ({
   explanation: data.explanation,
   imageUrl: data.image_url,
   isActive: data.is_active,
+  moduleType: data.module_type,
+  category: data.category,
+  subdivision: data.subdivision,
+  examPart: data.exam_part,
   createdAt: data.created_at,
   updatedAt: data.updated_at,
   options: data.question_options ? data.question_options.map((opt: any) => ({
@@ -28,6 +32,37 @@ export const questionsAPI = {
       .from('questions')
       .select('*, question_options(*)')
       .order('created_at', { ascending: false })
+
+    if (error) throw error
+    return (data || []).map(mapToQuestion)
+  },
+
+  async getByFilters(filters: {
+    moduleType?: string
+    category?: string
+    subdivision?: string
+    examPart?: string
+  }): Promise<Question[]> {
+    let query = supabase
+      .from('questions')
+      .select('*, question_options(*)')
+
+    if (filters.moduleType) {
+      query = query.eq('module_type', filters.moduleType)
+    }
+    if (filters.category) {
+      query = query.eq('category', filters.category)
+    }
+    if (filters.subdivision) {
+      query = query.eq('subdivision', filters.subdivision)
+    }
+    if (filters.examPart) {
+      query = query.eq('exam_part', filters.examPart)
+    }
+
+    query = query.order('created_at', { ascending: false })
+
+    const { data, error } = await query
 
     if (error) throw error
     return (data || []).map(mapToQuestion)
@@ -66,7 +101,11 @@ export const questionsAPI = {
         points: input.points ?? 1,
         explanation: input.explanation,
         image_url: input.imageUrl,
-        is_active: input.isActive ?? true
+        is_active: input.isActive ?? true,
+        module_type: input.moduleType,
+        category: input.category,
+        subdivision: input.subdivision,
+        exam_part: input.examPart
       }])
       .select()
       .single()
@@ -99,6 +138,10 @@ export const questionsAPI = {
     if (input.explanation !== undefined) updateData.explanation = input.explanation
     if (input.imageUrl !== undefined) updateData.image_url = input.imageUrl
     if (input.isActive !== undefined) updateData.is_active = input.isActive
+    if (input.moduleType !== undefined) updateData.module_type = input.moduleType
+    if (input.category !== undefined) updateData.category = input.category
+    if (input.subdivision !== undefined) updateData.subdivision = input.subdivision
+    if (input.examPart !== undefined) updateData.exam_part = input.examPart
 
     const { data, error } = await supabase
       .from('questions')
@@ -118,6 +161,21 @@ export const questionsAPI = {
       .eq('id', id)
 
     if (error) throw error
+  },
+
+  async bulkCreate(inputs: CreateQuestionInput[]): Promise<Question[]> {
+    const createdQuestions: Question[] = []
+
+    for (const input of inputs) {
+      try {
+        const question = await questionsAPI.create(input)
+        createdQuestions.push(question)
+      } catch (error) {
+        console.error('Failed to create question:', input, error)
+      }
+    }
+
+    return createdQuestions
   },
 
   async uploadImage(file: File): Promise<string> {
