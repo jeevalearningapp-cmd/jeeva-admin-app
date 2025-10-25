@@ -19,6 +19,20 @@ Preferred communication style: Simple, everyday language.
 - **Theme Icons**: WbSunnyOutlined (Light mode), ContrastOutlined (Dark mode)
 - **User Display**: Simple avatar with dropdown menu (role visible in menu)
 
+## Recent Changes
+
+### October 25, 2025 - Learning Module Subtopic Organization & Seed Data
+- **Subtopic-Based Content Structure**: Implemented subtopic dropdown selector for Learning Module
+  - Content tabs only appear after topic AND subtopic selection (prevents orphaned content)
+  - Questions, Lessons, and Flashcards all organized by subtopic ID
+  - Numeracy (no subtopics) works correctly without subtopic selector
+- **Database Organization**: Questions use `category` (topic title) and `subdivision` (subtopic ID); Lessons use `category` (subtopic ID)
+- **Seed Data Script**: Created SQL seed script (`scripts/seed_learning_complete.sql`) that generates:
+  - 63 lessons (3 per subtopic: audio podcast, video tutorial, text intro)
+  - 42 questions (2 per subtopic with 4 options each)
+  - Common media URLs: NMC Code podcast audio and video tutorial
+- **Documentation**: Created comprehensive Learning Module structure guide and seed instructions
+
 ## System Architecture
 
 ### Frontend Architecture
