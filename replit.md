@@ -42,7 +42,7 @@ Preferred communication style: Simple, everyday language.
 ### Feature Specifications
 
 **Admin Portal Features:**
-- **Content Management System:** CRUD for fixed 3-module structure (Practice, Learning, Mock Exams), with hierarchical content (topics, lessons, questions, flashcards) and media upload. Includes a unified content management page with filtering and bulk CSV upload.
+- **Content Management System:** CRUD for fixed 3-module structure (Practice, Learning, Mock Exams), with hierarchical content (topics, lessons, questions, flashcards) and media upload. Includes a unified content management page with filtering, rich text editor (TipTap) for lesson content, and bulk CSV upload.
 - **Student User Management:** View profiles, OAuth tracking, subscription status, performance metrics.
 - **Subscription & Discount Management:** CRUD for plans and user subscriptions, discount codes with expiry/usage limits.
 - **Dashboard Hero Management:** CRUD for mobile app promotional banners.

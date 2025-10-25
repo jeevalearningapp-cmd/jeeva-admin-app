@@ -28,11 +28,11 @@ import {
   PRACTICE_CATEGORIES,
   NUMERACY_SUBDIVISIONS,
   CLINICAL_SUBDIVISIONS,
-  LEARNING_TOPICS,
   ModuleType,
   ExamPart
 } from '@/types/content'
-import { QuestionManager, CSVBulkUpload, FlashcardManager, FlashcardCSVUpload } from '@/components/content'
+import { LEARNING_TOPICS } from '@/constants/learningStructure'
+import { QuestionManager, CSVBulkUpload, FlashcardManager, FlashcardCSVUpload, LessonManager } from '@/components/content'
 
 interface TabPanelProps {
   children?: React.ReactNode
@@ -235,8 +235,8 @@ export const ContentManagementPage: React.FC = () => {
               label="Topic"
             >
               {LEARNING_TOPICS.map((topic) => (
-                <MenuItem key={topic} value={topic}>
-                  {topic}
+                <MenuItem key={topic.id} value={topic.title}>
+                  {topic.title}
                 </MenuItem>
               ))}
             </Select>
@@ -311,9 +311,15 @@ export const ContentManagementPage: React.FC = () => {
           {/* Lessons Tab (Learning Module only) */}
           {selectedModule === 'learning' && (
             <TabPanel value={tabValue} index={2}>
-              <Alert severity="info">
-                Lesson management (video URL, audio URL, text content) will be here
-              </Alert>
+              {selectedTopic ? (
+                <LessonManager
+                  topicTitle={selectedTopic}
+                />
+              ) : (
+                <Alert severity="info">
+                  Select a topic to manage lessons
+                </Alert>
+              )}
             </TabPanel>
           )}
 
