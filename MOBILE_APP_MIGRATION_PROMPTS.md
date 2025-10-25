@@ -1,8 +1,20 @@
 # Mobile App Migration Prompts - Copy & Paste Guide
 
+## 📋 Overview
+
+This guide provides step-by-step prompts to migrate your mobile app from a dynamic CMS structure to the fixed 7-topic Learning Module system. The admin portal has been updated to support this new structure with:
+
+- **7 Fixed Learning Topics** (Numeracy, NMC Code, Mental Capacity Act, Safeguarding, Consent & Confidentiality, Equality & Diversity, Duty of Candour, Cultural Adaptation)
+- **25 Subtopics** organized hierarchically (e.g., "1.1 Prioritise People", "2.1 Presumption of Capacity")
+- **Category-based Organization** for lessons and flashcards
+- **Topic-level Flashcards** in addition to lesson-level flashcards
+
+---
+
 ## Database Setup
 
 ### Prompt 1: Run Database Migration
+
 ```
 Run this SQL migration in Supabase SQL Editor to add the category column to lessons table:
 
@@ -15,6 +27,8 @@ CREATE INDEX IF NOT EXISTS idx_lessons_category ON lessons(category);
 
 -- Add comment
 COMMENT ON COLUMN lessons.category IS 'Subtopic identifier (e.g., "1.1 Prioritise People", "3.1 Recognising Abuse") for hierarchical organization within Learning Module topics.';
+
+This migration allows lessons to be organized by subtopics within the Learning Module.
 ```
 
 ---
@@ -22,18 +36,33 @@ COMMENT ON COLUMN lessons.category IS 'Subtopic identifier (e.g., "1.1 Prioritis
 ## Step 1: Create Learning Structure Constants
 
 ### Prompt 2: Create Learning Module Constants File
+
 ```
 Create a new file src/constants/learningStructure.ts with the complete Learning Module hierarchy:
 
+export interface Subtopic {
+  id: string;
+  title: string;
+  description: string;
+}
+
+export interface LearningTopic {
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+  subtopics: Subtopic[];
+}
+
 export const LEARNING_MODULE_ID = '22222222-2222-2222-2222-222222222222';
 
-export const LEARNING_TOPICS = [
+export const LEARNING_TOPICS: LearningTopic[] = [
   {
     id: '22222222-2222-0001-0000-000000000001',
     title: 'Numeracy',
     description: 'Essential numeracy skills for nursing practice',
     icon: 'calculate',
-    subtopics: [] // Numeracy has no subtopics, just lessons
+    subtopics: [] // Numeracy has direct lessons, no subtopics
   },
   {
     id: '22222222-2222-0002-0000-000000000002',
@@ -112,10 +141,9 @@ export const LEARNING_TOPICS = [
       { id: '7.2', title: 'UK Communication Styles', description: 'Adapting to British healthcare culture' }
     ]
   }
-] as const;
+];
 
-export type LearningTopic = typeof LEARNING_TOPICS[number];
-export type Subtopic = LearningTopic['subtopics'][number];
+This creates the complete 7-topic, 25-subtopic Learning Module structure that matches the admin portal.
 ```
 
 ---
@@ -123,6 +151,7 @@ export type Subtopic = LearningTopic['subtopics'][number];
 ## Step 2: Update TypeScript Types
 
 ### Prompt 3: Update Lesson and Flashcard Types
+
 ```
 Update src/types/content.ts to add the category field to Lesson and Flashcard interfaces:
 
@@ -147,8 +176,8 @@ export interface Lesson {
 // Add to Flashcard interface:
 export interface Flashcard {
   id: string;
-  lesson_id?: string; // Made optional since flashcards can now be topic-level
-  category?: string; // NEW: Topic identifier for Learning Module
+  lesson_id?: string; // Made optional - flashcards can be lesson-level OR topic-level
+  category?: string; // NEW: Topic identifier for topic-level flashcards (e.g., "The NMC Code")
   front: string;
   back: string;
   image_url?: string;
@@ -157,6 +186,10 @@ export interface Flashcard {
   created_at: string;
   updated_at: string;
 }
+
+Important: Flashcards now support TWO modes:
+1. Lesson-level: Set lesson_id, leave category empty (old approach)
+2. Topic-level: Set category to topic title, leave lesson_id empty (new approach for Learning Module)
 ```
 
 ---
@@ -164,6 +197,7 @@ export interface Flashcard {
 ## Step 3: Update Supabase API Functions
 
 ### Prompt 4: Add Lessons API Functions
+
 ```
 Update src/api/lessons.ts to add category-based lesson fetching:
 
@@ -196,26 +230,16 @@ export async function getLessonsByTopic(topicId: string): Promise<Lesson[]> {
   if (error) throw error;
   return data || [];
 }
+
+These functions enable filtering lessons by subtopic category for the new structure.
 ```
 
 ### Prompt 5: Update Flashcards API Functions
+
 ```
-Update src/api/flashcards.ts to replace lesson-based with category-based fetching:
+Update src/api/flashcards.ts to support both lesson-based and topic-based flashcards:
 
-// REMOVE the old getFlashcardsByLesson function and REPLACE with:
-export async function getFlashcardsByCategory(category: string): Promise<Flashcard[]> {
-  const { data, error } = await supabase
-    .from('flashcards')
-    .select('*')
-    .eq('category', category)
-    .eq('is_active', true)
-    .order('display_order');
-
-  if (error) throw error;
-  return data || [];
-}
-
-// Add function to get all flashcards for a topic:
+// NEW: Fetch flashcards by topic (for Learning Module topics)
 export async function getFlashcardsByTopic(topicTitle: string): Promise<Flashcard[]> {
   const { data, error } = await supabase
     .from('flashcards')
@@ -227,6 +251,22 @@ export async function getFlashcardsByTopic(topicTitle: string): Promise<Flashcar
   if (error) throw error;
   return data || [];
 }
+
+// KEEP: Existing lesson-based function (for backward compatibility)
+export async function getFlashcardsByLesson(lessonId: string): Promise<Flashcard[]> {
+  const { data, error } = await supabase
+    .from('flashcards')
+    .select('*')
+    .eq('lesson_id', lessonId)
+    .eq('is_active', true)
+    .order('display_order');
+
+  if (error) throw error;
+  return data || [];
+}
+
+Now flashcards can be organized by topic (e.g., all flashcards for "The NMC Code") 
+OR by specific lesson (traditional approach).
 ```
 
 ---
@@ -234,13 +274,13 @@ export async function getFlashcardsByTopic(topicTitle: string): Promise<Flashcar
 ## Step 4: Create React Query Hooks
 
 ### Prompt 6: Create Learning Module Hooks
+
 ```
 Create src/hooks/useLearningModule.ts with React Query hooks for the Learning Module:
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { getLessonsBySubtopic, getLessonsByTopic } from '../api/lessons';
-import { getFlashcardsByCategory } from '../api/flashcards';
-import type { Lesson, Flashcard } from '../types/content';
+import { getFlashcardsByTopic } from '../api/flashcards';
 
 // Fetch lessons for a specific subtopic
 export function useLessonsBySubtopic(topicId: string, subtopicId: string) {
@@ -260,14 +300,16 @@ export function useLessonsByTopic(topicId: string) {
   });
 }
 
-// Fetch flashcards for a Learning Module topic
+// Fetch topic-level flashcards for a Learning Module topic
 export function useFlashcardsByTopic(topicTitle: string) {
   return useQuery({
     queryKey: ['flashcards', 'topic', topicTitle],
-    queryFn: () => getFlashcardsByCategory(topicTitle),
+    queryFn: () => getFlashcardsByTopic(topicTitle),
     enabled: !!topicTitle
   });
 }
+
+These hooks fetch lessons and flashcards based on the new category-based structure.
 ```
 
 ---
@@ -275,6 +317,7 @@ export function useFlashcardsByTopic(topicTitle: string) {
 ## Step 5: Create Learning Module Screens
 
 ### Prompt 7: Create Learning Topics List Screen
+
 ```
 Create src/screens/learning/LearningTopicsScreen.tsx to display all 8 topics:
 
@@ -325,25 +368,10 @@ export default function LearningTopicsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5'
-  },
-  header: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    padding: 20,
-    paddingBottom: 8
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#666',
-    paddingHorizontal: 20,
-    paddingBottom: 16
-  },
-  list: {
-    padding: 16
-  },
+  container: { flex: 1, backgroundColor: '#f5f5f5' },
+  header: { fontSize: 28, fontWeight: 'bold', padding: 20, paddingBottom: 8 },
+  subtitle: { fontSize: 16, color: '#666', paddingHorizontal: 20, paddingBottom: 16 },
+  list: { padding: 16 },
   card: {
     flexDirection: 'row',
     backgroundColor: 'white',
@@ -366,35 +394,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginRight: 12
   },
-  textContainer: {
-    flex: 1
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 4
-  },
-  description: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 4
-  },
-  subtopicCount: {
-    fontSize: 12,
-    color: '#007aff',
-    fontWeight: '500'
-  }
+  textContainer: { flex: 1 },
+  title: { fontSize: 18, fontWeight: '600', marginBottom: 4 },
+  description: { fontSize: 14, color: '#666', marginBottom: 4 },
+  subtopicCount: { fontSize: 12, color: '#007aff', fontWeight: '500' }
 });
+
+This displays the 8 Learning Module topics with proper icons and navigation.
 ```
 
 ### Prompt 8: Create Topic Detail Screen with Subtopics
+
 ```
 Create src/screens/learning/TopicDetailScreen.tsx to show subtopics or direct lessons:
 
 import React from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
-import { useLessonsByTopic } from '../../hooks/useLearningModule';
+import { useLessonsByTopic, useFlashcardsByTopic } from '../../hooks/useLearningModule';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 export default function TopicDetailScreen() {
@@ -403,6 +420,7 @@ export default function TopicDetailScreen() {
   const { topic } = route.params;
 
   const { data: lessons, isLoading } = useLessonsByTopic(topic.id);
+  const { data: flashcards } = useFlashcardsByTopic(topic.title);
 
   // If topic has subtopics, show subtopic list
   if (topic.subtopics && topic.subtopics.length > 0) {
@@ -434,6 +452,24 @@ export default function TopicDetailScreen() {
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.list}
         />
+        
+        {/* Topic-level flashcards */}
+        {flashcards && flashcards.length > 0 && (
+          <View style={styles.flashcardsSection}>
+            <TouchableOpacity
+              style={styles.flashcardsButton}
+              onPress={() => navigation.navigate('Flashcards', { 
+                topicTitle: topic.title,
+                flashcards 
+              })}
+            >
+              <Icon name="style" size={24} color="white" />
+              <Text style={styles.flashcardsButtonText}>
+                Study Flashcards ({flashcards.length})
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
     );
   }
@@ -472,35 +508,34 @@ export default function TopicDetailScreen() {
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.list}
       />
+      
+      {/* Topic-level flashcards for topics without subtopics */}
+      {flashcards && flashcards.length > 0 && (
+        <View style={styles.flashcardsSection}>
+          <TouchableOpacity
+            style={styles.flashcardsButton}
+            onPress={() => navigation.navigate('Flashcards', { 
+              topicTitle: topic.title,
+              flashcards 
+            })}
+          >
+            <Icon name="style" size={24} color="white" />
+            <Text style={styles.flashcardsButtonText}>
+              Study Flashcards ({flashcards.length})
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5'
-  },
-  centerContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  header: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    padding: 20,
-    paddingBottom: 8
-  },
-  description: {
-    fontSize: 16,
-    color: '#666',
-    paddingHorizontal: 20,
-    paddingBottom: 16
-  },
-  list: {
-    padding: 16
-  },
+  container: { flex: 1, backgroundColor: '#f5f5f5' },
+  centerContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  header: { fontSize: 24, fontWeight: 'bold', padding: 20, paddingBottom: 8 },
+  description: { fontSize: 16, color: '#666', paddingHorizontal: 20, paddingBottom: 16 },
+  list: { padding: 16 },
   subtopicCard: {
     flexDirection: 'row',
     backgroundColor: 'white',
@@ -523,23 +558,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginRight: 12
   },
-  subtopicNumberText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 16
-  },
-  subtopicContent: {
-    flex: 1
-  },
-  subtopicTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 4
-  },
-  subtopicDesc: {
-    fontSize: 14,
-    color: '#666'
-  },
+  subtopicNumberText: { color: 'white', fontWeight: 'bold', fontSize: 16 },
+  subtopicContent: { flex: 1 },
+  subtopicTitle: { fontSize: 16, fontWeight: '600', marginBottom: 4 },
+  subtopicDesc: { fontSize: 14, color: '#666' },
   lessonCard: {
     flexDirection: 'row',
     backgroundColor: 'white',
@@ -554,15 +576,26 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3
   },
-  lessonTitle: {
-    flex: 1,
-    fontSize: 16,
-    fontWeight: '500'
-  }
+  lessonTitle: { flex: 1, fontSize: 16, fontWeight: '500' },
+  flashcardsSection: { padding: 16 },
+  flashcardsButton: {
+    flexDirection: 'row',
+    backgroundColor: '#007aff',
+    borderRadius: 12,
+    padding: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8
+  },
+  flashcardsButtonText: { color: 'white', fontSize: 16, fontWeight: '600' }
 });
+
+This handles both subtopic-based topics (NMC Code, etc.) and direct lesson topics (Numeracy).
+It also displays topic-level flashcards created from the admin portal.
 ```
 
 ### Prompt 9: Create Subtopic Lessons Screen
+
 ```
 Create src/screens/learning/SubtopicLessonsScreen.tsx to show lessons within a subtopic:
 
@@ -637,7 +670,7 @@ export default function SubtopicLessonsScreen() {
         )}
       </View>
 
-      {/* Flashcards Section */}
+      {/* Topic-level Flashcards Section */}
       {flashcards && flashcards.length > 0 && (
         <View style={styles.section}>
           <TouchableOpacity
@@ -659,44 +692,19 @@ export default function SubtopicLessonsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5'
-  },
-  centerContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
+  container: { flex: 1, backgroundColor: '#f5f5f5' },
+  centerContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   headerSection: {
     backgroundColor: 'white',
     padding: 20,
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0'
   },
-  topicName: {
-    fontSize: 14,
-    color: '#007aff',
-    fontWeight: '600',
-    marginBottom: 4
-  },
-  subtopicTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 8
-  },
-  description: {
-    fontSize: 16,
-    color: '#666'
-  },
-  section: {
-    padding: 16
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 12
-  },
+  topicName: { fontSize: 14, color: '#007aff', fontWeight: '600', marginBottom: 4 },
+  subtopicTitle: { fontSize: 24, fontWeight: 'bold', marginBottom: 8 },
+  description: { fontSize: 16, color: '#666' },
+  section: { padding: 16 },
+  sectionTitle: { fontSize: 18, fontWeight: '600', marginBottom: 12 },
   card: {
     flexDirection: 'row',
     backgroundColor: 'white',
@@ -711,24 +719,10 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3
   },
-  cardContent: {
-    flex: 1
-  },
-  cardTitle: {
-    fontSize: 16,
-    fontWeight: '500',
-    marginBottom: 4
-  },
-  duration: {
-    fontSize: 14,
-    color: '#666'
-  },
-  emptyText: {
-    textAlign: 'center',
-    color: '#999',
-    fontSize: 16,
-    padding: 20
-  },
+  cardContent: { flex: 1 },
+  cardTitle: { fontSize: 16, fontWeight: '500', marginBottom: 4 },
+  duration: { fontSize: 14, color: '#666' },
+  emptyText: { textAlign: 'center', color: '#999', fontSize: 16, padding: 20 },
   flashcardsButton: {
     flexDirection: 'row',
     backgroundColor: '#007aff',
@@ -738,12 +732,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 8
   },
-  flashcardsButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '600'
-  }
+  flashcardsButtonText: { color: 'white', fontSize: 16, fontWeight: '600' }
 });
+
+This shows lessons for a specific subtopic and includes topic-level flashcards.
 ```
 
 ---
@@ -751,6 +743,7 @@ const styles = StyleSheet.create({
 ## Step 6: Update Navigation
 
 ### Prompt 10: Add Learning Module Routes
+
 ```
 Update your navigation file (e.g., src/navigation/AppNavigator.tsx) to add the new Learning Module screens:
 
@@ -786,6 +779,8 @@ import FlashcardsScreen from '../screens/learning/FlashcardsScreen';
   component={FlashcardsScreen}
   options={{ title: 'Flashcards' }}
 />
+
+This sets up the complete navigation flow for the Learning Module.
 ```
 
 ---
@@ -793,6 +788,7 @@ import FlashcardsScreen from '../screens/learning/FlashcardsScreen';
 ## Step 7: Create Lesson Content Screen (Video/Audio/Text)
 
 ### Prompt 11: Create Lesson Content Player
+
 ```
 Create src/screens/learning/LessonContentScreen.tsx to display lesson content with quiz at the end:
 
@@ -810,8 +806,7 @@ export default function LessonContentScreen() {
   const [completed, setCompleted] = useState(false);
 
   const handleComplete = () => {
-    // TODO: If lesson_type is 'quiz', navigate to quiz screen
-    // Otherwise mark as complete
+    // If lesson_type is 'quiz', navigate to quiz screen
     if (lesson.lesson_type === 'quiz') {
       navigation.navigate('LessonQuiz', { 
         lesson,
@@ -881,54 +876,15 @@ export default function LessonContentScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5'
-  },
-  header: {
-    backgroundColor: 'white',
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0'
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 8
-  },
-  category: {
-    fontSize: 14,
-    color: '#007aff',
-    fontWeight: '600'
-  },
-  video: {
-    width: '100%',
-    height: 250,
-    backgroundColor: '#000'
-  },
-  audioPlayer: {
-    backgroundColor: 'white',
-    padding: 40,
-    alignItems: 'center',
-    margin: 16,
-    borderRadius: 12
-  },
-  audioText: {
-    fontSize: 18,
-    marginTop: 16,
-    color: '#666'
-  },
-  contentSection: {
-    backgroundColor: 'white',
-    padding: 20,
-    margin: 16,
-    borderRadius: 12
-  },
-  content: {
-    fontSize: 16,
-    lineHeight: 24,
-    color: '#333'
-  },
+  container: { flex: 1, backgroundColor: '#f5f5f5' },
+  header: { backgroundColor: 'white', padding: 20, borderBottomWidth: 1, borderBottomColor: '#e0e0e0' },
+  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 8 },
+  category: { fontSize: 14, color: '#007aff', fontWeight: '600' },
+  video: { width: '100%', height: 250, backgroundColor: '#000' },
+  audioPlayer: { backgroundColor: 'white', padding: 40, alignItems: 'center', margin: 16, borderRadius: 12 },
+  audioText: { fontSize: 18, marginTop: 16, color: '#666' },
+  contentSection: { backgroundColor: 'white', padding: 20, margin: 16, borderRadius: 12 },
+  content: { fontSize: 16, lineHeight: 24, color: '#333' },
   completeButton: {
     flexDirection: 'row',
     backgroundColor: '#007aff',
@@ -939,15 +895,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 8
   },
-  completedButton: {
-    backgroundColor: '#4caf50'
-  },
-  completeButtonText: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: '600'
-  }
+  completedButton: { backgroundColor: '#4caf50' },
+  completeButtonText: { color: 'white', fontSize: 18, fontWeight: '600' }
 });
+
+This displays video/audio/text lessons with completion tracking and quiz integration.
 ```
 
 ---
@@ -958,13 +910,28 @@ These 11 prompts will:
 
 1. ✅ Add database support for subtopics (category column in lessons)
 2. ✅ Create constants for the 7 Learning Module topics with 25 subtopics
-3. ✅ Update TypeScript types
+3. ✅ Update TypeScript types for category support
 4. ✅ Add Supabase API functions for category-based fetching
 5. ✅ Create React Query hooks
 6. ✅ Build complete UI for Topics → Subtopics → Lessons hierarchy
 7. ✅ Support video/audio/text/quiz lesson types
-8. ✅ Enable flashcards at topic level
+8. ✅ Enable **topic-level flashcards** (created from admin portal)
 9. ✅ Include 80% quiz passing requirement structure
+
+## Key Features
+
+- **Topic-Level Flashcards**: Flashcards can now be associated with entire topics (e.g., "The NMC Code") instead of just individual lessons
+- **Hierarchical Navigation**: Topics → Subtopics → Lessons flow
+- **Dual Flashcard Modes**: Supports both lesson-level and topic-level flashcards
+- **Category-Based Filtering**: Lessons organized by subtopic categories (e.g., "1.1 Prioritise People")
+
+## Admin Portal Integration
+
+The admin portal has been updated to support:
+- Creating lessons with subtopic categories (dropdown shows all 25 subtopics)
+- Creating flashcards for either specific lessons OR entire topics
+- Filtering content by topic and subtopic
+- Visual indicators showing which lessons/flashcards belong to which categories
 
 **Next Steps After Implementation:**
 - Test the complete flow: Topics → Subtopics → Lessons → Flashcards

@@ -110,6 +110,7 @@ export interface Lesson {
   audioUrl?: string
   lessonType?: LessonType
   passingScorePercentage?: number
+  category?: string
   duration?: number
   isActive: boolean
   displayOrder: number
@@ -126,6 +127,7 @@ export interface CreateLessonInput {
   audioUrl?: string
   lessonType?: LessonType
   passingScorePercentage?: number
+  category?: string
   duration?: number
   isActive?: boolean
   displayOrder?: number
@@ -139,6 +141,7 @@ export interface UpdateLessonInput {
   audioUrl?: string
   lessonType?: LessonType
   passingScorePercentage?: number
+  category?: string
   duration?: number
   isActive?: boolean
   displayOrder?: number

@@ -37,10 +37,12 @@ import { Alert } from '@mui/material'
 import { useLessons, useCreateLesson, useUpdateLesson, useDeleteLesson } from '@/hooks/useLessons'
 import { useTopics } from '@/hooks/useTopics'
 import { PageLoader } from '@/components/common'
-import { Lesson, CreateLessonInput } from '@/types/content'
+import { Lesson, CreateLessonInput, FIXED_MODULE_IDS } from '@/types/content'
 import { CSVUpload } from '@/components/common/CSVUpload'
 import { lessonTemplate } from '@/utils/csvTemplates'
 import { useBulkUpload } from '@/hooks/useBulkUpload'
+import { LEARNING_TOPICS, getAllSubtopics } from '@/constants/learningStructure'
+import { RichTextEditor } from '@/components/common/RichTextEditor'
 
 export const LessonsPage: React.FC = () => {
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -55,6 +57,9 @@ export const LessonsPage: React.FC = () => {
     content: '',
     videoUrl: '',
     audioUrl: '',
+    lessonType: 'text',
+    passingScorePercentage: 80,
+    category: '',
     duration: 0,
     isActive: true,
     displayOrder: 0
@@ -96,6 +101,9 @@ export const LessonsPage: React.FC = () => {
         content: lesson.content,
         videoUrl: lesson.videoUrl,
         audioUrl: lesson.audioUrl || '',
+        lessonType: lesson.lessonType || 'text',
+        passingScorePercentage: lesson.passingScorePercentage || 80,
+        category: lesson.category || '',
         duration: lesson.duration,
         isActive: lesson.isActive,
         displayOrder: lesson.displayOrder
@@ -108,6 +116,9 @@ export const LessonsPage: React.FC = () => {
         content: '',
         videoUrl: '',
         audioUrl: '',
+        lessonType: 'text',
+        passingScorePercentage: 80,
+        category: '',
         duration: 0,
         isActive: true,
         displayOrder: 0
@@ -238,6 +249,7 @@ export const LessonsPage: React.FC = () => {
             <TableRow>
               <TableCell>Title</TableCell>
               <TableCell>Topic</TableCell>
+              <TableCell>Subtopic</TableCell>
               <TableCell>Duration</TableCell>
               <TableCell>Video</TableCell>
               <TableCell>Order</TableCell>
@@ -258,6 +270,13 @@ export const LessonsPage: React.FC = () => {
                     label={topics?.find(t => t.id === lesson.topicId)?.title || 'Unknown'}
                     size="small"
                   />
+                </TableCell>
+                <TableCell>
+                  {lesson.category ? (
+                    <Chip label={lesson.category} size="small" color="primary" variant="outlined" />
+                  ) : (
+                    <Typography variant="caption" color="text.secondary">—</Typography>
+                  )}
                 </TableCell>
                 <TableCell>
                   <Chip label={`${lesson.duration} min`} size="small" />
@@ -297,7 +316,7 @@ export const LessonsPage: React.FC = () => {
             ))}
             {(!filteredLessons || filteredLessons.length === 0) && (
               <TableRow>
-                <TableCell colSpan={7} align="center" sx={{ py: 4 }}>
+                <TableCell colSpan={8} align="center" sx={{ py: 4 }}>
                   <Typography variant="body2" color="text.secondary">
                     {searchQuery || topicFilter !== 'all'
                       ? 'No lessons found matching your filters.'
@@ -340,6 +359,31 @@ export const LessonsPage: React.FC = () => {
                 </Typography>
               )}
             </FormControl>
+            
+            {/* Category Dropdown - Only show for Learning Module topics */}
+            {formData.topicId && topics?.find(t => t.id === formData.topicId)?.moduleId === FIXED_MODULE_IDS.LEARNING && (
+              <FormControl fullWidth>
+                <InputLabel>Subtopic</InputLabel>
+                <Select
+                  value={formData.category || ''}
+                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                  label="Subtopic"
+                >
+                  <MenuItem value="">
+                    <em>None</em>
+                  </MenuItem>
+                  {getAllSubtopics().map((subtopic) => (
+                    <MenuItem key={subtopic.id} value={subtopic.id}>
+                      {subtopic.displayLabel}
+                    </MenuItem>
+                  ))}
+                </Select>
+                <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, ml: 2 }}>
+                  Select which subtopic this lesson belongs to (e.g., "1.1 Prioritise People")
+                </Typography>
+              </FormControl>
+            )}
+            
             <TextField
               label="Title"
               value={formData.title}
@@ -350,18 +394,25 @@ export const LessonsPage: React.FC = () => {
               error={!!getFieldError('title')}
               helperText={getFieldError('title')}
             />
-            <TextField
-              label="Content"
-              value={formData.content}
-              onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-              onBlur={() => setTouched({ ...touched, content: true })}
-              fullWidth
-              multiline
-              rows={5}
-              required
-              error={!!getFieldError('content')}
-              helperText={getFieldError('content')}
-            />
+            
+            <Box>
+              <Typography variant="body2" sx={{ mb: 1, fontWeight: 500 }}>
+                Lesson Content *
+              </Typography>
+              <RichTextEditor
+                content={formData.content}
+                onChange={(content) => {
+                  setFormData({ ...formData, content })
+                  setTouched({ ...touched, content: true })
+                }}
+                placeholder="Write your lesson content here... Use the toolbar for formatting."
+              />
+              {getFieldError('content') && (
+                <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 2 }}>
+                  {getFieldError('content')}
+                </Typography>
+              )}
+            </Box>
             <TextField
               label="Video URL"
               value={formData.videoUrl}
@@ -377,6 +428,36 @@ export const LessonsPage: React.FC = () => {
               placeholder="https://example.com/audio.mp3"
               helperText="Optional: Add audio/podcast content for this lesson"
             />
+            
+            <FormControl fullWidth>
+              <InputLabel>Lesson Type</InputLabel>
+              <Select
+                value={formData.lessonType}
+                onChange={(e) => setFormData({ ...formData, lessonType: e.target.value as any })}
+                label="Lesson Type"
+              >
+                <MenuItem value="text">Text</MenuItem>
+                <MenuItem value="video">Video</MenuItem>
+                <MenuItem value="audio">Audio</MenuItem>
+                <MenuItem value="quiz">Quiz</MenuItem>
+              </Select>
+              <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, ml: 2 }}>
+                Select the primary format of this lesson
+              </Typography>
+            </FormControl>
+            
+            {formData.lessonType === 'quiz' && (
+              <TextField
+                label="Passing Score (%)"
+                type="number"
+                value={formData.passingScorePercentage}
+                onChange={(e) => setFormData({ ...formData, passingScorePercentage: parseInt(e.target.value) || 80 })}
+                fullWidth
+                inputProps={{ min: 0, max: 100 }}
+                helperText="Minimum score required to pass this quiz (0-100%)"
+              />
+            )}
+            
             <TextField
               label="Duration (minutes)"
               type="number"

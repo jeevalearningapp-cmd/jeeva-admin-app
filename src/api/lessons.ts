@@ -7,6 +7,10 @@ const mapToLesson = (data: any): Lesson => ({
   title: data.title,
   content: data.content,
   videoUrl: data.video_url,
+  audioUrl: data.audio_url,
+  lessonType: data.lesson_type,
+  passingScorePercentage: data.passing_score_percentage,
+  category: data.category,
   duration: data.duration,
   isActive: data.is_active,
   displayOrder: data.display_order,
@@ -65,6 +69,10 @@ export const lessonsAPI = {
         title: input.title,
         content: input.content,
         video_url: input.videoUrl,
+        audio_url: input.audioUrl,
+        lesson_type: input.lessonType,
+        passing_score_percentage: input.passingScorePercentage,
+        category: input.category,
         duration: input.duration,
         is_active: input.isActive ?? true,
         display_order: input.displayOrder ?? 0
@@ -82,6 +90,10 @@ export const lessonsAPI = {
     if (input.title !== undefined) updateData.title = input.title
     if (input.content !== undefined) updateData.content = input.content
     if (input.videoUrl !== undefined) updateData.video_url = input.videoUrl
+    if (input.audioUrl !== undefined) updateData.audio_url = input.audioUrl
+    if (input.lessonType !== undefined) updateData.lesson_type = input.lessonType
+    if (input.passingScorePercentage !== undefined) updateData.passing_score_percentage = input.passingScorePercentage
+    if (input.category !== undefined) updateData.category = input.category
     if (input.duration !== undefined) updateData.duration = input.duration
     if (input.isActive !== undefined) updateData.is_active = input.isActive
     if (input.displayOrder !== undefined) updateData.display_order = input.displayOrder

@@ -41,6 +41,7 @@ import { Flashcard, CreateFlashcardInput } from '@/types/content'
 import { CSVUpload } from '@/components/common/CSVUpload'
 import { flashcardTemplate } from '@/utils/csvTemplates'
 import { useBulkUpload } from '@/hooks/useBulkUpload'
+import { LEARNING_TOPICS } from '@/constants/learningStructure'
 
 export const FlashcardsPage: React.FC = () => {
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -51,6 +52,7 @@ export const FlashcardsPage: React.FC = () => {
   const [lessonFilter, setLessonFilter] = useState<string>('all')
   const [formData, setFormData] = useState<CreateFlashcardInput>({
     lessonId: '',
+    category: '',
     front: '',
     back: '',
     imageUrl: '',
@@ -92,6 +94,7 @@ export const FlashcardsPage: React.FC = () => {
       setEditingFlashcard(flashcard)
       setFormData({
         lessonId: flashcard.lessonId,
+        category: flashcard.category,
         front: flashcard.front,
         back: flashcard.back,
         imageUrl: flashcard.imageUrl,
@@ -102,6 +105,7 @@ export const FlashcardsPage: React.FC = () => {
       setEditingFlashcard(null)
       setFormData({
         lessonId: '',
+        category: '',
         front: '',
         back: '',
         imageUrl: '',
@@ -122,12 +126,15 @@ export const FlashcardsPage: React.FC = () => {
   }
 
   const validate = () => {
-    return formData.lessonId.trim() !== '' && formData.front.trim() !== '' && formData.back.trim() !== ''
+    // Either lessonId OR category must be provided
+    const hasAssociation = (formData.lessonId && formData.lessonId.trim() !== '') || 
+                           (formData.category && formData.category.trim() !== '')
+    return hasAssociation && formData.front.trim() !== '' && formData.back.trim() !== ''
   }
 
   const getFieldError = (field: 'lessonId' | 'front' | 'back') => {
     if (!touched[field]) return ''
-    if (field === 'lessonId' && !formData.lessonId) return 'Lesson is required'
+    if (field === 'lessonId' && !formData.lessonId && !formData.category) return 'Either Lesson or Learning Topic is required'
     if (field === 'front' && !formData.front.trim()) return 'Front text is required'
     if (field === 'back' && !formData.back.trim()) return 'Back text is required'
     return ''
@@ -248,6 +255,7 @@ export const FlashcardsPage: React.FC = () => {
               <TableCell>Front</TableCell>
               <TableCell>Back</TableCell>
               <TableCell>Lesson</TableCell>
+              <TableCell>Learning Topic</TableCell>
               <TableCell>Order</TableCell>
               <TableCell>Status</TableCell>
               <TableCell align="right">Actions</TableCell>
@@ -267,10 +275,21 @@ export const FlashcardsPage: React.FC = () => {
                   </Typography>
                 </TableCell>
                 <TableCell>
-                  <Chip
-                    label={lessons?.find(l => l.id === flashcard.lessonId)?.title || 'Unknown'}
-                    size="small"
-                  />
+                  {flashcard.lessonId ? (
+                    <Chip
+                      label={lessons?.find(l => l.id === flashcard.lessonId)?.title || 'Unknown'}
+                      size="small"
+                    />
+                  ) : (
+                    <Typography variant="caption" color="text.secondary">—</Typography>
+                  )}
+                </TableCell>
+                <TableCell>
+                  {flashcard.category ? (
+                    <Chip label={flashcard.category} size="small" color="primary" variant="outlined" />
+                  ) : (
+                    <Typography variant="caption" color="text.secondary">—</Typography>
+                  )}
                 </TableCell>
                 <TableCell>
                   <Chip label={flashcard.displayOrder} size="small" />
@@ -302,7 +321,7 @@ export const FlashcardsPage: React.FC = () => {
             ))}
             {(!filteredFlashcards || filteredFlashcards.length === 0) && (
               <TableRow>
-                <TableCell colSpan={6} align="center" sx={{ py: 4 }}>
+                <TableCell colSpan={7} align="center" sx={{ py: 4 }}>
                   <Typography variant="body2" color="text.secondary">
                     {searchQuery || lessonFilter !== 'all'
                       ? 'No flashcards found matching your filters.'
@@ -327,14 +346,41 @@ export const FlashcardsPage: React.FC = () => {
                 {submitError}
               </Alert>
             )}
-            <FormControl fullWidth required error={!!getFieldError('lessonId')}>
-              <InputLabel>Lesson</InputLabel>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+              Flashcards can be associated with either a specific lesson OR a Learning Module topic:
+            </Typography>
+            
+            <FormControl fullWidth error={!!getFieldError('lessonId')}>
+              <InputLabel>Learning Module Topic (Optional)</InputLabel>
               <Select
-                value={formData.lessonId}
-                onChange={(e) => setFormData({ ...formData, lessonId: e.target.value })}
+                value={formData.category || ''}
+                onChange={(e) => setFormData({ ...formData, category: e.target.value, lessonId: '' })}
                 onBlur={() => setTouched({ ...touched, lessonId: true })}
-                label="Lesson"
+                label="Learning Module Topic (Optional)"
               >
+                <MenuItem value="">
+                  <em>None - Use specific lesson instead</em>
+                </MenuItem>
+                {LEARNING_TOPICS.map(topic => (
+                  <MenuItem key={topic.id} value={topic.title}>{topic.title}</MenuItem>
+                ))}
+              </Select>
+              <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, ml: 2 }}>
+                For topic-level flashcards (e.g., all flashcards for "The NMC Code")
+              </Typography>
+            </FormControl>
+            
+            <FormControl fullWidth disabled={!!formData.category} error={!!getFieldError('lessonId')}>
+              <InputLabel>Or Select Specific Lesson</InputLabel>
+              <Select
+                value={formData.lessonId || ''}
+                onChange={(e) => setFormData({ ...formData, lessonId: e.target.value, category: '' })}
+                onBlur={() => setTouched({ ...touched, lessonId: true })}
+                label="Or Select Specific Lesson"
+              >
+                <MenuItem value="">
+                  <em>None</em>
+                </MenuItem>
                 {lessons?.filter(l => l.isActive).map(lesson => (
                   <MenuItem key={lesson.id} value={lesson.id}>{lesson.title}</MenuItem>
                 ))}
