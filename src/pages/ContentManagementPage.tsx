@@ -32,7 +32,7 @@ import {
   ModuleType,
   ExamPart
 } from '@/types/content'
-import { QuestionManager } from '@/components/content'
+import { QuestionManager, CSVBulkUpload } from '@/components/content'
 
 interface TabPanelProps {
   children?: React.ReactNode
@@ -306,23 +306,12 @@ export const ContentManagementPage: React.FC = () => {
 
           {/* Bulk Upload Tab */}
           <TabPanel value={tabValue} index={selectedModule === 'learning' ? 2 : 1}>
-            <Box sx={{ textAlign: 'center', py: 4 }}>
-              <UploadFileOutlined sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
-              <Typography variant="h6" gutterBottom>
-                Bulk Upload Questions via CSV
-              </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                Download the CSV template, fill it with questions, and upload to add multiple questions at once
-              </Typography>
-              <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center' }}>
-                <Button variant="outlined">
-                  Download CSV Template
-                </Button>
-                <Button variant="contained" startIcon={<UploadFileOutlined />}>
-                  Upload CSV File
-                </Button>
-              </Box>
-            </Box>
+            <CSVBulkUpload
+              moduleType={selectedModule}
+              category={selectedCategory}
+              subdivision={selectedSubdivision}
+              examPart={selectedModule === 'mock_exam' ? selectedExamPart : undefined}
+            />
           </TabPanel>
         </Paper>
       )}
