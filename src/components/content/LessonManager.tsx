@@ -42,9 +42,10 @@ import { RichTextEditor } from '@/components/common/RichTextEditor'
 
 interface LessonManagerProps {
   topicTitle: string
+  subtopicId?: string
 }
 
-export const LessonManager: React.FC<LessonManagerProps> = ({ topicTitle }) => {
+export const LessonManager: React.FC<LessonManagerProps> = ({ topicTitle, subtopicId }) => {
   // Find the topic ID from the title
   const selectedTopic = LEARNING_TOPICS.find(t => t.title === topicTitle)
   const topicId = selectedTopic?.id || ''
@@ -66,7 +67,7 @@ export const LessonManager: React.FC<LessonManagerProps> = ({ topicTitle }) => {
   const [touched, setTouched] = useState({ title: false, content: false })
   const [submitError, setSubmitError] = useState<string>('')
 
-  const { data: lessons, isLoading } = useLessonsByTopic(topicId)
+  const { data: allLessons, isLoading } = useLessonsByTopic(topicId)
   const { data: topics } = useTopics()
   const createMutation = useCreateLesson()
   const updateMutation = useUpdateLesson()
@@ -74,6 +75,11 @@ export const LessonManager: React.FC<LessonManagerProps> = ({ topicTitle }) => {
 
   const currentTopic = topics?.find(t => t.id === topicId)
   const isLearningModule = currentTopic?.moduleId === FIXED_MODULE_IDS.LEARNING
+
+  // Filter lessons by subtopic if provided
+  const lessons = subtopicId 
+    ? allLessons?.filter(lesson => lesson.category === subtopicId)
+    : allLessons
 
   if (isLoading) {
     return <PageLoader />
@@ -105,7 +111,7 @@ export const LessonManager: React.FC<LessonManagerProps> = ({ topicTitle }) => {
         audioUrl: '',
         lessonType: 'text',
         passingScorePercentage: 80,
-        category: '',
+        category: subtopicId || '',
         duration: 0,
         isActive: true,
         displayOrder: 0

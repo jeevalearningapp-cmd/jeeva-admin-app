@@ -53,6 +53,7 @@ export const ContentManagementPage: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('')
   const [selectedSubdivision, setSelectedSubdivision] = useState<string>('')
   const [selectedTopic, setSelectedTopic] = useState<string>('')
+  const [selectedSubtopic, setSelectedSubtopic] = useState<string>('')
   const [selectedExamPart, setSelectedExamPart] = useState<'part_a' | 'part_b'>('part_a')
   const [tabValue, setTabValue] = useState(0)
   const [searchQuery, setSearchQuery] = useState('')
@@ -97,7 +98,13 @@ export const ContentManagementPage: React.FC = () => {
     setSelectedCategory('')
     setSelectedSubdivision('')
     setSelectedTopic('')
+    setSelectedSubtopic('')
     setTabValue(0)
+  }
+
+  const getSelectedTopicSubtopics = () => {
+    const topic = LEARNING_TOPICS.find(t => t.title === selectedTopic)
+    return topic?.subtopics || []
   }
 
   return (
@@ -227,20 +234,42 @@ export const ContentManagementPage: React.FC = () => {
 
         {/* Learning Module Selector */}
         {selectedModule === 'learning' && (
-          <FormControl sx={{ minWidth: 300 }}>
-            <InputLabel>Topic</InputLabel>
-            <Select
-              value={selectedTopic}
-              onChange={(e) => setSelectedTopic(e.target.value)}
-              label="Topic"
-            >
-              {LEARNING_TOPICS.map((topic) => (
-                <MenuItem key={topic.id} value={topic.title}>
-                  {topic.title}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+          <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+            <FormControl sx={{ minWidth: 300 }}>
+              <InputLabel>Topic</InputLabel>
+              <Select
+                value={selectedTopic}
+                onChange={(e) => {
+                  setSelectedTopic(e.target.value)
+                  setSelectedSubtopic('')
+                }}
+                label="Topic"
+              >
+                {LEARNING_TOPICS.map((topic) => (
+                  <MenuItem key={topic.id} value={topic.title}>
+                    {topic.title}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+
+            {selectedTopic && getSelectedTopicSubtopics().length > 0 && (
+              <FormControl sx={{ minWidth: 300 }}>
+                <InputLabel>Subtopic</InputLabel>
+                <Select
+                  value={selectedSubtopic}
+                  onChange={(e) => setSelectedSubtopic(e.target.value)}
+                  label="Subtopic"
+                >
+                  {getSelectedTopicSubtopics().map((subtopic) => (
+                    <MenuItem key={subtopic.id} value={subtopic.id}>
+                      {subtopic.id} {subtopic.title}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            )}
+          </Box>
         )}
 
         {/* Mock Exam Selector */}
@@ -269,14 +298,21 @@ export const ContentManagementPage: React.FC = () => {
         )}
         {selectedModule === 'learning' && !selectedTopic && (
           <Alert severity="info" sx={{ mt: 2 }}>
-            Select a topic to manage lessons and associated questions
+            Select a topic to start
+          </Alert>
+        )}
+        {selectedModule === 'learning' && selectedTopic && getSelectedTopicSubtopics().length > 0 && !selectedSubtopic && (
+          <Alert severity="info" sx={{ mt: 2 }}>
+            Select a subtopic to manage content (questions, lessons, flashcards)
           </Alert>
         )}
       </Paper>
 
-      {/* Content Tabs */}
+      {/* Content Tabs - Only show when proper selection is made */}
       {((selectedModule === 'practice' && selectedSubdivision) ||
-        (selectedModule === 'learning' && selectedTopic) ||
+        (selectedModule === 'learning' && selectedTopic && (
+          getSelectedTopicSubtopics().length === 0 ? true : !!selectedSubtopic
+        )) ||
         (selectedModule === 'mock_exam')) && (
         <Paper sx={{ p: 3 }}>
           <Tabs value={tabValue} onChange={(_, newValue) => setTabValue(newValue)}>
@@ -290,8 +326,8 @@ export const ContentManagementPage: React.FC = () => {
           <TabPanel value={tabValue} index={0}>
             <QuestionManager
               moduleType={selectedModule}
-              category={selectedCategory}
-              subdivision={selectedSubdivision}
+              category={selectedModule === 'learning' ? selectedTopic : selectedCategory}
+              subdivision={selectedModule === 'learning' ? selectedSubtopic : selectedSubdivision}
               examPart={selectedModule === 'mock_exam' ? selectedExamPart : undefined}
             />
           </TabPanel>
@@ -300,10 +336,10 @@ export const ContentManagementPage: React.FC = () => {
           {selectedModule === 'learning' && (
             <TabPanel value={tabValue} index={1}>
               <FlashcardManager
-                category={selectedTopic}
+                category={selectedSubtopic || selectedTopic}
               />
               <Box sx={{ mt: 4, pt: 4, borderTop: 1, borderColor: 'divider' }}>
-                <FlashcardCSVUpload category={selectedTopic} />
+                <FlashcardCSVUpload category={selectedSubtopic || selectedTopic} />
               </Box>
             </TabPanel>
           )}
@@ -311,15 +347,10 @@ export const ContentManagementPage: React.FC = () => {
           {/* Lessons Tab (Learning Module only) */}
           {selectedModule === 'learning' && (
             <TabPanel value={tabValue} index={2}>
-              {selectedTopic ? (
-                <LessonManager
-                  topicTitle={selectedTopic}
-                />
-              ) : (
-                <Alert severity="info">
-                  Select a topic to manage lessons
-                </Alert>
-              )}
+              <LessonManager
+                topicTitle={selectedTopic}
+                subtopicId={selectedSubtopic}
+              />
             </TabPanel>
           )}
 
@@ -327,8 +358,8 @@ export const ContentManagementPage: React.FC = () => {
           <TabPanel value={tabValue} index={selectedModule === 'learning' ? 3 : 1}>
             <CSVBulkUpload
               moduleType={selectedModule}
-              category={selectedCategory}
-              subdivision={selectedSubdivision}
+              category={selectedModule === 'learning' ? selectedTopic : selectedCategory}
+              subdivision={selectedModule === 'learning' ? selectedSubtopic : selectedSubdivision}
               examPart={selectedModule === 'mock_exam' ? selectedExamPart : undefined}
             />
           </TabPanel>
