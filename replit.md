@@ -28,6 +28,38 @@ A powerful administrative dashboard for content creators and platform managers f
 **Subscription Plans:** 30/60/90/120 days access in USD ($49-$149)
 **Revenue Model:** Duration-based subscriptions with trial-to-paid conversion
 
+## Recent Changes (October 2025)
+
+### NMC Course Structure Restructuring
+
+**Major architectural change:** Converted from flexible CMS to fixed 3-module NMC-specific structure.
+
+**3 Fixed Modules:**
+1. **Practice Module** - Topic-wise practice with 50+ questions per subdivision
+   - Numeracy: Dosage Calculations, Unit Conversions, IV Flow Rates, Fluid Balance
+   - Clinical Knowledge: Medical-Surgical, Pharmacology, Infection Control, Wound Care, Palliative Care
+
+2. **Learning Module** - Structured lessons (video + audio + text + quiz)
+   - 8 fixed topics: Numeracy, NMC Code, Mental Capacity Act, Safeguarding, Consent & Confidentiality, Equality & Diversity, Duty of Candour, Cultural Adaptation
+   - Each topic requires 80% quiz score to progress
+
+3. **Mock Exams** - Real exam simulator with random question selection
+   - Part A: 15 numeracy questions, 30 minutes, no calculator
+   - Part B: 120 clinical questions, 150 minutes
+   - Questions randomly selected from 500+ question pool
+
+**Database Changes:**
+- Added question tagging: `module_type`, `category`, `subdivision`, `exam_part`
+- Modules are now fixed (cannot be created/deleted by admins)
+- Questions managed via centralized Content Management page
+- Bulk CSV upload support for efficient question entry
+
+**Admin Panel Changes:**
+- New unified Content Management page replacing separate module/topic/question pages
+- Module selector (3 fixed options) with dynamic category/subdivision selectors
+- Question management with filtering by module type, category, and subdivision
+- CSV bulk upload with downloadable templates
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
