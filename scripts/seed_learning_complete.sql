@@ -42,8 +42,8 @@ Nurses must assess capacity: can the patient understand the information, retain 
 
 -- Questions for 1.1
 WITH q1 AS (
-  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, display_order, explanation)
-  VALUES ('Which of the following best describes the key principle of Prioritise People?', 'learning', 'The NMC Code', '1.1', true, 1, 'This question tests your understanding of Prioritise People principles as outlined in the NMC Code.')
+  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, explanation)
+  VALUES ('Which of the following best describes the key principle of Prioritise People?', 'learning', 'The NMC Code', '1.1', true, 'This question tests your understanding of Prioritise People principles as outlined in the NMC Code.')
   RETURNING id
 )
 INSERT INTO question_options (question_id, option_text, is_correct, display_order)
@@ -53,8 +53,8 @@ UNION ALL SELECT id, 'Prioritizing efficiency over patient preferences', false, 
 UNION ALL SELECT id, 'Making decisions on behalf of all patients', false, 4 FROM q1;
 
 WITH q2 AS (
-  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, display_order, explanation)
-  VALUES ('In the context of Prioritise People, what is the nurse''s primary responsibility?', 'learning', 'The NMC Code', '1.1', true, 2, 'This assesses your knowledge of nursing responsibilities related to Prioritise People.')
+  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, explanation)
+  VALUES ('In the context of Prioritise People, what is the nurse''s primary responsibility?', 'learning', 'The NMC Code', '1.1', true, 'This assesses your knowledge of nursing responsibilities related to Prioritise People.')
   RETURNING id
 )
 INSERT INTO question_options (question_id, option_text, is_correct, display_order)
@@ -97,8 +97,8 @@ Nurses must assess capacity: can the patient understand the information, retain 
 
 -- Questions for 1.2
 WITH q1 AS (
-  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, display_order, explanation)
-  VALUES ('Which of the following best describes the key principle of Practice Effectively?', 'learning', 'The NMC Code', '1.2', true, 1, 'This question tests your understanding of Practice Effectively principles as outlined in the NMC Code.')
+  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, explanation)
+  VALUES ('Which of the following best describes the key principle of Practice Effectively?', 'learning', 'The NMC Code', '1.2', true, 'This question tests your understanding of Practice Effectively principles as outlined in the NMC Code.')
   RETURNING id
 )
 INSERT INTO question_options (question_id, option_text, is_correct, display_order)
@@ -108,8 +108,8 @@ UNION ALL SELECT id, 'Prioritizing efficiency over patient preferences', false, 
 UNION ALL SELECT id, 'Making decisions on behalf of all patients', false, 4 FROM q1;
 
 WITH q2 AS (
-  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, display_order, explanation)
-  VALUES ('In the context of Practice Effectively, what is the nurse''s primary responsibility?', 'learning', 'The NMC Code', '1.2', true, 2, 'This assesses your knowledge of nursing responsibilities related to Practice Effectively.')
+  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, explanation)
+  VALUES ('In the context of Practice Effectively, what is the nurse''s primary responsibility?', 'learning', 'The NMC Code', '1.2', true, 'This assesses your knowledge of nursing responsibilities related to Practice Effectively.')
   RETURNING id
 )
 INSERT INTO question_options (question_id, option_text, is_correct, display_order)
@@ -152,8 +152,8 @@ Nurses must assess capacity: can the patient understand the information, retain 
 
 -- Questions for 1.3
 WITH q1 AS (
-  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, display_order, explanation)
-  VALUES ('Which of the following best describes the key principle of Preserve Safety?', 'learning', 'The NMC Code', '1.3', true, 1, 'This question tests your understanding of Preserve Safety principles as outlined in the NMC Code.')
+  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, explanation)
+  VALUES ('Which of the following best describes the key principle of Preserve Safety?', 'learning', 'The NMC Code', '1.3', true, 'This question tests your understanding of Preserve Safety principles as outlined in the NMC Code.')
   RETURNING id
 )
 INSERT INTO question_options (question_id, option_text, is_correct, display_order)
@@ -163,8 +163,8 @@ UNION ALL SELECT id, 'Prioritizing efficiency over patient preferences', false, 
 UNION ALL SELECT id, 'Making decisions on behalf of all patients', false, 4 FROM q1;
 
 WITH q2 AS (
-  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, display_order, explanation)
-  VALUES ('In the context of Preserve Safety, what is the nurse''s primary responsibility?', 'learning', 'The NMC Code', '1.3', true, 2, 'This assesses your knowledge of nursing responsibilities related to Preserve Safety.')
+  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, explanation)
+  VALUES ('In the context of Preserve Safety, what is the nurse''s primary responsibility?', 'learning', 'The NMC Code', '1.3', true, 'This assesses your knowledge of nursing responsibilities related to Preserve Safety.')
   RETURNING id
 )
 INSERT INTO question_options (question_id, option_text, is_correct, display_order)
@@ -207,8 +207,8 @@ Nurses must assess capacity: can the patient understand the information, retain 
 
 -- Questions for 1.4
 WITH q1 AS (
-  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, display_order, explanation)
-  VALUES ('Which of the following best describes the key principle of Promote Professionalism?', 'learning', 'The NMC Code', '1.4', true, 1, 'This question tests your understanding of Promote Professionalism principles as outlined in the NMC Code.')
+  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, explanation)
+  VALUES ('Which of the following best describes the key principle of Promote Professionalism?', 'learning', 'The NMC Code', '1.4', true, 'This question tests your understanding of Promote Professionalism principles as outlined in the NMC Code.')
   RETURNING id
 )
 INSERT INTO question_options (question_id, option_text, is_correct, display_order)
@@ -218,8 +218,8 @@ UNION ALL SELECT id, 'Prioritizing efficiency over patient preferences', false, 
 UNION ALL SELECT id, 'Making decisions on behalf of all patients', false, 4 FROM q1;
 
 WITH q2 AS (
-  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, display_order, explanation)
-  VALUES ('In the context of Promote Professionalism, what is the nurse''s primary responsibility?', 'learning', 'The NMC Code', '1.4', true, 2, 'This assesses your knowledge of nursing responsibilities related to Promote Professionalism.')
+  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, explanation)
+  VALUES ('In the context of Promote Professionalism, what is the nurse''s primary responsibility?', 'learning', 'The NMC Code', '1.4', true, 'This assesses your knowledge of nursing responsibilities related to Promote Professionalism.')
   RETURNING id
 )
 INSERT INTO question_options (question_id, option_text, is_correct, display_order)
@@ -266,8 +266,8 @@ Nurses must assess capacity: can the patient understand the information, retain 
 
 -- Questions for 2.1
 WITH q1 AS (
-  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, display_order, explanation)
-  VALUES ('Which of the following best describes the key principle of Presumption of Capacity?', 'learning', 'Mental Capacity Act', '2.1', true, 1, 'This question tests your understanding of Presumption of Capacity principles as outlined in the NMC Code.')
+  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, explanation)
+  VALUES ('Which of the following best describes the key principle of Presumption of Capacity?', 'learning', 'Mental Capacity Act', '2.1', true, 'This question tests your understanding of Presumption of Capacity principles as outlined in the NMC Code.')
   RETURNING id
 )
 INSERT INTO question_options (question_id, option_text, is_correct, display_order)
@@ -277,8 +277,8 @@ UNION ALL SELECT id, 'Prioritizing efficiency over patient preferences', false, 
 UNION ALL SELECT id, 'Making decisions on behalf of all patients', false, 4 FROM q1;
 
 WITH q2 AS (
-  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, display_order, explanation)
-  VALUES ('In the context of Presumption of Capacity, what is the nurse''s primary responsibility?', 'learning', 'Mental Capacity Act', '2.1', true, 2, 'This assesses your knowledge of nursing responsibilities related to Presumption of Capacity.')
+  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, explanation)
+  VALUES ('In the context of Presumption of Capacity, what is the nurse''s primary responsibility?', 'learning', 'Mental Capacity Act', '2.1', true, 'This assesses your knowledge of nursing responsibilities related to Presumption of Capacity.')
   RETURNING id
 )
 INSERT INTO question_options (question_id, option_text, is_correct, display_order)
@@ -321,8 +321,8 @@ Nurses must assess capacity: can the patient understand the information, retain 
 
 -- Questions for 2.2
 WITH q1 AS (
-  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, display_order, explanation)
-  VALUES ('Which of the following best describes the key principle of Assessing Capacity?', 'learning', 'Mental Capacity Act', '2.2', true, 1, 'This question tests your understanding of Assessing Capacity principles as outlined in the NMC Code.')
+  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, explanation)
+  VALUES ('Which of the following best describes the key principle of Assessing Capacity?', 'learning', 'Mental Capacity Act', '2.2', true, 'This question tests your understanding of Assessing Capacity principles as outlined in the NMC Code.')
   RETURNING id
 )
 INSERT INTO question_options (question_id, option_text, is_correct, display_order)
@@ -332,8 +332,8 @@ UNION ALL SELECT id, 'Prioritizing efficiency over patient preferences', false, 
 UNION ALL SELECT id, 'Making decisions on behalf of all patients', false, 4 FROM q1;
 
 WITH q2 AS (
-  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, display_order, explanation)
-  VALUES ('In the context of Assessing Capacity, what is the nurse''s primary responsibility?', 'learning', 'Mental Capacity Act', '2.2', true, 2, 'This assesses your knowledge of nursing responsibilities related to Assessing Capacity.')
+  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, explanation)
+  VALUES ('In the context of Assessing Capacity, what is the nurse''s primary responsibility?', 'learning', 'Mental Capacity Act', '2.2', true, 'This assesses your knowledge of nursing responsibilities related to Assessing Capacity.')
   RETURNING id
 )
 INSERT INTO question_options (question_id, option_text, is_correct, display_order)
@@ -376,8 +376,8 @@ Nurses must assess capacity: can the patient understand the information, retain 
 
 -- Questions for 2.3
 WITH q1 AS (
-  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, display_order, explanation)
-  VALUES ('Which of the following best describes the key principle of Best Interests Decisions?', 'learning', 'Mental Capacity Act', '2.3', true, 1, 'This question tests your understanding of Best Interests Decisions principles as outlined in the NMC Code.')
+  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, explanation)
+  VALUES ('Which of the following best describes the key principle of Best Interests Decisions?', 'learning', 'Mental Capacity Act', '2.3', true, 'This question tests your understanding of Best Interests Decisions principles as outlined in the NMC Code.')
   RETURNING id
 )
 INSERT INTO question_options (question_id, option_text, is_correct, display_order)
@@ -387,8 +387,8 @@ UNION ALL SELECT id, 'Prioritizing efficiency over patient preferences', false, 
 UNION ALL SELECT id, 'Making decisions on behalf of all patients', false, 4 FROM q1;
 
 WITH q2 AS (
-  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, display_order, explanation)
-  VALUES ('In the context of Best Interests Decisions, what is the nurse''s primary responsibility?', 'learning', 'Mental Capacity Act', '2.3', true, 2, 'This assesses your knowledge of nursing responsibilities related to Best Interests Decisions.')
+  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, explanation)
+  VALUES ('In the context of Best Interests Decisions, what is the nurse''s primary responsibility?', 'learning', 'Mental Capacity Act', '2.3', true, 'This assesses your knowledge of nursing responsibilities related to Best Interests Decisions.')
   RETURNING id
 )
 INSERT INTO question_options (question_id, option_text, is_correct, display_order)
@@ -431,8 +431,8 @@ Nurses must assess capacity: can the patient understand the information, retain 
 
 -- Questions for 2.4
 WITH q1 AS (
-  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, display_order, explanation)
-  VALUES ('Which of the following best describes the key principle of Advanced Care Planning?', 'learning', 'Mental Capacity Act', '2.4', true, 1, 'This question tests your understanding of Advanced Care Planning principles as outlined in the NMC Code.')
+  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, explanation)
+  VALUES ('Which of the following best describes the key principle of Advanced Care Planning?', 'learning', 'Mental Capacity Act', '2.4', true, 'This question tests your understanding of Advanced Care Planning principles as outlined in the NMC Code.')
   RETURNING id
 )
 INSERT INTO question_options (question_id, option_text, is_correct, display_order)
@@ -442,8 +442,8 @@ UNION ALL SELECT id, 'Prioritizing efficiency over patient preferences', false, 
 UNION ALL SELECT id, 'Making decisions on behalf of all patients', false, 4 FROM q1;
 
 WITH q2 AS (
-  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, display_order, explanation)
-  VALUES ('In the context of Advanced Care Planning, what is the nurse''s primary responsibility?', 'learning', 'Mental Capacity Act', '2.4', true, 2, 'This assesses your knowledge of nursing responsibilities related to Advanced Care Planning.')
+  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, explanation)
+  VALUES ('In the context of Advanced Care Planning, what is the nurse''s primary responsibility?', 'learning', 'Mental Capacity Act', '2.4', true, 'This assesses your knowledge of nursing responsibilities related to Advanced Care Planning.')
   RETURNING id
 )
 INSERT INTO question_options (question_id, option_text, is_correct, display_order)
@@ -490,8 +490,8 @@ Nurses must assess capacity: can the patient understand the information, retain 
 
 -- Questions for 3.1
 WITH q1 AS (
-  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, display_order, explanation)
-  VALUES ('Which of the following best describes the key principle of Recognising Abuse?', 'learning', 'Safeguarding', '3.1', true, 1, 'This question tests your understanding of Recognising Abuse principles as outlined in the NMC Code.')
+  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, explanation)
+  VALUES ('Which of the following best describes the key principle of Recognising Abuse?', 'learning', 'Safeguarding', '3.1', true, 'This question tests your understanding of Recognising Abuse principles as outlined in the NMC Code.')
   RETURNING id
 )
 INSERT INTO question_options (question_id, option_text, is_correct, display_order)
@@ -501,8 +501,8 @@ UNION ALL SELECT id, 'Prioritizing efficiency over patient preferences', false, 
 UNION ALL SELECT id, 'Making decisions on behalf of all patients', false, 4 FROM q1;
 
 WITH q2 AS (
-  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, display_order, explanation)
-  VALUES ('In the context of Recognising Abuse, what is the nurse''s primary responsibility?', 'learning', 'Safeguarding', '3.1', true, 2, 'This assesses your knowledge of nursing responsibilities related to Recognising Abuse.')
+  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, explanation)
+  VALUES ('In the context of Recognising Abuse, what is the nurse''s primary responsibility?', 'learning', 'Safeguarding', '3.1', true, 'This assesses your knowledge of nursing responsibilities related to Recognising Abuse.')
   RETURNING id
 )
 INSERT INTO question_options (question_id, option_text, is_correct, display_order)
@@ -545,8 +545,8 @@ Nurses must assess capacity: can the patient understand the information, retain 
 
 -- Questions for 3.2
 WITH q1 AS (
-  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, display_order, explanation)
-  VALUES ('Which of the following best describes the key principle of Reporting Protocols?', 'learning', 'Safeguarding', '3.2', true, 1, 'This question tests your understanding of Reporting Protocols principles as outlined in the NMC Code.')
+  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, explanation)
+  VALUES ('Which of the following best describes the key principle of Reporting Protocols?', 'learning', 'Safeguarding', '3.2', true, 'This question tests your understanding of Reporting Protocols principles as outlined in the NMC Code.')
   RETURNING id
 )
 INSERT INTO question_options (question_id, option_text, is_correct, display_order)
@@ -556,8 +556,8 @@ UNION ALL SELECT id, 'Prioritizing efficiency over patient preferences', false, 
 UNION ALL SELECT id, 'Making decisions on behalf of all patients', false, 4 FROM q1;
 
 WITH q2 AS (
-  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, display_order, explanation)
-  VALUES ('In the context of Reporting Protocols, what is the nurse''s primary responsibility?', 'learning', 'Safeguarding', '3.2', true, 2, 'This assesses your knowledge of nursing responsibilities related to Reporting Protocols.')
+  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, explanation)
+  VALUES ('In the context of Reporting Protocols, what is the nurse''s primary responsibility?', 'learning', 'Safeguarding', '3.2', true, 'This assesses your knowledge of nursing responsibilities related to Reporting Protocols.')
   RETURNING id
 )
 INSERT INTO question_options (question_id, option_text, is_correct, display_order)
@@ -600,8 +600,8 @@ Nurses must assess capacity: can the patient understand the information, retain 
 
 -- Questions for 3.3
 WITH q1 AS (
-  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, display_order, explanation)
-  VALUES ('Which of the following best describes the key principle of Child Protection?', 'learning', 'Safeguarding', '3.3', true, 1, 'This question tests your understanding of Child Protection principles as outlined in the NMC Code.')
+  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, explanation)
+  VALUES ('Which of the following best describes the key principle of Child Protection?', 'learning', 'Safeguarding', '3.3', true, 'This question tests your understanding of Child Protection principles as outlined in the NMC Code.')
   RETURNING id
 )
 INSERT INTO question_options (question_id, option_text, is_correct, display_order)
@@ -611,8 +611,8 @@ UNION ALL SELECT id, 'Prioritizing efficiency over patient preferences', false, 
 UNION ALL SELECT id, 'Making decisions on behalf of all patients', false, 4 FROM q1;
 
 WITH q2 AS (
-  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, display_order, explanation)
-  VALUES ('In the context of Child Protection, what is the nurse''s primary responsibility?', 'learning', 'Safeguarding', '3.3', true, 2, 'This assesses your knowledge of nursing responsibilities related to Child Protection.')
+  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, explanation)
+  VALUES ('In the context of Child Protection, what is the nurse''s primary responsibility?', 'learning', 'Safeguarding', '3.3', true, 'This assesses your knowledge of nursing responsibilities related to Child Protection.')
   RETURNING id
 )
 INSERT INTO question_options (question_id, option_text, is_correct, display_order)
@@ -659,8 +659,8 @@ Nurses must assess capacity: can the patient understand the information, retain 
 
 -- Questions for 4.1
 WITH q1 AS (
-  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, display_order, explanation)
-  VALUES ('Which of the following best describes the key principle of Valid Consent?', 'learning', 'Consent & Confidentiality', '4.1', true, 1, 'This question tests your understanding of Valid Consent principles as outlined in the NMC Code.')
+  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, explanation)
+  VALUES ('Which of the following best describes the key principle of Valid Consent?', 'learning', 'Consent & Confidentiality', '4.1', true, 'This question tests your understanding of Valid Consent principles as outlined in the NMC Code.')
   RETURNING id
 )
 INSERT INTO question_options (question_id, option_text, is_correct, display_order)
@@ -670,8 +670,8 @@ UNION ALL SELECT id, 'Prioritizing efficiency over patient preferences', false, 
 UNION ALL SELECT id, 'Making decisions on behalf of all patients', false, 4 FROM q1;
 
 WITH q2 AS (
-  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, display_order, explanation)
-  VALUES ('In the context of Valid Consent, what is the nurse''s primary responsibility?', 'learning', 'Consent & Confidentiality', '4.1', true, 2, 'This assesses your knowledge of nursing responsibilities related to Valid Consent.')
+  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, explanation)
+  VALUES ('In the context of Valid Consent, what is the nurse''s primary responsibility?', 'learning', 'Consent & Confidentiality', '4.1', true, 'This assesses your knowledge of nursing responsibilities related to Valid Consent.')
   RETURNING id
 )
 INSERT INTO question_options (question_id, option_text, is_correct, display_order)
@@ -714,8 +714,8 @@ Nurses must assess capacity: can the patient understand the information, retain 
 
 -- Questions for 4.2
 WITH q1 AS (
-  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, display_order, explanation)
-  VALUES ('Which of the following best describes the key principle of GDPR & Confidentiality?', 'learning', 'Consent & Confidentiality', '4.2', true, 1, 'This question tests your understanding of GDPR & Confidentiality principles as outlined in the NMC Code.')
+  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, explanation)
+  VALUES ('Which of the following best describes the key principle of GDPR & Confidentiality?', 'learning', 'Consent & Confidentiality', '4.2', true, 'This question tests your understanding of GDPR & Confidentiality principles as outlined in the NMC Code.')
   RETURNING id
 )
 INSERT INTO question_options (question_id, option_text, is_correct, display_order)
@@ -725,8 +725,8 @@ UNION ALL SELECT id, 'Prioritizing efficiency over patient preferences', false, 
 UNION ALL SELECT id, 'Making decisions on behalf of all patients', false, 4 FROM q1;
 
 WITH q2 AS (
-  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, display_order, explanation)
-  VALUES ('In the context of GDPR & Confidentiality, what is the nurse''s primary responsibility?', 'learning', 'Consent & Confidentiality', '4.2', true, 2, 'This assesses your knowledge of nursing responsibilities related to GDPR & Confidentiality.')
+  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, explanation)
+  VALUES ('In the context of GDPR & Confidentiality, what is the nurse''s primary responsibility?', 'learning', 'Consent & Confidentiality', '4.2', true, 'This assesses your knowledge of nursing responsibilities related to GDPR & Confidentiality.')
   RETURNING id
 )
 INSERT INTO question_options (question_id, option_text, is_correct, display_order)
@@ -769,8 +769,8 @@ Nurses must assess capacity: can the patient understand the information, retain 
 
 -- Questions for 4.3
 WITH q1 AS (
-  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, display_order, explanation)
-  VALUES ('Which of the following best describes the key principle of Confidentiality vs. Safeguarding?', 'learning', 'Consent & Confidentiality', '4.3', true, 1, 'This question tests your understanding of Confidentiality vs. Safeguarding principles as outlined in the NMC Code.')
+  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, explanation)
+  VALUES ('Which of the following best describes the key principle of Confidentiality vs. Safeguarding?', 'learning', 'Consent & Confidentiality', '4.3', true, 'This question tests your understanding of Confidentiality vs. Safeguarding principles as outlined in the NMC Code.')
   RETURNING id
 )
 INSERT INTO question_options (question_id, option_text, is_correct, display_order)
@@ -780,8 +780,8 @@ UNION ALL SELECT id, 'Prioritizing efficiency over patient preferences', false, 
 UNION ALL SELECT id, 'Making decisions on behalf of all patients', false, 4 FROM q1;
 
 WITH q2 AS (
-  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, display_order, explanation)
-  VALUES ('In the context of Confidentiality vs. Safeguarding, what is the nurse''s primary responsibility?', 'learning', 'Consent & Confidentiality', '4.3', true, 2, 'This assesses your knowledge of nursing responsibilities related to Confidentiality vs. Safeguarding.')
+  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, explanation)
+  VALUES ('In the context of Confidentiality vs. Safeguarding, what is the nurse''s primary responsibility?', 'learning', 'Consent & Confidentiality', '4.3', true, 'This assesses your knowledge of nursing responsibilities related to Confidentiality vs. Safeguarding.')
   RETURNING id
 )
 INSERT INTO question_options (question_id, option_text, is_correct, display_order)
@@ -828,8 +828,8 @@ Nurses must assess capacity: can the patient understand the information, retain 
 
 -- Questions for 5.1
 WITH q1 AS (
-  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, display_order, explanation)
-  VALUES ('Which of the following best describes the key principle of Equality Act 2010?', 'learning', 'Equality & Diversity', '5.1', true, 1, 'This question tests your understanding of Equality Act 2010 principles as outlined in the NMC Code.')
+  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, explanation)
+  VALUES ('Which of the following best describes the key principle of Equality Act 2010?', 'learning', 'Equality & Diversity', '5.1', true, 'This question tests your understanding of Equality Act 2010 principles as outlined in the NMC Code.')
   RETURNING id
 )
 INSERT INTO question_options (question_id, option_text, is_correct, display_order)
@@ -839,8 +839,8 @@ UNION ALL SELECT id, 'Prioritizing efficiency over patient preferences', false, 
 UNION ALL SELECT id, 'Making decisions on behalf of all patients', false, 4 FROM q1;
 
 WITH q2 AS (
-  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, display_order, explanation)
-  VALUES ('In the context of Equality Act 2010, what is the nurse''s primary responsibility?', 'learning', 'Equality & Diversity', '5.1', true, 2, 'This assesses your knowledge of nursing responsibilities related to Equality Act 2010.')
+  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, explanation)
+  VALUES ('In the context of Equality Act 2010, what is the nurse''s primary responsibility?', 'learning', 'Equality & Diversity', '5.1', true, 'This assesses your knowledge of nursing responsibilities related to Equality Act 2010.')
   RETURNING id
 )
 INSERT INTO question_options (question_id, option_text, is_correct, display_order)
@@ -883,8 +883,8 @@ Nurses must assess capacity: can the patient understand the information, retain 
 
 -- Questions for 5.2
 WITH q1 AS (
-  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, display_order, explanation)
-  VALUES ('Which of the following best describes the key principle of Cultural Competence?', 'learning', 'Equality & Diversity', '5.2', true, 1, 'This question tests your understanding of Cultural Competence principles as outlined in the NMC Code.')
+  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, explanation)
+  VALUES ('Which of the following best describes the key principle of Cultural Competence?', 'learning', 'Equality & Diversity', '5.2', true, 'This question tests your understanding of Cultural Competence principles as outlined in the NMC Code.')
   RETURNING id
 )
 INSERT INTO question_options (question_id, option_text, is_correct, display_order)
@@ -894,8 +894,8 @@ UNION ALL SELECT id, 'Prioritizing efficiency over patient preferences', false, 
 UNION ALL SELECT id, 'Making decisions on behalf of all patients', false, 4 FROM q1;
 
 WITH q2 AS (
-  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, display_order, explanation)
-  VALUES ('In the context of Cultural Competence, what is the nurse''s primary responsibility?', 'learning', 'Equality & Diversity', '5.2', true, 2, 'This assesses your knowledge of nursing responsibilities related to Cultural Competence.')
+  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, explanation)
+  VALUES ('In the context of Cultural Competence, what is the nurse''s primary responsibility?', 'learning', 'Equality & Diversity', '5.2', true, 'This assesses your knowledge of nursing responsibilities related to Cultural Competence.')
   RETURNING id
 )
 INSERT INTO question_options (question_id, option_text, is_correct, display_order)
@@ -938,8 +938,8 @@ Nurses must assess capacity: can the patient understand the information, retain 
 
 -- Questions for 5.3
 WITH q1 AS (
-  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, display_order, explanation)
-  VALUES ('Which of the following best describes the key principle of Reasonable Adjustments?', 'learning', 'Equality & Diversity', '5.3', true, 1, 'This question tests your understanding of Reasonable Adjustments principles as outlined in the NMC Code.')
+  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, explanation)
+  VALUES ('Which of the following best describes the key principle of Reasonable Adjustments?', 'learning', 'Equality & Diversity', '5.3', true, 'This question tests your understanding of Reasonable Adjustments principles as outlined in the NMC Code.')
   RETURNING id
 )
 INSERT INTO question_options (question_id, option_text, is_correct, display_order)
@@ -949,8 +949,8 @@ UNION ALL SELECT id, 'Prioritizing efficiency over patient preferences', false, 
 UNION ALL SELECT id, 'Making decisions on behalf of all patients', false, 4 FROM q1;
 
 WITH q2 AS (
-  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, display_order, explanation)
-  VALUES ('In the context of Reasonable Adjustments, what is the nurse''s primary responsibility?', 'learning', 'Equality & Diversity', '5.3', true, 2, 'This assesses your knowledge of nursing responsibilities related to Reasonable Adjustments.')
+  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, explanation)
+  VALUES ('In the context of Reasonable Adjustments, what is the nurse''s primary responsibility?', 'learning', 'Equality & Diversity', '5.3', true, 'This assesses your knowledge of nursing responsibilities related to Reasonable Adjustments.')
   RETURNING id
 )
 INSERT INTO question_options (question_id, option_text, is_correct, display_order)
@@ -997,8 +997,8 @@ Nurses must assess capacity: can the patient understand the information, retain 
 
 -- Questions for 6.1
 WITH q1 AS (
-  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, display_order, explanation)
-  VALUES ('Which of the following best describes the key principle of Transparency After Errors?', 'learning', 'Duty of Candour', '6.1', true, 1, 'This question tests your understanding of Transparency After Errors principles as outlined in the NMC Code.')
+  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, explanation)
+  VALUES ('Which of the following best describes the key principle of Transparency After Errors?', 'learning', 'Duty of Candour', '6.1', true, 'This question tests your understanding of Transparency After Errors principles as outlined in the NMC Code.')
   RETURNING id
 )
 INSERT INTO question_options (question_id, option_text, is_correct, display_order)
@@ -1008,8 +1008,8 @@ UNION ALL SELECT id, 'Prioritizing efficiency over patient preferences', false, 
 UNION ALL SELECT id, 'Making decisions on behalf of all patients', false, 4 FROM q1;
 
 WITH q2 AS (
-  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, display_order, explanation)
-  VALUES ('In the context of Transparency After Errors, what is the nurse''s primary responsibility?', 'learning', 'Duty of Candour', '6.1', true, 2, 'This assesses your knowledge of nursing responsibilities related to Transparency After Errors.')
+  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, explanation)
+  VALUES ('In the context of Transparency After Errors, what is the nurse''s primary responsibility?', 'learning', 'Duty of Candour', '6.1', true, 'This assesses your knowledge of nursing responsibilities related to Transparency After Errors.')
   RETURNING id
 )
 INSERT INTO question_options (question_id, option_text, is_correct, display_order)
@@ -1052,8 +1052,8 @@ Nurses must assess capacity: can the patient understand the information, retain 
 
 -- Questions for 6.2
 WITH q1 AS (
-  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, display_order, explanation)
-  VALUES ('Which of the following best describes the key principle of NHS Incident Reporting?', 'learning', 'Duty of Candour', '6.2', true, 1, 'This question tests your understanding of NHS Incident Reporting principles as outlined in the NMC Code.')
+  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, explanation)
+  VALUES ('Which of the following best describes the key principle of NHS Incident Reporting?', 'learning', 'Duty of Candour', '6.2', true, 'This question tests your understanding of NHS Incident Reporting principles as outlined in the NMC Code.')
   RETURNING id
 )
 INSERT INTO question_options (question_id, option_text, is_correct, display_order)
@@ -1063,8 +1063,8 @@ UNION ALL SELECT id, 'Prioritizing efficiency over patient preferences', false, 
 UNION ALL SELECT id, 'Making decisions on behalf of all patients', false, 4 FROM q1;
 
 WITH q2 AS (
-  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, display_order, explanation)
-  VALUES ('In the context of NHS Incident Reporting, what is the nurse''s primary responsibility?', 'learning', 'Duty of Candour', '6.2', true, 2, 'This assesses your knowledge of nursing responsibilities related to NHS Incident Reporting.')
+  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, explanation)
+  VALUES ('In the context of NHS Incident Reporting, what is the nurse''s primary responsibility?', 'learning', 'Duty of Candour', '6.2', true, 'This assesses your knowledge of nursing responsibilities related to NHS Incident Reporting.')
   RETURNING id
 )
 INSERT INTO question_options (question_id, option_text, is_correct, display_order)
@@ -1111,8 +1111,8 @@ Nurses must assess capacity: can the patient understand the information, retain 
 
 -- Questions for 7.1
 WITH q1 AS (
-  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, display_order, explanation)
-  VALUES ('Which of the following best describes the key principle of Autonomy vs. Family Decisions?', 'learning', 'Cultural Adaptation', '7.1', true, 1, 'This question tests your understanding of Autonomy vs. Family Decisions principles as outlined in the NMC Code.')
+  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, explanation)
+  VALUES ('Which of the following best describes the key principle of Autonomy vs. Family Decisions?', 'learning', 'Cultural Adaptation', '7.1', true, 'This question tests your understanding of Autonomy vs. Family Decisions principles as outlined in the NMC Code.')
   RETURNING id
 )
 INSERT INTO question_options (question_id, option_text, is_correct, display_order)
@@ -1122,8 +1122,8 @@ UNION ALL SELECT id, 'Prioritizing efficiency over patient preferences', false, 
 UNION ALL SELECT id, 'Making decisions on behalf of all patients', false, 4 FROM q1;
 
 WITH q2 AS (
-  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, display_order, explanation)
-  VALUES ('In the context of Autonomy vs. Family Decisions, what is the nurse''s primary responsibility?', 'learning', 'Cultural Adaptation', '7.1', true, 2, 'This assesses your knowledge of nursing responsibilities related to Autonomy vs. Family Decisions.')
+  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, explanation)
+  VALUES ('In the context of Autonomy vs. Family Decisions, what is the nurse''s primary responsibility?', 'learning', 'Cultural Adaptation', '7.1', true, 'This assesses your knowledge of nursing responsibilities related to Autonomy vs. Family Decisions.')
   RETURNING id
 )
 INSERT INTO question_options (question_id, option_text, is_correct, display_order)
@@ -1166,8 +1166,8 @@ Nurses must assess capacity: can the patient understand the information, retain 
 
 -- Questions for 7.2
 WITH q1 AS (
-  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, display_order, explanation)
-  VALUES ('Which of the following best describes the key principle of UK Communication Styles?', 'learning', 'Cultural Adaptation', '7.2', true, 1, 'This question tests your understanding of UK Communication Styles principles as outlined in the NMC Code.')
+  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, explanation)
+  VALUES ('Which of the following best describes the key principle of UK Communication Styles?', 'learning', 'Cultural Adaptation', '7.2', true, 'This question tests your understanding of UK Communication Styles principles as outlined in the NMC Code.')
   RETURNING id
 )
 INSERT INTO question_options (question_id, option_text, is_correct, display_order)
@@ -1177,8 +1177,8 @@ UNION ALL SELECT id, 'Prioritizing efficiency over patient preferences', false, 
 UNION ALL SELECT id, 'Making decisions on behalf of all patients', false, 4 FROM q1;
 
 WITH q2 AS (
-  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, display_order, explanation)
-  VALUES ('In the context of UK Communication Styles, what is the nurse''s primary responsibility?', 'learning', 'Cultural Adaptation', '7.2', true, 2, 'This assesses your knowledge of nursing responsibilities related to UK Communication Styles.')
+  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, explanation)
+  VALUES ('In the context of UK Communication Styles, what is the nurse''s primary responsibility?', 'learning', 'Cultural Adaptation', '7.2', true, 'This assesses your knowledge of nursing responsibilities related to UK Communication Styles.')
   RETURNING id
 )
 INSERT INTO question_options (question_id, option_text, is_correct, display_order)

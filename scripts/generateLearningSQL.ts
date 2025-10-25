@@ -72,8 +72,8 @@ function generateSQL(): string {
       // Create 2 questions
       sql += `-- Questions for ${subtopic.id}\n`;
       sql += `WITH q1 AS (\n`;
-      sql += `  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, display_order, explanation)\n`;
-      sql += `  VALUES ('Which of the following best describes the key principle of ${escapeSQL(subtopic.title)}?', 'learning', '${escapeSQL(topic.title)}', '${subtopic.id}', true, 1, 'This question tests your understanding of ${escapeSQL(subtopic.title)} principles as outlined in the NMC Code.')\n`;
+      sql += `  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, explanation)\n`;
+      sql += `  VALUES ('Which of the following best describes the key principle of ${escapeSQL(subtopic.title)}?', 'learning', '${escapeSQL(topic.title)}', '${subtopic.id}', true, 'This question tests your understanding of ${escapeSQL(subtopic.title)} principles as outlined in the NMC Code.')\n`;
       sql += `  RETURNING id\n`;
       sql += `)\n`;
       sql += `INSERT INTO question_options (question_id, option_text, is_correct, display_order)\n`;
@@ -83,8 +83,8 @@ function generateSQL(): string {
       sql += `UNION ALL SELECT id, 'Making decisions on behalf of all patients', false, 4 FROM q1;\n\n`;
 
       sql += `WITH q2 AS (\n`;
-      sql += `  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, display_order, explanation)\n`;
-      sql += `  VALUES ('In the context of ${escapeSQL(subtopic.title)}, what is the nurse''s primary responsibility?', 'learning', '${escapeSQL(topic.title)}', '${subtopic.id}', true, 2, 'This assesses your knowledge of nursing responsibilities related to ${escapeSQL(subtopic.title)}.')\n`;
+      sql += `  INSERT INTO questions (question_text, module_type, category, subdivision, is_active, explanation)\n`;
+      sql += `  VALUES ('In the context of ${escapeSQL(subtopic.title)}, what is the nurse''s primary responsibility?', 'learning', '${escapeSQL(topic.title)}', '${subtopic.id}', true, 'This assesses your knowledge of nursing responsibilities related to ${escapeSQL(subtopic.title)}.')\n`;
       sql += `  RETURNING id\n`;
       sql += `)\n`;
       sql += `INSERT INTO question_options (question_id, option_text, is_correct, display_order)\n`;
