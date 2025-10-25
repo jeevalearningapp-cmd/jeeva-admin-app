@@ -42,7 +42,12 @@ export const useCreateFlashcard = () => {
     mutationFn: (input: CreateFlashcardInput) => flashcardsAPI.create(input),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['flashcards'] })
-      queryClient.invalidateQueries({ queryKey: ['flashcards', 'lesson', data.lessonId] })
+      if (data.lessonId) {
+        queryClient.invalidateQueries({ queryKey: ['flashcards', 'lesson', data.lessonId] })
+      }
+      if (data.category) {
+        queryClient.invalidateQueries({ queryKey: ['flashcards', 'category', data.category] })
+      }
       enqueueSnackbar('Flashcard created successfully', { variant: 'success' })
     },
     onError: (error: any) => {
@@ -60,7 +65,12 @@ export const useUpdateFlashcard = () => {
       flashcardsAPI.update(id, input),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['flashcards'] })
-      queryClient.invalidateQueries({ queryKey: ['flashcards', 'lesson', data.lessonId] })
+      if (data.lessonId) {
+        queryClient.invalidateQueries({ queryKey: ['flashcards', 'lesson', data.lessonId] })
+      }
+      if (data.category) {
+        queryClient.invalidateQueries({ queryKey: ['flashcards', 'category', data.category] })
+      }
       enqueueSnackbar('Flashcard updated successfully', { variant: 'success' })
     },
     onError: (error: any) => {

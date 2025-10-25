@@ -71,6 +71,17 @@ A powerful administrative dashboard for content creators and platform managers f
 - Real-time question filtering by module/category/subdivision/exam_part
 - Loading states and error handling throughout
 
+✅ **Flashcard System for Learning Module**
+- Added `category` column to flashcards table for topic-level organization
+- Extended flashcardsAPI with `getByCategory` method for topic filtering
+- Created `useFlashcardsByCategory` React Query hook with proper cache invalidation
+- Built FlashcardManager component with full CRUD interface (front/back cards)
+- Implemented FlashcardCSVUpload component with template download and preview
+- Integrated Flashcards tab into Learning Module ContentManagementPage
+- Database migration to add category support and make lesson_id nullable
+- Fixed React Query invalidation for category-scoped cache consistency
+- Comprehensive documentation in FLASHCARD_SETUP.md
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
