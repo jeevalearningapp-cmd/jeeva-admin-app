@@ -17,6 +17,7 @@ import {
 import { UploadFileOutlined, DownloadOutlined, CheckCircleOutlined } from '@mui/icons-material'
 import { ModuleType, ExamPart, CreateQuestionInput } from '@/types/content'
 import { useBulkCreateQuestions } from '@/hooks/useQuestions'
+import Papa from 'papaparse'
 
 interface CSVBulkUploadProps {
   moduleType: ModuleType
@@ -70,40 +71,47 @@ export const CSVBulkUpload: React.FC<CSVBulkUploadProps> = ({
   }
 
   const parseCSV = (text: string): ParsedQuestion[] => {
-    const lines = text.split('\n').filter(line => line.trim())
-    if (lines.length < 2) {
+    const parseResult = Papa.parse(text, {
+      header: true,
+      skipEmptyLines: true,
+      transformHeader: (header) => header.trim()
+    })
+
+    if (parseResult.errors.length > 0) {
+      console.error('CSV parsing errors:', parseResult.errors)
+      throw new Error(`CSV parsing error: ${parseResult.errors[0].message}`)
+    }
+
+    if (!parseResult.data || parseResult.data.length === 0) {
       throw new Error('CSV file is empty or missing data')
     }
 
-    const headers = lines[0].split(',').map(h => h.trim())
     const questions: ParsedQuestion[] = []
 
-    for (let i = 1; i < lines.length; i++) {
-      const values = lines[i].split(',').map(v => v.trim())
-      
-      if (values.length < 8) {
-        console.warn(`Skipping row ${i + 1}: insufficient columns`)
-        continue
+    parseResult.data.forEach((row: any, index: number) => {
+      if (!row.question_text || !row.option_1 || !row.option_2 || !row.option_3 || !row.option_4 || !row.correct_option) {
+        console.warn(`Skipping row ${index + 2}: missing required fields`)
+        return
       }
 
-      const correctOption = parseInt(values[7])
+      const correctOption = parseInt(row.correct_option)
       if (isNaN(correctOption) || correctOption < 1 || correctOption > 4) {
-        console.warn(`Skipping row ${i + 1}: invalid correct option`)
-        continue
+        console.warn(`Skipping row ${index + 2}: invalid correct option "${row.correct_option}"`)
+        return
       }
 
       questions.push({
-        questionText: values[0],
-        difficulty: (values[1] || 'medium') as 'easy' | 'medium' | 'hard',
-        explanation: values[2],
-        option1: values[3],
-        option2: values[4],
-        option3: values[5],
-        option4: values[6],
+        questionText: row.question_text,
+        difficulty: (row.difficulty || 'medium') as 'easy' | 'medium' | 'hard',
+        explanation: row.explanation || '',
+        option1: row.option_1,
+        option2: row.option_2,
+        option3: row.option_3,
+        option4: row.option_4,
         correctOption,
-        imageUrl: values[8] || undefined
+        imageUrl: row.image_url || undefined
       })
-    }
+    })
 
     return questions
   }
