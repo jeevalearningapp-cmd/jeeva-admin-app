@@ -29,8 +29,10 @@ import {
   NUMERACY_SUBDIVISIONS,
   CLINICAL_SUBDIVISIONS,
   LEARNING_TOPICS,
-  ModuleType
+  ModuleType,
+  ExamPart
 } from '@/types/content'
+import { QuestionManager } from '@/components/content'
 
 interface TabPanelProps {
   children?: React.ReactNode
@@ -285,34 +287,12 @@ export const ContentManagementPage: React.FC = () => {
 
           {/* Questions Tab */}
           <TabPanel value={tabValue} index={0}>
-            <Box sx={{ mb: 3, display: 'flex', gap: 2, alignItems: 'center' }}>
-              <TextField
-                placeholder="Search questions..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                sx={{ flexGrow: 1 }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchOutlined />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-              <Button
-                variant="contained"
-                startIcon={<AddOutlined />}
-                onClick={() => {
-                  // Will implement
-                }}
-              >
-                Add Question
-              </Button>
-            </Box>
-
-            <Alert severity="info">
-              Question list will be displayed here (to be implemented in next step)
-            </Alert>
+            <QuestionManager
+              moduleType={selectedModule}
+              category={selectedCategory}
+              subdivision={selectedSubdivision}
+              examPart={selectedModule === 'mock_exam' ? selectedExamPart : undefined}
+            />
           </TabPanel>
 
           {/* Lessons Tab (Learning Module only) */}

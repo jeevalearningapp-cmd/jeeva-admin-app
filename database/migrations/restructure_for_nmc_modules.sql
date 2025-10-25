@@ -9,7 +9,7 @@ ALTER TABLE questions
 ADD COLUMN IF NOT EXISTS module_type VARCHAR(50) CHECK (module_type IN ('practice', 'learning', 'mock_exam')),
 ADD COLUMN IF NOT EXISTS category VARCHAR(100),
 ADD COLUMN IF NOT EXISTS subdivision VARCHAR(100),
-ADD COLUMN IF NOT EXISTS exam_part VARCHAR(20) CHECK (exam_part IN ('part_a', 'part_b', NULL));
+ADD COLUMN IF NOT EXISTS exam_part VARCHAR(20) CHECK (exam_part IS NULL OR exam_part IN ('part_a', 'part_b'));
 
 -- Add indexes for efficient filtering
 CREATE INDEX IF NOT EXISTS idx_questions_module_type ON questions(module_type);
