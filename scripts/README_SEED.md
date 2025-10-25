@@ -1,125 +1,53 @@
 # Learning Module Seed Data Instructions
 
-## ⚠️ IMPORTANT: Two-Step Process
+## ✨ Super Simple - Just ONE Script!
 
-You must run **TWO SQL scripts** in this order:
+Run **ONE** SQL script and you're done. No multiple steps, no confusion!
 
-1. **FIRST**: `setup_schema.sql` - Creates database tables
-2. **SECOND**: `seed_learning_complete.sql` - Loads the content
+**File**: `scripts/setup_and_seed_complete.sql`
 
-Do not skip step 1!
+This script automatically:
+- ✅ Drops any old conflicting tables
+- ✅ Creates all tables fresh with correct columns
+- ✅ Loads 63 lessons (audio, video, text)
+- ✅ Loads 42 questions with answer options
 
-## Overview
+## 🚀 How to Run (3 Minutes)
 
-The seed data includes:
-- **63 lessons** (3 per subtopic: Audio, Video, Text)
-- **42 questions** (2 per subtopic, each with 4 multiple-choice options)
-- **All 21 subtopics** across 7 Learning Module topics
+### In Supabase SQL Editor:
 
-## What's Included
-
-Each subtopic gets:
-
-### Lessons
-1. **Audio Podcast** - Common NMC Code podcast audio for all subtopics
-2. **Video Tutorial** - Common video tutorial for all subtopics  
-3. **Text Lesson** - NMC Code introduction text content
-
-### Questions
-1. Question about key principles (with 4 options)
-2. Question about nurse responsibilities (with 4 options)
-
-## How to Run the Seed Scripts
-
-### Option 1: Supabase SQL Editor (Recommended)
-
-#### STEP 1: Create Database Schema
-
-1. **Open your Supabase Dashboard**
+1. **Open Supabase Dashboard**
    - Go to [https://supabase.com/dashboard](https://supabase.com/dashboard)
-   - Select your project
+   - Select your Jeeva Learning project
 
-2. **Navigate to SQL Editor**
-   - Click on "SQL Editor" in the left sidebar
-
-3. **Create a new query**
+2. **Open SQL Editor**
+   - Click "SQL Editor" in left sidebar
    - Click "New Query"
 
-4. **Copy the schema SQL**
-   - Open `scripts/setup_schema.sql`
-   - Copy the entire contents
+3. **Copy & Paste**
+   - Open `scripts/setup_and_seed_complete.sql` in this Replit
+   - Copy **ALL** content (it's long - 1300+ lines)
+   - Paste into Supabase SQL Editor
 
-5. **Paste and Run**
-   - Paste into the SQL Editor
-   - Click "Run" or press `Ctrl+Enter` (Windows) / `Cmd+Enter` (Mac)
+4. **Run It**
+   - Click "Run" button (or Ctrl+Enter / Cmd+Enter)
+   - Wait ~10 seconds for it to complete
 
-6. **Verify Success**
-   - You should see: "Database schema created successfully!"
-   - Check the "Table Editor" - you should now see tables: modules, topics, lessons, questions, question_options, flashcards
+5. **Verify Success**
+   - You should see:
+     - "Database schema created successfully!"
+     - "63 lessons created successfully!"
+     - "42 questions created successfully!"
 
-#### STEP 2: Load Seed Data
-
-7. **Create another new query**
-   - Click "New Query" again
-
-8. **Copy the seed SQL**
-   - Open `scripts/seed_learning_complete.sql`
-   - Copy the entire contents
-
-9. **Paste and Run**
-   - Paste into the SQL Editor
-   - Click "Run" or press `Ctrl+Enter` (Windows) / `Cmd+Enter` (Mac)
-
-10. **Verify Success**
-    - You should see success messages
-    - Check the "Table Editor" to confirm lessons and questions were created
-
-### Option 2: Using psql Command Line
-
-If you have direct database access:
-
-```bash
-# Step 1: Create schema
-psql YOUR_DATABASE_CONNECTION_STRING < scripts/setup_schema.sql
-
-# Step 2: Load seed data
-psql YOUR_DATABASE_CONNECTION_STRING < scripts/seed_learning_complete.sql
-```
-
-## Verify the Seed Data
-
-After running the script:
-
-1. **Go to Admin Portal**
-   - Navigate to Content Management
+6. **Check Your Admin Portal**
+   - Go to Content Management
    - Select "Learning Module"
+   - Choose "The NMC Code" → "1.1 Prioritise People"
+   - You should see 3 lessons and 2 questions! 🎉
 
-2. **Select a Topic**
-   - Choose "The NMC Code"
+## 📊 What Gets Loaded
 
-3. **Select a Subtopic**
-   - Choose "1.1 Prioritise People"
-
-4. **Check Content Tabs**
-   - **Lessons Tab**: Should show 3 lessons (Audio, Video, Text)
-   - **Questions Tab**: Should show 2 questions
-   - **Flashcards Tab**: Will be empty (add manually as needed)
-
-## Seed Data Details
-
-### Media URLs
-
-**Audio (Common for all subtopics):**
-```
-https://qsvjvgsnbslgypykuznd.supabase.co/storage/v1/object/public/Podcast%20audio/NMC-code.mp3
-```
-
-**Video (Common for all subtopics):**
-```
-https://qsvjvgsnbslgypykuznd.supabase.co/storage/v1/object/public/Video%20tutorial/1.1%20Prioritise%20people.mp4
-```
-
-### Topics & Subtopics Seeded
+### All 21 Subtopics Across 7 Topics:
 
 ✅ **The NMC Code** (4 subtopics)
 - 1.1 Prioritise People
@@ -156,67 +84,71 @@ https://qsvjvgsnbslgypykuznd.supabase.co/storage/v1/object/public/Video%20tutori
 - 7.1 Autonomy vs. Family Decisions
 - 7.2 UK Communication Styles
 
-## Customizing Content
+### Each Subtopic Gets:
 
-After seeding, you can:
+**3 Lessons:**
+1. 🎧 Audio Podcast - NMC Code podcast
+2. 🎥 Video Tutorial - Video lesson
+3. 📄 Text Introduction - NMC Code content
 
-1. **Edit Lessons**
-   - Update text content with specific subtopic information
-   - Replace video URLs with subtopic-specific videos
-   - Replace audio URLs with subtopic-specific podcasts
+**2 Questions:**
+- Each with 4 multiple-choice options
+- Includes explanations
 
-2. **Edit Questions**
-   - Modify question text to be more subtopic-specific
-   - Add more questions per subtopic
-   - Update answer options
+### Media URLs Used:
 
-3. **Add Flashcards**
-   - Use the Flashcards tab to add review cards
-   - Aim for 8-12 flashcards per subtopic
-
-## Troubleshooting
-
-### Error: "row-level security policy"
-- This means you need to run the SQL in the Supabase SQL Editor (which has admin privileges)
-- Do not run the TypeScript seed script directly
-
-### Error: "column does not exist"
-- Check that your database schema includes all required columns
-- Verify tables: `lessons`, `questions`, `question_options`
-
-### No data appears in Admin Portal
-- Refresh the browser
-- Check filters (make sure correct topic/subtopic is selected)
-- Verify data in Supabase Table Editor
-
-## Re-running the Seed
-
-If you need to re-run the seed script:
-
-```sql
--- First, delete existing seed data
-DELETE FROM question_options WHERE question_id IN (
-  SELECT id FROM questions WHERE module_type = 'learning'
-);
-DELETE FROM questions WHERE module_type = 'learning';
-DELETE FROM lessons WHERE category LIKE '%.%'; -- Matches subtopic IDs
-
--- Then run the seed script again
+**Audio (all subtopics):**
+```
+https://qsvjvgsnbslgypykuznd.supabase.co/storage/v1/object/public/Podcast%20audio/NMC-code.mp3
 ```
 
-## Next Steps
+**Video (all subtopics):**
+```
+https://qsvjvgsnbslgypykuznd.supabase.co/storage/v1/object/public/Video%20tutorial/1.1%20Prioritise%20people.mp4
+```
 
-After seeding:
+## 🔄 Need to Re-Run?
 
-1. Review and customize lesson content for each subtopic
-2. Add more questions to reach 10-15 per subtopic
-3. Create flashcards (8-12 per subtopic)
-4. Test the mobile app learning flow
-5. Verify sequential progression logic works correctly
+No problem! The script drops old tables first, so you can run it again anytime:
 
-## Support
+1. Just run `setup_and_seed_complete.sql` again in Supabase SQL Editor
+2. It will clean everything and reload fresh
 
-If you encounter issues:
-1. Check the Supabase logs
-2. Verify your database schema matches expectations
-3. Ensure RLS policies allow admin operations
+## 🎯 Next Steps After Loading
+
+1. **Test in Admin Portal** - Make sure content appears correctly
+2. **Customize Content** - Edit lessons to be more subtopic-specific
+3. **Add More Questions** - Aim for 10-15 questions per subtopic
+4. **Create Flashcards** - Add 8-12 flashcards per subtopic
+5. **Test Mobile App** - Verify the learning flow works end-to-end
+
+## ❓ Troubleshooting
+
+### "column does not exist" error
+- Make sure you copied the ENTIRE script (all 1300+ lines)
+- The DROP TABLE statements must run first
+
+### "row-level security" error
+- You must run this in Supabase SQL Editor (has admin privileges)
+- Don't run it via the app or API
+
+### No data appears in Admin Portal
+- Refresh your browser
+- Check you selected the correct topic/subtopic
+- Go to Supabase Table Editor → verify data exists in `lessons` and `questions` tables
+
+### Tables already exist error
+- This shouldn't happen - the script drops tables first
+- If it does, manually drop tables in Supabase Table Editor, then re-run
+
+## 📝 Files in This Directory
+
+- ✅ **setup_and_seed_complete.sql** - THE ONE YOU NEED (use this!)
+- 📖 **README_SEED.md** - This file (instructions)
+- 🔧 **generateLearningSQL.ts** - Script generator (don't need to run)
+- ~~setup_schema.sql~~ - Old separate file (ignore)
+- ~~seed_learning_complete.sql~~ - Old separate file (ignore)
+
+## 🎉 That's It!
+
+One script, one run, done! Your Learning Module is ready with 63 lessons and 42 questions across all subtopics.
