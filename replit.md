@@ -21,6 +21,18 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### November 2, 2025 - Navigation Cleanup & Page Renaming
+- **Removed Duplicate Pages**: Eliminated duplicate "Users" page that showed the same data as "Students" page
+- **Navigation Reorganization**: Cleaned up admin portal navigation menu:
+  - Removed: "Users" page (duplicate)
+  - Renamed: "Students" → "Mobile App Users" (clearer naming)
+  - Kept: "Admin Users" (for admin portal access management)
+- **Route Updates**: Updated all routes and page titles to reflect new naming convention
+  - `/students` → `/mobile-app-users`
+  - Page title: "Student Users" → "Mobile App Users"
+  - Drawer title: "Student Details" → "User Details"
+- **Cleanup**: Deleted unused `UsersPage.tsx` file and removed all references
+
 ### November 2, 2025 - Phase 1 AI Chatbot Backend (JeevaBot) Implementation
 - **AI Integration**: Integrated Google Gemini 2.5-flash model for context-aware chatbot responses
 - **Chat API Endpoints**: Created complete REST API for chat functionality:
