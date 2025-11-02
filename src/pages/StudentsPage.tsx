@@ -211,7 +211,7 @@ export const StudentsPage: React.FC = () => {
     return (
       <Box>
         <Typography variant="h4" gutterBottom>
-          Student Users Management
+          Mobile App Users Management
         </Typography>
         <Alert severity="error" sx={{ mt: 2 }}>
           Error loading students: {error}
@@ -224,9 +224,9 @@ export const StudentsPage: React.FC = () => {
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Box>
-          <Typography variant="h4">Student Users</Typography>
+          <Typography variant="h4">Mobile App Users</Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-            Manage all registered students and their subscriptions
+            Manage all mobile app users and their subscriptions
           </Typography>
         </Box>
         <Button
@@ -386,7 +386,7 @@ export const StudentsPage: React.FC = () => {
         {selectedStudent && (
           <Box sx={{ p: 3 }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-              <Typography variant="h5">Student Details</Typography>
+              <Typography variant="h5">User Details</Typography>
               <IconButton onClick={handleCloseDrawer}>
                 <CloseIcon />
               </IconButton>
