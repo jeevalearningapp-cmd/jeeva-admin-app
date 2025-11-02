@@ -24,7 +24,7 @@ const mapToUserSubscription = (data: any): UserSubscription => ({
     id: data.subscription_plans.id,
     name: data.subscription_plans.name,
     description: data.subscription_plans.description,
-    price: data.subscription_plans.price,
+    price: data.subscription_plans.price_usd || data.subscription_plans.price || 0,
     billingCycle: data.subscription_plans.billing_cycle,
     features: data.subscription_plans.features || [],
     maxUsers: data.subscription_plans.max_users,
@@ -146,9 +146,9 @@ export const userSubscriptionsAPI = {
       .reduce((sum, sub) => {
         const plan = sub.subscription_plans
         if (plan?.billing_cycle === 'monthly') {
-          return sum + (plan.price || 0)
+          return sum + (plan.price_usd || 0)
         } else if (plan?.billing_cycle === 'yearly') {
-          return sum + (plan.price || 0) / 12
+          return sum + (plan.price_usd || 0) / 12
         }
         return sum
       }, 0) || 0
@@ -170,9 +170,9 @@ export const userSubscriptionsAPI = {
         }
         planBreakdown[plan.id].count += 1
         if (plan.billing_cycle === 'monthly') {
-          planBreakdown[plan.id].revenue += plan.price || 0
+          planBreakdown[plan.id].revenue += plan.price_usd || 0
         } else if (plan.billing_cycle === 'yearly') {
-          planBreakdown[plan.id].revenue += (plan.price || 0) / 12
+          planBreakdown[plan.id].revenue += (plan.price_usd || 0) / 12
         }
       }
     })

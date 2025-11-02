@@ -5,7 +5,7 @@ const mapToSubscriptionPlan = (data: any): SubscriptionPlan => ({
   id: data.id,
   name: data.name,
   description: data.description,
-  price: data.price,
+  price: data.price_usd || data.price || 0,
   billingCycle: data.billing_cycle,
   features: data.features || [],
   maxUsers: data.max_users,
@@ -54,7 +54,7 @@ export const subscriptionPlansAPI = {
       .insert([{
         name: input.name,
         description: input.description,
-        price: input.price,
+        price_usd: input.price,
         billing_cycle: input.billingCycle,
         features: input.features,
         max_users: input.maxUsers,
@@ -72,7 +72,7 @@ export const subscriptionPlansAPI = {
     const updateData: any = {}
     if (input.name !== undefined) updateData.name = input.name
     if (input.description !== undefined) updateData.description = input.description
-    if (input.price !== undefined) updateData.price = input.price
+    if (input.price !== undefined) updateData.price_usd = input.price
     if (input.billingCycle !== undefined) updateData.billing_cycle = input.billingCycle
     if (input.features !== undefined) updateData.features = input.features
     if (input.maxUsers !== undefined) updateData.max_users = input.maxUsers

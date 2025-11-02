@@ -21,6 +21,29 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### November 2, 2025 - Phase 1 AI Chatbot Backend (JeevaBot) Implementation
+- **AI Integration**: Integrated Google Gemini 2.5-flash model for context-aware chatbot responses
+- **Chat API Endpoints**: Created complete REST API for chat functionality:
+  - `POST /api/chat/send` - Send messages and receive AI responses
+  - `GET /api/chat/conversations/:userId` - Fetch conversation history
+  - `GET /api/chat/messages/:conversationId` - Get messages in a conversation
+  - `GET /api/chat/rate-limit/:userId` - Check remaining daily messages
+- **Subscription-Based Rate Limiting**: AI message limits dynamically controlled via `subscription_plans.config` JSONB field:
+  - Free Trial: 10 messages/day
+  - 30/60 Day Plans: 50 messages/day
+  - 90 Day Plan: 75 messages/day
+  - 120 Day Plan: 100 messages/day
+- **Context-Aware Responses**: JeevaBot fetches user's current lesson, practice history, and weak topics for personalized responses
+- **Database Schema Updates**:
+  - Added `config` JSONB column to `subscription_plans` table for technical settings
+  - Created `get_user_ai_limit(user_id)` PostgreSQL RPC function to fetch AI limits from subscription config
+  - Fixed `price` vs `price_usd` column mapping in TypeScript API layer
+- **Documentation Created**:
+  - `docs/MOBILE_APP_CHAT_INTEGRATION.md` - Complete React Native integration guide with code examples
+  - `docs/SUBSCRIPTION_PLANS_SETUP.md` - Guide for creating/modifying subscription plans and AI limits
+- **Environment Variables**: Requires `GEMINI_API_KEY` and `SUPABASE_SERVICE_ROLE_KEY` for server-side operations
+- **Mobile App Ready**: API endpoints tested and ready for React Native/Expo integration
+
 ### November 2, 2025 - Learning Module Structure Update (8 Topics)
 - **Numeracy Subtopic Addition**: Added 4 subtopics to Numeracy (previously had none):
   - 1.1 Dosage Calculations: Tablets, liquids, IV medications
@@ -106,8 +129,22 @@ Preferred communication style: Simple, everyday language.
 - **State & Data:** `zustand`, `@tanstack/react-query`, `@supabase/supabase-js`.
 - **Utilities:** `react-router-dom`, `notistack`, `date-fns`, `clsx`.
 
-**Environment Configuration:** `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `RESEND_API_KEY`, `STRIPE_SECRET_KEY`, `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `GEMINI_API_KEY`.
+**Environment Configuration:** 
+- Frontend: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`
+- Backend Server: `SUPABASE_SERVICE_ROLE_KEY`, `GEMINI_API_KEY`, `RESEND_API_KEY`
+- Payment Gateways: `STRIPE_SECRET_KEY`, `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`
 
-**Database Schema:** Supabase PostgreSQL with tables for users, admin, content, learning data, AI, payments, platform, and analytics. Includes `user_profiles`, `admin_users`, `modules`, `topics`, `lessons`, `flashcards`, `questions`, `subscriptions`, `discount_coupons`, `hero_sections`, `email_templates`, `analytics_sessions`. Utilizes PostgreSQL RPC functions for optimized performance and comprehensive RLS policies.
+**Database Schema:** Supabase PostgreSQL with tables for users, admin, content, learning data, AI, payments, platform, and analytics. Includes `user_profiles`, `admin_users`, `modules`, `topics`, `lessons`, `flashcards`, `questions`, `subscriptions`, `subscription_plans` (with `config` JSONB for technical settings like AI limits), `discount_coupons`, `hero_sections`, `email_templates`, `analytics_sessions`, `chat_conversations`, `chat_messages`, `ai_usage_stats`. Utilizes PostgreSQL RPC functions (`get_user_ai_limit`, analytics functions) for optimized performance and comprehensive RLS policies.
 
-**Email System:** Uses an Express.js backend API server (`server/index.ts`) for secure email sending via Resend. Integrates with `email_templates` table in Supabase.
+**Backend API Server:** Express.js server (`server/index.ts`) running on port 3001 provides:
+- Email sending via Resend API (integrates with `email_templates` table)
+- AI Chat endpoints for JeevaBot (uses Gemini API)
+- Server-side operations using `SUPABASE_SERVICE_ROLE_KEY` to bypass RLS policies
+
+**AI Chat System:** 
+- Backend uses Google Gemini 2.5-flash for chat responses
+- Rate limiting controlled via `subscription_plans.config.ai_messages_per_day`
+- Usage tracking in `ai_usage_stats` table (daily message counts and token usage)
+- Context includes user's current lesson, practice history, and weak topics
+- See `docs/MOBILE_APP_CHAT_INTEGRATION.md` for mobile app integration
+- See `docs/SUBSCRIPTION_PLANS_SETUP.md` for managing AI limits and creating new plans
