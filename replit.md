@@ -21,11 +21,28 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### November 2, 2025 - Learning Module Structure Update (8 Topics)
+- **Numeracy Subtopic Addition**: Added 4 subtopics to Numeracy (previously had none):
+  - 1.1 Dosage Calculations: Tablets, liquids, IV medications
+  - 1.2 Unit Conversions: mg ↔ mcg, kg ↔ lbs, mL ↔ L
+  - 1.3 IV Flow Rate Calculations: Drip rates, infusion times
+  - 1.4 Fluid Balance: Fluid charts, BMI, nutrition
+- **Subtopic ID Renumbering**: All subtopic IDs renumbered to accommodate Numeracy:
+  - The NMC Code: 1.x → 2.x
+  - Mental Capacity Act: 2.x → 3.x
+  - Safeguarding: 3.x → 4.x
+  - Consent & Confidentiality: 4.x → 5.x
+  - Equality & Diversity: 5.x → 6.x
+  - Duty of Candour: 6.x → 7.x
+  - Cultural Adaptation: 7.x → 8.x
+- **Documentation Updates**: Updated all docs to reflect 8 topics with consistent subtopic structure
+- **Migration Guide**: Created `docs/LEARNING_MODULE_MIGRATION_GUIDE.md` with complete SQL migration scripts and verification queries
+- **Important**: Database migration required before deploying code changes to production
+
 ### October 25, 2025 - Learning Module Subtopic Organization & Seed Data
 - **Subtopic-Based Content Structure**: Implemented subtopic dropdown selector for Learning Module
   - Content tabs only appear after topic AND subtopic selection (prevents orphaned content)
   - Questions, Lessons, and Flashcards all organized by subtopic ID
-  - Numeracy (no subtopics) works correctly without subtopic selector
 - **Database Organization**: Questions use `category` (topic title) and `subdivision` (subtopic ID); Lessons use `category` (subtopic ID)
 - **Seed Data Script**: Created SQL seed script (`scripts/seed_learning_complete.sql`) that generates:
   - 63 lessons (3 per subtopic: audio podcast, video tutorial, text intro)
