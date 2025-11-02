@@ -9,7 +9,6 @@ import { MainLayout } from './components/layout'
 import { ErrorBoundary } from './components/common'
 import {
   DashboardPage,
-  UsersPage,
   AdminUsersPage,
   SubscriptionsPage,
   ContentManagementPage,

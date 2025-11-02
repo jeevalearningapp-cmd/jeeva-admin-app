@@ -1,5 +1,4 @@
 export { DashboardPage } from './DashboardPage'
-export { UsersPage } from './UsersPage'
 export { AdminUsersPage } from './AdminUsersPage'
 export { SubscriptionsPage } from './SubscriptionsPage'
 export { ContentManagementPage } from './ContentManagementPage'
