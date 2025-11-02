@@ -5,45 +5,58 @@
 ```
 Learning Module
 ├── Topic 1: Numeracy
-│   ├── Lessons (direct, no subtopics)
-│   ├── Questions
-│   └── Flashcards
-│
-├── Topic 2: The NMC Code
-│   ├── Subtopic 1.1: Prioritise People
+│   ├── Subtopic 1.1: Dosage Calculations
 │   │   ├── Lessons (text, video, audio)
 │   │   ├── Questions
 │   │   └── Flashcards
-│   ├── Subtopic 1.2: Practice Effectively
+│   ├── Subtopic 1.2: Unit Conversions
 │   │   ├── Lessons
 │   │   ├── Questions
 │   │   └── Flashcards
-│   ├── Subtopic 1.3: Preserve Safety
+│   ├── Subtopic 1.3: IV Flow Rate Calculations
 │   │   ├── Lessons
 │   │   ├── Questions
 │   │   └── Flashcards
-│   └── Subtopic 1.4: Promote Professionalism
+│   └── Subtopic 1.4: Fluid Balance
+│       ├── Lessons
+│       ├── Questions
+│       └── Flashcards
+│
+├── Topic 2: The NMC Code
+│   ├── Subtopic 2.1: Prioritise People
+│   │   ├── Lessons (text, video, audio)
+│   │   ├── Questions
+│   │   └── Flashcards
+│   ├── Subtopic 2.2: Practice Effectively
+│   │   ├── Lessons
+│   │   ├── Questions
+│   │   └── Flashcards
+│   ├── Subtopic 2.3: Preserve Safety
+│   │   ├── Lessons
+│   │   ├── Questions
+│   │   └── Flashcards
+│   └── Subtopic 2.4: Promote Professionalism
 │       ├── Lessons
 │       ├── Questions
 │       └── Flashcards
 │
 ├── Topic 3: Mental Capacity Act
-│   └── (4 subtopics with same structure)
+│   └── (4 subtopics: 3.1-3.4 with same structure)
 │
 ├── Topic 4: Safeguarding
-│   └── (3 subtopics)
+│   └── (3 subtopics: 4.1-4.3)
 │
 ├── Topic 5: Consent & Confidentiality
-│   └── (3 subtopics)
+│   └── (3 subtopics: 5.1-5.3)
 │
 ├── Topic 6: Equality & Diversity
-│   └── (3 subtopics)
+│   └── (3 subtopics: 6.1-6.3)
 │
 ├── Topic 7: Duty of Candour
-│   └── (2 subtopics)
+│   └── (2 subtopics: 7.1-7.2)
 │
 └── Topic 8: Cultural Adaptation
-    └── (2 subtopics)
+    └── (2 subtopics: 8.1-8.2)
 ```
 
 ## User Progression Logic (Mobile App)
@@ -79,10 +92,13 @@ To mark a topic as "complete" and unlock the next topic:
 - Complete **ALL** subtopics within that topic
 - Each subtopic must have 80%+ passing score
 
-### Special Case: Numeracy (Topic 1)
+### All Topics Follow Same Structure
 
-Numeracy has **no subtopics** - content is directly under the topic:
-- Lessons → Questions → 80% pass → Complete
+All 8 topics now have subtopics:
+- Complete all lessons in a subtopic
+- Pass assessment with 80%+ score
+- Unlock next subtopic
+- Complete all subtopics to unlock next topic
 
 ## Database Structure
 
@@ -109,7 +125,7 @@ category: string      -- Subtopic ID (e.g., "1.1") or Topic title
 
 ### 1. Fetch Topic List
 ```typescript
-const topics = LEARNING_TOPICS; // 7 fixed topics
+const topics = LEARNING_TOPICS; // 8 fixed topics
 ```
 
 ### 2. Check User Progress
@@ -204,9 +220,9 @@ Click "Learning Module" (green card)
 ### 2. Select Topic
 Choose from dropdown: "The NMC Code", "Safeguarding", etc.
 
-### 3. Select Subtopic (if applicable)
-- For topics with subtopics: Choose from dropdown (e.g., "1.1 Prioritise People")
-- For Numeracy: No subtopic selector appears
+### 3. Select Subtopic
+- All topics now have subtopics
+- Choose from dropdown (e.g., "1.1 Dosage Calculations", "2.1 Prioritise People")
 
 ### 4. Manage Content
 Tabs:
@@ -220,17 +236,21 @@ Tabs:
 ### Topic List Screen
 ```
 ✓ Topic 1: Numeracy [COMPLETED] [100%]
+  ├── ✓ 1.1 Dosage Calculations [PASSED] [92%]
+  ├── ✓ 1.2 Unit Conversions [PASSED] [88%]
+  ├── ✓ 1.3 IV Flow Rate Calculations [PASSED] [85%]
+  └── ✓ 1.4 Fluid Balance [PASSED] [90%]
 → Topic 2: The NMC Code [IN PROGRESS] [60%]
-  ├── ✓ 1.1 Prioritise People [PASSED] [85%]
-  ├── → 1.2 Practice Effectively [CURRENT]
-  ├── 🔒 1.3 Preserve Safety [LOCKED]
-  └── 🔒 1.4 Promote Professionalism [LOCKED]
+  ├── ✓ 2.1 Prioritise People [PASSED] [85%]
+  ├── → 2.2 Practice Effectively [CURRENT]
+  ├── 🔒 2.3 Preserve Safety [LOCKED]
+  └── 🔒 2.4 Promote Professionalism [LOCKED]
 🔒 Topic 3: Mental Capacity Act [LOCKED]
 ```
 
 ### Subtopic Screen
 ```
-[Header: 1.2 Practice Effectively]
+[Header: 2.2 Practice Effectively]
 
 Lessons (5 of 8 completed)
 ─────────────────────────────
@@ -275,7 +295,7 @@ Correct Answers: 11 / 12
 Passing Score: 80%
 
 [View Detailed Results]
-[Next Subtopic: 1.3 Preserve Safety →]
+[Next Subtopic: 2.3 Preserve Safety →]
 ```
 
 ## Analytics & Tracking
@@ -359,7 +379,7 @@ CREATE TABLE lesson_completions (
 
 ## Summary
 
-- **Content is organized by subtopics** (except Numeracy)
+- **All 8 topics have subtopics** - Content is consistently organized
 - **Sequential unlocking** ensures structured learning
 - **80% passing score** required for progression
 - **Questions, Lessons, and Flashcards** all belong to subtopics

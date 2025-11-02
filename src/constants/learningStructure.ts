@@ -1,7 +1,7 @@
 /**
  * Fixed Learning Module Structure for NMC CBT Exam
  * 
- * This defines the 7 core topics and their subtopics that make up
+ * This defines the 8 core topics and their subtopics that make up
  * the Learning Module content hierarchy.
  */
 
@@ -25,7 +25,28 @@ export const LEARNING_TOPICS: LearningTopic[] = [
     id: '22222222-2222-0001-0000-000000000001',
     title: 'Numeracy',
     description: 'Essential numeracy skills for nursing practice',
-    subtopics: [] // Numeracy has direct lessons, no subtopics
+    subtopics: [
+      { 
+        id: '1.1', 
+        title: 'Dosage Calculations', 
+        description: 'Tablets, liquids, IV medications' 
+      },
+      { 
+        id: '1.2', 
+        title: 'Unit Conversions', 
+        description: 'mg ↔ mcg, kg ↔ lbs, mL ↔ L' 
+      },
+      { 
+        id: '1.3', 
+        title: 'IV Flow Rate Calculations', 
+        description: 'Drip rates, infusion times' 
+      },
+      { 
+        id: '1.4', 
+        title: 'Fluid Balance', 
+        description: 'Fluid charts, BMI, nutrition' 
+      }
+    ]
   },
   {
     id: '22222222-2222-0002-0000-000000000002',
@@ -33,24 +54,24 @@ export const LEARNING_TOPICS: LearningTopic[] = [
     description: 'Professional standards of practice and behaviour',
     subtopics: [
       { 
-        id: '1.1', 
+        id: '2.1', 
         title: 'Prioritise People', 
-        description: 'Putting patients at the center of care' 
+        description: 'Patient dignity, consent, advocacy' 
       },
       { 
-        id: '1.2', 
+        id: '2.2', 
         title: 'Practice Effectively', 
-        description: 'Maintaining competence and communication' 
+        description: 'Evidence-based care, delegation, continuous learning' 
       },
       { 
-        id: '1.3', 
+        id: '2.3', 
         title: 'Preserve Safety', 
-        description: 'Protecting patients from harm' 
+        description: 'Risk reporting, infection control, safeguarding' 
       },
       { 
-        id: '1.4', 
+        id: '2.4', 
         title: 'Promote Professionalism', 
-        description: 'Upholding professional standards' 
+        description: 'Social media ethics, accountability, revalidation' 
       }
     ]
   },
@@ -60,24 +81,24 @@ export const LEARNING_TOPICS: LearningTopic[] = [
     description: 'Understanding mental capacity and decision-making',
     subtopics: [
       { 
-        id: '2.1', 
+        id: '3.1', 
         title: 'Presumption of Capacity', 
-        description: 'Assuming capacity unless proven otherwise' 
+        description: 'Assume capacity unless proven otherwise' 
       },
       { 
-        id: '2.2', 
+        id: '3.2', 
         title: 'Assessing Capacity', 
-        description: 'How to assess decision-making ability' 
+        description: '2-stage test (understanding, retaining, weighing, communicating)' 
       },
       { 
-        id: '2.3', 
+        id: '3.3', 
         title: 'Best Interests Decisions', 
-        description: 'Making decisions for those who lack capacity' 
+        description: 'Involving families, advanced care plans' 
       },
       { 
-        id: '2.4', 
+        id: '3.4', 
         title: 'Advanced Care Planning', 
-        description: 'Respecting advance decisions' 
+        description: 'Living wills, lasting power of attorney' 
       }
     ]
   },
@@ -87,19 +108,19 @@ export const LEARNING_TOPICS: LearningTopic[] = [
     description: 'Protecting vulnerable individuals from harm',
     subtopics: [
       { 
-        id: '3.1', 
+        id: '4.1', 
         title: 'Recognising Abuse', 
-        description: 'Identifying signs of harm' 
+        description: 'Physical, emotional, financial abuse in adults/children' 
       },
       { 
-        id: '3.2', 
+        id: '4.2', 
         title: 'Reporting Protocols', 
-        description: 'How to report safeguarding concerns' 
+        description: 'Care Act 2014, whistleblowing, escalation' 
       },
       { 
-        id: '3.3', 
+        id: '4.3', 
         title: 'Child Protection', 
-        description: 'Specific considerations for children' 
+        description: 'Children Act 1989, signs of neglect' 
       }
     ]
   },
@@ -109,19 +130,19 @@ export const LEARNING_TOPICS: LearningTopic[] = [
     description: 'Patient rights and information governance',
     subtopics: [
       { 
-        id: '4.1', 
+        id: '5.1', 
         title: 'Valid Consent', 
-        description: 'Requirements for informed consent' 
+        description: 'Informed, voluntary, capacitous consent' 
       },
       { 
-        id: '4.2', 
+        id: '5.2', 
         title: 'GDPR & Confidentiality', 
-        description: 'Data protection and privacy' 
+        description: 'Data protection, sharing information' 
       },
       { 
-        id: '4.3', 
+        id: '5.3', 
         title: 'Confidentiality vs. Safeguarding', 
-        description: 'When to break confidentiality' 
+        description: 'Disclosing info without consent for protection' 
       }
     ]
   },
@@ -131,19 +152,19 @@ export const LEARNING_TOPICS: LearningTopic[] = [
     description: 'Promoting equality in healthcare',
     subtopics: [
       { 
-        id: '5.1', 
+        id: '6.1', 
         title: 'Equality Act 2010', 
-        description: 'Protected characteristics and legal duties' 
+        description: 'Protected characteristics, non-discrimination' 
       },
       { 
-        id: '5.2', 
+        id: '6.2', 
         title: 'Cultural Competence', 
-        description: 'Understanding diverse backgrounds' 
+        description: 'Religious dietary needs, prayer times' 
       },
       { 
-        id: '5.3', 
+        id: '6.3', 
         title: 'Reasonable Adjustments', 
-        description: 'Supporting patients with disabilities' 
+        description: 'Disability access, communication aids' 
       }
     ]
   },
@@ -153,14 +174,14 @@ export const LEARNING_TOPICS: LearningTopic[] = [
     description: 'Being open and honest when things go wrong',
     subtopics: [
       { 
-        id: '6.1', 
+        id: '7.1', 
         title: 'Transparency After Errors', 
-        description: 'How to communicate mistakes' 
+        description: 'Apologising, explaining harm, documentation' 
       },
       { 
-        id: '6.2', 
+        id: '7.2', 
         title: 'NHS Incident Reporting', 
-        description: 'Proper incident documentation' 
+        description: 'DATIX forms, root cause analysis' 
       }
     ]
   },
@@ -170,14 +191,14 @@ export const LEARNING_TOPICS: LearningTopic[] = [
     description: 'Working effectively in a multicultural healthcare environment',
     subtopics: [
       { 
-        id: '7.1', 
+        id: '8.1', 
         title: 'Autonomy vs. Family Decisions', 
-        description: 'Balancing individual and family involvement' 
+        description: 'UK patient-led vs. India family-led care' 
       },
       { 
-        id: '7.2', 
+        id: '8.2', 
         title: 'UK Communication Styles', 
-        description: 'Adapting to British healthcare culture' 
+        description: 'Assertiveness, multidisciplinary teamwork' 
       }
     ]
   }
@@ -201,24 +222,18 @@ export function getAllSubtopics(): Array<{
   }> = [];
 
   LEARNING_TOPICS.forEach(topic => {
-    if (topic.subtopics.length > 0) {
-      topic.subtopics.forEach(subtopic => {
-        subtopics.push({
-          id: subtopic.id,
-          title: subtopic.title,
-          topicTitle: topic.title,
-          displayLabel: `${topic.title} → ${subtopic.id} ${subtopic.title}`
-        });
-      });
-    } else {
-      // For topics without subtopics (like Numeracy), use topic title as category
-      subtopics.push({
-        id: topic.title,
-        title: topic.title,
-        topicTitle: topic.title,
-        displayLabel: topic.title
-      });
+    if (topic.subtopics.length === 0) {
+      throw new Error(`Topic "${topic.title}" has no subtopics. All topics must have subtopics.`);
     }
+    
+    topic.subtopics.forEach(subtopic => {
+      subtopics.push({
+        id: subtopic.id,
+        title: subtopic.title,
+        topicTitle: topic.title,
+        displayLabel: `${topic.title} → ${subtopic.id} ${subtopic.title}`
+      });
+    });
   });
 
   return subtopics;
