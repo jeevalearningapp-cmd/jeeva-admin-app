@@ -40,8 +40,7 @@ interface MenuItem {
 
 const menuItems: MenuItem[] = [
   { title: 'Dashboard', path: '/dashboard', icon: <DashboardIcon />, roles: ['superadmin', 'editor', 'moderator'] },
-  { title: 'Users', path: '/users', icon: <PeopleIcon />, roles: ['superadmin', 'editor'] },
-  { title: 'Students', path: '/students', icon: <StudentsIcon />, roles: ['superadmin', 'editor'] },
+  { title: 'Mobile App Users', path: '/mobile-app-users', icon: <PeopleIcon />, roles: ['superadmin', 'editor'] },
   { title: 'Admin Users', path: '/admin-users', icon: <AdminIcon />, roles: ['superadmin'] },
   { title: 'Subscriptions', path: '/subscriptions', icon: <SubscriptionsIcon />, roles: ['superadmin', 'editor'] },
   { title: 'Discount Coupons', path: '/discount-coupons', icon: <CouponIcon />, roles: ['superadmin', 'editor'] },
