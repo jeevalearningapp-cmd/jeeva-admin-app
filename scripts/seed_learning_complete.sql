@@ -64,7 +64,7 @@ INSERT INTO lessons (id, title, category, content, content_type, media_url, dura
 INSERT INTO lessons (id, title, category, content, content_type, media_url, duration_minutes, is_active, display_order) VALUES
 (gen_random_uuid(), 'Mental Capacity Act Podcast: Best Interests', '3.3', 'Making decisions in the best interests of patients', 'audio', 'https://qsvjvgsnbslgypykuznd.supabase.co/storage/v1/object/public/Podcast%20audio/NMC-code.mp3', 15, true, 1),
 (gen_random_uuid(), 'Video: Best Interests Decision-Making', '3.3', 'Examples of best interests decisions in clinical practice', 'video', 'https://qsvjvgsnbslgypykuznd.supabase.co/storage/v1/object/public/Video%20tutorial/1.1%20Prioritise%20people.mp4', 12, true, 2),
-(gen_random_uuid(), 'Introduction to Best Interests Decisions', '3.3', 'When someone lacks capacity, decisions must be made in their best interests. This involves considering the person\'s wishes, beliefs, values, and consulting with family and carers before acting.', 'text', null, 5, true, 3);
+(gen_random_uuid(), 'Introduction to Best Interests Decisions', '3.3', 'When someone lacks capacity, decisions must be made in their best interests. This involves considering the person''s wishes, beliefs, values, and consulting with family and carers before acting.', 'text', null, 5, true, 3);
 
 -- Subtopic 3.4: Advanced Care Planning
 INSERT INTO lessons (id, title, category, content, content_type, media_url, duration_minutes, is_active, display_order) VALUES
@@ -83,13 +83,13 @@ INSERT INTO lessons (id, title, category, content, content_type, media_url, dura
 INSERT INTO lessons (id, title, category, content, content_type, media_url, duration_minutes, is_active, display_order) VALUES
 (gen_random_uuid(), 'Safeguarding Podcast: Reporting Protocols', '4.2', 'UK safeguarding reporting procedures and responsibilities', 'audio', 'https://qsvjvgsnbslgypykuznd.supabase.co/storage/v1/object/public/Podcast%20audio/NMC-code.mp3', 15, true, 1),
 (gen_random_uuid(), 'Video: Safeguarding Reporting Step-by-Step', '4.2', 'How to report safeguarding concerns in your organization', 'video', 'https://qsvjvgsnbslgypykuznd.supabase.co/storage/v1/object/public/Video%20tutorial/1.1%20Prioritise%20people.mp4', 12, true, 2),
-(gen_random_uuid(), 'Introduction to Reporting Protocols', '4.2', 'All healthcare professionals have a duty to report safeguarding concerns. Follow your organization\'s policy, document concerns accurately, and escalate to safeguarding leads or local authorities when necessary.', 'text', null, 5, true, 3);
+(gen_random_uuid(), 'Introduction to Reporting Protocols', '4.2', 'All healthcare professionals have a duty to report safeguarding concerns. Follow your organization''s policy, document concerns accurately, and escalate to safeguarding leads or local authorities when necessary.', 'text', null, 5, true, 3);
 
 -- Subtopic 4.3: Child Protection
 INSERT INTO lessons (id, title, category, content, content_type, media_url, duration_minutes, is_active, display_order) VALUES
 (gen_random_uuid(), 'Safeguarding Podcast: Child Protection', '4.3', 'Protecting children and young people in healthcare settings', 'audio', 'https://qsvjvgsnbslgypykuznd.supabase.co/storage/v1/object/public/Podcast%20audio/NMC-code.mp3', 15, true, 1),
 (gen_random_uuid(), 'Video: Child Safeguarding in Practice', '4.3', 'Recognizing and responding to child protection concerns', 'video', 'https://qsvjvgsnbslgypykuznd.supabase.co/storage/v1/object/public/Video%20tutorial/1.1%20Prioritise%20people.mp4', 12, true, 2),
-(gen_random_uuid(), 'Introduction to Child Protection', '4.3', 'Child protection requires understanding developmental stages, recognizing indicators of harm, and following children\'s safeguarding procedures. Always prioritize the child\'s welfare and safety above all other considerations.', 'text', null, 5, true, 3);
+(gen_random_uuid(), 'Introduction to Child Protection', '4.3', 'Child protection requires understanding developmental stages, recognizing indicators of harm, and following children''s safeguarding procedures. Always prioritize the child''s welfare and safety above all other considerations.', 'text', null, 5, true, 3);
 
 -- Topic 5: Consent & Confidentiality
 -- Subtopic 5.1: Valid Consent
@@ -121,7 +121,7 @@ INSERT INTO lessons (id, title, category, content, content_type, media_url, dura
 INSERT INTO lessons (id, title, category, content, content_type, media_url, duration_minutes, is_active, display_order) VALUES
 (gen_random_uuid(), 'Diversity Podcast: Cultural Competence', '6.2', 'Developing cultural awareness in patient care', 'audio', 'https://qsvjvgsnbslgypykuznd.supabase.co/storage/v1/object/public/Podcast%20audio/NMC-code.mp3', 15, true, 1),
 (gen_random_uuid(), 'Video: Culturally Sensitive Care', '6.2', 'Providing respectful care to diverse patient populations', 'video', 'https://qsvjvgsnbslgypykuznd.supabase.co/storage/v1/object/public/Video%20tutorial/1.1%20Prioritise%20people.mp4', 12, true, 2),
-(gen_random_uuid(), 'Introduction to Cultural Competence', '6.2', 'Cultural competence involves understanding and respecting patients\' cultural backgrounds, beliefs, and practices. Nurses must avoid stereotypes, use interpreters when needed, and adapt care to meet diverse needs.', 'text', null, 5, true, 3);
+(gen_random_uuid(), 'Introduction to Cultural Competence', '6.2', 'Cultural competence involves understanding and respecting patients'' cultural backgrounds, beliefs, and practices. Nurses must avoid stereotypes, use interpreters when needed, and adapt care to meet diverse needs.', 'text', null, 5, true, 3);
 
 -- Subtopic 6.3: Reasonable Adjustments
 INSERT INTO lessons (id, title, category, content, content_type, media_url, duration_minutes, is_active, display_order) VALUES
@@ -140,14 +140,14 @@ INSERT INTO lessons (id, title, category, content, content_type, media_url, dura
 INSERT INTO lessons (id, title, category, content, content_type, media_url, duration_minutes, is_active, display_order) VALUES
 (gen_random_uuid(), 'Duty of Candour Podcast: Incident Reporting', '7.2', 'Using incident reporting systems to improve patient safety', 'audio', 'https://qsvjvgsnbslgypykuznd.supabase.co/storage/v1/object/public/Podcast%20audio/NMC-code.mp3', 15, true, 1),
 (gen_random_uuid(), 'Video: NHS Incident Reporting Process', '7.2', 'Step-by-step guide to reporting incidents and near misses', 'video', 'https://qsvjvgsnbslgypykuznd.supabase.co/storage/v1/object/public/Video%20tutorial/1.1%20Prioritise%20people.mp4', 12, true, 2),
-(gen_random_uuid(), 'Introduction to NHS Incident Reporting', '7.2', 'All incidents, near misses, and adverse events must be reported through your organization\'s system. Reporting promotes learning, improves safety, and ensures appropriate follow-up actions are taken.', 'text', null, 5, true, 3);
+  (gen_random_uuid(), 'Introduction to NHS Incident Reporting', '7.2', 'All incidents, near misses, and adverse events must be reported through your organization''s system. Reporting promotes learning, improves safety, and ensures appropriate follow-up actions are taken.', 'text', null, 5, true, 3);
 
 -- Topic 8: Cultural Adaptation
 -- Subtopic 8.1: Autonomy vs. Family Decisions
 INSERT INTO lessons (id, title, category, content, content_type, media_url, duration_minutes, is_active, display_order) VALUES
 (gen_random_uuid(), 'Cultural Adaptation Podcast: Autonomy and Family', '8.1', 'Navigating patient autonomy in collectivist cultures', 'audio', 'https://qsvjvgsnbslgypykuznd.supabase.co/storage/v1/object/public/Podcast%20audio/NMC-code.mp3', 15, true, 1),
 (gen_random_uuid(), 'Video: Balancing Individual and Family Choices', '8.1', 'Case studies on family involvement in decision-making', 'video', 'https://qsvjvgsnbslgypykuznd.supabase.co/storage/v1/object/public/Video%20tutorial/1.1%20Prioritise%20people.mp4', 12, true, 2),
-(gen_random_uuid(), 'Introduction to Autonomy vs. Family Decisions', '8.1', 'UK healthcare emphasizes individual autonomy, but many cultures involve families in decisions. Nurses must respect patient preferences while ensuring the individual\'s voice is heard and their rights protected.', 'text', null, 5, true, 3);
+(gen_random_uuid(), 'Introduction to Autonomy vs. Family Decisions', '8.1', 'UK healthcare emphasizes individual autonomy, but many cultures involve families in decisions. Nurses must respect patient preferences while ensuring the individual''s voice is heard and their rights protected.', 'text', null, 5, true, 3);
 
 -- Subtopic 8.2: UK Communication Styles
 INSERT INTO lessons (id, title, category, content, content_type, media_url, duration_minutes, is_active, display_order) VALUES
