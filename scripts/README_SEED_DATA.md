@@ -1,149 +1,236 @@
-# Learning Module Seed Data - Quick Start Guide
+# Learning Module Seed Data - Complete Guide
 
 ## 📦 What's Included
 
-This seed script (`seed_learning_complete.sql`) provides sample content for the Learning Module:
+**✅ CORRECTED SCRIPTS** (Compatible with your actual database schema):
 
-✅ **63 Lessons** (3 per subtopic)
-- Audio podcast lessons
-- Video tutorial lessons  
-- Text introduction lessons
+- `seed_learning_fixed.sql` - 63 lessons + 42 questions
+- `generate_all_question_options_fixed.sql` - 168 question options (4 per question)
 
-✅ **42 Questions** (2 per subtopic)
-- Questions with explanations
-- Covers all 21 subtopics
+---
 
-✅ **168 Question Options** - Auto-generated script available
+## 🎯 Content Coverage
 
-## 🎯 Subtopic Coverage
+All 21 subtopics using **remapped IDs** (2.1 through 8.2):
 
-All 21 subtopics using **updated IDs** (after Numeracy remapping):
+### Topic 2: The NMC Code
+- 2.1 Prioritise People
+- 2.2 Practice Effectively  
+- 2.3 Preserve Safety
+- 2.4 Promote Professionalism
 
-- **The NMC Code**: 2.1, 2.2, 2.3, 2.4
-- **Mental Capacity Act**: 3.1, 3.2, 3.3, 3.4
-- **Safeguarding**: 4.1, 4.2, 4.3
-- **Consent & Confidentiality**: 5.1, 5.2, 5.3
-- **Equality & Diversity**: 6.1, 6.2, 6.3
-- **Duty of Candour**: 7.1, 7.2
-- **Cultural Adaptation**: 8.1, 8.2
+### Topic 3: Mental Capacity Act
+- 3.1 Presumption of Capacity
+- 3.2 Assessing Capacity
+- 3.3 Best Interests Decisions
+- 3.4 Advanced Care Planning
 
-## 🚀 How to Run
+### Topic 4: Safeguarding
+- 4.1 Recognising Abuse
+- 4.2 Reporting Protocols
+- 4.3 Child Protection
 
-### Step 1: Open Supabase SQL Editor
+### Topic 5: Consent & Confidentiality
+- 5.1 Valid Consent
+- 5.2 GDPR & Confidentiality
+- 5.3 Confidentiality vs. Safeguarding
 
-1. Go to your Supabase Dashboard
-2. Click **SQL Editor** in the sidebar
-3. Click **New Query**
+### Topic 6: Equality & Diversity
+- 6.1 Equality Act 2010
+- 6.2 Cultural Competence
+- 6.3 Reasonable Adjustments
 
-### Step 2: Run the Seed Script
+### Topic 7: Duty of Candour
+- 7.1 Transparency After Errors
+- 7.2 NHS Incident Reporting
 
-1. Open `scripts/seed_learning_complete.sql`
-2. Copy the entire file
-3. Paste into Supabase SQL Editor
-4. Click **Run** (or Ctrl/Cmd + Enter)
+### Topic 8: Cultural Adaptation
+- 8.1 Autonomy vs. Family Decisions
+- 8.2 UK Communication Styles
 
-### Step 3: Verify
+---
 
-Run these verification queries:
+## 🚀 Quick Start (2 Steps!)
+
+### Step 1: Seed Lessons & Questions
+
+1. Open **Supabase Dashboard** → **SQL Editor**
+2. Click **New Query**
+3. Open `scripts/seed_learning_fixed.sql`
+4. Copy the **entire file**
+5. Paste into SQL Editor
+6. Click **Run** (or Ctrl/Cmd + Enter)
+
+**Result:**
+- ✅ 63 lessons created (3 per subtopic)
+- ✅ 42 questions created (2 per subtopic)
+
+### Step 2: Add Question Options
+
+1. Stay in **Supabase SQL Editor**
+2. Click **New Query**
+3. Open `scripts/generate_all_question_options_fixed.sql`
+4. Copy the **entire file**
+5. Paste into SQL Editor
+6. Click **Run**
+
+**Result:**
+- ✅ 168 question options created (4 per question)
+- ⚠️ Options are placeholders - customize via admin portal
+
+---
+
+## ✅ Verification
+
+After running both scripts, verify the data:
 
 ```sql
 -- Check lesson count (should be 63)
 SELECT COUNT(*) FROM lessons;
 
--- Check question count (should be 42)  
+-- Check question count (should be 42)
 SELECT COUNT(*) FROM questions;
+
+-- Check option count (should be 168)
+SELECT COUNT(*) FROM question_options;
 
 -- View lessons by subtopic
 SELECT category, COUNT(*) 
 FROM lessons 
 GROUP BY category 
 ORDER BY category;
+
+-- View questions by subtopic
+SELECT subdivision, COUNT(*) 
+FROM questions 
+GROUP BY subdivision 
+ORDER BY subdivision;
+
+-- Check each question has 4 options
+SELECT 
+  q.subdivision,
+  COUNT(qo.id) as option_count
+FROM questions q
+LEFT JOIN question_options qo ON q.id = qo.question_id
+GROUP BY q.subdivision
+ORDER BY q.subdivision;
 ```
 
-## ⚙️ Adding Question Options (168 Total)
+---
 
-### Quick Method: Auto-Generate All Options
+## 🎨 Customizing Content
 
-Run this script to create all 168 options automatically:
+The seed data provides **sample content**. You should customize:
 
-**File**: `scripts/generate_all_question_options.sql`
+### Via Admin Portal (Recommended):
+1. Go to **Content Management** → **Learning Module**
+2. Select a topic and subtopic
+3. Click on lessons/questions to edit
+4. Update question options with real answers
 
-```bash
-# In Supabase SQL Editor
-# 1. Copy generate_all_question_options.sql
-# 2. Paste and run
-# 3. All 168 options created instantly!
-```
+### What to Customize:
+- ✏️ **Lesson content** - Make it specific to each subtopic
+- ✏️ **Question text** - Create NMC CBT-style questions
+- ✏️ **Question options** - Replace placeholders with real answers
+- ➕ **Add more content** - Aim for 10-15 questions per subtopic
 
-This creates placeholder options that you can customize later via the admin portal.
-
-### Alternative: Customize Each Question
-
-If you prefer more control, use:
-- **seed_question_options.sql** - Template with realistic examples for first 13 questions
-- **Admin Portal** - Add/edit options through the UI
-
-Both approaches work - use what fits your workflow!
-
-## 📝 Customizing Content
-
-The seed data provides generic sample content. You should customize:
-
-1. **Lesson Content** - Make it more specific to each subtopic
-2. **Question Text** - Create more NMC CBT-style questions
-3. **Add More Questions** - Aim for 10-15 questions per subtopic
-4. **Create Flashcards** - Add 8-12 flashcards per subtopic
+---
 
 ## 🔄 Re-running the Script
 
-If you need to re-run:
+⚠️ **Warning:** Running the scripts again will create **duplicate entries**!
 
-⚠️ **Warning**: This will create duplicate entries! 
+### To avoid duplicates:
 
-To avoid duplicates, either:
-1. Delete existing data first:
+**Option A: Clear existing data first**
 ```sql
+-- Delete all seeded data
 DELETE FROM question_options;
-DELETE FROM questions;
-DELETE FROM lessons;
+DELETE FROM questions WHERE category IS NOT NULL;
+DELETE FROM lessons WHERE category IS NOT NULL;
 ```
 
-2. Or add WHERE conditions to prevent duplicates
+**Option B: Manually check for duplicates**
+```sql
+-- Check if data already exists
+SELECT COUNT(*) FROM lessons WHERE category = '2.1';
+```
 
-## ✅ Next Steps
+---
 
-After running the seed script:
+## 📁 File Reference
 
-1. ✅ Verify data in Supabase Table Editor
-2. ✅ Check content in Admin Portal
-3. ⚠️ Add question options (via portal or SQL)
-4. ✏️ Customize content for each subtopic
-5. 📱 Test in mobile app
+### Main Scripts (Use These!)
+- ✅ `seed_learning_fixed.sql` - Schema-compliant lessons & questions
+- ✅ `generate_all_question_options_fixed.sql` - Auto-generate all options
 
-## 📚 Files in This Directory
+### Legacy Scripts (Don't Use!)
+- ❌ `seed_learning_complete.sql` - **OLD** version with wrong schema
+- ❌ `generate_all_question_options.sql` - **OLD** version
+- ❌ `seed_question_options.sql` - **OLD** template version
 
-- `seed_learning_complete.sql` - Main seed script (run this!)
-- `README_SEED_DATA.md` - This file
-- `generateLearningSQL.ts` - Generator script (optional)
+---
+
+## 🔧 Technical Details
+
+### Database Schema Used:
+
+**Lessons Table:**
+- `topic_id` (UUID, required) - Foreign key to topics
+- `lesson_type` ('audio' | 'video' | 'text')
+- `audio_url` - For podcast lessons
+- `video_url` - For video lessons
+- `category` - Stores subtopic ID (e.g., '2.1', '3.2')
+- `duration` - In **seconds** (not minutes)
+
+**Questions Table:**
+- `category` - Topic title (e.g., 'The NMC Code')
+- `subdivision` - Subtopic ID (e.g., '2.1', '3.2')
+- `difficulty` - 'easy' | 'medium' | 'hard'
+- `lesson_id` - Optional foreign key to lessons
+
+**Question Options Table:**
+- `question_id` - Foreign key to questions
+- `option_text` - The answer text
+- `is_correct` - Boolean (one per question should be true)
+- `display_order` - 1, 2, 3, 4
+
+---
 
 ## ❓ Troubleshooting
 
 ### "Column does not exist" error
-- Make sure your database schema matches the expected structure
-- Check that `lessons` and `questions` tables exist
+- ✅ You're using the **FIXED** scripts (`seed_learning_fixed.sql`)
+- ❌ Don't use the old `seed_learning_complete.sql`
+
+### "Topic not found" warning
+- The script looks up topics by name (e.g., "NMC Code", "Mental Capacity")
+- Make sure your topics table has these topics created
+- Check topic names match: `SELECT title FROM topics;`
 
 ### No data shows in Admin Portal
-- Refresh your browser
-- Verify data exists in Supabase Table Editor
-- Check you selected the correct topic/subtopic (use 2.1-8.2, not 1.x)
+- Refresh your browser (Ctrl+Shift+R / Cmd+Shift+R)
+- Verify data exists: `SELECT COUNT(*) FROM lessons;`
+- Check you selected correct topic/subtopic (2.1-8.2, not 1.x)
 
-### Questions show but have no options
-- This is normal! Add options via admin portal or SQL (see above)
-
-## 🎉 You're Done!
-
-Once you've run the script and added question options, your Learning Module will have a complete set of sample content across all 21 subtopics!
+### Questions have no options
+- Run `generate_all_question_options_fixed.sql`
+- Verify: `SELECT COUNT(*) FROM question_options;` (should be 168)
 
 ---
+
+## 🎉 Success Checklist
+
+After running both scripts, you should have:
+
+- ✅ 63 lessons across 21 subtopics
+- ✅ 42 questions (2 per subtopic)
+- ✅ 168 question options (4 per question)
+- ✅ Content visible in Admin Portal
+- ✅ Ready for customization via UI
+
+---
+
 **Created**: November 2025  
-**Version**: 1.0 (Post-Numeracy Remapping)
+**Version**: 2.0 (Schema-Compliant)  
+**Status**: ✅ Production Ready
