@@ -195,7 +195,7 @@ UPDATE flashcards SET category = '2.1' WHERE category = '1.1';
 -- This requires manual categorization into 1.1, 1.2, 1.3, or 1.4
 ```
 
-### Step 5: Update User Progress Table (if exists)
+### Step 5: Update User Progress Table (if exists) Note - we dont use this table ( not in supabase )
 ```sql
 -- Update learning_progress.subtopic_id from old IDs to new IDs
 -- This table tracks user progress through subtopics

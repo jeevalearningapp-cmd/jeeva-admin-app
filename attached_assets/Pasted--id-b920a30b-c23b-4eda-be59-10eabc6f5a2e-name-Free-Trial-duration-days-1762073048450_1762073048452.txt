@@ -1,0 +1,192 @@
+[
+  {
+    "id": "b920a30b-c23b-4eda-be59-10eabc6f5a2e",
+    "name": "Free Trial",
+    "duration_days": 7,
+    "price_usd": "0",
+    "features": [
+      "Limited Learning Modules",
+      "Basic Practice MCQs",
+      "AI JeevaBot (10 msg/day)"
+    ],
+    "config": {
+      "priority_support": false,
+      "mock_exams_access": false,
+      "all_content_access": false,
+      "ai_messages_per_day": 10
+    },
+    "is_active": true
+  },
+  {
+    "id": "c8a85641-ff41-40a5-8025-ae8c8b4546b6",
+    "name": "30 Days Access",
+    "duration_days": 30,
+    "price_usd": "49.00",
+    "features": [
+      "All Learning Modules",
+      "Practice MCQs",
+      "Mock Exams",
+      "AI JeevaBot",
+      "Performance Analytics"
+    ],
+    "config": {
+      "priority_support": false,
+      "mock_exams_access": true,
+      "all_content_access": true,
+      "ai_messages_per_day": 50
+    },
+    "is_active": true
+  },
+  {
+    "id": "ec9d61f8-4890-446c-833d-8deacd4d0d8f",
+    "name": "30 Days Access",
+    "duration_days": 30,
+    "price_usd": "49.00",
+    "features": [
+      "All Learning Modules",
+      "Practice MCQs",
+      "Mock Exams",
+      "AI JeevaBot",
+      "Performance Analytics"
+    ],
+    "config": {
+      "priority_support": false,
+      "mock_exams_access": true,
+      "all_content_access": true,
+      "ai_messages_per_day": 50
+    },
+    "is_active": true
+  },
+  {
+    "id": "1c813f54-a814-4735-9b33-6e7afe4ef083",
+    "name": "60 Days Access",
+    "duration_days": 60,
+    "price_usd": "89.00",
+    "features": [
+      "All Learning Modules",
+      "Practice MCQs",
+      "Mock Exams",
+      "AI JeevaBot",
+      "Performance Analytics",
+      "Priority Support"
+    ],
+    "config": {
+      "priority_support": true,
+      "mock_exams_access": true,
+      "all_content_access": true,
+      "ai_messages_per_day": 50
+    },
+    "is_active": true
+  },
+  {
+    "id": "67acff2c-0582-436d-aec4-cf8c3ed51f58",
+    "name": "60 Days Access",
+    "duration_days": 60,
+    "price_usd": "89.00",
+    "features": [
+      "All Learning Modules",
+      "Practice MCQs",
+      "Mock Exams",
+      "AI JeevaBot",
+      "Performance Analytics",
+      "Priority Support"
+    ],
+    "config": {
+      "priority_support": true,
+      "mock_exams_access": true,
+      "all_content_access": true,
+      "ai_messages_per_day": 50
+    },
+    "is_active": true
+  },
+  {
+    "id": "53c27370-a246-47ec-9801-4f6bccf1d4e2",
+    "name": "90 Days Access",
+    "duration_days": 90,
+    "price_usd": "119.00",
+    "features": [
+      "All Learning Modules",
+      "Practice MCQs",
+      "Mock Exams",
+      "AI JeevaBot",
+      "Performance Analytics",
+      "Priority Support",
+      "Study Planner"
+    ],
+    "config": {
+      "priority_support": true,
+      "mock_exams_access": true,
+      "all_content_access": true,
+      "ai_messages_per_day": 75
+    },
+    "is_active": true
+  },
+  {
+    "id": "ee9116f3-81c2-4f0b-b46b-04a188fb0c31",
+    "name": "90 Days Access",
+    "duration_days": 90,
+    "price_usd": "119.00",
+    "features": [
+      "All Learning Modules",
+      "Practice MCQs",
+      "Mock Exams",
+      "AI JeevaBot",
+      "Performance Analytics",
+      "Priority Support",
+      "Study Planner"
+    ],
+    "config": {
+      "priority_support": true,
+      "mock_exams_access": true,
+      "all_content_access": true,
+      "ai_messages_per_day": 75
+    },
+    "is_active": true
+  },
+  {
+    "id": "fb52fdad-0afe-4ca5-93a9-eb44419f53ae",
+    "name": "120 Days Access",
+    "duration_days": 120,
+    "price_usd": "149.00",
+    "features": [
+      "All Learning Modules",
+      "Practice MCQs",
+      "Mock Exams",
+      "AI JeevaBot",
+      "Performance Analytics",
+      "Priority Support",
+      "Study Planner",
+      "Personalized Mentoring"
+    ],
+    "config": {
+      "priority_support": true,
+      "mock_exams_access": true,
+      "all_content_access": true,
+      "ai_messages_per_day": 100
+    },
+    "is_active": true
+  },
+  {
+    "id": "d18f38d3-eddb-4179-8818-5224076000a9",
+    "name": "120 Days Access",
+    "duration_days": 120,
+    "price_usd": "149.00",
+    "features": [
+      "All Learning Modules",
+      "Practice MCQs",
+      "Mock Exams",
+      "AI JeevaBot",
+      "Performance Analytics",
+      "Priority Support",
+      "Study Planner",
+      "Personalized Mentoring"
+    ],
+    "config": {
+      "priority_support": true,
+      "mock_exams_access": true,
+      "all_content_access": true,
+      "ai_messages_per_day": 100
+    },
+    "is_active": true
+  }
+]
