@@ -1,0 +1,37 @@
+Jeeva AI Voice Conversation Module – Summary
+The Jeeva AI voice conversation module is an advanced conversational tutoring system built to mimic natural, real-time voice interaction between a learner and an expert mentor. Designed for NMC CBT exam preparation, it leverages Gemini Live/Flash models with native speech streaming, full interruption (“barge-in”), and session memory continuity.
+
+Core Features
+True Voice Conversational UI: Users talk with Jeeva as they would with a human coach. Responses are streamed in natural male UK-accented English, with <200 ms first audio and near real-time barge-in support.
+
+Multimodal Interaction: Supports seamless switching between voice and text within the same session, retaining conversation history and all context.
+
+Expert Tutor Personas: Eight specialized AI tutor contexts (Numeracy, Clinical, Ethics, etc.), each inheriting a universal Jeeva “mentor” personality and tone.
+
+Scenario-based Adaptive Learning: Interactions are structured as clinical scenarios and guided calculation breakdowns, not generic Q&A.
+
+Interrupt Handling: The system instantly stops speech if the user begins talking, listens for new input, and resumes logically from that point.
+
+Memory & Progress Tracking: Learner progress, weak areas, and session summaries are remembered cross-session using Supabase as backend, enabling “Welcome back! Last time…” resumption.
+
+RAG Knowledge Pipeline: All explanations, policy citations, and formulas are grounded in a retrieval-augmented generation pipeline, prioritizing official NMC/NHS materials and Jeeva’s structured syllabus.
+
+Error & Circuit Breaker Resilience: Built-in degradation logic ensures that if voice/audio or retrieval fails, the assistant smoothly falls back to text and transparent recovery, never freezing or repeating.
+
+Analytics & UX Telemetry: Every session logs latency, user engagement, voice quality, error events, and interruption statistics to enable continuous product improvement and operational monitoring.
+
+UI & UX Highlights
+Gemini-style interface: Clean, modern dark/light theme with animated voice waveform, visually distinct voice/text bubbles, and session status indicators.
+
+Accessibility: Voice pacing adapts to user energy and comprehension; all audio and text responses prioritize clarity and warmth.
+
+Performance Feedback: UI optionally shows session health (latency, engagement), with voice agent providing empathetic feedback when delays or errors occur.
+
+Session Controls: Users see mic state, current mode (voice/text), and their consumed minutes; quick toggles for switching or repeating last response.
+
+Learning Experience
+Personalized, Friendly Mentoring: Jeeva interacts as a calm, supportive UK nurse mentor, blending knowledge, encouragement, and checking questions.
+
+Exam-Ready Output: All explanations, scenarios, and quizzes are UK-NMC-aligned, never giving live clinical advice and always referencing official content.
+
+Short, Impactful Turns: Voice turns are 20–45 seconds for best comprehension; recaps and next steps are built into the agent’s conversational pattern.

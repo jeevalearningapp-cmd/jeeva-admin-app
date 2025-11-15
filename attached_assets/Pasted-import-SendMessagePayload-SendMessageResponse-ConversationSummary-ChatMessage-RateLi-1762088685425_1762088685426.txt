@@ -1,0 +1,195 @@
+import {
+  SendMessagePayload,
+  SendMessageResponse,
+  ConversationSummary,
+  ChatMessage,
+  RateLimitStatus,
+  ChatStreamingChunk,
+  ChatError,
+} from '@/types/chat';
+
+const BACKEND_URL =
+  process.env.EXPO_PUBLIC_BACKEND_URL || 'https://Vollskick.jeeva-admin-portal.replit.co:3003';
+
+const CHAT_BASE_URL = `${BACKEND_URL.replace(/\/$/, '')}/api/chat`;
+
+const TEXT_DECODER = typeof TextDecoder !== 'undefined' ? new TextDecoder() : undefined;
+
+const parseError = async (response: Response): Promise<ChatError> => {
+  const fallback: ChatError = {
+    message: `Server error: ${response.status}`,
+    status: response.status,
+  };
+
+  try {
+    const data = await response.json();
+    return {
+      message: data?.error || fallback.message,
+      code: data?.code,
+      status: response.status,
+      retryAfter: data?.retryAfter,
+    };
+  } catch (_err) {
+    return fallback;
+  }
+};
+
+class ChatService {
+  async sendMessage(
+    payload: SendMessagePayload,
+    abortSignal?: AbortSignal,
+  ): Promise<SendMessageResponse> {
+    const response = await fetch(`${CHAT_BASE_URL}/send`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      signal: abortSignal,
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      throw await parseError(response);
+    }
+
+    const data = (await response.json()) as SendMessageResponse;
+    return data;
+  }
+
+  async sendMessageWithStream(
+    payload: SendMessagePayload,
+    handlers: {
+      onChunk: (chunk: ChatStreamingChunk) => void;
+      onError: (error: ChatError) => void;
+      onComplete: (metadata: SendMessageResponse) => void;
+    },
+    abortSignal?: AbortSignal,
+  ): Promise<void> {
+    const response = await fetch(`${CHAT_BASE_URL}/stream`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'text/event-stream',
+      },
+      signal: abortSignal,
+      body: JSON.stringify({ ...payload, useStreaming: true }),
+    }).catch(error => {
+      handlers.onError({
+        message: error?.message || 'Network error',
+        code: 'network_error',
+      });
+      throw error;
+    });
+
+    if (!response) {
+      return;
+    }
+
+    if (!response.ok) {
+      handlers.onError(await parseError(response));
+      return;
+    }
+
+    const contentType = response.headers.get('content-type') || '';
+
+    if (!response.body || !contentType.includes('text/event-stream') || !TEXT_DECODER) {
+      try {
+        const data = (await response.json()) as SendMessageResponse;
+        handlers.onChunk({ delta: data.response, done: true, messageId: data.messageId });
+        handlers.onComplete(data);
+      } catch (error: any) {
+        handlers.onError({
+          message: error?.message || 'Failed to parse response',
+        });
+      }
+      return;
+    }
+
+    const reader = response.body.getReader();
+    let buffer = '';
+
+    const processBuffer = () => {
+      const events = buffer.split('\n\n');
+      buffer = events.pop() || '';
+
+      events.forEach(event => {
+        if (!event.startsWith('data:')) {
+          return;
+        }
+
+        const chunkData = event.replace(/^data:\s*/, '');
+
+        if (chunkData === '[DONE]') {
+          handlers.onChunk({ delta: '', done: true });
+          return;
+        }
+
+        try {
+          const parsed = JSON.parse(chunkData) as ChatStreamingChunk & {
+            metadata?: SendMessageResponse;
+          };
+
+          handlers.onChunk({
+            delta: parsed.delta || '',
+            done: Boolean(parsed.done),
+            messageId: parsed.messageId,
+          });
+
+          if (parsed.done && parsed.metadata) {
+            handlers.onComplete(parsed.metadata);
+          }
+        } catch (_err) {
+          handlers.onChunk({ delta: chunkData, done: false });
+        }
+      });
+    };
+
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) {
+        break;
+      }
+      buffer += TEXT_DECODER.decode(value, { stream: true });
+      processBuffer();
+    }
+
+    buffer += TEXT_DECODER.decode();
+    if (buffer.trim().length > 0) {
+      processBuffer();
+    }
+  }
+
+  async getConversations(userId: string): Promise<ConversationSummary[]> {
+    const response = await fetch(`${CHAT_BASE_URL}/conversations/${userId}`);
+    if (!response.ok) {
+      throw await parseError(response);
+    }
+    return (await response.json()) as ConversationSummary[];
+  }
+
+  async getMessages(conversationId: string): Promise<ChatMessage[]> {
+    const response = await fetch(`${CHAT_BASE_URL}/messages/${conversationId}`);
+    if (!response.ok) {
+      throw await parseError(response);
+    }
+    return (await response.json()) as ChatMessage[];
+  }
+
+  async getRateLimit(userId: string): Promise<RateLimitStatus> {
+    const response = await fetch(`${CHAT_BASE_URL}/rate-limit/${userId}`);
+    if (response.status === 404) {
+      return {
+        allowed: true,
+        limit: Number.POSITIVE_INFINITY,
+        current: 0,
+        remaining: Number.POSITIVE_INFINITY,
+      };
+    }
+    if (!response.ok) {
+      throw await parseError(response);
+    }
+    return (await response.json()) as RateLimitStatus;
+  }
+}
+
+export default new ChatService();
