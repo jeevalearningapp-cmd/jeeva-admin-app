@@ -1,6 +1,7 @@
 export { DashboardPage } from './DashboardPage'
 export { AdminUsersPage } from './AdminUsersPage'
 export { SubscriptionsPage } from './SubscriptionsPage'
+export { SubscriptionPlansPage } from './SubscriptionPlansPage'
 export { ContentManagementPage } from './ContentManagementPage'
 export { ApprovalsPage } from './ApprovalsPage'
 export { AnalyticsPage } from './AnalyticsPage'

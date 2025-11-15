@@ -11,6 +11,7 @@ import {
   DashboardPage,
   AdminUsersPage,
   SubscriptionsPage,
+  SubscriptionPlansPage,
   ContentManagementPage,
   ApprovalsPage,
   AnalyticsPage,
@@ -78,6 +79,17 @@ function App() {
                 <ProtectedRoute allowedRoles={['superadmin', 'editor']}>
                   <MainLayout>
                     <SubscriptionsPage />
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+            
+            <Route
+              path="/subscription-plans"
+              element={
+                <ProtectedRoute allowedRoles={['superadmin']}>
+                  <MainLayout>
+                    <SubscriptionPlansPage />
                   </MainLayout>
                 </ProtectedRoute>
               }
