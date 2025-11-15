@@ -21,6 +21,23 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### November 15, 2025 - Subscription Plans Management Feature
+- **Admin Portal Enhancement**: Added new Subscription Plans management page (`/subscription-plans`)
+- **AI Message Limit Control**: Superadmins can now view and edit AI message limits for each subscription plan through the UI
+- **Inline Editing**: Single-click editing with real-time validation and immediate server sync
+- **Features**:
+  - Table view of all subscription plans with pricing, duration, and AI limits
+  - Inline text field editing for `ai_messages_per_day` config values
+  - Input validation: enforces positive integers (minimum 1)
+  - Null-safe price rendering (displays "N/A" if price not set)
+  - Real-time updates with automatic data refetch after successful save
+- **Navigation**: Added "Subscription Plans" menu item (Superadmin-only access)
+- **Technical Implementation**:
+  - Component: `src/pages/SubscriptionPlansPage.tsx`
+  - Route: `/subscription-plans` (protected, Superadmin role only)
+  - Updates `subscription_plans.config` JSONB field directly in Supabase
+  - No database schema changes required (uses existing `config` column)
+
 ### November 2, 2025 - Navigation Cleanup & Page Renaming
 - **Removed Duplicate Pages**: Eliminated duplicate "Users" page that showed the same data as "Students" page
 - **Navigation Reorganization**: Cleaned up admin portal navigation menu:
@@ -111,6 +128,7 @@ Preferred communication style: Simple, everyday language.
 - **Content Management System:** CRUD for fixed 3-module structure (Practice, Learning, Mock Exams), with hierarchical content (topics, lessons, questions, flashcards) and media upload. Includes a unified content management page with filtering, rich text editor (TipTap) for lesson content, and bulk CSV upload.
 - **Student User Management:** View profiles, OAuth tracking, subscription status, performance metrics.
 - **Subscription & Discount Management:** CRUD for plans and user subscriptions, discount codes with expiry/usage limits.
+- **Subscription Plans Management:** Superadmin interface for managing AI message limits and plan configurations via inline editing with validation.
 - **Dashboard Hero Management:** CRUD for mobile app promotional banners.
 - **Analytics & Dashboard:** Real-time metrics from Supabase, date-range filtering, trend charts, content analysis, CSV export, using `analytics_sessions` and PostgreSQL functions.
 - **Admin User Management:** CRUD, role assignment, status management.
