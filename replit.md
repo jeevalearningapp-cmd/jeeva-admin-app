@@ -54,6 +54,7 @@ Preferred communication style: Simple, everyday language.
 - **Performance Dashboard:** Progress tracking, exam readiness scores.
 - **AI-Powered Features:** JeevaBot (chatbot), personalized weekly study recommendations.
 - **Push Notifications:** Expo Push Notifications with deep linking, automated and manual notifications from admin portal.
+- **In-App Notifications:** Notification inbox with read/unread status, badge counts, mark as read functionality, notification preferences (push/email/in-app channels, notification types, quiet hours).
 - **Hero Sections:** Promotional banners.
 
 ## External Dependencies
@@ -75,4 +76,4 @@ Preferred communication style: Simple, everyday language.
 - Backend Server: `SUPABASE_SERVICE_ROLE_KEY`, `GEMINI_API_KEY`, `RESEND_API_KEY`
 - Payment Gateways: `STRIPE_SECRET_KEY`, `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`
 
-**Database Schema:** Supabase PostgreSQL with tables for users, admin, content, learning data, AI, payments, platform, and analytics. Key tables include `user_profiles`, `admin_users`, `modules`, `topics`, `lessons`, `flashcards`, `questions`, `subscriptions`, `subscription_plans` (with `config` JSONB for technical settings like AI limits), `discount_coupons`, `hero_sections`, `email_templates`, `analytics_sessions`, `chat_conversations`, `chat_messages`, `ai_usage_stats`, `push_tokens`, `notifications`, `notification_targets`, `notification_queue`. Utilizes PostgreSQL RPC functions and comprehensive RLS policies.
+**Database Schema:** Supabase PostgreSQL with tables for users, admin, content, learning data, AI, payments, platform, and analytics. Key tables include `user_profiles`, `admin_users`, `modules`, `topics`, `lessons`, `flashcards`, `questions`, `subscriptions`, `subscription_plans` (with `config` JSONB for technical settings like AI limits), `discount_coupons`, `hero_sections`, `email_templates`, `analytics_sessions`, `chat_conversations`, `chat_messages`, `ai_usage_stats`, `push_tokens`, `notifications`, `notification_targets`, `notification_queue`, `user_notification_reads` (tracks read status), `notification_preferences` (user notification settings). Utilizes PostgreSQL RPC functions (`get_user_notifications_with_read_status`, `get_unread_notification_count`) and comprehensive RLS policies.
