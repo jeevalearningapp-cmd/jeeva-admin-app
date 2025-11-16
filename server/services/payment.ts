@@ -77,7 +77,7 @@ export const paymentService = {
   },
 
   async createPayment(input: CreatePaymentInput) {
-    const gateway = this.selectGateway(input.countryCode)
+    const gateway = input.gatewayOverride || this.selectGateway(input.countryCode)
     
     const pricing = await this.calculatePricing(
       input.subscriptionPlanId!,

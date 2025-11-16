@@ -109,6 +109,7 @@ export interface CreatePaymentInput {
   subscriptionPlanId?: string
   discountCouponCode?: string
   countryCode: string
+  gatewayOverride?: PaymentGateway
   metadata?: Record<string, any>
 }
 
