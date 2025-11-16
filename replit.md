@@ -33,7 +33,9 @@ Preferred communication style: Simple, everyday language.
 
 **Data Architecture:** Relational model with UUID primary keys.
 
-**Backend API Server:** Express.js server (`server/index.ts`) providing email services, AI chat endpoints (JeevaBot), and server-side operations bypassing RLS policies where necessary.
+**Backend API Server:** Express.js server (`server/index.ts`) providing email services, AI chat endpoints (JeevaBot), payment processing endpoints (Stripe/Razorpay), and server-side operations bypassing RLS policies where necessary.
+
+**Payment Gateway Architecture:** Dual payment gateway system with smart country-based routing. Stripe handles international payments (UK, US, etc.) while Razorpay handles Indian payments (offering 0% UPI fees). Backend services in `server/services/` include stripe.ts, razorpay.ts, and payment.ts (unified routing). Payment API endpoints at `/api/payments` for creation, verification, refunds, and webhook handling. Mobile integration guides provided in `docs/mobile-app-payment-gateway/` for React Native team.
 
 ### Feature Specifications
 
@@ -76,4 +78,4 @@ Preferred communication style: Simple, everyday language.
 - Backend Server: `SUPABASE_SERVICE_ROLE_KEY`, `GEMINI_API_KEY`, `RESEND_API_KEY`
 - Payment Gateways: `STRIPE_SECRET_KEY`, `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`
 
-**Database Schema:** Supabase PostgreSQL with tables for users, admin, content, learning data, AI, payments, platform, and analytics. Key tables include `user_profiles`, `admin_users`, `modules`, `topics`, `lessons`, `flashcards`, `questions`, `subscriptions`, `subscription_plans` (with `config` JSONB for technical settings like AI limits), `discount_coupons`, `hero_sections`, `email_templates`, `analytics_sessions`, `chat_conversations`, `chat_messages`, `ai_usage_stats`, `push_tokens`, `notifications`, `notification_targets`, `notification_queue`, `user_notification_reads` (tracks read status), `notification_preferences` (user notification settings). Utilizes PostgreSQL RPC functions (`get_user_notifications_with_read_status`, `get_unread_notification_count`) and comprehensive RLS policies.
+**Database Schema:** Supabase PostgreSQL with tables for users, admin, content, learning data, AI, payments, platform, and analytics. Key tables include `user_profiles`, `admin_users`, `modules`, `topics`, `lessons`, `flashcards`, `questions`, `subscriptions`, `subscription_plans` (with `config` JSONB for technical settings like AI limits), `discount_coupons`, `hero_sections`, `email_templates`, `analytics_sessions`, `chat_conversations`, `chat_messages`, `ai_usage_stats`, `push_tokens`, `notifications`, `notification_targets`, `notification_queue`, `user_notification_reads` (tracks read status), `notification_preferences` (user notification settings), `payment_customers` (gateway customer records), `payments` (payment transactions with Stripe/Razorpay IDs), `payment_refunds` (refund records), `payment_methods` (saved payment methods), `payment_webhook_events` (webhook event log for debugging). Utilizes PostgreSQL RPC functions (`get_user_notifications_with_read_status`, `get_unread_notification_count`) and comprehensive RLS policies.
