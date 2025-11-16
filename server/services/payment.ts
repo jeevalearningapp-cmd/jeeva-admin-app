@@ -84,20 +84,19 @@ export const paymentService = {
       input.discountCouponCode
     )
 
-    const { data: user } = await supabase.auth.getUser()
-    if (!user) {
-      throw new Error('User not authenticated')
-    }
-
-    const { data: profile } = await supabase
+    const { data: profile, error: profileError } = await supabase
       .from('user_profiles')
       .select('email, full_name, phone_number')
       .eq('user_id', input.userId)
       .single()
 
-    const email = profile?.email || user.user?.email || ''
-    const fullName = profile?.full_name
-    const phone = profile?.phone_number
+    if (profileError || !profile) {
+      throw new Error('User profile not found')
+    }
+
+    const email = profile.email || ''
+    const fullName = profile.full_name
+    const phone = profile.phone_number
 
     let paymentCustomer = await paymentsAPI.getPaymentCustomer(input.userId, gateway)
 
