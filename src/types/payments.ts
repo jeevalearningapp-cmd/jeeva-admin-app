@@ -156,6 +156,8 @@ export interface PaymentFilters {
 export interface CreatePaymentCustomerInput {
   userId: string
   gateway: PaymentGateway
+  stripeCustomerId?: string
+  razorpayCustomerId?: string
   email: string
   fullName?: string
   phone?: string
