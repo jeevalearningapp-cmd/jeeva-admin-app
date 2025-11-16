@@ -2,17 +2,33 @@
 
 ## Overview
 
-The Jeeva Learning platform automatically routes users to the optimal payment gateway based on their country:
+The Jeeva Learning platform routes users to the optimal payment gateway based on their country, with support for both **automatic routing** (recommended) and **manual gateway selection** (user choice).
 
 - **India (IN)**: Razorpay (0% fees on UPI, supports all Indian payment methods)
 - **UK/International**: Stripe (global card processing, Apple Pay, Google Pay)
 
 This guide explains how to implement smart routing in your React Native mobile app.
 
+## Routing Options
+
+### Option 1: Automatic Routing (Recommended)
+System automatically selects the best gateway based on user's country:
+- Simple user experience
+- Optimizes for lowest fees
+- No user decision needed
+
+### Option 2: Manual Gateway Selection
+User chooses their preferred gateway with smart defaults:
+- Flexibility for power users
+- Gateway pre-selected based on country
+- User can switch if desired
+
+See [Manual Gateway Selection Guide](./manual-gateway-selection.md) for implementation details.
+
 ## Architecture
 
 ```
-User → Country Detection → Gateway Selection → Payment Processing
+User → Country Detection → Gateway Selection (Auto or Manual) → Payment Processing
 ```
 
 ## Implementation

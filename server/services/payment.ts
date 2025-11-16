@@ -1,7 +1,7 @@
 import { supabase } from '../lib/supabase'
 import { stripeService } from './stripe'
 import { razorpayService } from './razorpay'
-import { paymentsAPI } from '../../src/api/payments'
+import { paymentsDB } from '../lib/paymentsDB'
 import type {
   PaymentGateway,
   CurrencyCode,
@@ -98,13 +98,13 @@ export const paymentService = {
     const fullName = profile.full_name
     const phone = profile.phone_number
 
-    let paymentCustomer = await paymentsAPI.getPaymentCustomer(input.userId, gateway)
+    let paymentCustomer = await paymentsDB.getPaymentCustomer(input.userId, gateway)
 
     if (gateway === 'stripe') {
       if (!paymentCustomer) {
         const stripeCustomer = await stripeService.createCustomer(email, fullName, phone)
 
-        paymentCustomer = await paymentsAPI.createPaymentCustomer({
+        paymentCustomer = await paymentsDB.createPaymentCustomer({
           userId: input.userId,
           gateway: 'stripe',
           stripeCustomerId: stripeCustomer.id,
@@ -126,7 +126,7 @@ export const paymentService = {
         },
       })
 
-      const payment = await paymentsAPI.createPayment({
+      const payment = await paymentsDB.createPayment({
         userId: input.userId,
         gateway: 'stripe',
         amount: pricing.finalAmount,
@@ -153,7 +153,7 @@ export const paymentService = {
           phone
         )
 
-        paymentCustomer = await paymentsAPI.createPaymentCustomer({
+        paymentCustomer = await paymentsDB.createPaymentCustomer({
           userId: input.userId,
           gateway: 'razorpay',
           razorpayCustomerId: razorpayCustomer.id,
@@ -175,7 +175,7 @@ export const paymentService = {
         },
       })
 
-      const payment = await paymentsAPI.createPayment({
+      const payment = await paymentsDB.createPayment({
         userId: input.userId,
         gateway: 'razorpay',
         amount: pricing.finalAmount,
@@ -198,7 +198,7 @@ export const paymentService = {
   },
 
   async verifyPayment(input: VerifyPaymentInput) {
-    const payment = await paymentsAPI.getPayment(input.paymentId)
+    const payment = await paymentsDB.getPayment(input.paymentId)
 
     if (input.gateway === 'stripe') {
       if (!input.stripePaymentIntentId) {
@@ -210,7 +210,7 @@ export const paymentService = {
       )
 
       if (paymentIntent.status === 'succeeded') {
-        await paymentsAPI.updatePayment(payment.id, {
+        await paymentsDB.updatePayment(payment.id, {
           status: 'succeeded',
           gatewayResponse: paymentIntent,
         })
@@ -221,10 +221,10 @@ export const paymentService = {
 
         return {
           success: true,
-          payment: await paymentsAPI.getPayment(payment.id),
+          payment: await paymentsDB.getPayment(payment.id),
         }
       } else {
-        await paymentsAPI.updatePayment(payment.id, {
+        await paymentsDB.updatePayment(payment.id, {
           status: 'failed',
           failureMessage: 'Payment not succeeded',
           gatewayResponse: paymentIntent,
@@ -247,7 +247,7 @@ export const paymentService = {
       )
 
       if (!isValid) {
-        await paymentsAPI.updatePayment(payment.id, {
+        await paymentsDB.updatePayment(payment.id, {
           status: 'failed',
           failureMessage: 'Invalid payment signature',
         })
@@ -261,7 +261,7 @@ export const paymentService = {
       const razorpayPayment = await razorpayService.fetchPayment(input.razorpayPaymentId)
 
       if (razorpayPayment.status === 'authorized' || razorpayPayment.status === 'captured') {
-        await paymentsAPI.updatePayment(payment.id, {
+        await paymentsDB.updatePayment(payment.id, {
           status: 'succeeded',
           razorpayPaymentId: input.razorpayPaymentId,
           paymentMethodType: razorpayPayment.method,
@@ -274,10 +274,10 @@ export const paymentService = {
 
         return {
           success: true,
-          payment: await paymentsAPI.getPayment(payment.id),
+          payment: await paymentsDB.getPayment(payment.id),
         }
       } else {
-        await paymentsAPI.updatePayment(payment.id, {
+        await paymentsDB.updatePayment(payment.id, {
           status: 'failed',
           razorpayPaymentId: input.razorpayPaymentId,
           failureCode: razorpayPayment.errorCode,
@@ -305,9 +305,9 @@ export const paymentService = {
   },
 
   async createRefund(paymentId: string, amount?: number, reason?: string, refundedBy?: string) {
-    const payment = await paymentsAPI.getPayment(paymentId)
+    const payment = await paymentsDB.getPayment(paymentId)
 
-    const refund = await paymentsAPI.createRefund({
+    const refund = await paymentsDB.createRefund({
       paymentId,
       amount,
       reason,
@@ -322,14 +322,14 @@ export const paymentService = {
           reason
         )
 
-        await paymentsAPI.updateRefund(refund.id, {
+        await paymentsDB.updateRefund(refund.id, {
           status: 'succeeded',
           stripeRefundId: stripeRefund.id,
         })
 
         return {
           success: true,
-          refund: await paymentsAPI.getPayment(payment.id),
+          refund: await paymentsDB.getPayment(payment.id),
         }
       } else if (payment.gateway === 'razorpay' && payment.razorpayPaymentId) {
         const razorpayRefund = await razorpayService.createRefund(
@@ -337,14 +337,14 @@ export const paymentService = {
           amount
         )
 
-        await paymentsAPI.updateRefund(refund.id, {
+        await paymentsDB.updateRefund(refund.id, {
           status: 'succeeded',
           razorpayRefundId: razorpayRefund.id,
         })
 
         return {
           success: true,
-          refund: await paymentsAPI.getPayment(payment.id),
+          refund: await paymentsDB.getPayment(payment.id),
         }
       } else {
         throw new Error('Invalid payment gateway or payment ID')

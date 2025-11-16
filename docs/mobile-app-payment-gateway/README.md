@@ -81,6 +81,7 @@ Share these guides with your React Native mobile development team:
 - `stripe-integration.md` - Stripe setup for UK/international users
 - `razorpay-integration.md` - Razorpay setup for Indian users
 - `smart-routing-guide.md` - Auto-routing based on country
+- `manual-gateway-selection.md` - Let users choose their gateway (optional)
 - `testing-guide.md` - How to test payments
 - `environment-setup.md` - Setting up API keys
 
@@ -100,6 +101,7 @@ Share these guides with your React Native mobile development team:
 - [ ] Install Stripe React Native SDK
 - [ ] Install Razorpay React Native SDK
 - [ ] Implement country detection
+- [ ] Decide: Automatic routing OR manual gateway selection
 - [ ] Implement payment service
 - [ ] Test with Stripe test cards
 - [ ] Test with Razorpay test UPI
@@ -126,6 +128,7 @@ Share these guides with your React Native mobile development team:
 
 ### Smart Routing Logic
 
+**Option 1: Automatic (Recommended)**
 ```
 User Location
     ↓
@@ -139,6 +142,23 @@ Payment Processing
     ↓
 Subscription Activation
 ```
+
+**Option 2: Manual Selection with Smart Defaults**
+```
+User Location
+    ↓
+Country Detection → Pre-select Gateway
+    ↓
+User sees recommended gateway
+    ↓
+User can switch if desired
+    ↓
+Payment Processing with chosen gateway
+    ↓
+Subscription Activation
+```
+
+Both options work with the same backend API - just pass `gatewayOverride` parameter for manual selection.
 
 ### Payment Flow
 
