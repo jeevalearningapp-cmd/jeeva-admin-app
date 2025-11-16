@@ -283,7 +283,7 @@ export const dashboardApi = {
 
   async getDashboardHeroes(): Promise<DashboardHero[]> {
     const { data, error } = await supabase
-      .from('dashboard_heroes')
+      .from('hero_sections')
       .select('*')
       .order('created_at', { ascending: false })
 
@@ -293,7 +293,7 @@ export const dashboardApi = {
 
   async createDashboardHero(hero: Omit<DashboardHero, 'id' | 'created_at' | 'updated_at'>): Promise<DashboardHero> {
     const { data, error } = await supabase
-      .from('dashboard_heroes')
+      .from('hero_sections')
       .insert(hero)
       .select()
       .single()
@@ -304,7 +304,7 @@ export const dashboardApi = {
 
   async updateDashboardHero(id: string, updates: Partial<DashboardHero>): Promise<DashboardHero> {
     const { data, error } = await supabase
-      .from('dashboard_heroes')
+      .from('hero_sections')
       .update(updates)
       .eq('id', id)
       .select()
@@ -316,7 +316,7 @@ export const dashboardApi = {
 
   async deleteDashboardHero(id: string): Promise<void> {
     const { error } = await supabase
-      .from('dashboard_heroes')
+      .from('hero_sections')
       .delete()
       .eq('id', id)
 
