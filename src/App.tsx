@@ -20,6 +20,7 @@ import {
   ProfilePage,
   StudentsPage,
   DiscountCouponsPage,
+  NotificationsPage,
 } from './pages'
 import { SplashScreen } from './pages/SplashScreen'
 import { EmailTestPage } from './pages/EmailTestPage'
@@ -156,6 +157,17 @@ function App() {
                 <ProtectedRoute allowedRoles={['superadmin']}>
                   <MainLayout>
                     <SettingsPage />
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+            
+            <Route
+              path="/notifications"
+              element={
+                <ProtectedRoute allowedRoles={['superadmin', 'editor']}>
+                  <MainLayout>
+                    <NotificationsPage />
                   </MainLayout>
                 </ProtectedRoute>
               }

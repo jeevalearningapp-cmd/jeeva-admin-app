@@ -24,6 +24,7 @@ import {
   StarOutlined as HeroIcon,
   SchoolOutlined as StudentsIcon,
   LocalOfferOutlined as CouponIcon,
+  NotificationsOutlined as NotificationsIcon,
 } from '@mui/icons-material'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '@/context'
@@ -49,6 +50,7 @@ const menuItems: MenuItem[] = [
   { title: 'Content', path: '/content', icon: <ContentIcon />, roles: ['superadmin', 'editor'] },
   { title: 'Approvals', path: '/approvals', icon: <ApprovalsIcon />, roles: ['superadmin', 'moderator'] },
   { title: 'Analytics', path: '/analytics', icon: <AnalyticsIcon />, roles: ['superadmin'] },
+  { title: 'Push Notifications', path: '/notifications', icon: <NotificationsIcon />, roles: ['superadmin', 'editor'] },
   { title: 'Dashboard Hero', path: '/dashboard-hero', icon: <HeroIcon />, roles: ['superadmin', 'editor'] },
   { title: 'Settings', path: '/settings', icon: <SettingsIcon />, roles: ['superadmin'] },
 ]

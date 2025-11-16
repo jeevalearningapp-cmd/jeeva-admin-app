@@ -42,6 +42,7 @@ Preferred communication style: Simple, everyday language.
 - **User Management:** Student and Admin user profiles, OAuth tracking, subscription status, performance metrics, role assignment.
 - **Subscription Management:** CRUD for plans and user subscriptions, discount codes, and management of AI message limits and plan configurations via inline editing.
 - **Dashboard Hero Management:** CRUD for mobile app promotional banners.
+- **Push Notifications:** Compose and send notifications to mobile users, user targeting (all, subscription tier, active users), scheduling, delivery tracking, campaign history with metrics, automated triggers for events (subscription expiring, content approved/rejected, welcome messages).
 - **Analytics & Dashboard:** Real-time metrics, date-range filtering, trend charts, content analysis, CSV export.
 - **Content Approvals System:** Workflow with status and reviewer assignment.
 
@@ -52,6 +53,7 @@ Preferred communication style: Simple, everyday language.
 - **Core Learning Modules:** Practice MCQs, Learning Content (text, images, audio), Mock Exams.
 - **Performance Dashboard:** Progress tracking, exam readiness scores.
 - **AI-Powered Features:** JeevaBot (chatbot), personalized weekly study recommendations.
+- **Push Notifications:** Expo Push Notifications with deep linking, automated and manual notifications from admin portal.
 - **Hero Sections:** Promotional banners.
 
 ## External Dependencies
@@ -73,4 +75,4 @@ Preferred communication style: Simple, everyday language.
 - Backend Server: `SUPABASE_SERVICE_ROLE_KEY`, `GEMINI_API_KEY`, `RESEND_API_KEY`
 - Payment Gateways: `STRIPE_SECRET_KEY`, `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`
 
-**Database Schema:** Supabase PostgreSQL with tables for users, admin, content, learning data, AI, payments, platform, and analytics. Key tables include `user_profiles`, `admin_users`, `modules`, `topics`, `lessons`, `flashcards`, `questions`, `subscriptions`, `subscription_plans` (with `config` JSONB for technical settings like AI limits), `discount_coupons`, `hero_sections`, `email_templates`, `analytics_sessions`, `chat_conversations`, `chat_messages`, `ai_usage_stats`. Utilizes PostgreSQL RPC functions and comprehensive RLS policies.
+**Database Schema:** Supabase PostgreSQL with tables for users, admin, content, learning data, AI, payments, platform, and analytics. Key tables include `user_profiles`, `admin_users`, `modules`, `topics`, `lessons`, `flashcards`, `questions`, `subscriptions`, `subscription_plans` (with `config` JSONB for technical settings like AI limits), `discount_coupons`, `hero_sections`, `email_templates`, `analytics_sessions`, `chat_conversations`, `chat_messages`, `ai_usage_stats`, `push_tokens`, `notifications`, `notification_targets`, `notification_queue`. Utilizes PostgreSQL RPC functions and comprehensive RLS policies.
