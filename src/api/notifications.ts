@@ -325,7 +325,7 @@ export const notificationsAPI = {
   },
 
   async getUserPushTokens(userId: string): Promise<PushToken[]> {
-    const { data, error } = await supabase
+    const { data, error} = await supabase
       .from('push_tokens')
       .select('*')
       .eq('user_id', userId)
@@ -336,6 +336,124 @@ export const notificationsAPI = {
     }
 
     return data.map(transformPushTokenFromDB)
+  },
+
+  async getUserNotifications(userId: string, limit = 50, offset = 0): Promise<any[]> {
+    const { data, error } = await supabase.rpc('get_user_notifications_with_read_status', {
+      user_id_param: userId,
+      limit_param: limit,
+      offset_param: offset,
+    })
+
+    if (error) {
+      throw new Error(`Failed to fetch user notifications: ${error.message}`)
+    }
+
+    return data || []
+  },
+
+  async markNotificationAsRead(userId: string, notificationId: string): Promise<void> {
+    const { error } = await supabase
+      .from('user_notification_reads')
+      .insert({
+        user_id: userId,
+        notification_id: notificationId,
+      })
+
+    if (error && !error.message.includes('duplicate key')) {
+      throw new Error(`Failed to mark notification as read: ${error.message}`)
+    }
+  },
+
+  async markAllNotificationsAsRead(userId: string): Promise<void> {
+    const unreadNotifications = await this.getUserNotifications(userId, 1000, 0)
+    
+    const unread = unreadNotifications
+      .filter((n: any) => !n.is_read)
+      .map((n: any) => ({
+        user_id: userId,
+        notification_id: n.id,
+      }))
+
+    if (unread.length === 0) return
+
+    const { error } = await supabase
+      .from('user_notification_reads')
+      .insert(unread)
+
+    if (error && !error.message.includes('duplicate key')) {
+      throw new Error(`Failed to mark all notifications as read: ${error.message}`)
+    }
+  },
+
+  async getUnreadCount(userId: string): Promise<number> {
+    const { data, error } = await supabase.rpc('get_unread_notification_count', {
+      user_id_param: userId,
+    })
+
+    if (error) {
+      console.error('Failed to fetch unread count:', error)
+      return 0
+    }
+
+    return data || 0
+  },
+
+  async getNotificationPreferences(userId: string): Promise<any> {
+    const { data, error } = await supabase
+      .from('notification_preferences')
+      .select('*')
+      .eq('user_id', userId)
+      .maybeSingle()
+
+    if (error) {
+      throw new Error(`Failed to fetch notification preferences: ${error.message}`)
+    }
+
+    if (!data) {
+      const { data: newPrefs, error: insertError } = await supabase
+        .from('notification_preferences')
+        .insert({ user_id: userId })
+        .select()
+        .single()
+
+      if (insertError) {
+        throw new Error(`Failed to create notification preferences: ${insertError.message}`)
+      }
+
+      return transformNotificationPreferencesFromDB(newPrefs)
+    }
+
+    return transformNotificationPreferencesFromDB(data)
+  },
+
+  async updateNotificationPreferences(userId: string, preferences: any): Promise<any> {
+    const updateData: Record<string, any> = {}
+
+    if (preferences.pushEnabled !== undefined) updateData.push_enabled = preferences.pushEnabled
+    if (preferences.emailEnabled !== undefined) updateData.email_enabled = preferences.emailEnabled
+    if (preferences.inAppEnabled !== undefined) updateData.in_app_enabled = preferences.inAppEnabled
+    if (preferences.subscriptionExpiringEnabled !== undefined) 
+      updateData.subscription_expiring_enabled = preferences.subscriptionExpiringEnabled
+    if (preferences.contentApprovedEnabled !== undefined) 
+      updateData.content_approved_enabled = preferences.contentApprovedEnabled
+    if (preferences.welcomeEnabled !== undefined) updateData.welcome_enabled = preferences.welcomeEnabled
+    if (preferences.milestonesEnabled !== undefined) updateData.milestones_enabled = preferences.milestonesEnabled
+    if (preferences.marketingEnabled !== undefined) updateData.marketing_enabled = preferences.marketingEnabled
+    if (preferences.quietHours !== undefined) updateData.quiet_hours = preferences.quietHours
+
+    const { data, error } = await supabase
+      .from('notification_preferences')
+      .update(updateData)
+      .eq('user_id', userId)
+      .select()
+      .single()
+
+    if (error) {
+      throw new Error(`Failed to update notification preferences: ${error.message}`)
+    }
+
+    return transformNotificationPreferencesFromDB(data)
   },
 }
 
@@ -389,6 +507,24 @@ function transformPushTokenFromDB(data: any): PushToken {
     platform: data.platform,
     isActive: data.is_active,
     lastSeenAt: data.last_seen_at,
+    createdAt: data.created_at,
+    updatedAt: data.updated_at,
+  }
+}
+
+function transformNotificationPreferencesFromDB(data: any): any {
+  return {
+    id: data.id,
+    userId: data.user_id,
+    pushEnabled: data.push_enabled,
+    emailEnabled: data.email_enabled,
+    inAppEnabled: data.in_app_enabled,
+    subscriptionExpiringEnabled: data.subscription_expiring_enabled,
+    contentApprovedEnabled: data.content_approved_enabled,
+    welcomeEnabled: data.welcome_enabled,
+    milestonesEnabled: data.milestones_enabled,
+    marketingEnabled: data.marketing_enabled,
+    quietHours: data.quiet_hours,
     createdAt: data.created_at,
     updatedAt: data.updated_at,
   }

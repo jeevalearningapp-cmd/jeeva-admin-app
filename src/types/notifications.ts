@@ -159,3 +159,42 @@ export interface UpdatePushTokenInput {
   isActive?: boolean
   lastSeenAt?: string
 }
+
+export interface UserNotification extends Notification {
+  isRead: boolean
+  readAt?: string
+}
+
+export interface NotificationPreferences {
+  id: string
+  userId: string
+  pushEnabled: boolean
+  emailEnabled: boolean
+  inAppEnabled: boolean
+  subscriptionExpiringEnabled: boolean
+  contentApprovedEnabled: boolean
+  welcomeEnabled: boolean
+  milestonesEnabled: boolean
+  marketingEnabled: boolean
+  quietHours?: {
+    start: string
+    end: string
+  }
+  createdAt: string
+  updatedAt: string
+}
+
+export interface UpdateNotificationPreferencesInput {
+  pushEnabled?: boolean
+  emailEnabled?: boolean
+  inAppEnabled?: boolean
+  subscriptionExpiringEnabled?: boolean
+  contentApprovedEnabled?: boolean
+  welcomeEnabled?: boolean
+  milestonesEnabled?: boolean
+  marketingEnabled?: boolean
+  quietHours?: {
+    start: string
+    end: string
+  } | null
+}
