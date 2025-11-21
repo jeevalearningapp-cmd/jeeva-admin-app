@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useSnackbar } from 'notistack'
 import { paymentsAPI } from '@/api/payments'
-import type { PaymentFilters } from '@/types/payments'
+import type { PaymentFilters, PaymentSummary } from '@/types/payments'
 import { ErrorHandler } from '@/utils/errorHandler'
 
 export const usePayments = (filters?: PaymentFilters) => {
@@ -18,7 +18,13 @@ export const usePayments = (filters?: PaymentFilters) => {
   })
 
   const {
-    data: summary,
+    data: summary = {
+      totalPayments: 0,
+      totalAmount: 0,
+      successfulPayments: 0,
+      failedPayments: 0,
+      refundedAmount: 0,
+    } as PaymentSummary,
     isLoading: summaryLoading,
   } = useQuery({
     queryKey: ['paymentsSummary', filters],

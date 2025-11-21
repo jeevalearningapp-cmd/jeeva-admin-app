@@ -242,6 +242,57 @@ export const paymentsAPI = {
     return transformPaymentRefundFromDB(data)
   },
 
+  async getPaymentsSummary(filters?: PaymentFilters) {
+    let query = supabase
+      .from('payments')
+      .select('amount, final_amount, status')
+
+    if (filters?.status && filters.status.length > 0) {
+      query = query.in('status', filters.status)
+    }
+
+    if (filters?.gateway && filters.gateway.length > 0) {
+      query = query.in('gateway', filters.gateway)
+    }
+
+    if (filters?.dateFrom) {
+      query = query.gte('created_at', filters.dateFrom)
+    }
+
+    if (filters?.dateTo) {
+      query = query.lte('created_at', filters.dateTo)
+    }
+
+    const { data, error } = await query
+
+    if (error) {
+      throw new Error(`Failed to get payments summary: ${error.message}`)
+    }
+
+    const payments = data || []
+    const totalPayments = payments.length
+    const successfulPayments = payments.filter(p => p.status === 'succeeded').length
+    const failedPayments = payments.filter(p => p.status === 'failed').length
+    const totalAmount = payments.reduce((sum, p) => sum + parseFloat(p.final_amount || 0), 0)
+
+    return {
+      totalPayments,
+      totalAmount,
+      successfulPayments,
+      failedPayments,
+      refundedAmount: 0,
+    }
+  },
+
+  async refundPayment(paymentId: string, input: { amount?: number; reason?: string; refundedBy: string }) {
+    return this.createRefund({
+      paymentId,
+      amount: input.amount,
+      reason: input.reason,
+      refundedBy: input.refundedBy,
+    })
+  },
+
   async logWebhookEvent(gateway: PaymentGateway, eventId: string, eventType: string, payload: any) {
     const { error } = await supabase.from('payment_webhook_events').insert({
       gateway,
