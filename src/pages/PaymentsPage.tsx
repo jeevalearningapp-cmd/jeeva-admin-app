@@ -32,8 +32,11 @@ import {
   VisibilityOutlined,
 } from '@mui/icons-material'
 import { usePayments } from '@/hooks/usePayments'
+import { ExportDialog } from '@/components/payments/ExportDialog'
 import type { PaymentFilters, Payment, PaymentStatus, PaymentGateway } from '@/types/payments'
+import type { StatementData } from '@/types/export'
 import { format } from 'date-fns'
+import { DownloadOutlined } from '@mui/icons-material'
 
 const statuses: PaymentStatus[] = ['pending', 'processing', 'succeeded', 'failed', 'cancelled', 'refunded']
 const gateways: PaymentGateway[] = ['stripe', 'razorpay']
@@ -46,8 +49,23 @@ export const PaymentsPage: React.FC = () => {
   const [refundOpen, setRefundOpen] = useState(false)
   const [refundAmount, setRefundAmount] = useState('')
   const [refundReason, setRefundReason] = useState('')
+  const [exportOpen, setExportOpen] = useState(false)
 
   const { payments, summary, isLoading, refund, isRefunding } = usePayments(filters)
+
+  const prepareStatementData = (): StatementData => {
+    return {
+      payments: filteredPayments,
+      subscriptions: [],
+      summary,
+      refunds: [],
+      generatedAt: new Date().toISOString(),
+      dateRange: {
+        from: filters.dateFrom || format(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), 'yyyy-MM-dd'),
+        to: filters.dateTo || format(new Date(), 'yyyy-MM-dd'),
+      },
+    }
+  }
 
   const getStatusColor = (status: PaymentStatus) => {
     switch (status) {
@@ -80,6 +98,14 @@ export const PaymentsPage: React.FC = () => {
             View and manage all payment transactions
           </Typography>
         </Box>
+        <Button
+          variant="contained"
+          startIcon={<DownloadOutlined />}
+          onClick={() => setExportOpen(true)}
+          sx={{ textTransform: 'none' }}
+        >
+          Export Statement
+        </Button>
       </Box>
 
       {/* Stats Cards */}
@@ -311,6 +337,13 @@ export const PaymentsPage: React.FC = () => {
           </DialogActions>
         </Dialog>
       )}
+
+      {/* Export Dialog */}
+      <ExportDialog
+        open={exportOpen}
+        onClose={() => setExportOpen(false)}
+        statementData={prepareStatementData()}
+      />
 
       {/* Refund Dialog */}
       {selectedPayment && (
