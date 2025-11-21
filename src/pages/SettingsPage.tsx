@@ -20,6 +20,8 @@ import {
   EmailOutlined,
   NotificationsOutlined,
   SecurityOutlined,
+  DeleteOutlined,
+  AddOutlined,
 } from '@mui/icons-material'
 import { useSettings } from '@/hooks/useSettings'
 import type { UpdateSettingsInput } from '@/types'
@@ -49,6 +51,9 @@ export const SettingsPage: React.FC = () => {
     siteDescription: '',
     contactEmail: '',
     supportEmail: '',
+    logoUrl: '',
+    faviconUrl: '',
+    defaultNotificationImageUrl: '',
     maintenanceMode: false,
     registrationEnabled: true,
     emailVerificationRequired: true,
@@ -78,6 +83,9 @@ export const SettingsPage: React.FC = () => {
         siteDescription: backendSettings.siteDescription,
         contactEmail: backendSettings.contactEmail,
         supportEmail: backendSettings.supportEmail,
+        logoUrl: backendSettings.logoUrl,
+        faviconUrl: backendSettings.faviconUrl,
+        defaultNotificationImageUrl: backendSettings.defaultNotificationImageUrl,
         maintenanceMode: backendSettings.maintenanceMode,
         registrationEnabled: backendSettings.registrationEnabled,
         emailVerificationRequired: backendSettings.emailVerificationRequired,
@@ -230,6 +238,46 @@ export const SettingsPage: React.FC = () => {
             </Box>
 
             <Typography variant="h6" sx={{ mt: 2 }}>
+              Branding
+            </Typography>
+            <Divider />
+
+            <TextField
+              label="Logo URL"
+              value={localSettings.logoUrl || ''}
+              onChange={handleChange('logoUrl')}
+              fullWidth
+              placeholder="https://example.com/logo.png"
+              helperText="URL to your company logo (used in admin portal)"
+              sx={{ '& .MuiOutlinedInput-root': { borderRadius: 0 } }}
+            />
+
+            <TextField
+              label="Favicon URL"
+              value={localSettings.faviconUrl || ''}
+              onChange={handleChange('faviconUrl')}
+              fullWidth
+              placeholder="https://example.com/favicon.ico"
+              helperText="URL to your favicon (small browser tab icon)"
+              sx={{ '& .MuiOutlinedInput-root': { borderRadius: 0 } }}
+            />
+
+            <Typography variant="h6" sx={{ mt: 2 }}>
+              Notification Settings
+            </Typography>
+            <Divider />
+
+            <TextField
+              label="Default Notification Image URL"
+              value={localSettings.defaultNotificationImageUrl || ''}
+              onChange={handleChange('defaultNotificationImageUrl')}
+              fullWidth
+              placeholder="https://example.com/notification-logo.png"
+              helperText="Default image for push & in-app notifications (when no custom image is provided)"
+              sx={{ '& .MuiOutlinedInput-root': { borderRadius: 0 } }}
+            />
+
+            <Typography variant="h6" sx={{ mt: 2 }}>
               Feature Toggles
             </Typography>
             <Divider />
@@ -285,10 +333,47 @@ export const SettingsPage: React.FC = () => {
               <Typography variant="body2" color="text.secondary" gutterBottom>
                 Allowed File Types
               </Typography>
-              <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+              <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 2 }}>
                 {(localSettings.allowedFileTypes || []).map((type) => (
-                  <Chip key={type} label={type} size="small" />
+                  <Chip 
+                    key={type} 
+                    label={type} 
+                    size="small"
+                    onDelete={() => {
+                      setLocalSettings({
+                        ...localSettings,
+                        allowedFileTypes: (localSettings.allowedFileTypes || []).filter(t => t !== type)
+                      })
+                    }}
+                  />
                 ))}
+              </Box>
+              <Box sx={{ display: 'flex', gap: 2 }}>
+                <TextField
+                  label="Add new file type"
+                  placeholder="e.g., image/webp"
+                  size="small"
+                  id="fileTypeInput"
+                  sx={{ '& .MuiOutlinedInput-root': { borderRadius: 0 } }}
+                />
+                <Button
+                  variant="outlined"
+                  size="small"
+                  startIcon={<AddOutlined />}
+                  onClick={() => {
+                    const input = document.getElementById('fileTypeInput') as HTMLInputElement
+                    if (input && input.value) {
+                      setLocalSettings({
+                        ...localSettings,
+                        allowedFileTypes: [...(localSettings.allowedFileTypes || []), input.value]
+                      })
+                      input.value = ''
+                    }
+                  }}
+                  sx={{ borderRadius: 0 }}
+                >
+                  Add
+                </Button>
               </Box>
             </Box>
           </Box>

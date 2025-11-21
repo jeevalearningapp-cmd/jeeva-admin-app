@@ -6,6 +6,7 @@ export interface AppSettings {
   supportEmail?: string
   logoUrl?: string
   faviconUrl?: string
+  defaultNotificationImageUrl?: string
   maintenanceMode: boolean
   registrationEnabled: boolean
   emailVerificationRequired: boolean
@@ -37,6 +38,7 @@ export interface UpdateSettingsInput {
   supportEmail?: string
   logoUrl?: string
   faviconUrl?: string
+  defaultNotificationImageUrl?: string
   maintenanceMode?: boolean
   registrationEnabled?: boolean
   emailVerificationRequired?: boolean

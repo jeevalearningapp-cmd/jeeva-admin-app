@@ -24,6 +24,7 @@ export const getSettings = async (): Promise<AppSettings> => {
     supportEmail: data.support_email,
     logoUrl: data.logo_url,
     faviconUrl: data.favicon_url,
+    defaultNotificationImageUrl: data.default_notification_image_url,
     maintenanceMode: data.maintenance_mode,
     registrationEnabled: data.registration_enabled,
     emailVerificationRequired: data.email_verification_required,
@@ -65,6 +66,7 @@ export const updateSettings = async (
   if (input.supportEmail !== undefined) updateData.support_email = input.supportEmail
   if (input.logoUrl !== undefined) updateData.logo_url = input.logoUrl
   if (input.faviconUrl !== undefined) updateData.favicon_url = input.faviconUrl
+  if (input.defaultNotificationImageUrl !== undefined) updateData.default_notification_image_url = input.defaultNotificationImageUrl
   if (input.maintenanceMode !== undefined) updateData.maintenance_mode = input.maintenanceMode
   if (input.registrationEnabled !== undefined) updateData.registration_enabled = input.registrationEnabled
   if (input.emailVerificationRequired !== undefined) updateData.email_verification_required = input.emailVerificationRequired
@@ -105,6 +107,7 @@ export const updateSettings = async (
     supportEmail: data.support_email,
     logoUrl: data.logo_url,
     faviconUrl: data.favicon_url,
+    defaultNotificationImageUrl: data.default_notification_image_url,
     maintenanceMode: data.maintenance_mode,
     registrationEnabled: data.registration_enabled,
     emailVerificationRequired: data.email_verification_required,
