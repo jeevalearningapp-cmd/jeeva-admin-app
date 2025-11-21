@@ -29,7 +29,7 @@ import {
 import {
   SearchOutlined,
   GetAppOutlined,
-  RefundOutlined,
+  MoneyOffOutlined,
   VisibilityOutlined,
 } from '@mui/icons-material'
 import { usePayments } from '@/hooks/usePayments'
@@ -250,7 +250,7 @@ export const PaymentsPage: React.FC = () => {
                             setRefundOpen(true)
                           }}
                         >
-                          <RefundOutlined fontSize="small" />
+                          <MoneyOffOutlined fontSize="small" />
                         </IconButton>
                       </Tooltip>
                     )}
