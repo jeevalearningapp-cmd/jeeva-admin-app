@@ -1,0 +1,665 @@
+# Jeeva Learning - Mobile App Implementation Checklist
+
+**Project:** React Native Mobile App for UK NMC CBT Exam Preparation  
+**Status Date:** November 21, 2025  
+**Tech Stack:** React Native, Expo, TypeScript
+
+---
+
+## Phase 1: Project Setup & Authentication ⏳
+
+### 1.1 Environment & Tools
+- [ ] Create React Native project with Expo
+- [ ] Configure TypeScript & ESLint
+- [ ] Set up environment variables (.env file)
+- [ ] Configure Supabase SDK for React Native
+- [ ] Set up Expo modules (auth, notifications, storage)
+
+### 1.2 Authentication - BACKEND READY ✅
+**Admin portal support:** ✅ Complete  
+**Status:** Backend ready, mobile integration needed
+
+- [ ] Implement Supabase Auth with email/password
+- [ ] Implement Google Sign-In (OAuth)
+- [ ] Implement Apple Sign-In (OAuth)
+- [ ] Create authentication context/provider
+- [ ] Build login screen UI
+- [ ] Build signup screen UI
+- [ ] Build profile completion screen
+  - [ ] Name field
+  - [ ] Email verification
+  - [ ] Phone number (optional)
+  - [ ] Profile picture upload
+- [ ] Implement password reset flow
+- [ ] Persist auth token securely
+- [ ] Auto-login on app restart
+
+### 1.3 Navigation & Routing
+- [ ] Set up React Navigation (Native Stack & Bottom Tab)
+- [ ] Create public routes (Login, Signup)
+- [ ] Create protected routes (Dashboard, Learning, etc.)
+- [ ] Implement route protection middleware
+- [ ] Handle deep linking for notifications
+  - [ ] Notification deep link handling
+  - [ ] Dynamic route parameters
+
+---
+
+## Phase 2: Core Learning Features 🎓
+
+### 2.1 Dashboard Screen
+**Admin portal support:** ✅ Analytics/metrics ready  
+**Status:** Mobile UI needed
+
+- [ ] Design dashboard layout
+- [ ] Build exam readiness score card
+- [ ] Build progress tracking card
+- [ ] Build last activity card
+- [ ] Fetch user stats from `/api/users/stats`
+- [ ] Display subscription tier badge
+- [ ] Display days remaining in subscription
+- [ ] Quick access buttons (Practice, Mock, Learning)
+
+### 2.2 Practice Module - MCQs
+**Admin portal support:** ✅ Content management ready  
+**Status:** Mobile UI needed
+
+- [ ] Build practice questions list
+- [ ] Fetch questions from `/api/content/questions`
+- [ ] Display question with options (A, B, C, D)
+- [ ] Implement question counter (1/100)
+- [ ] Build answer selection UI
+- [ ] Implement submit answer button
+- [ ] Show correct/incorrect feedback
+- [ ] Track answers (for performance)
+- [ ] Build "Next Question" flow
+- [ ] Implement "Mark for Review" feature
+- [ ] Build "Skip Question" feature
+- [ ] Show progress bar
+- [ ] End of practice summary
+  - [ ] Score
+  - [ ] Correct/Incorrect count
+  - [ ] Topics covered
+  - [ ] Weak areas identified
+
+### 2.3 Learning Module - Content
+**Admin portal support:** ✅ Content management ready  
+**Status:** Mobile UI needed
+
+- [ ] Build lessons list by topic
+- [ ] Fetch learning content from `/api/content/lessons`
+- [ ] Display text content with formatting
+- [ ] Display images in lessons
+- [ ] Display audio (play controls)
+- [ ] Build flashcard view
+- [ ] Implement flashcard flip animation
+- [ ] Build flashcard browser
+- [ ] Fetch flashcards from `/api/content/flashcards`
+- [ ] Implement bookmarking for later
+- [ ] Build lesson navigation (prev/next)
+- [ ] Track lesson progress
+
+### 2.4 Mock Exams
+**Admin portal support:** ✅ Mock exam management ready  
+**Status:** Mobile UI needed
+
+- [ ] Fetch available mock exams from `/api/content/mock-exams`
+- [ ] Display mock exam list with difficulty
+- [ ] Build mock exam start flow
+- [ ] Implement timer for exam (e.g., 3.5 hours)
+- [ ] Display all questions in exam
+- [ ] Build question navigation (jump to any question)
+- [ ] Implement review of marked questions
+- [ ] Add "End Exam" confirmation
+- [ ] Submit exam and calculate score
+- [ ] Show mock exam results
+  - [ ] Final score
+  - [ ] Pass/Fail status
+  - [ ] Topic-wise breakdown
+  - [ ] Comparison with previous attempts
+- [ ] Build mock exam history
+- [ ] Store exam attempts for analytics
+
+---
+
+## Phase 3: Payment Integration 💳
+
+### 3.1 Payment Gateway - BACKEND READY ✅
+**Admin portal support:** ✅ Dual gateway (Stripe + Razorpay)  
+**Status:** Mobile implementation needed
+
+#### Country Detection
+- [ ] Implement country detection via IP geolocation
+- [ ] Store user's country preference in profile
+- [ ] Add country selector in settings (override if needed)
+
+#### Subscription Plans Display
+- [ ] Fetch subscription plans from `/api/subscriptions/plans`
+- [ ] Display plans with features list
+- [ ] Display pricing (USD converted if needed)
+- [ ] Display billing frequency (monthly/yearly)
+- [ ] Show "Try Free" or upgrade button
+
+#### For India Users (Razorpay)
+- [ ] Integrate Razorpay React Native SDK
+- [ ] Implement payment method selection
+  - [ ] Credit/Debit Card
+  - [ ] UPI
+  - [ ] Wallet
+  - [ ] NetBanking
+- [ ] Build payment form UI
+- [ ] Create payment with `/api/payments/create`
+- [ ] Verify payment with `/api/payments/verify`
+- [ ] Handle payment success/failure
+- [ ] Store payment method for future (optional)
+
+#### For International Users (Stripe)
+- [ ] Integrate Stripe React Native SDK
+- [ ] Build card input form
+- [ ] Create payment intent with `/api/payments/create`
+- [ ] Handle 3D Secure authentication
+- [ ] Process payment
+- [ ] Verify payment with `/api/payments/verify`
+- [ ] Handle payment success/failure
+
+#### Subscription Management
+- [ ] Build subscription plans UI
+- [ ] Implement upgrade flow
+- [ ] Implement downgrade confirmation
+- [ ] Handle trial period activation
+- [ ] Display subscription status
+- [ ] Show expiration date
+- [ ] Implement auto-renewal settings
+
+### 3.2 Discount Codes
+- [ ] Build promo code input field
+- [ ] Validate coupon with `/api/subscriptions/validate-coupon`
+- [ ] Apply discount to total
+- [ ] Show discount percentage/amount
+- [ ] Handle invalid coupon errors
+
+---
+
+## Phase 4: AI Features 🤖
+
+### 4.1 JeevaBot (AI Chatbot)
+**Admin portal support:** ✅ Backend ready  
+**Status:** Mobile UI needed
+
+- [ ] Build chat screen layout
+- [ ] Implement message input field
+- [ ] Display chat messages (user + bot)
+- [ ] Show loading indicator while waiting for response
+- [ ] Fetch AI response from `/api/chat`
+- [ ] Parse and display bot response
+- [ ] Show typing indicator
+- [ ] Store conversation history locally
+- [ ] Build chat history screen
+- [ ] Implement "New Chat" button
+- [ ] Clear chat history option
+- [ ] Handle API errors gracefully
+
+### 4.2 Personalized Recommendations
+**Admin portal support:** ✅ Backend ready  
+**Status:** Mobile UI needed
+
+- [ ] Fetch personalized recommendations from `/api/ai/recommendations`
+- [ ] Display weekly study plan
+- [ ] Show recommended topics based on weak areas
+- [ ] Display suggested practice questions
+- [ ] Implement recommendation notifications
+- [ ] Build recommendations dashboard card
+
+---
+
+## Phase 5: Notifications 🔔
+
+### 5.1 Push Notifications - BACKEND READY ✅
+**Admin portal support:** ✅ Expo integration complete  
+**Status:** Mobile implementation needed
+
+#### Expo Setup
+- [ ] Register for Expo account
+- [ ] Configure Expo project settings
+- [ ] Install Expo Notifications module
+- [ ] Request notification permissions from user
+- [ ] Handle permission denial gracefully
+
+#### Token Registration
+- [ ] Get device Expo push token
+- [ ] Send token to `/api/push-tokens/register`
+- [ ] Update token on app start
+- [ ] Handle token expiration/refresh
+- [ ] Store token locally as backup
+
+#### Notification Handling
+- [ ] Implement foreground notification handler
+- [ ] Implement background notification handler
+- [ ] Parse notification data payload
+- [ ] Handle notification tap/deep linking
+- [ ] Play notification sound
+- [ ] Show notification badge
+- [ ] Vibrate on notification (optional)
+
+#### Push Notification Types
+- [ ] Subscription expiring soon
+- [ ] New content available
+- [ ] Content approved/rejected (admin only)
+- [ ] Welcome messages
+- [ ] Scheduled reminders
+- [ ] Performance milestones
+- [ ] Campaign notifications
+
+### 5.2 In-App Notification Inbox - BACKEND READY ✅
+**Admin portal support:** ✅ Complete  
+**Status:** Mobile UI needed
+
+- [ ] Build notification inbox screen
+- [ ] Fetch notifications from `/api/notifications/user/:userId`
+- [ ] Display notification list
+- [ ] Show notification timestamp
+- [ ] Implement "Mark as Read" functionality
+- [ ] Implement "Mark all as Read"
+- [ ] Show unread badge count
+- [ ] Implement notification filtering (all, unread)
+- [ ] Implement notification deletion
+- [ ] Show notification preferences icon
+- [ ] Navigate to notification settings on tap
+
+### 5.3 Notification Preferences - BACKEND READY ✅
+**Admin portal support:** ✅ Complete  
+**Status:** Mobile UI needed
+
+- [ ] Build notification settings screen
+- [ ] Toggle push notifications on/off
+- [ ] Toggle email notifications on/off
+- [ ] Toggle in-app notifications on/off
+- [ ] Implement quiet hours setup
+  - [ ] Start time picker
+  - [ ] End time picker
+  - [ ] Days selection
+- [ ] Set notification preferences by type
+- [ ] Save preferences to `/api/notifications/preferences`
+- [ ] Fetch preferences from `/api/notifications/preferences`
+
+---
+
+## Phase 6: Performance & Analytics 📊
+
+### 6.1 Performance Dashboard
+**Admin portal support:** ✅ Analytics ready  
+**Status:** Mobile UI needed
+
+- [ ] Build performance dashboard screen
+- [ ] Display overall accuracy percentage
+- [ ] Display topics wise performance
+- [ ] Show progress charts
+- [ ] Display time spent on platform
+- [ ] Show practice stats (questions attempted, correct, incorrect)
+- [ ] Display mock exam performance history
+- [ ] Show improvement trend
+- [ ] Fetch analytics from `/api/analytics/user`
+
+### 6.2 Analytics Tracking
+- [ ] Track question attempts
+- [ ] Track time spent on content
+- [ ] Track exam attempts and scores
+- [ ] Track topic performance
+- [ ] Store locally, sync with backend
+- [ ] Send analytics to `/api/analytics/track`
+
+---
+
+## Phase 7: Content Gating & Trial 🔒
+
+### 7.1 Free Trial Mode
+**Admin portal support:** ✅ Configuration ready  
+**Status:** Mobile implementation needed
+
+- [ ] Detect free trial status from user subscription
+- [ ] Show "Try Free" banner
+- [ ] Limited access to practice questions
+- [ ] Limited access to learning content
+- [ ] Full mock exam access (optional)
+- [ ] Show upgrade prompt after trial
+- [ ] Notify when trial expiring (7 days before)
+
+### 7.2 Subscription Validation
+- [ ] Check subscription status on app start
+- [ ] Refresh subscription status periodically
+- [ ] Show "Upgrade" screen if subscription expired
+- [ ] Prevent access to paid content without subscription
+- [ ] Show subscription renewal option
+
+---
+
+## Phase 8: Hero Sections & Marketing 📱
+
+### 8.1 Promotional Banners
+**Admin portal support:** ✅ Hero section management ready  
+**Status:** Mobile UI needed
+
+- [ ] Fetch hero sections from `/api/hero-sections`
+- [ ] Display banner on dashboard
+- [ ] Display banner images with proper aspect ratio
+- [ ] Add CTA button functionality
+- [ ] Implement banner carousel/slider
+- [ ] Track banner impressions
+- [ ] Handle banner deep links
+
+---
+
+## Phase 9: User Profile & Settings ⚙️
+
+### 9.1 User Profile Screen
+- [ ] Display user profile information
+- [ ] Show profile picture
+- [ ] Display name, email
+- [ ] Show subscription tier
+- [ ] Show member since date
+- [ ] Edit profile button
+- [ ] Upload profile picture
+
+### 9.2 Edit Profile
+- [ ] Build edit profile form
+- [ ] Update name
+- [ ] Update email
+- [ ] Update phone
+- [ ] Update profile picture
+- [ ] Save changes to `/api/users/profile`
+- [ ] Handle validation errors
+
+### 9.3 App Settings
+- [ ] Theme selection (Light/Dark mode)
+- [ ] Language preference (if multilingual)
+- [ ] Clear app cache
+- [ ] Clear downloaded content
+- [ ] App version display
+- [ ] Terms of Service link
+- [ ] Privacy Policy link
+- [ ] Contact Support link
+- [ ] Logout button
+
+---
+
+## Phase 10: Content Download & Offline Mode 📲
+
+### 10.1 Offline Content
+- [ ] Implement local storage for lessons
+- [ ] Implement local storage for questions
+- [ ] Implement local storage for flashcards
+- [ ] Build content download progress
+- [ ] Cache downloaded content
+- [ ] Display storage used
+- [ ] Clear downloaded content option
+
+### 10.2 Offline Mode
+- [ ] Continue practicing offline
+- [ ] Sync answers when online
+- [ ] Continue learning offline
+- [ ] Sync progress when online
+- [ ] Show offline indicator
+- [ ] Handle sync conflicts gracefully
+
+---
+
+## Phase 11: UI/UX Polish 🎨
+
+### 11.1 Design System
+- [ ] Create component library
+  - [ ] Button component
+  - [ ] Input component
+  - [ ] Card component
+  - [ ] Modal component
+  - [ ] Loader component
+  - [ ] Toast/Snackbar component
+  - [ ] Bottom sheet component
+- [ ] Implement theming (Light/Dark)
+- [ ] Define typography system
+- [ ] Define spacing system
+- [ ] Define color palette
+
+### 11.2 Animations
+- [ ] Add screen transitions
+- [ ] Add button interactions
+- [ ] Add loading animations
+- [ ] Add success/error animations
+- [ ] Add flashcard flip animation
+- [ ] Add chart animations
+
+### 11.3 Responsive Design
+- [ ] Test on various screen sizes
+- [ ] Optimize for tablets
+- [ ] Test landscape orientation
+- [ ] Handle notch/safe areas
+- [ ] Test on different aspect ratios
+
+---
+
+## Phase 12: Testing & Quality Assurance ✅
+
+### 12.1 Unit Testing
+- [ ] Test API service functions
+- [ ] Test hooks (usePayments, useNotifications, etc.)
+- [ ] Test utility functions
+- [ ] Test reducers/state management
+- [ ] Achieve 80%+ coverage
+
+### 12.2 Integration Testing
+- [ ] Test authentication flow
+- [ ] Test payment flow
+- [ ] Test notification delivery
+- [ ] Test content loading
+- [ ] Test offline mode
+
+### 12.3 E2E Testing
+- [ ] Test complete user journey (signup → practice)
+- [ ] Test payment journey
+- [ ] Test notification flow
+- [ ] Test learning path
+
+### 12.4 Manual Testing
+- [ ] Test on iOS device
+- [ ] Test on Android device
+- [ ] Test on different screen sizes
+- [ ] Test permissions
+- [ ] Test camera/photo access
+- [ ] Test network failures
+- [ ] Test timeout scenarios
+
+---
+
+## Phase 13: Performance Optimization 🚀
+
+### 13.1 App Performance
+- [ ] Implement code splitting
+- [ ] Optimize bundle size
+- [ ] Lazy load screens
+- [ ] Implement caching strategies
+- [ ] Optimize images (compression, webp format)
+- [ ] Monitor memory usage
+- [ ] Profile app startup time
+- [ ] Optimize re-renders
+
+### 13.2 Network Performance
+- [ ] Implement request batching
+- [ ] Add request caching
+- [ ] Implement pagination for lists
+- [ ] Add request throttling
+- [ ] Monitor API response times
+
+---
+
+## Phase 14: Security 🔐
+
+### 14.1 Data Security
+- [ ] Implement secure token storage
+- [ ] Use encryption for sensitive data
+- [ ] Implement certificate pinning
+- [ ] Secure local storage
+- [ ] Validate all API responses
+- [ ] Implement timeout for auth tokens
+- [ ] Refresh tokens before expiry
+
+### 14.2 App Security
+- [ ] Implement app code obfuscation
+- [ ] Jailbreak/Root detection
+- [ ] Implement app signing
+- [ ] Use ProGuard/R8 for Android
+- [ ] Implement OWASP security best practices
+
+### 14.3 Payment Security
+- [ ] Never store card details locally
+- [ ] Use tokenized payments only
+- [ ] Implement webhook verification
+- [ ] Log security events
+- [ ] Monitor for suspicious activity
+
+---
+
+## Phase 15: Build & Deployment 🚢
+
+### 15.1 iOS Build
+- [ ] Create Apple Developer account
+- [ ] Create certificates & provisioning profiles
+- [ ] Build iOS app (development)
+- [ ] Create TestFlight build
+- [ ] Submit to App Store
+- [ ] Handle App Store review
+- [ ] Publish to App Store
+
+### 15.2 Android Build
+- [ ] Create Google Play account
+- [ ] Create keystore file
+- [ ] Build Android app (development)
+- [ ] Test on Android device
+- [ ] Create Play Store release
+- [ ] Submit to Play Store
+- [ ] Handle Play Store review
+- [ ] Publish to Play Store
+
+### 15.3 Release Management
+- [ ] Create release notes
+- [ ] Version management
+- [ ] Track user feedback
+- [ ] Plan updates
+- [ ] Monitor crash reports
+
+---
+
+## Phase 16: Post-Launch Support 🛠️
+
+### 16.1 Monitoring
+- [ ] Set up crash analytics (Firebase Crashlytics)
+- [ ] Monitor API performance
+- [ ] Track user engagement
+- [ ] Monitor payment success rates
+- [ ] Track notification delivery rates
+- [ ] Monitor app ratings & reviews
+
+### 16.2 User Support
+- [ ] In-app help/FAQ section
+- [ ] Support contact form
+- [ ] Email support system
+- [ ] Community forum (optional)
+- [ ] Social media support
+
+---
+
+## Backend Support Status Summary
+
+| Feature | Backend | Status | Notes |
+|---------|---------|--------|-------|
+| Authentication | ✅ Ready | `/auth/*` endpoints | Supabase Auth integrated |
+| Content (MCQs, Lessons, Flashcards) | ✅ Ready | `/api/content/*` | Full CRUD in admin portal |
+| Payments (Stripe + Razorpay) | ✅ Ready | `/api/payments/*` | Smart country-based routing |
+| Subscriptions | ✅ Ready | `/api/subscriptions/*` | Plans, coupons, management |
+| Analytics | ✅ Ready | `/api/analytics/*` | Performance tracking ready |
+| Push Notifications | ✅ Ready | `/api/notifications/*` | Expo integration complete |
+| In-App Notifications | ✅ Ready | `/api/notifications/*` | Inbox, preferences ready |
+| AI Chat (JeevaBot) | ✅ Ready | `/api/chat` | Gemini integration done |
+| AI Recommendations | ✅ Ready | `/api/ai/recommendations` | Personalized content ready |
+| Hero Sections | ✅ Ready | `/api/hero-sections` | Marketing banners ready |
+| User Profile | ✅ Ready | `/api/users/*` | Profile management ready |
+| Email Templates | ✅ Ready | Resend configured | For transactional emails |
+
+---
+
+## Timeline Estimate
+
+| Phase | Effort | Timeline |
+|-------|--------|----------|
+| 1. Setup | 1-2 weeks | Week 1-2 |
+| 2. Learning Features | 3-4 weeks | Week 3-6 |
+| 3. Payments | 2-3 weeks | Week 7-9 |
+| 4. AI Features | 1-2 weeks | Week 10-11 |
+| 5. Notifications | 1-2 weeks | Week 12-13 |
+| 6-8. Dashboard, Content, Settings | 2-3 weeks | Week 14-16 |
+| 9. Polish & Testing | 2-3 weeks | Week 17-19 |
+| 10. Performance & Security | 1-2 weeks | Week 20-21 |
+| 11. Build & Deploy | 1-2 weeks | Week 22-23 |
+
+**Total Estimate:** 16-24 weeks (4-6 months) for full feature parity
+
+---
+
+## Priority Ranking
+
+### Must Have (MVP)
+1. ✅ Authentication (OAuth + email)
+2. ✅ Practice MCQs module
+3. ✅ Payment integration
+4. ✅ Subscription management
+5. ✅ Performance dashboard
+6. ✅ Push notifications
+
+### Should Have
+7. Learning content module
+8. Mock exams
+9. AI chatbot (JeevaBot)
+10. In-app notifications
+11. Offline mode
+
+### Nice to Have
+12. Content download
+13. Dark mode
+14. Advanced analytics
+15. Social sharing
+16. Referral program
+
+---
+
+## Key Integration Points
+
+### Admin Portal → Mobile
+- Content created in admin → fetched via API
+- Notifications sent from admin → delivered to mobile
+- Subscriptions managed in admin → enforced on mobile
+- Analytics tracked on mobile → displayed in admin dashboard
+
+### Mobile → Backend APIs
+```
+Authentication:       POST /auth/login, /auth/signup, /auth/refresh
+Content:             GET /api/content/questions, /api/content/lessons
+Payments:            POST /api/payments/create, POST /api/payments/verify
+Notifications:       GET /api/notifications, POST /api/push-tokens/register
+Analytics:           POST /api/analytics/track
+User Profile:        GET/PUT /api/users/profile
+Subscriptions:       GET /api/subscriptions/plans, GET /api/subscriptions/user
+```
+
+---
+
+## Notes
+
+- All backend APIs are production-ready and documented
+- Payment gateway integration handles both Stripe (international) and Razorpay (India)
+- Push notification infrastructure (Expo) is fully configured
+- In-app notification system is ready for mobile consumption
+- Analytics framework is in place for tracking user behavior
+- Security features (RLS, JWT tokens) are implemented at backend
+
+---
+
+**Document Updated:** November 21, 2025  
+**Status:** Backend Complete ✅ | Mobile Implementation In Progress 🚧
