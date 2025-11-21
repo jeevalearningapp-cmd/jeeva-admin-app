@@ -25,6 +25,7 @@ import {
   SchoolOutlined as StudentsIcon,
   LocalOfferOutlined as CouponIcon,
   NotificationsOutlined as NotificationsIcon,
+  CreditCardOutlined as PaymentsIcon,
 } from '@mui/icons-material'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '@/context'
@@ -47,6 +48,7 @@ const menuItems: MenuItem[] = [
   { title: 'Subscriptions', path: '/subscriptions', icon: <SubscriptionsIcon />, roles: ['superadmin', 'editor'] },
   { title: 'Subscription Plans', path: '/subscription-plans', icon: <PlansIcon />, roles: ['superadmin'] },
   { title: 'Discount Coupons', path: '/discount-coupons', icon: <CouponIcon />, roles: ['superadmin', 'editor'] },
+  { title: 'Payments', path: '/payments', icon: <PaymentsIcon />, roles: ['superadmin', 'editor'] },
   { title: 'Content', path: '/content', icon: <ContentIcon />, roles: ['superadmin', 'editor'] },
   { title: 'Approvals', path: '/approvals', icon: <ApprovalsIcon />, roles: ['superadmin', 'moderator'] },
   { title: 'Analytics', path: '/analytics', icon: <AnalyticsIcon />, roles: ['superadmin'] },
