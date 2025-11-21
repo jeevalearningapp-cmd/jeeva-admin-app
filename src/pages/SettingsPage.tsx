@@ -13,6 +13,17 @@ import {
   Alert,
   Chip,
   CircularProgress,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  IconButton,
+  Tooltip,
 } from '@mui/material'
 import {
   SaveOutlined,
@@ -22,9 +33,11 @@ import {
   SecurityOutlined,
   DeleteOutlined,
   AddOutlined,
+  EditOutlined,
 } from '@mui/icons-material'
 import { useSettings } from '@/hooks/useSettings'
-import type { UpdateSettingsInput } from '@/types'
+import { useEmailTemplates } from '@/hooks/useEmailTemplates'
+import type { UpdateSettingsInput, EmailTemplate } from '@/types'
 import { validateSettings, getValidationErrorMessage, type SettingsValidationResult } from '@/utils/settingsValidation'
 
 interface TabPanelProps {
@@ -44,7 +57,17 @@ const TabPanel: React.FC<TabPanelProps> = ({ children, value, index }) => {
 export const SettingsPage: React.FC = () => {
   const [tabValue, setTabValue] = React.useState(0)
   const { settings: backendSettings, isLoading, updateSettings, isUpdating } = useSettings()
+  const { templates, create: createTemplate, update: updateTemplate, delete: deleteTemplate, isCreating } = useEmailTemplates()
   const [validationResult, setValidationResult] = useState<SettingsValidationResult>({ isValid: true, errors: [] })
+  const [templateDialogOpen, setTemplateDialogOpen] = useState(false)
+  const [editingTemplate, setEditingTemplate] = useState<EmailTemplate | null>(null)
+  const [templateForm, setTemplateForm] = useState({
+    name: '',
+    subject: '',
+    body: '',
+    variables: [] as string[],
+    isActive: true,
+  })
   
   const [localSettings, setLocalSettings] = React.useState<UpdateSettingsInput>({
     siteName: '',
@@ -560,15 +583,205 @@ export const SettingsPage: React.FC = () => {
 
         {/* Email Templates */}
         <TabPanel value={tabValue} index={3}>
-          <Typography variant="h6" gutterBottom>
-            Email Templates
-          </Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+            <Typography variant="h6">
+              Email Templates
+            </Typography>
+            <Button
+              variant="contained"
+              startIcon={<AddOutlined />}
+              onClick={() => {
+                setEditingTemplate(null)
+                setTemplateForm({ name: '', subject: '', body: '', variables: [], isActive: true })
+                setTemplateDialogOpen(true)
+              }}
+              sx={{ borderRadius: 0 }}
+            >
+              New Template
+            </Button>
+          </Box>
           <Divider sx={{ mb: 3 }} />
 
-          <Alert severity="info" sx={{ borderRadius: 0 }}>
-            Email template management coming soon. Configure templates for welcome emails, 
-            password resets, content approvals, and subscription notifications.
-          </Alert>
+          {templates.length === 0 ? (
+            <Alert severity="info" sx={{ borderRadius: 0 }}>
+              No email templates created yet. Create templates for welcome emails, password resets, content approvals, and subscription notifications.
+            </Alert>
+          ) : (
+            <Paper sx={{ borderRadius: 0, overflowX: 'auto' }}>
+              <Table>
+                <TableHead>
+                  <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
+                    <TableCell>Name</TableCell>
+                    <TableCell>Subject</TableCell>
+                    <TableCell>Variables</TableCell>
+                    <TableCell>Status</TableCell>
+                    <TableCell align="right">Actions</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {templates.map((template) => (
+                    <TableRow key={template.id}>
+                      <TableCell>{template.name}</TableCell>
+                      <TableCell>{template.subject}</TableCell>
+                      <TableCell>
+                        <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+                          {template.variables.length > 0 ? (
+                            template.variables.map((v) => (
+                              <Chip key={v} label={`{{${v}}}}`} size="small" variant="outlined" />
+                            ))
+                          ) : (
+                            <Typography variant="caption" color="text.secondary">None</Typography>
+                          )}
+                        </Box>
+                      </TableCell>
+                      <TableCell>
+                        {template.isActive ? (
+                          <Chip label="Active" size="small" color="success" variant="filled" />
+                        ) : (
+                          <Chip label="Inactive" size="small" variant="outlined" />
+                        )}
+                      </TableCell>
+                      <TableCell align="right">
+                        <Tooltip title="Edit">
+                          <IconButton
+                            size="small"
+                            onClick={() => {
+                              setEditingTemplate(template)
+                              setTemplateForm({
+                                name: template.name,
+                                subject: template.subject,
+                                body: template.body,
+                                variables: template.variables,
+                                isActive: template.isActive,
+                              })
+                              setTemplateDialogOpen(true)
+                            }}
+                          >
+                            <EditOutlined fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Delete">
+                          <IconButton
+                            size="small"
+                            color="error"
+                            onClick={() => {
+                              if (window.confirm('Delete this template?')) {
+                                deleteTemplate(template.id)
+                              }
+                            }}
+                          >
+                            <DeleteOutlined fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </Paper>
+          )}
+
+          {/* Template Dialog */}
+          <Dialog open={templateDialogOpen} onClose={() => setTemplateDialogOpen(false)} maxWidth="sm" fullWidth>
+            <DialogTitle>
+              {editingTemplate ? 'Edit Template' : 'Create New Template'}
+            </DialogTitle>
+            <DialogContent sx={{ pt: 3, display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <TextField
+                label="Template Name"
+                value={templateForm.name}
+                onChange={(e) => setTemplateForm({ ...templateForm, name: e.target.value })}
+                fullWidth
+                placeholder="e.g., Welcome Email"
+              />
+              <TextField
+                label="Email Subject"
+                value={templateForm.subject}
+                onChange={(e) => setTemplateForm({ ...templateForm, subject: e.target.value })}
+                fullWidth
+                placeholder="e.g., Welcome to {{APP_NAME}}"
+              />
+              <TextField
+                label="Email Body (HTML)"
+                value={templateForm.body}
+                onChange={(e) => setTemplateForm({ ...templateForm, body: e.target.value })}
+                fullWidth
+                multiline
+                rows={8}
+                placeholder="<h1>Welcome {{USER_NAME}}!</h1><p>Your account has been created.</p>"
+              />
+              <Box>
+                <Typography variant="body2" color="text.secondary" gutterBottom>
+                  Variables
+                </Typography>
+                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 1 }}>
+                  {templateForm.variables.map((v) => (
+                    <Chip
+                      key={v}
+                      label={`{{${v}}}}`}
+                      onDelete={() => {
+                        setTemplateForm({
+                          ...templateForm,
+                          variables: templateForm.variables.filter(x => x !== v),
+                        })
+                      }}
+                    />
+                  ))}
+                </Box>
+                <Box sx={{ display: 'flex', gap: 1 }}>
+                  <TextField
+                    label="Add variable"
+                    size="small"
+                    placeholder="e.g., USER_NAME"
+                    id="varInput"
+                    sx={{ flexGrow: 1 }}
+                  />
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    onClick={() => {
+                      const input = document.getElementById('varInput') as HTMLInputElement
+                      if (input && input.value && !templateForm.variables.includes(input.value)) {
+                        setTemplateForm({
+                          ...templateForm,
+                          variables: [...templateForm.variables, input.value],
+                        })
+                        input.value = ''
+                      }
+                    }}
+                  >
+                    Add
+                  </Button>
+                </Box>
+              </Box>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={templateForm.isActive}
+                    onChange={(e) => setTemplateForm({ ...templateForm, isActive: e.target.checked })}
+                  />
+                }
+                label="Active"
+              />
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setTemplateDialogOpen(false)}>Cancel</Button>
+              <Button
+                variant="contained"
+                onClick={() => {
+                  if (editingTemplate) {
+                    updateTemplate({ id: editingTemplate.id, template: templateForm })
+                  } else {
+                    createTemplate(templateForm)
+                  }
+                  setTemplateDialogOpen(false)
+                }}
+                disabled={isCreating || !templateForm.name || !templateForm.subject || !templateForm.body}
+              >
+                {editingTemplate ? 'Update' : 'Create'}
+              </Button>
+            </DialogActions>
+          </Dialog>
         </TabPanel>
       </Paper>
     </Box>

@@ -24,6 +24,9 @@ interface SubscriptionConfirmationParams {
   appUrl: string
 }
 
+import { supabase } from '@/lib/supabase'
+import type { EmailTemplate } from '@/types'
+
 export const emailAPI = {
   async sendEmail(params: SendEmailParams) {
     const response = await fetch(`${API_URL}/send`, {
@@ -83,5 +86,90 @@ export const emailAPI = {
     }
 
     return response.json()
+  },
+}
+
+// Email Templates API
+export const emailTemplatesAPI = {
+  async getAll(): Promise<EmailTemplate[]> {
+    const { data, error } = await supabase
+      .from('email_templates')
+      .select('*')
+      .order('name', { ascending: true })
+
+    if (error) throw new Error(error.message)
+    return (data || []).map(t => ({
+      id: t.id,
+      name: t.name,
+      subject: t.subject,
+      body: t.body,
+      variables: t.variables || [],
+      isActive: t.is_active,
+      createdAt: t.created_at,
+      updatedAt: t.updated_at,
+    }))
+  },
+
+  async create(template: Omit<EmailTemplate, 'id' | 'createdAt' | 'updatedAt'>): Promise<EmailTemplate> {
+    const { data, error } = await supabase
+      .from('email_templates')
+      .insert({
+        name: template.name,
+        subject: template.subject,
+        body: template.body,
+        variables: template.variables,
+        is_active: template.isActive,
+      })
+      .select()
+      .single()
+
+    if (error) throw new Error(error.message)
+    return {
+      id: data.id,
+      name: data.name,
+      subject: data.subject,
+      body: data.body,
+      variables: data.variables || [],
+      isActive: data.is_active,
+      createdAt: data.created_at,
+      updatedAt: data.updated_at,
+    }
+  },
+
+  async update(id: string, template: Partial<Omit<EmailTemplate, 'id' | 'createdAt' | 'updatedAt'>>): Promise<EmailTemplate> {
+    const updateData: Record<string, any> = {}
+    if (template.name !== undefined) updateData.name = template.name
+    if (template.subject !== undefined) updateData.subject = template.subject
+    if (template.body !== undefined) updateData.body = template.body
+    if (template.variables !== undefined) updateData.variables = template.variables
+    if (template.isActive !== undefined) updateData.is_active = template.isActive
+
+    const { data, error } = await supabase
+      .from('email_templates')
+      .update(updateData)
+      .eq('id', id)
+      .select()
+      .single()
+
+    if (error) throw new Error(error.message)
+    return {
+      id: data.id,
+      name: data.name,
+      subject: data.subject,
+      body: data.body,
+      variables: data.variables || [],
+      isActive: data.is_active,
+      createdAt: data.created_at,
+      updatedAt: data.updated_at,
+    }
+  },
+
+  async delete(id: string): Promise<void> {
+    const { error } = await supabase
+      .from('email_templates')
+      .delete()
+      .eq('id', id)
+
+    if (error) throw new Error(error.message)
   },
 }
