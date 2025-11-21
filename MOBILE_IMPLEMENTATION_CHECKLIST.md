@@ -120,6 +120,97 @@
 - [ ] Build mock exam history
 - [ ] Store exam attempts for analytics
 
+### 2.5 Real-time Voice Tutoring with Instructors 🎤
+**Status:** NEW FEATURE - Requires Backend Implementation
+
+#### Prerequisites
+- [ ] Set up WebRTC infrastructure (Twilio, Jitsi, or Agora)
+- [ ] Create instructor availability management system
+- [ ] Build scheduling database tables
+- [ ] Create user-instructor matching algorithm
+- [ ] Set up video call authentication tokens
+
+#### Mobile Implementation
+- [ ] Build "Request Live Tutoring" button on learning screens
+- [ ] Create tutoring scheduling screen
+  - [ ] Display available instructors
+  - [ ] Display instructor profiles (bio, expertise, ratings)
+  - [ ] Show availability slots
+  - [ ] Implement time slot booking
+  - [ ] Display booking confirmation
+- [ ] Build live call screen
+  - [ ] Video feed from instructor
+  - [ ] Audio/Video controls (mute, camera toggle)
+  - [ ] Screen sharing (instructor can show content)
+  - [ ] Chat for sharing notes/links during call
+  - [ ] Recording indicator (if allowed)
+  - [ ] End call button
+  - [ ] Timer showing call duration
+- [ ] Implement pre-call setup
+  - [ ] Microphone permission check
+  - [ ] Camera permission check
+  - [ ] Audio/video quality settings
+  - [ ] Connection test before joining
+- [ ] Build post-call flow
+  - [ ] Rate instructor (1-5 stars)
+  - [ ] Provide feedback/notes
+  - [ ] Option to share recording link
+  - [ ] Schedule follow-up session
+  - [ ] View call history
+  - [ ] Download call transcript (if available)
+
+#### Backend Requirements (TBD)
+- [ ] Create `/api/tutoring/instructors` endpoint (list available instructors)
+- [ ] Create `/api/tutoring/availability` endpoint (get instructor schedules)
+- [ ] Create `/api/tutoring/book` endpoint (book a session)
+- [ ] Create `/api/tutoring/sessions` endpoint (get user's session history)
+- [ ] Create `/api/tutoring/call-token` endpoint (get WebRTC access token)
+- [ ] Create `/api/tutoring/feedback` endpoint (submit session feedback)
+- [ ] Webhook for call completion/recording storage
+- [ ] Database tables: `tutoring_instructors`, `tutoring_sessions`, `tutoring_feedback`, `tutoring_schedule`
+
+#### Instructor Features (Admin Portal)
+- [ ] Instructor dashboard
+- [ ] Availability calendar
+- [ ] Upcoming sessions list
+- [ ] Session recordings storage
+- [ ] Earnings/payment tracking
+- [ ] Student feedback ratings
+- [ ] Performance analytics
+
+#### Video Call Provider Integration
+**Choose one:**
+- [ ] **Twilio Video** (Most reliable, paid)
+  - Scalable, SDKs for all platforms
+  - Screen sharing, recording built-in
+  - Integration: Twilio SDK for React Native
+  
+- [ ] **Agora** (Good balance, cheaper)
+  - Lower latency, good for India
+  - Screen sharing, recording available
+  - Integration: Agora SDK for React Native
+  
+- [ ] **Jitsi** (Open source, free)
+  - Self-hosted or cloud
+  - Screen sharing built-in
+  - Integration: WebRTC with Jitsi API
+
+#### Session Features
+- [ ] Duration limit (15-60 minutes)
+- [ ] Pricing per minute or fixed price
+- [ ] Payment before/after session
+- [ ] Session rescheduling
+- [ ] No-show policies
+- [ ] Cancellation policies
+
+#### Analytics & Tracking
+- [ ] Track call duration
+- [ ] Track failed connection attempts
+- [ ] Track no-shows
+- [ ] Track student satisfaction ratings
+- [ ] Generate instructor performance reports
+- [ ] Track payment transactions
+
 ---
 
 ## Phase 3: Payment Integration 💳
@@ -582,6 +673,7 @@
 | Hero Sections | ✅ Ready | `/api/hero-sections` | Marketing banners ready |
 | User Profile | ✅ Ready | `/api/users/*` | Profile management ready |
 | Email Templates | ✅ Ready | Resend configured | For transactional emails |
+| Real-time Voice Tutoring | 🚧 TBD | `/api/tutoring/*` | Requires backend implementation |
 
 ---
 
@@ -590,16 +682,16 @@
 | Phase | Effort | Timeline |
 |-------|--------|----------|
 | 1. Setup | 1-2 weeks | Week 1-2 |
-| 2. Learning Features | 3-4 weeks | Week 3-6 |
-| 3. Payments | 2-3 weeks | Week 7-9 |
-| 4. AI Features | 1-2 weeks | Week 10-11 |
-| 5. Notifications | 1-2 weeks | Week 12-13 |
-| 6-8. Dashboard, Content, Settings | 2-3 weeks | Week 14-16 |
-| 9. Polish & Testing | 2-3 weeks | Week 17-19 |
-| 10. Performance & Security | 1-2 weeks | Week 20-21 |
-| 11. Build & Deploy | 1-2 weeks | Week 22-23 |
+| 2. Learning Features (incl. Voice Tutoring) | 4-5 weeks | Week 3-7 |
+| 3. Payments | 2-3 weeks | Week 8-10 |
+| 4. AI Features | 1-2 weeks | Week 11-12 |
+| 5. Notifications | 1-2 weeks | Week 13-14 |
+| 6-8. Dashboard, Content, Settings | 2-3 weeks | Week 15-17 |
+| 9. Polish & Testing | 2-3 weeks | Week 18-20 |
+| 10. Performance & Security | 1-2 weeks | Week 21-22 |
+| 11. Build & Deploy | 1-2 weeks | Week 23-24 |
 
-**Total Estimate:** 16-24 weeks (4-6 months) for full feature parity
+**Total Estimate:** 18-26 weeks (4.5-6.5 months) for full feature parity including Voice Tutoring
 
 ---
 
@@ -617,15 +709,17 @@
 7. Learning content module
 8. Mock exams
 9. AI chatbot (JeevaBot)
-10. In-app notifications
-11. Offline mode
+10. **Real-time Voice Tutoring with Instructors** 🎤 (Premium Feature)
+11. In-app notifications
+12. Offline mode
 
 ### Nice to Have
-12. Content download
-13. Dark mode
-14. Advanced analytics
-15. Social sharing
-16. Referral program
+13. Content download
+14. Dark mode
+15. Advanced analytics
+16. Social sharing
+17. Referral program
+18. Group study sessions
 
 ---
 
@@ -659,7 +753,43 @@ Subscriptions:       GET /api/subscriptions/plans, GET /api/subscriptions/user
 - Analytics framework is in place for tracking user behavior
 - Security features (RLS, JWT tokens) are implemented at backend
 
+## Voice Tutoring Implementation Notes
+
+**Real-time Voice Tutoring** is a premium feature that requires:
+
+1. **Backend Infrastructure**
+   - Instructor management system
+   - Session booking/scheduling system
+   - WebRTC signaling server setup
+   - Payment processing for tutoring sessions
+   - Session recording storage
+
+2. **Video Call Provider Selection**
+   - **Recommended:** Agora SDK (good balance of cost & reliability, works well in India)
+   - Alternative: Twilio Video (more expensive, more features)
+   - Alternative: Jitsi (free, self-hosted option)
+
+3. **Database Requirements**
+   - Instructor profiles & availability
+   - Session bookings & history
+   - Session recordings metadata
+   - Feedback & ratings
+   - Payment transactions (separate from course payments)
+
+4. **Integration Timeline**
+   - Backend setup: 3-4 weeks
+   - Mobile implementation: 2-3 weeks
+   - Admin portal for instructors: 1-2 weeks
+   - Testing & QA: 1 week
+
+5. **Pricing Model Considerations**
+   - Per-minute billing
+   - Fixed session price
+   - Subscription-based tutoring hours
+   - Premium instructor rates
+   - Geographic instructor pricing variations
+
 ---
 
 **Document Updated:** November 21, 2025  
-**Status:** Backend Complete ✅ | Mobile Implementation In Progress 🚧
+**Status:** Backend Complete ✅ | Mobile Implementation In Progress 🚧 | Voice Tutoring Added 🎤
