@@ -42,14 +42,12 @@ interface UserSubscription {
   id: string
   userId: string
   planId: string
-  status: 'active' | 'trial' | 'expired' | 'cancelled' | 'paused'
+  status: 'active' | 'trial' | 'expired' | 'cancelled'
   startDate: Date
   endDate: Date
-  renewalDate: Date
-  autoRenew: boolean
   paymentMethod: 'stripe' | 'razorpay' | 'free_trial'
-  stripeSubscriptionId?: string
-  razorpaySubscriptionId?: string
+  stripePaymentId?: string
+  razorpayPaymentId?: string
 }
 ```
 
@@ -254,11 +252,8 @@ function convertCurrency(usdAmount, countryCode) {
 ║  Plan: Yearly                  ║
 ║  Price: $99.99/year            ║
 ║                                ║
-║  Renews: 15 Dec 2025          ║
+║  Expires: 15 Dec 2025         ║
 ║  Days Remaining: 328 days      ║
-║                                ║
-║  Auto-Renewal: ON              ║
-║  [Toggle Auto-Renewal]         ║
 ║                                ║
 ║  ┌──────────────────────┐      ║
 ║  │ Usage This Month:    │      ║
@@ -266,7 +261,7 @@ function convertCurrency(usdAmount, countryCode) {
 ║  │ Voice Sessions: 2/5  │      ║
 ║  └──────────────────────┘      ║
 ║                                ║
-║  [UPGRADE]  [CANCEL]           ║
+║  [RENEW]  [CANCEL]             ║
 ╚════════════════════════════════╝
 ```
 
@@ -652,7 +647,7 @@ function PracticeModuleScreen() {
 
 ---
 
-## 8. Renewal & Expiration Logic
+## 8. Expiration & Manual Renewal Logic
 
 ### Check Subscription Validity
 
@@ -684,53 +679,58 @@ async function getDaysRemaining(userId) {
   return Math.max(0, daysRemaining)
 }
 
-async function shouldRenew(userId) {
+async function isSubscriptionExpiringSoon(userId) {
   const subscription = await getUserSubscription(userId)
   
   if (!subscription) return false
   
-  // Renew 5 days before expiration if auto-renew is enabled
+  // Show renewal prompt 5 days before expiration
   const daysRemaining = await getDaysRemaining(userId)
   
-  return subscription.auto_renew && daysRemaining <= 5
+  return daysRemaining <= 5 && daysRemaining > 0
 }
 ```
 
-### Auto-Renewal Process
+### Manual Renewal Process
 
 ```typescript
-// Background Task - Run daily or on app resume
-async function checkAndRenewSubscriptions() {
-  // Get all subscriptions due for renewal
-  const { data: subscriptions } = await supabase
-    .from('subscriptions')
-    .select('*')
-    .eq('auto_renew', true)
-    .lt('end_date', new Date())
-  
-  for (const sub of subscriptions) {
-    try {
-      // Charge user (Stripe/Razorpay)
-      const result = await chargeForRenewal(sub)
-      
-      if (result.success) {
-        // Update subscription end date
-        await supabase
-          .from('subscriptions')
-          .update({
-            end_date: addDays(new Date(), sub.duration_days),
-            renewal_date: addDays(new Date(), sub.duration_days + 1)
-          })
-          .eq('id', sub.id)
-        
-        // Send notification
-        await sendNotification(sub.user_id, 'Subscription renewed!')
-      }
-    } catch (error) {
-      console.error('Renewal failed:', error)
-      // Send failed notification
-      await sendNotification(sub.user_id, 'Renewal failed, please update payment method')
+// ManualRenewal.ts
+async function renewSubscription(userId, planId) {
+  try {
+    // Step 1: Get the plan details
+    const plan = await getPlan(planId)
+    
+    // Step 2: Process payment (user chooses to renew)
+    const paymentResult = await processPayment(userId, plan.price)
+    
+    if (!paymentResult.success) {
+      throw new Error('Payment failed')
     }
+    
+    // Step 3: Update subscription with new end date
+    const currentSub = await getUserSubscription(userId)
+    const newEndDate = addDays(new Date(), plan.duration_days)
+    
+    await supabase
+      .from('subscriptions')
+      .update({
+        status: 'active',
+        end_date: newEndDate,
+        plan_id: planId
+      })
+      .eq('id', currentSub.id)
+    
+    // Step 4: Send success notification
+    await sendNotification(
+      userId,
+      `Subscription renewed! Expires ${formatDate(newEndDate)}`
+    )
+    
+    return { success: true, newEndDate }
+    
+  } catch (error) {
+    console.error('Renewal error:', error)
+    throw error
   }
 }
 ```
@@ -868,28 +868,24 @@ async function downgradeSubscription(userId, newPlanId) {
    - Send immediately
    
 2. Trial Ending Soon (1 day before)
-   - "Your trial expires tomorrow. Upgrade now to continue"
-   - Include 'Upgrade' button
+   - "Your trial expires tomorrow. Subscribe now to continue"
+   - Include 'Subscribe' button
    
 3. Subscription Active
    - "Subscription activated! All features unlocked"
    - Send on activation
    
-4. Renewal Successful
-   - "Your subscription has been renewed for 30 days"
-   - Send on auto-renewal
+4. Subscription Expiring Soon (5 days before)
+   - "Your subscription expires in 5 days. Renew now?"
+   - Include 'Renew Subscription' button
    
-5. Renewal Failed
-   - "Renewal failed. Update payment method"
-   - Include 'Update Payment' button
+5. Subscription Expired
+   - "Your subscription has expired. Features are limited"
+   - Include 'Renew' or 'New Subscription' button
    
-6. Subscription Expiring Soon (5 days before)
-   - "Your subscription expires in 5 days. Renew now"
-   - Include 'Renew' button
-   
-7. Subscription Expired
-   - "Your subscription has expired. Some features are limited"
-   - Include 'Upgrade' button
+6. Renewal Successful
+   - "Subscription renewed! Expires on [date]"
+   - Send after manual renewal
 ```
 
 ---
@@ -1011,8 +1007,9 @@ async function handleSubscriptionError(error, context) {
 - [ ] Implement subscription status checking
 - [ ] Implement content gating
 - [ ] Implement usage tracking
-- [ ] Implement renewal logic
+- [ ] Implement manual renewal logic (no auto-renewal)
 - [ ] Implement trial management
+- [ ] Implement expiration alerts
 
 ### Phase 4: Payment Integration
 - [ ] Integrate Stripe checkout
@@ -1041,7 +1038,8 @@ async function handleSubscriptionError(error, context) {
    - id, name, price, billing_period, duration_days, features, is_active
 
 ✅ subscriptions
-   - id, user_id, plan_id, status, start_date, end_date, auto_renew, payment_method
+   - id, user_id, plan_id, status, start_date, end_date, payment_method
+   - NO auto_renew field - manual renewal only
 
 ✅ subscription_usage
    - id, user_id, feature, used_this_month, updated_at
