@@ -8,6 +8,16 @@ import { format } from 'date-fns'
 const JEEVA_COMPANY = 'Jeeva Learning'
 const JEEVA_SUBTITLE = 'Payment Management System'
 
+const downloadFile = (content: string, fileName: string, mimeType: string): void => {
+  const element = document.createElement('a')
+  element.setAttribute('href', `data:${mimeType};charset=utf-8,${encodeURIComponent(content)}`)
+  element.setAttribute('download', fileName)
+  element.style.display = 'none'
+  document.body.appendChild(element)
+  element.click()
+  document.body.removeChild(element)
+}
+
 export const exportService = {
   async exportToCSV(data: StatementData, options: ExportOptions): Promise<void> {
     const rows: any[] = []
@@ -75,7 +85,7 @@ export const exportService = {
 
     const csv = Papa.unparse(rows)
     const fileName = `Jeeva_Statement_${format(new Date(), 'yyyy-MM-dd_HHmmss')}.csv`
-    this.downloadFile(csv, fileName, 'text/csv')
+    downloadFile(csv, fileName, 'text/csv')
   },
 
   async exportToPDF(data: StatementData, options: ExportOptions): Promise<void> {
@@ -204,15 +214,5 @@ export const exportService = {
     // Save PDF
     const fileName = `Jeeva_Statement_${format(new Date(), 'yyyy-MM-dd_HHmmss')}.pdf`
     pdf.save(fileName)
-  },
-
-  private downloadFile(content: string, fileName: string, mimeType: string): void {
-    const element = document.createElement('a')
-    element.setAttribute('href', `data:${mimeType};charset=utf-8,${encodeURIComponent(content)}`)
-    element.setAttribute('download', fileName)
-    element.style.display = 'none'
-    document.body.appendChild(element)
-    element.click()
-    document.body.removeChild(element)
   },
 }
