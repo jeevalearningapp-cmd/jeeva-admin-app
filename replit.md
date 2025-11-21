@@ -146,6 +146,35 @@ Questions table includes: `module_type` ('practice'|'learning'|'mock_exam'), `ca
 - Push and in-app notifications
 - Real-time voice tutoring with instructors (premium feature)
 
+## Documentation Structure
+
+### Product Release Docs Folders
+
+```
+Product-release-docs/
+├── Mobile-Implementation/          (8 implementation guides)
+│   ├── MOBILE_APP_USER_FLOW.md
+│   ├── TRIAL_MODE_IMPLEMENTATION_GUIDE.md
+│   ├── MOBILE_SUBSCRIPTIONS_IMPLEMENTATION_GUIDE.md
+│   ├── MOBILE_SUBSCRIPTION_CHECKOUT_IMPLEMENTATION.md
+│   ├── MOBILE_NOTIFICATIONS_IMPLEMENTATION_GUIDE.md
+│   ├── MOBILE_COUPON_IMPLEMENTATION_GUIDE.md
+│   ├── MOBILE_PROGRESS_TRACKING_IMPLEMENTATION_GUIDE.md
+│   └── CUSTOMER_SUPPORT_CHATBOT_GUIDE.md
+│
+├── Voice-Conversation-Mode/        (Voice tutoring feature docs - in progress)
+│   ├── README.md (placeholder)
+│   └── [New docs to be added]
+│
+└── Legal-Compliance/               (6 compliance policies)
+    ├── TERMS_AND_CONDITIONS.md
+    ├── PRIVACY_POLICY.md
+    ├── SUBSCRIPTION_POLICY.md
+    ├── REFUND_POLICY.md
+    ├── USER_DATA_PROTECTION_POLICY.md
+    └── UK_APP_LAUNCH_REQUIREMENTS.md
+```
+
 ## Recent Changes (November 21, 2025)
 
 - ✅ Completed Push Notifications Phase 4 - Expo integration with automatic queue & receipt processing
@@ -154,3 +183,5 @@ Questions table includes: `module_type` ('practice'|'learning'|'mock_exam'), `ca
 - ✅ Added Real-time Voice Tutoring documentation to mobile checklist
 - ✅ Finalized Module & Question Logic documentation for all three modules
 - ✅ Updated MOBILE_IMPLEMENTATION_CHECKLIST with voice tutoring integration
+- ✅ Created Mobile Subscription Checkout Implementation Guide (1,200+ lines)
+- ✅ Established Voice-Conversation-Mode folder for future voice tutoring documentation
