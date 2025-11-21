@@ -17,7 +17,6 @@ import {
   Chip,
   Card,
   CardContent,
-  Grid,
   CircularProgress,
   IconButton,
   Tooltip,
@@ -84,104 +83,90 @@ export const PaymentsPage: React.FC = () => {
       </Box>
 
       {/* Stats Cards */}
-      <Grid container spacing={2} sx={{ mb: 3 }}>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Typography color="text.secondary" gutterBottom>
-                Total Payments
-              </Typography>
-              <Typography variant="h5">
-                {summary.totalPayments}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Typography color="text.secondary" gutterBottom>
-                Total Revenue
-              </Typography>
-              <Typography variant="h5">
-                ${summary.totalAmount.toFixed(2)}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Typography color="text.secondary" gutterBottom>
-                Successful
-              </Typography>
-              <Typography variant="h5" sx={{ color: '#4caf50' }}>
-                {summary.successfulPayments}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Typography color="text.secondary" gutterBottom>
-                Failed
-              </Typography>
-              <Typography variant="h5" sx={{ color: '#f44336' }}>
-                {summary.failedPayments}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr 1fr' }, gap: 2, mb: 3 }}>
+        <Card>
+          <CardContent>
+            <Typography color="text.secondary" gutterBottom>
+              Total Payments
+            </Typography>
+            <Typography variant="h5">
+              {summary.totalPayments}
+            </Typography>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent>
+            <Typography color="text.secondary" gutterBottom>
+              Total Revenue
+            </Typography>
+            <Typography variant="h5">
+              ${summary.totalAmount.toFixed(2)}
+            </Typography>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent>
+            <Typography color="text.secondary" gutterBottom>
+              Successful
+            </Typography>
+            <Typography variant="h5" sx={{ color: '#4caf50' }}>
+              {summary.successfulPayments}
+            </Typography>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent>
+            <Typography color="text.secondary" gutterBottom>
+              Failed
+            </Typography>
+            <Typography variant="h5" sx={{ color: '#f44336' }}>
+              {summary.failedPayments}
+            </Typography>
+          </CardContent>
+        </Card>
+      </Box>
 
       {/* Filters */}
       <Paper sx={{ p: 2, mb: 3, borderRadius: 0 }}>
-        <Grid container spacing={2}>
-          <Grid item xs={12} sm={6} md={4}>
-            <TextField
-              label="Search"
-              placeholder="Payment ID or User ID"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              fullWidth
-              size="small"
-              InputProps={{
-                startAdornment: <SearchOutlined sx={{ mr: 1, color: 'text.secondary' }} />,
-              }}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6} md={4}>
-            <FormControl fullWidth size="small">
-              <InputLabel>Status</InputLabel>
-              <Select
-                label="Status"
-                multiple
-                value={filters.status || []}
-                onChange={(e) => setFilters({ ...filters, status: e.target.value as PaymentStatus[] })}
-              >
-                {statuses.map(s => (
-                  <MenuItem key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item xs={12} sm={6} md={4}>
-            <FormControl fullWidth size="small">
-              <InputLabel>Gateway</InputLabel>
-              <Select
-                label="Gateway"
-                multiple
-                value={filters.gateway || []}
-                onChange={(e) => setFilters({ ...filters, gateway: e.target.value as PaymentGateway[] })}
-              >
-                {gateways.map(g => (
-                  <MenuItem key={g} value={g}>{getGatewayLabel(g)}</MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-        </Grid>
+        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr 1fr' }, gap: 2 }}>
+          <TextField
+            label="Search"
+            placeholder="Payment ID or User ID"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            fullWidth
+            size="small"
+            InputProps={{
+              startAdornment: <SearchOutlined sx={{ mr: 1, color: 'text.secondary' }} />,
+            }}
+          />
+          <FormControl fullWidth size="small">
+            <InputLabel>Status</InputLabel>
+            <Select
+              label="Status"
+              multiple
+              value={filters.status || []}
+              onChange={(e) => setFilters({ ...filters, status: e.target.value as PaymentStatus[] })}
+            >
+              {statuses.map(s => (
+                <MenuItem key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <FormControl fullWidth size="small">
+            <InputLabel>Gateway</InputLabel>
+            <Select
+              label="Gateway"
+              multiple
+              value={filters.gateway || []}
+              onChange={(e) => setFilters({ ...filters, gateway: e.target.value as PaymentGateway[] })}
+            >
+              {gateways.map(g => (
+                <MenuItem key={g} value={g}>{getGatewayLabel(g)}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Box>
       </Paper>
 
       {/* Payments Table */}
@@ -279,26 +264,26 @@ export const PaymentsPage: React.FC = () => {
                 {selectedPayment.userId}
               </Typography>
             </Box>
-            <Grid container spacing={2}>
-              <Grid item xs={6}>
+            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
+              <Box>
                 <Typography variant="caption" color="text.secondary">Original Amount</Typography>
                 <Typography>${selectedPayment.originalAmount.toFixed(2)}</Typography>
-              </Grid>
-              <Grid item xs={6}>
+              </Box>
+              <Box>
                 <Typography variant="caption" color="text.secondary">Discount</Typography>
                 <Typography>${selectedPayment.discountAmount.toFixed(2)}</Typography>
-              </Grid>
-            </Grid>
+              </Box>
+            </Box>
             <Box>
               <Typography variant="caption" color="text.secondary">Final Amount</Typography>
               <Typography variant="h6">${selectedPayment.finalAmount.toFixed(2)}</Typography>
             </Box>
-            <Grid container spacing={2}>
-              <Grid item xs={6}>
+            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
+              <Box>
                 <Typography variant="caption" color="text.secondary">Gateway</Typography>
                 <Chip label={getGatewayLabel(selectedPayment.gateway)} size="small" />
-              </Grid>
-              <Grid item xs={6}>
+              </Box>
+              <Box>
                 <Typography variant="caption" color="text.secondary">Status</Typography>
                 <Chip
                   label={selectedPayment.status}
@@ -306,8 +291,8 @@ export const PaymentsPage: React.FC = () => {
                   color={getStatusColor(selectedPayment.status) as any}
                   variant="filled"
                 />
-              </Grid>
-            </Grid>
+              </Box>
+            </Box>
             <Box>
               <Typography variant="caption" color="text.secondary">Created</Typography>
               <Typography>{format(new Date(selectedPayment.createdAt), 'PPpp')}</Typography>
