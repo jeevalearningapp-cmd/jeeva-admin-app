@@ -21,6 +21,7 @@ import {
   StudentsPage,
   DiscountCouponsPage,
   NotificationsPage,
+  PaymentsPage,
 } from './pages'
 import { SplashScreen } from './pages/SplashScreen'
 import { EmailTestPage } from './pages/EmailTestPage'
@@ -102,6 +103,17 @@ function App() {
                 <ProtectedRoute allowedRoles={['superadmin', 'editor']}>
                   <MainLayout>
                     <DiscountCouponsPage />
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+            
+            <Route
+              path="/payments"
+              element={
+                <ProtectedRoute allowedRoles={['superadmin', 'editor']}>
+                  <MainLayout>
+                    <PaymentsPage />
                   </MainLayout>
                 </ProtectedRoute>
               }
