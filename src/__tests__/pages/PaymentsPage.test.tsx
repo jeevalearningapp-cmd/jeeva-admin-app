@@ -1,8 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { BrowserRouter } from 'react-router-dom'
-import { SnackbarProvider } from 'notistack'
+import { screen, fireEvent, waitFor } from '@testing-library/react'
+import { renderWithProviders } from '@/__tests__/utils/test-wrapper'
 import React from 'react'
 
 // Mock the hooks and services
@@ -34,8 +32,6 @@ vi.mock('@/hooks/usePayments', () => ({
 }))
 
 describe('PaymentsPage', () => {
-  const queryClient = new QueryClient()
-
   beforeEach(() => {
     vi.clearAllMocks()
   })

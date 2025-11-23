@@ -1,10 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { renderHook, waitFor } from '@testing-library/react'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { QueryClientProvider } from '@tanstack/react-query'
 import { createElement } from 'react'
 import { useSettings } from '../useSettings'
 import * as settingsApi from '@/api/settings'
 import { ErrorHandler } from '@/utils/errorHandler'
+import { createTestQueryClient } from '@/__tests__/utils/test-wrapper'
 
 // Mock API and ErrorHandler
 vi.mock('@/api/settings')
@@ -40,15 +41,10 @@ const mockSettings = {
 }
 
 describe('useSettings', () => {
-  let queryClient: QueryClient
+  let queryClient: ReturnType<typeof createTestQueryClient>
 
   beforeEach(() => {
-    queryClient = new QueryClient({
-      defaultOptions: {
-        queries: { retry: false },
-        mutations: { retry: false },
-      },
-    })
+    queryClient = createTestQueryClient()
     vi.clearAllMocks()
   })
 
