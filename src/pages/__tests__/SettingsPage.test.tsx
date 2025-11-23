@@ -1,8 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, waitFor, fireEvent } from '@testing-library/react'
+import { screen, waitFor, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { SettingsPage } from '../SettingsPage'
 import * as useSettingsHook from '@/hooks/useSettings'
+import { renderWithProviders } from '@/__tests__/utils/test-wrapper'
 
 // Mock the useSettings hook
 vi.mock('@/hooks/useSettings')
@@ -53,7 +54,7 @@ describe('SettingsPage', () => {
         isUpdating: false,
       })
 
-      render(<SettingsPage />)
+      renderWithProviders(<SettingsPage />)
       expect(screen.getByRole('progressbar')).toBeInTheDocument()
     })
   })
@@ -70,7 +71,7 @@ describe('SettingsPage', () => {
     })
 
     it('should render settings form with current values', () => {
-      render(<SettingsPage />)
+      renderWithProviders(<SettingsPage />)
 
       expect(screen.getByDisplayValue('Jeeva Learning')).toBeInTheDocument()
       expect(screen.getByDisplayValue('Learning platform')).toBeInTheDocument()
@@ -79,7 +80,7 @@ describe('SettingsPage', () => {
     })
 
     it('should render security and notification tabs', () => {
-      render(<SettingsPage />)
+      renderWithProviders(<SettingsPage />)
 
       // Verify tabs exist  
       expect(screen.getByRole('tab', { name: /security/i })).toBeInTheDocument()
@@ -87,7 +88,7 @@ describe('SettingsPage', () => {
     })
 
     it('should display toggle switches with labels', () => {
-      render(<SettingsPage />)
+      renderWithProviders(<SettingsPage />)
       
       // Verify switch labels are present (sufficient to confirm switches render)
       expect(screen.getByText(/Maintenance Mode/i)).toBeInTheDocument()
@@ -109,7 +110,7 @@ describe('SettingsPage', () => {
 
     it('should switch between tabs', async () => {
       const user = userEvent.setup()
-      render(<SettingsPage />)
+      renderWithProviders(<SettingsPage />)
 
       const securityTab = screen.getByRole('tab', { name: /security/i })
       await user.click(securityTab)
@@ -120,7 +121,7 @@ describe('SettingsPage', () => {
     })
 
     it('should display all tabs', () => {
-      render(<SettingsPage />)
+      renderWithProviders(<SettingsPage />)
 
       expect(screen.getByRole('tab', { name: /general/i })).toBeInTheDocument()
       expect(screen.getByRole('tab', { name: /security/i })).toBeInTheDocument()
@@ -146,7 +147,7 @@ describe('SettingsPage', () => {
 
     it('should show validation error for empty site name', async () => {
       const user = userEvent.setup()
-      render(<SettingsPage />)
+      renderWithProviders(<SettingsPage />)
 
       const siteNameInput = screen.getByLabelText(/site name/i)
       await user.clear(siteNameInput)
@@ -164,7 +165,7 @@ describe('SettingsPage', () => {
     })
 
     it('should show validation error for invalid email', async () => {
-      render(<SettingsPage />)
+      renderWithProviders(<SettingsPage />)
 
       const contactEmailInput = screen.getByLabelText(/contact email/i)
       fireEvent.change(contactEmailInput, { target: { value: 'invalid-email' } })
@@ -182,7 +183,7 @@ describe('SettingsPage', () => {
     })
 
     it('should prevent save when form is invalid', async () => {
-      render(<SettingsPage />)
+      renderWithProviders(<SettingsPage />)
 
       const siteNameInput = screen.getByLabelText(/site name/i)
       fireEvent.change(siteNameInput, { target: { value: '' } })
@@ -211,7 +212,7 @@ describe('SettingsPage', () => {
     })
 
     it('should call updateSettings with correct data on save', async () => {
-      render(<SettingsPage />)
+      renderWithProviders(<SettingsPage />)
 
       const siteNameInput = screen.getByLabelText(/site name/i)
       fireEvent.change(siteNameInput, { target: { value: 'Updated Platform Name' } })
@@ -238,7 +239,7 @@ describe('SettingsPage', () => {
         isUpdating: true,
       })
 
-      render(<SettingsPage />)
+      renderWithProviders(<SettingsPage />)
 
       const saveButton = screen.getByRole('button', { name: /saving/i })
       expect(saveButton).toBeDisabled()
