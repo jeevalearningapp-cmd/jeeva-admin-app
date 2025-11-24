@@ -100,4 +100,27 @@ router.get('/plans', async (req: Request, res: Response) => {
   }
 })
 
+/**
+ * GET /api/subscriptions/coupons
+ * Get all active discount coupons
+ */
+router.get('/coupons', async (req: Request, res: Response) => {
+  try {
+    const { data: coupons, error } = await supabase
+      .from('discount_coupons')
+      .select('*')
+      .eq('is_active', true)
+      .order('created_at', { ascending: false })
+
+    if (error) throw error
+
+    res.json(coupons || [])
+  } catch (error) {
+    console.error('❌ Error fetching coupons:', error)
+    res.status(500).json({
+      error: 'Failed to fetch coupons'
+    })
+  }
+})
+
 export default router
