@@ -131,7 +131,7 @@ export const DashboardHeroPage: React.FC = () => {
     handleCloseDialog()
   }
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (id: number) => {
     if (window.confirm('Are you sure you want to delete this hero section?')) {
       await deleteMutation.mutateAsync(id)
     }
