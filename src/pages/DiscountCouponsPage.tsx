@@ -80,12 +80,11 @@ const initialFormData: CouponFormData = {
   is_active: true,
 }
 
-const SUBSCRIPTION_PLANS = [
-  { id: 'plan_30_days', name: '30 Days - $49' },
-  { id: 'plan_60_days', name: '60 Days - $89' },
-  { id: 'plan_90_days', name: '90 Days - $119' },
-  { id: 'plan_120_days', name: '120 Days - $149' },
-]
+interface SubscriptionPlan {
+  id: string
+  name: string
+  price_usd: number
+}
 
 export const DiscountCouponsPage: React.FC = () => {
   const [page, setPage] = useState(0)
@@ -99,7 +98,28 @@ export const DiscountCouponsPage: React.FC = () => {
   const [editingCoupon, setEditingCoupon] = useState<DiscountCoupon | null>(null)
   const [formData, setFormData] = useState<CouponFormData>(initialFormData)
   const [submitting, setSubmitting] = useState(false)
+  const [subscriptionPlans, setSubscriptionPlans] = useState<SubscriptionPlan[]>([])
+  const [plansLoading, setPlansLoading] = useState(true)
   const { enqueueSnackbar } = useSnackbar()
+
+  const fetchSubscriptionPlans = async () => {
+    try {
+      setPlansLoading(true)
+      const { data, error: fetchError } = await supabase
+        .from('subscription_plans')
+        .select('id, name, price_usd')
+        .eq('is_active', true)
+        .order('price_usd', { ascending: true })
+
+      if (fetchError) throw fetchError
+      setSubscriptionPlans(data || [])
+    } catch (err: any) {
+      console.error('Failed to load subscription plans:', err)
+      enqueueSnackbar('Failed to load subscription plans', { variant: 'warning' })
+    } finally {
+      setPlansLoading(false)
+    }
+  }
 
   const fetchCoupons = async () => {
     try {
@@ -132,6 +152,10 @@ export const DiscountCouponsPage: React.FC = () => {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    fetchSubscriptionPlans()
+  }, [])
 
   useEffect(() => {
     fetchCoupons()
@@ -514,7 +538,7 @@ export const DiscountCouponsPage: React.FC = () => {
             </Stack>
 
             <Box>
-              <FormControl fullWidth>
+              <FormControl fullWidth disabled={plansLoading}>
                 <InputLabel>Applicable Plans</InputLabel>
                 <Select
                   multiple
@@ -524,17 +548,23 @@ export const DiscountCouponsPage: React.FC = () => {
                   renderValue={(selected) => (
                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                       {selected.map((value) => {
-                        const plan = SUBSCRIPTION_PLANS.find(p => p.id === value)
-                        return <Chip key={value} label={plan?.name} size="small" />
+                        const plan = subscriptionPlans.find(p => p.id === value)
+                        return <Chip key={value} label={plan?.name || value} size="small" />
                       })}
                     </Box>
                   )}
                 >
-                  {SUBSCRIPTION_PLANS.map((plan) => (
-                    <MenuItem key={plan.id} value={plan.id}>
-                      {plan.name}
+                  {subscriptionPlans.length === 0 ? (
+                    <MenuItem disabled>
+                      <em>No active plans available</em>
                     </MenuItem>
-                  ))}
+                  ) : (
+                    subscriptionPlans.map((plan) => (
+                      <MenuItem key={plan.id} value={plan.id}>
+                        {plan.name} (${plan.price_usd})
+                      </MenuItem>
+                    ))
+                  )}
                 </Select>
               </FormControl>
               <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
