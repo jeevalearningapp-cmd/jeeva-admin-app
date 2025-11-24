@@ -148,6 +148,14 @@ export const SettingsPage: React.FC = () => {
     setLocalSettings({ ...localSettings, [field]: value })
   }
 
+  // Separate handler for Switch components (different onChange signature)
+  const handleSwitchChange = (field: keyof UpdateSettingsInput) => (
+    event: React.SyntheticEvent,
+    checked: boolean
+  ) => {
+    setLocalSettings({ ...localSettings, [field]: checked })
+  }
+
   const handleSave = () => {
     // Validate settings before saving
     const validation = validateSettings(localSettings)
@@ -162,6 +170,8 @@ export const SettingsPage: React.FC = () => {
         id: backendSettings.id,
         input: localSettings,
       })
+      // Clear validation errors after save
+      setValidationResult({ isValid: true, errors: [] })
     }
   }
 
