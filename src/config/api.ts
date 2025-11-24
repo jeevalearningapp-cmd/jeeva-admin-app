@@ -4,29 +4,32 @@
  */
 
 // Get API base URL from environment or use current domain
-// For mobile (React Native/Expo), use production URL
-// For web (admin portal), use current domain
 const getApiBaseUrl = (): string => {
-  // Mobile environment (no window object or Expo)
-  if (typeof window === 'undefined') {
-    return 'https://jeeva-admin-portal.vollskick.replit.dev'
-  }
-
-  // Environment variable takes precedence
+  // Priority 1: Explicit environment variable (for overrides)
   if (import.meta.env.VITE_API_URL) {
     return import.meta.env.VITE_API_URL
   }
 
-  // Web: use current domain
+  // Priority 2: Check if running in production (published Replit)
+  if (window?.location?.hostname === 'jeeva-admin-portal.vollskick.replit.dev') {
+    return 'https://jeeva-admin-portal.vollskick.replit.dev'
+  }
+
+  // Priority 3: Development - use current origin (works through Replit proxy)
   if (window?.location?.origin) {
     return window.location.origin
   }
 
-  // Fallback to production
-  return 'https://jeeva-admin-portal.vollskick.replit.dev'
+  // Fallback
+  return 'http://localhost:5000'
 }
 
 export const API_BASE_URL = getApiBaseUrl()
+
+// Debug helper (remove after testing)
+if (typeof window !== 'undefined') {
+  console.log('📡 API_BASE_URL:', API_BASE_URL)
+}
 
 // API Endpoints
 export const API_ENDPOINTS = {
