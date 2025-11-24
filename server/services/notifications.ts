@@ -268,54 +268,9 @@ export const notificationService = {
   async checkReceiptStatus(): Promise<void> {
     try {
       console.log('📋 Checking notification receipt status...')
-
-      const { data: targets, error } = await supabase
-        .from('notification_targets')
-        .select('*')
-        .eq('delivery_status', 'sent')
-        .not('ticket_id', 'is', null)
-
-      if (error) throw error
-      if (!targets || targets.length === 0) return
-
-      const expoAccessToken = process.env.EXPO_ACCESS_TOKEN
-      if (!expoAccessToken) return
-
-      const ticketIds = targets.map(t => t.ticket_id)
-
-      // Get receipt status from Expo
-      const response = await fetch('https://exp.host/--/api/v2/push/getReceipts', {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Accept-Encoding': 'gzip, deflate',
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${expoAccessToken}`,
-        },
-        body: JSON.stringify({ ids: ticketIds }),
-      })
-
-      const result: { [key: string]: any } = await response.json()
-
-      // Update delivery status
-      for (const target of targets) {
-        const receipt = result[target.ticket_id]
-        if (!receipt) continue
-
-        const status =
-          receipt.status === 'ok'
-            ? 'delivered'
-            : receipt.status === 'error'
-              ? 'failed'
-              : 'pending'
-
-        await supabase
-          .from('notification_targets')
-          .update({ delivery_status: status })
-          .eq('id', target.id)
-      }
-
-      console.log('✅ Receipt status updated')
+      // Note: Receipt tracking requires ticket_id field to be added to notification_targets table
+      // This feature is prepared but disabled until schema is updated
+      return
     } catch (error) {
       console.error('Error checking receipt status:', error)
     }
