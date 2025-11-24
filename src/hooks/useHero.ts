@@ -10,7 +10,7 @@ export const useHeroSections = () => {
   })
 }
 
-export const useHeroSection = (id: string) => {
+export const useHeroSection = (id: number) => {
   return useQuery({
     queryKey: ['hero-sections', id],
     queryFn: () => heroAPI.getById(id),
@@ -39,7 +39,7 @@ export const useUpdateHero = () => {
   const { enqueueSnackbar } = useSnackbar()
 
   return useMutation({
-    mutationFn: ({ id, input }: { id: string; input: UpdateHeroInput }) =>
+    mutationFn: ({ id, input }: { id: number; input: UpdateHeroInput }) =>
       heroAPI.update(id, input),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['hero-sections'] })
@@ -56,7 +56,7 @@ export const useDeleteHero = () => {
   const { enqueueSnackbar } = useSnackbar()
 
   return useMutation({
-    mutationFn: (id: string) => heroAPI.delete(id),
+    mutationFn: (id: number) => heroAPI.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['hero-sections'] })
       enqueueSnackbar('Hero section deleted successfully', { variant: 'success' })
