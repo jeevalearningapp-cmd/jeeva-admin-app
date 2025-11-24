@@ -2,50 +2,58 @@ import { supabase } from '@/lib/supabase'
 import type { AppSettings, UpdateSettingsInput } from '@/types'
 
 /**
- * Get the current app settings
- * Note: There should only be one row in app_settings table
+ * Get all app settings from key-value store
  */
 export const getSettings = async (): Promise<AppSettings> => {
   const { data, error } = await supabase
     .from('app_settings')
-    .select('*')
-    .single()
+    .select('key, value')
 
   if (error) {
     throw new Error(`Failed to fetch settings: ${error.message}`)
   }
 
-  // Transform snake_case to camelCase
+  // Transform array of key-value pairs to object
+  const settings: Record<string, any> = { id: 'settings' }
+  
+  if (data) {
+    data.forEach((row: any) => {
+      // Convert camelCase key back from snake_case if needed
+      const key = row.key
+      settings[key] = row.value
+    })
+  }
+
   return {
-    id: data.id,
-    siteName: data.site_name,
-    siteDescription: data.site_description,
-    contactEmail: data.contact_email,
-    supportEmail: data.support_email,
-    logoUrl: data.logo_url,
-    faviconUrl: data.favicon_url,
-    defaultNotificationImageUrl: data.default_notification_image_url,
-    maintenanceMode: data.maintenance_mode,
-    registrationEnabled: data.registration_enabled,
-    emailVerificationRequired: data.email_verification_required,
-    maxFileUploadSize: data.max_file_upload_size,
-    allowedFileTypes: data.allowed_file_types || [],
-    sessionTimeout: data.session_timeout,
-    passwordMinLength: data.password_min_length,
-    passwordRequireUppercase: data.password_require_uppercase,
-    passwordRequireLowercase: data.password_require_lowercase,
-    passwordRequireNumbers: data.password_require_numbers,
-    passwordRequireSpecialChars: data.password_require_special_chars,
-    emailNotifications: data.email_notifications,
-    pushNotifications: data.push_notifications,
-    newUserSignup: data.new_user_signup,
-    contentSubmitted: data.content_submitted,
-    contentApproved: data.content_approved,
-    contentRejected: data.content_rejected,
-    subscriptionExpiring: data.subscription_expiring,
-    subscriptionRenewed: data.subscription_renewed,
-    createdAt: data.created_at,
-    updatedAt: data.updated_at,
+    id: 'settings',
+    siteName: settings.site_name || '',
+    siteDescription: settings.site_description || '',
+    contactEmail: settings.contact_email || '',
+    supportEmail: settings.support_email || '',
+    logoUrl: settings.logo_url || '',
+    faviconUrl: settings.favicon_url || '',
+    defaultNotificationImageUrl: settings.default_notification_image_url || '',
+    maintenanceMode: settings.maintenance_mode || false,
+    registrationEnabled: settings.registration_enabled ?? true,
+    emailVerificationRequired: settings.email_verification_required ?? true,
+    maxFileUploadSize: settings.max_file_upload_size || 5,
+    allowedFileTypes: settings.allowed_file_types || ['image/jpeg', 'image/png'],
+    sessionTimeout: settings.session_timeout || 60,
+    passwordMinLength: settings.password_min_length || 8,
+    passwordRequireUppercase: settings.password_require_uppercase ?? true,
+    passwordRequireLowercase: settings.password_require_lowercase ?? true,
+    passwordRequireNumbers: settings.password_require_numbers ?? true,
+    passwordRequireSpecialChars: settings.password_require_special_chars ?? true,
+    emailNotifications: settings.email_notifications ?? true,
+    pushNotifications: settings.push_notifications ?? false,
+    newUserSignup: settings.new_user_signup ?? true,
+    contentSubmitted: settings.content_submitted ?? true,
+    contentApproved: settings.content_approved ?? true,
+    contentRejected: settings.content_rejected ?? true,
+    subscriptionExpiring: settings.subscription_expiring ?? true,
+    subscriptionRenewed: settings.subscription_renewed ?? true,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   }
 }
 
@@ -57,77 +65,54 @@ export const updateSettings = async (
   id: string,
   input: UpdateSettingsInput
 ): Promise<AppSettings> => {
-  // Transform camelCase to snake_case
-  const updateData: Record<string, any> = {}
+  // Transform camelCase to snake_case and prepare updates
+  const updates: Array<{ key: string; value: any }> = []
 
-  if (input.siteName !== undefined) updateData.site_name = input.siteName
-  if (input.siteDescription !== undefined) updateData.site_description = input.siteDescription
-  if (input.contactEmail !== undefined) updateData.contact_email = input.contactEmail
-  if (input.supportEmail !== undefined) updateData.support_email = input.supportEmail
-  if (input.logoUrl !== undefined) updateData.logo_url = input.logoUrl
-  if (input.faviconUrl !== undefined) updateData.favicon_url = input.faviconUrl
-  if (input.defaultNotificationImageUrl !== undefined) updateData.default_notification_image_url = input.defaultNotificationImageUrl
-  if (input.maintenanceMode !== undefined) updateData.maintenance_mode = input.maintenanceMode
-  if (input.registrationEnabled !== undefined) updateData.registration_enabled = input.registrationEnabled
-  if (input.emailVerificationRequired !== undefined) updateData.email_verification_required = input.emailVerificationRequired
-  if (input.maxFileUploadSize !== undefined) updateData.max_file_upload_size = input.maxFileUploadSize
-  if (input.allowedFileTypes !== undefined) updateData.allowed_file_types = input.allowedFileTypes
-  if (input.sessionTimeout !== undefined) updateData.session_timeout = input.sessionTimeout
-  if (input.passwordMinLength !== undefined) updateData.password_min_length = input.passwordMinLength
-  if (input.passwordRequireUppercase !== undefined) updateData.password_require_uppercase = input.passwordRequireUppercase
-  if (input.passwordRequireLowercase !== undefined) updateData.password_require_lowercase = input.passwordRequireLowercase
-  if (input.passwordRequireNumbers !== undefined) updateData.password_require_numbers = input.passwordRequireNumbers
-  if (input.passwordRequireSpecialChars !== undefined) updateData.password_require_special_chars = input.passwordRequireSpecialChars
-  if (input.emailNotifications !== undefined) updateData.email_notifications = input.emailNotifications
-  if (input.pushNotifications !== undefined) updateData.push_notifications = input.pushNotifications
-  if (input.newUserSignup !== undefined) updateData.new_user_signup = input.newUserSignup
-  if (input.contentSubmitted !== undefined) updateData.content_submitted = input.contentSubmitted
-  if (input.contentApproved !== undefined) updateData.content_approved = input.contentApproved
-  if (input.contentRejected !== undefined) updateData.content_rejected = input.contentRejected
-  if (input.subscriptionExpiring !== undefined) updateData.subscription_expiring = input.subscriptionExpiring
-  if (input.subscriptionRenewed !== undefined) updateData.subscription_renewed = input.subscriptionRenewed
+  if (input.siteName !== undefined) updates.push({ key: 'site_name', value: input.siteName })
+  if (input.siteDescription !== undefined) updates.push({ key: 'site_description', value: input.siteDescription })
+  if (input.contactEmail !== undefined) updates.push({ key: 'contact_email', value: input.contactEmail })
+  if (input.supportEmail !== undefined) updates.push({ key: 'support_email', value: input.supportEmail })
+  if (input.logoUrl !== undefined) updates.push({ key: 'logo_url', value: input.logoUrl })
+  if (input.faviconUrl !== undefined) updates.push({ key: 'favicon_url', value: input.faviconUrl })
+  if (input.defaultNotificationImageUrl !== undefined) updates.push({ key: 'default_notification_image_url', value: input.defaultNotificationImageUrl })
+  if (input.maintenanceMode !== undefined) updates.push({ key: 'maintenance_mode', value: input.maintenanceMode })
+  if (input.registrationEnabled !== undefined) updates.push({ key: 'registration_enabled', value: input.registrationEnabled })
+  if (input.emailVerificationRequired !== undefined) updates.push({ key: 'email_verification_required', value: input.emailVerificationRequired })
+  if (input.maxFileUploadSize !== undefined) updates.push({ key: 'max_file_upload_size', value: input.maxFileUploadSize })
+  if (input.allowedFileTypes !== undefined) updates.push({ key: 'allowed_file_types', value: input.allowedFileTypes })
+  if (input.sessionTimeout !== undefined) updates.push({ key: 'session_timeout', value: input.sessionTimeout })
+  if (input.passwordMinLength !== undefined) updates.push({ key: 'password_min_length', value: input.passwordMinLength })
+  if (input.passwordRequireUppercase !== undefined) updates.push({ key: 'password_require_uppercase', value: input.passwordRequireUppercase })
+  if (input.passwordRequireLowercase !== undefined) updates.push({ key: 'password_require_lowercase', value: input.passwordRequireLowercase })
+  if (input.passwordRequireNumbers !== undefined) updates.push({ key: 'password_require_numbers', value: input.passwordRequireNumbers })
+  if (input.passwordRequireSpecialChars !== undefined) updates.push({ key: 'password_require_special_chars', value: input.passwordRequireSpecialChars })
+  if (input.emailNotifications !== undefined) updates.push({ key: 'email_notifications', value: input.emailNotifications })
+  if (input.pushNotifications !== undefined) updates.push({ key: 'push_notifications', value: input.pushNotifications })
+  if (input.newUserSignup !== undefined) updates.push({ key: 'new_user_signup', value: input.newUserSignup })
+  if (input.contentSubmitted !== undefined) updates.push({ key: 'content_submitted', value: input.contentSubmitted })
+  if (input.contentApproved !== undefined) updates.push({ key: 'content_approved', value: input.contentApproved })
+  if (input.contentRejected !== undefined) updates.push({ key: 'content_rejected', value: input.contentRejected })
+  if (input.subscriptionExpiring !== undefined) updates.push({ key: 'subscription_expiring', value: input.subscriptionExpiring })
+  if (input.subscriptionRenewed !== undefined) updates.push({ key: 'subscription_renewed', value: input.subscriptionRenewed })
 
-  const { data, error } = await supabase
-    .from('app_settings')
-    .update(updateData)
-    .eq('id', id)
-    .select()
-    .single()
+  // Upsert each setting (insert or update)
+  for (const update of updates) {
+    const { error } = await supabase
+      .from('app_settings')
+      .upsert(
+        {
+          key: update.key,
+          value: update.value,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: 'key' }
+      )
 
-  if (error) {
-    throw new Error(`Failed to update settings: ${error.message}`)
+    if (error) {
+      throw new Error(`Failed to update setting ${update.key}: ${error.message}`)
+    }
   }
 
-  // Transform response
-  return {
-    id: data.id,
-    siteName: data.site_name,
-    siteDescription: data.site_description,
-    contactEmail: data.contact_email,
-    supportEmail: data.support_email,
-    logoUrl: data.logo_url,
-    faviconUrl: data.favicon_url,
-    defaultNotificationImageUrl: data.default_notification_image_url,
-    maintenanceMode: data.maintenance_mode,
-    registrationEnabled: data.registration_enabled,
-    emailVerificationRequired: data.email_verification_required,
-    maxFileUploadSize: data.max_file_upload_size,
-    allowedFileTypes: data.allowed_file_types || [],
-    sessionTimeout: data.session_timeout,
-    passwordMinLength: data.password_min_length,
-    passwordRequireUppercase: data.password_require_uppercase,
-    passwordRequireLowercase: data.password_require_lowercase,
-    passwordRequireNumbers: data.password_require_numbers,
-    passwordRequireSpecialChars: data.password_require_special_chars,
-    emailNotifications: data.email_notifications,
-    pushNotifications: data.push_notifications,
-    newUserSignup: data.new_user_signup,
-    contentSubmitted: data.content_submitted,
-    contentApproved: data.content_approved,
-    contentRejected: data.content_rejected,
-    subscriptionExpiring: data.subscription_expiring,
-    subscriptionRenewed: data.subscription_renewed,
-    createdAt: data.created_at,
-    updatedAt: data.updated_at,
-  }
+  // Return updated settings
+  return getSettings()
 }
