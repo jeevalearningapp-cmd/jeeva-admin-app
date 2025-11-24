@@ -35,11 +35,11 @@ export const DashboardHeroPage: React.FC = () => {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingHero, setEditingHero] = useState<HeroSection | null>(null)
   const [formData, setFormData] = useState<CreateHeroInput>({
-    title: '',
-    subtitle: '',
+    headline: '',
+    subheadline: '',
     imageUrl: '',
-    ctaText: '',
-    ctaLink: '',
+    buttonText: '',
+    buttonLink: '',
     isActive: true,
     displayOrder: 0,
     titleColor: '#FFFFFF',
@@ -70,11 +70,11 @@ export const DashboardHeroPage: React.FC = () => {
     if (hero) {
       setEditingHero(hero)
       setFormData({
-        title: hero.title,
-        subtitle: hero.subtitle,
+        headline: hero.headline,
+        subheadline: hero.subheadline,
         imageUrl: hero.imageUrl,
-        ctaText: hero.ctaText,
-        ctaLink: hero.ctaLink,
+        buttonText: hero.buttonText,
+        buttonLink: hero.buttonLink,
         isActive: hero.isActive,
         displayOrder: hero.displayOrder,
         titleColor: hero.titleColor || '#FFFFFF',
@@ -85,11 +85,11 @@ export const DashboardHeroPage: React.FC = () => {
     } else {
       setEditingHero(null)
       setFormData({
-        title: '',
-        subtitle: '',
+        headline: '',
+        subheadline: '',
         imageUrl: '',
-        ctaText: '',
-        ctaLink: '',
+        buttonText: '',
+        buttonLink: '',
         isActive: true,
         displayOrder: 0,
         titleColor: '#FFFFFF',
@@ -191,16 +191,16 @@ export const DashboardHeroPage: React.FC = () => {
                 </TableCell>
                 <TableCell>
                   <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                    {hero.title}
+                    {hero.headline}
                   </Typography>
                 </TableCell>
                 <TableCell>
                   <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 300 }}>
-                    {hero.subtitle}
+                    {hero.subheadline}
                   </Typography>
                 </TableCell>
                 <TableCell>
-                  <Typography variant="body2">{hero.ctaText}</Typography>
+                  <Typography variant="body2">{hero.buttonText}</Typography>
                 </TableCell>
                 <TableCell>
                   <Chip label={hero.displayOrder} size="small" />
@@ -251,16 +251,16 @@ export const DashboardHeroPage: React.FC = () => {
         <DialogContent>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
             <TextField
-              label="Title"
-              value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              label="Headline"
+              value={formData.headline}
+              onChange={(e) => setFormData({ ...formData, headline: e.target.value })}
               fullWidth
               required
             />
             <TextField
-              label="Subtitle"
-              value={formData.subtitle}
-              onChange={(e) => setFormData({ ...formData, subtitle: e.target.value })}
+              label="Subheadline"
+              value={formData.subheadline}
+              onChange={(e) => setFormData({ ...formData, subheadline: e.target.value })}
               fullWidth
               multiline
               rows={3}
@@ -306,16 +306,16 @@ export const DashboardHeroPage: React.FC = () => {
             </Box>
 
             <TextField
-              label="CTA Button Text"
-              value={formData.ctaText}
-              onChange={(e) => setFormData({ ...formData, ctaText: e.target.value })}
+              label="Button Text"
+              value={formData.buttonText}
+              onChange={(e) => setFormData({ ...formData, buttonText: e.target.value })}
               fullWidth
               required
             />
             <TextField
-              label="CTA Link"
-              value={formData.ctaLink}
-              onChange={(e) => setFormData({ ...formData, ctaLink: e.target.value })}
+              label="Button Link"
+              value={formData.buttonLink}
+              onChange={(e) => setFormData({ ...formData, buttonLink: e.target.value })}
               fullWidth
               placeholder="/path or https://..."
               required
@@ -423,7 +423,7 @@ export const DashboardHeroPage: React.FC = () => {
           <Button
             onClick={handleSubmit}
             variant="contained"
-            disabled={!formData.title || !formData.subtitle || !formData.imageUrl || !formData.ctaText || !formData.ctaLink}
+            disabled={!formData.headline || !formData.subheadline || !formData.imageUrl || !formData.buttonText || !formData.buttonLink}
           >
             {editingHero ? 'Update' : 'Create'}
           </Button>

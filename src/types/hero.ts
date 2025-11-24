@@ -1,10 +1,10 @@
 export interface HeroSection {
-  id: string
-  title: string
-  subtitle: string
+  id: number
+  headline: string
+  subheadline: string
   imageUrl: string
-  ctaText: string
-  ctaLink: string
+  buttonText: string
+  buttonLink: string
   isActive: boolean
   displayOrder: number
   titleColor?: string
@@ -16,11 +16,11 @@ export interface HeroSection {
 }
 
 export interface CreateHeroInput {
-  title: string
-  subtitle: string
+  headline: string
+  subheadline: string
   imageUrl: string
-  ctaText: string
-  ctaLink: string
+  buttonText: string
+  buttonLink: string
   isActive?: boolean
   displayOrder?: number
   titleColor?: string
@@ -30,11 +30,11 @@ export interface CreateHeroInput {
 }
 
 export interface UpdateHeroInput {
-  title?: string
-  subtitle?: string
+  headline?: string
+  subheadline?: string
   imageUrl?: string
-  ctaText?: string
-  ctaLink?: string
+  buttonText?: string
+  buttonLink?: string
   isActive?: boolean
   displayOrder?: number
   titleColor?: string

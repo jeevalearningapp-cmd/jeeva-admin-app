@@ -3,11 +3,11 @@ import { HeroSection, CreateHeroInput, UpdateHeroInput } from '@/types/hero'
 
 const mapToHeroSection = (data: any): HeroSection => ({
   id: data.id,
-  title: data.title,
-  subtitle: data.subtitle,
+  headline: data.headline,
+  subheadline: data.subheadline,
   imageUrl: data.image_url,
-  ctaText: data.cta_text,
-  ctaLink: data.cta_link,
+  buttonText: data.button_text,
+  buttonLink: data.button_link,
   isActive: data.is_active,
   displayOrder: data.display_order,
   titleColor: data.title_color,
@@ -21,7 +21,7 @@ const mapToHeroSection = (data: any): HeroSection => ({
 export const heroAPI = {
   async getAll(): Promise<HeroSection[]> {
     const { data, error } = await supabase
-      .from('hero_sections')
+      .from('dashboard_hero')
       .select('*')
       .order('display_order', { ascending: true })
 
@@ -29,9 +29,9 @@ export const heroAPI = {
     return (data || []).map(mapToHeroSection)
   },
 
-  async getById(id: string): Promise<HeroSection> {
+  async getById(id: number): Promise<HeroSection> {
     const { data, error } = await supabase
-      .from('hero_sections')
+      .from('dashboard_hero')
       .select('*')
       .eq('id', id)
       .single()
@@ -42,13 +42,13 @@ export const heroAPI = {
 
   async create(input: CreateHeroInput): Promise<HeroSection> {
     const { data, error } = await supabase
-      .from('hero_sections')
+      .from('dashboard_hero')
       .insert([{
-        title: input.title,
-        subtitle: input.subtitle,
+        headline: input.headline,
+        subheadline: input.subheadline,
         image_url: input.imageUrl,
-        cta_text: input.ctaText,
-        cta_link: input.ctaLink,
+        button_text: input.buttonText,
+        button_link: input.buttonLink,
         is_active: input.isActive ?? true,
         display_order: input.displayOrder ?? 0,
         title_color: input.titleColor || '#FFFFFF',
@@ -63,13 +63,13 @@ export const heroAPI = {
     return mapToHeroSection(data)
   },
 
-  async update(id: string, input: UpdateHeroInput): Promise<HeroSection> {
+  async update(id: number, input: UpdateHeroInput): Promise<HeroSection> {
     const updateData: any = {}
-    if (input.title !== undefined) updateData.title = input.title
-    if (input.subtitle !== undefined) updateData.subtitle = input.subtitle
+    if (input.headline !== undefined) updateData.headline = input.headline
+    if (input.subheadline !== undefined) updateData.subheadline = input.subheadline
     if (input.imageUrl !== undefined) updateData.image_url = input.imageUrl
-    if (input.ctaText !== undefined) updateData.cta_text = input.ctaText
-    if (input.ctaLink !== undefined) updateData.cta_link = input.ctaLink
+    if (input.buttonText !== undefined) updateData.button_text = input.buttonText
+    if (input.buttonLink !== undefined) updateData.button_link = input.buttonLink
     if (input.isActive !== undefined) updateData.is_active = input.isActive
     if (input.displayOrder !== undefined) updateData.display_order = input.displayOrder
     if (input.titleColor !== undefined) updateData.title_color = input.titleColor
@@ -78,7 +78,7 @@ export const heroAPI = {
     if (input.buttonBackgroundColor !== undefined) updateData.button_background_color = input.buttonBackgroundColor
 
     const { data, error } = await supabase
-      .from('hero_sections')
+      .from('dashboard_hero')
       .update(updateData)
       .eq('id', id)
       .select()
@@ -88,9 +88,9 @@ export const heroAPI = {
     return mapToHeroSection(data)
   },
 
-  async delete(id: string): Promise<void> {
+  async delete(id: number): Promise<void> {
     const { error } = await supabase
-      .from('hero_sections')
+      .from('dashboard_hero')
       .delete()
       .eq('id', id)
 
