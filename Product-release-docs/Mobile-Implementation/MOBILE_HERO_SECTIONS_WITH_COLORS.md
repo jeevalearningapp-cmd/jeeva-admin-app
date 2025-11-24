@@ -42,12 +42,19 @@ interface HeroSection {
 
 ## Implementation Steps
 
-### Step 1: Create API Hook
+### Step 1: Create Hook - Direct Supabase Query
+
+The mobile app can fetch hero sections directly from Supabase without needing a backend endpoint:
 
 ```typescript
 // src/hooks/useHeroSections.ts
 import { useQuery } from 'react-query'
-import axios from 'axios'
+import { createClient } from '@supabase/supabase-js'
+
+const supabaseUrl = process.env.REACT_APP_SUPABASE_URL
+const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY
+
+const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 interface HeroSection {
   id: string
@@ -68,14 +75,32 @@ export function useHeroSections() {
   return useQuery<HeroSection[]>(
     'heroSections',
     async () => {
-      const { data } = await axios.get(
-        `${process.env.REACT_NATIVE_API_URL}/api/hero-sections`
-      )
-      return data.filter((hero: HeroSection) => hero.isActive)
-        .sort((a: HeroSection, b: HeroSection) => a.displayOrder - b.displayOrder)
+      const { data, error } = await supabase
+        .from('dashboard_hero')
+        .select('*')
+        .eq('is_active', true)
+        .order('display_order', { ascending: true })
+
+      if (error) throw new Error(error.message)
+
+      // Map snake_case to camelCase
+      return (data || []).map((hero: any) => ({
+        id: hero.id,
+        headline: hero.headline,
+        subheadline: hero.subheadline,
+        imageUrl: hero.image_url,
+        buttonText: hero.button_text,
+        buttonLink: hero.button_link,
+        isActive: hero.is_active,
+        displayOrder: hero.display_order,
+        titleColor: hero.title_color,
+        subtitleColor: hero.subtitle_color,
+        buttonTextColor: hero.button_text_color,
+        buttonBackgroundColor: hero.button_background_color,
+      }))
     },
     {
-      staleTime: 10 * 60 * 1000, // 10 minutes
+      staleTime: 5 * 60 * 1000, // 5 minutes
       cacheTime: 30 * 60 * 1000, // 30 minutes
     }
   )
@@ -399,13 +424,25 @@ Add to your `package.json`:
 
 ---
 
-## API Endpoint
+## Direct Supabase Integration
 
-**Fetch Hero Sections:**
+The mobile app queries the `dashboard_hero` table directly via Supabase (no backend API needed).
+
+**Environment Variables Required:**
 ```
-GET /api/hero-sections
+REACT_APP_SUPABASE_URL=https://your-project.supabase.co
+REACT_APP_SUPABASE_ANON_KEY=your-anon-key
+```
 
-Response:
+**Database Query:**
+```sql
+-- Supabase RLS must allow public reads on active heroes
+-- Table: dashboard_hero
+-- Query: Select * WHERE is_active = true ORDER BY display_order ASC
+```
+
+**Response Data Structure:**
+```json
 {
   "heroes": [
     {
@@ -425,6 +462,12 @@ Response:
   ]
 }
 ```
+
+**Advantages:**
+- No backend overhead - direct database queries
+- Faster response times
+- Automatic real-time updates if using Supabase subscriptions
+- Less network latency
 
 ---
 

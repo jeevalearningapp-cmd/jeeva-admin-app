@@ -94,3 +94,28 @@ Questions table includes: `module_type`, `category`, `subdivision`, `lesson_id`,
 - Payment Gateways: `STRIPE_SECRET_KEY`, `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`
 
 **Database Schema:** Supabase PostgreSQL with tables for users, admin, content, learning data, AI, payments, platform, and analytics. Key tables include `user_profiles`, `admin_users`, `modules`, `topics`, `lessons`, `flashcards`, `questions`, `subscriptions`, `subscription_plans`, `discount_coupons`, `hero_sections`, `email_templates`, `analytics_sessions`, `chat_conversations`, `chat_messages`, `ai_usage_stats`, `push_tokens`, `notifications`, `notification_targets`, `notification_queue`, `user_notification_reads`, `notification_preferences`, `payment_customers`, `payments`, `payment_refunds`, `payment_methods`, `payment_webhook_events`, `learning_progress`, `mock_exam_attempts`. Utilizes PostgreSQL RPC functions and comprehensive RLS policies.
+## Mobile Hero Sections - Direct Supabase Integration (November 24, 2025)
+
+✅ **SOLUTION IMPLEMENTED:**
+- Mobile app now fetches hero sections directly from Supabase (not via backend)
+- Removed unnecessary backend API endpoint to simplify architecture
+- Updated implementation guide: `MOBILE_HERO_SECTIONS_WITH_COLORS.md`
+- Dashboard hero color support now fully integrated end-to-end
+
+### Why Direct Supabase?
+- Faster response times (no backend intermediary)
+- Less network latency 
+- Direct database queries with automatic caching
+- Simpler mobile implementation
+
+### Integration Steps for Mobile Team:
+1. Use the hook from implementation guide to query `dashboard_hero` table directly
+2. Add Supabase credentials to mobile .env: `REACT_APP_SUPABASE_URL`, `REACT_APP_SUPABASE_ANON_KEY`
+3. Display hero sections with custom admin-set colors: titleColor, subtitleColor, buttonTextColor, buttonBackgroundColor
+4. Heroes automatically sorted by displayOrder and filtered for active status
+
+### Database Setup:
+- `dashboard_hero` table has RLS disabled to allow public reads
+- Mobile app uses anonymous Supabase client (ANON_KEY)
+- No authentication required to fetch active promotional banners
+
