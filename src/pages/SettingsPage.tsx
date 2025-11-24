@@ -453,7 +453,7 @@ export const SettingsPage: React.FC = () => {
               control={
                 <Switch
                   checked={localSettings.passwordRequireUppercase || false}
-                  onChange={handleChange('passwordRequireUppercase')}
+                  onChange={handleSwitchChange('passwordRequireUppercase')}
                 />
               }
               label="Require Uppercase Letters"
@@ -463,7 +463,7 @@ export const SettingsPage: React.FC = () => {
               control={
                 <Switch
                   checked={localSettings.passwordRequireLowercase || false}
-                  onChange={handleChange('passwordRequireLowercase')}
+                  onChange={handleSwitchChange('passwordRequireLowercase')}
                 />
               }
               label="Require Lowercase Letters"
@@ -473,7 +473,7 @@ export const SettingsPage: React.FC = () => {
               control={
                 <Switch
                   checked={localSettings.passwordRequireNumbers || false}
-                  onChange={handleChange('passwordRequireNumbers')}
+                  onChange={handleSwitchChange('passwordRequireNumbers')}
                 />
               }
               label="Require Numbers"
@@ -483,7 +483,7 @@ export const SettingsPage: React.FC = () => {
               control={
                 <Switch
                   checked={localSettings.passwordRequireSpecialChars || false}
-                  onChange={handleChange('passwordRequireSpecialChars')}
+                  onChange={handleSwitchChange('passwordRequireSpecialChars')}
                 />
               }
               label="Require Special Characters"
@@ -508,7 +508,7 @@ export const SettingsPage: React.FC = () => {
               control={
                 <Switch
                   checked={localSettings.emailNotifications || false}
-                  onChange={handleChange('emailNotifications')}
+                  onChange={handleSwitchChange('emailNotifications')}
                 />
               }
               label="Email Notifications"
@@ -518,7 +518,7 @@ export const SettingsPage: React.FC = () => {
               control={
                 <Switch
                   checked={localSettings.pushNotifications || false}
-                  onChange={handleChange('pushNotifications')}
+                  onChange={handleSwitchChange('pushNotifications')}
                 />
               }
               label="Push Notifications"
@@ -533,7 +533,7 @@ export const SettingsPage: React.FC = () => {
               control={
                 <Switch
                   checked={localSettings.newUserSignup || false}
-                  onChange={handleChange('newUserSignup')}
+                  onChange={handleSwitchChange('newUserSignup')}
                 />
               }
               label="New User Signup"
@@ -543,7 +543,7 @@ export const SettingsPage: React.FC = () => {
               control={
                 <Switch
                   checked={localSettings.contentSubmitted || false}
-                  onChange={handleChange('contentSubmitted')}
+                  onChange={handleSwitchChange('contentSubmitted')}
                 />
               }
               label="Content Submitted for Approval"
@@ -553,7 +553,7 @@ export const SettingsPage: React.FC = () => {
               control={
                 <Switch
                   checked={localSettings.contentApproved || false}
-                  onChange={handleChange('contentApproved')}
+                  onChange={handleSwitchChange('contentApproved')}
                 />
               }
               label="Content Approved"
@@ -563,7 +563,7 @@ export const SettingsPage: React.FC = () => {
               control={
                 <Switch
                   checked={localSettings.contentRejected || false}
-                  onChange={handleChange('contentRejected')}
+                  onChange={handleSwitchChange('contentRejected')}
                 />
               }
               label="Content Rejected"
@@ -573,7 +573,7 @@ export const SettingsPage: React.FC = () => {
               control={
                 <Switch
                   checked={localSettings.subscriptionExpiring || false}
-                  onChange={handleChange('subscriptionExpiring')}
+                  onChange={handleSwitchChange('subscriptionExpiring')}
                 />
               }
               label="Subscription Expiring Soon"
@@ -583,7 +583,7 @@ export const SettingsPage: React.FC = () => {
               control={
                 <Switch
                   checked={localSettings.subscriptionRenewed || false}
-                  onChange={handleChange('subscriptionRenewed')}
+                  onChange={handleSwitchChange('subscriptionRenewed')}
                 />
               }
               label="Subscription Renewed"
