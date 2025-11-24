@@ -1,0 +1,43 @@
+Error detecting country: [AbortError: Aborted] 
+
+Code: fetch.umd.js
+  523 |       this.message = message;
+  524 |       this.name = name;
+> 525 |       var error = Error(message);
+      |                        ^
+  526 |       this.stack = error.stack;
+  527 |     };
+  528 |     exports.DOMException.prototype = Object.create(Error.prototype);
+Call Stack
+  exports.DOMException (node_modules/.pnpm/whatwg-fetch@3.6.20/node_modules/whatwg-fetch/dist/fetch.umd.js:525:24)
+  setTimeout$argument_0 (node_modules/.pnpm/whatwg-fetch@3.6.20/node_modules/whatwg-fetch/dist/fetch.umd.js:579:42)
+ ERROR  Error detecting country: [AbortError: Aborted] 
+
+Code: fetch.umd.js
+  523 |       this.message = message;
+  524 |       this.name = name;
+> 525 |       var error = Error(message);
+      |                        ^
+  526 |       this.stack = error.stack;
+  527 |     };
+  528 |     exports.DOMException.prototype = Object.create(Error.prototype);
+Call Stack
+  exports.DOMException (node_modules/.pnpm/whatwg-fetch@3.6.20/node_modules/whatwg-fetch/dist/fetch.umd.js:525:24)
+  setTimeout$argument_0 (node_modules/.pnpm/whatwg-fetch@3.6.20/node_modules/whatwg-fetch/dist/fetch.umd.js:579:42)
+ ERROR  Error detecting country: [AbortError: Aborted] 
+
+Code: fetch.umd.js
+  523 |       this.message = message;
+  524 |       this.name = name;
+> 525 |       var error = Error(message);
+      |                        ^
+  526 |       this.stack = error.stack;
+  527 |     };
+  528 |     exports.DOMException.prototype = Object.create(Error.prototype);
+Call Stack
+  exports.DOMException (node_modules/.pnpm/whatwg-fetch@3.6.20/node_modules/whatwg-fetch/dist/fetch.umd.js:525:24)
+  setTimeout$argument_0 (node_modules/.pnpm/whatwg-fetch@3.6.20/node_modules/whatwg-fetch/dist/fetch.umd.js:579:42)
+ WARN  Failed to fetch payment config: [TypeError: Network request timed out]
+ LOG  Routing payment to stripe for country US
+Android node_modules/.pnpm/expo-router@6.0.15_2504d03b23d36f4d48ae0c060b044798/node_modules/expo-router/
+entry.js ▓▓▓░░░░░░░░░░░░░ 21.8% (244/538)

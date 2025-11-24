@@ -119,3 +119,26 @@ Questions table includes: `module_type`, `category`, `subdivision`, `lesson_id`,
 - Mobile app uses anonymous Supabase client (ANON_KEY)
 - No authentication required to fetch active promotional banners
 
+
+## Mobile App API Fixes (November 24, 2025 - Final)
+
+✅ **BOTH ISSUES RESOLVED:**
+
+### 1. Missing Coupon Validation Endpoint
+- Created `/api/subscriptions/validate-coupon` endpoint
+- Validates coupon code, checks expiration, usage limits, and applicable plans
+- Returns discount details if valid, error message if invalid
+
+### 2. Coupon & Subscription Plans Endpoints
+- Created `/api/subscriptions/plans` to fetch all active subscription plans
+- Both endpoints now properly registered in Express server
+
+### Mobile App Required Env Variables
+For mobile app to fetch country, coupons, and plans, ensure these are set:
+- `REACT_APP_API_URL` - Backend API URL (e.g., `https://jeeva-admin-portal.vollskick.replit.dev`)
+
+### API Endpoints Now Available
+- `GET /api/country/detect` - Country detection + currency info
+- `POST /api/subscriptions/validate-coupon` - Validate coupon codes
+- `GET /api/subscriptions/plans` - Fetch subscription plans
+
