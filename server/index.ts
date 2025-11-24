@@ -4,6 +4,7 @@ import emailRoutes from "./routes/email.js";
 import chatRoutes from "./routes/chat.js";
 import paymentRoutes from "./routes/payments.js";
 import notificationRoutes from "./routes/notifications.js";
+import countryRoutes from "./routes/country.js";
 import { notificationService } from "./services/notifications.js";
 
 const app = express();
@@ -20,9 +21,10 @@ app.use("/api/email", emailRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/country", countryRoutes);
 
 app.get("/api/health", (req, res) => {
-  res.json({ status: "ok", message: "API server running (Email + AI Chat + Payments + Notifications)" });
+  res.json({ status: "ok", message: "API server running (Email + AI Chat + Payments + Notifications + Country Detection)" });
 });
 
 // Start notification queue processor (runs every 2 minutes)
@@ -49,6 +51,7 @@ app.listen(PORT, "0.0.0.0", () => {
   console.log(`   - Chat API: /api/chat`);
   console.log(`   - Payment API: /api/payments`);
   console.log(`   - Notifications API: /api/notifications`);
+  console.log(`   - Country API: /api/country`);
   console.log(`\n🔔 Push notification service started`);
   console.log(`   - Queue processor: every 2 minutes`);
   console.log(`   - Receipt checker: every 5 minutes`);

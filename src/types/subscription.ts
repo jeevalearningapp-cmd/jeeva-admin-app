@@ -79,6 +79,24 @@ export interface UpdateUserSubscriptionInput {
   nextPaymentDate?: string
 }
 
+// Country Detection Types
+export interface CountryInfo {
+  countryCode: string
+  countryName: string
+  currency: string
+  currencySymbol: string
+  exchangeRate: number
+  paymentProvider: 'stripe'
+}
+
+export interface ExchangeRateMap {
+  [countryCode: string]: number
+}
+
+export interface CurrencyMap {
+  [countryCode: string]: string
+}
+
 // Subscription Analytics
 export interface SubscriptionAnalytics {
   totalSubscriptions: number
