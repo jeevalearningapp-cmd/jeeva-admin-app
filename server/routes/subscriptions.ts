@@ -87,7 +87,7 @@ router.get('/plans', async (req: Request, res: Response) => {
       .from('subscription_plans')
       .select('*')
       .eq('is_active', true)
-      .order('price', { ascending: true })
+      .order('price_usd', { ascending: true })
 
     if (error) throw error
 
