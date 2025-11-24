@@ -41,7 +41,11 @@ export const DashboardHeroPage: React.FC = () => {
     ctaText: '',
     ctaLink: '',
     isActive: true,
-    displayOrder: 0
+    displayOrder: 0,
+    titleColor: '#FFFFFF',
+    subtitleColor: '#FFFFFF',
+    buttonTextColor: '#FFFFFF',
+    buttonBackgroundColor: '#007AFF'
   })
   const [uploading, setUploading] = useState(false)
   const [initialLoad, setInitialLoad] = useState(true)
@@ -72,7 +76,11 @@ export const DashboardHeroPage: React.FC = () => {
         ctaText: hero.ctaText,
         ctaLink: hero.ctaLink,
         isActive: hero.isActive,
-        displayOrder: hero.displayOrder
+        displayOrder: hero.displayOrder,
+        titleColor: hero.titleColor || '#FFFFFF',
+        subtitleColor: hero.subtitleColor || '#FFFFFF',
+        buttonTextColor: hero.buttonTextColor || '#FFFFFF',
+        buttonBackgroundColor: hero.buttonBackgroundColor || '#007AFF'
       })
     } else {
       setEditingHero(null)
@@ -83,7 +91,11 @@ export const DashboardHeroPage: React.FC = () => {
         ctaText: '',
         ctaLink: '',
         isActive: true,
-        displayOrder: 0
+        displayOrder: 0,
+        titleColor: '#FFFFFF',
+        subtitleColor: '#FFFFFF',
+        buttonTextColor: '#FFFFFF',
+        buttonBackgroundColor: '#007AFF'
       })
     }
     setDialogOpen(true)
@@ -325,6 +337,85 @@ export const DashboardHeroPage: React.FC = () => {
               }
               label="Active"
             />
+
+            {/* Color Customization Section */}
+            <Box sx={{ borderTop: '1px solid #e0e0e0', pt: 2, mt: 2 }}>
+              <Typography variant="h6" gutterBottom sx={{ fontSize: '0.95rem', fontWeight: 600 }}>
+                Colors
+              </Typography>
+              
+              {/* Title Color */}
+              <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', mb: 2 }}>
+                <Box sx={{ flex: 1 }}>
+                  <Typography variant="body2" sx={{ mb: 0.5 }}>Title Color</Typography>
+                  <TextField
+                    type="color"
+                    value={formData.titleColor || '#FFFFFF'}
+                    onChange={(e) => setFormData({ ...formData, titleColor: e.target.value })}
+                    fullWidth
+                    size="small"
+                    inputProps={{ style: { cursor: 'pointer', height: 40 } }}
+                  />
+                </Box>
+                <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>
+                  {formData.titleColor || '#FFFFFF'}
+                </Typography>
+              </Box>
+
+              {/* Subtitle Color */}
+              <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', mb: 2 }}>
+                <Box sx={{ flex: 1 }}>
+                  <Typography variant="body2" sx={{ mb: 0.5 }}>Subtitle Color</Typography>
+                  <TextField
+                    type="color"
+                    value={formData.subtitleColor || '#FFFFFF'}
+                    onChange={(e) => setFormData({ ...formData, subtitleColor: e.target.value })}
+                    fullWidth
+                    size="small"
+                    inputProps={{ style: { cursor: 'pointer', height: 40 } }}
+                  />
+                </Box>
+                <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>
+                  {formData.subtitleColor || '#FFFFFF'}
+                </Typography>
+              </Box>
+
+              {/* Button Text Color */}
+              <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', mb: 2 }}>
+                <Box sx={{ flex: 1 }}>
+                  <Typography variant="body2" sx={{ mb: 0.5 }}>Button Text Color</Typography>
+                  <TextField
+                    type="color"
+                    value={formData.buttonTextColor || '#FFFFFF'}
+                    onChange={(e) => setFormData({ ...formData, buttonTextColor: e.target.value })}
+                    fullWidth
+                    size="small"
+                    inputProps={{ style: { cursor: 'pointer', height: 40 } }}
+                  />
+                </Box>
+                <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>
+                  {formData.buttonTextColor || '#FFFFFF'}
+                </Typography>
+              </Box>
+
+              {/* Button Background Color */}
+              <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                <Box sx={{ flex: 1 }}>
+                  <Typography variant="body2" sx={{ mb: 0.5 }}>Button Background Color</Typography>
+                  <TextField
+                    type="color"
+                    value={formData.buttonBackgroundColor || '#007AFF'}
+                    onChange={(e) => setFormData({ ...formData, buttonBackgroundColor: e.target.value })}
+                    fullWidth
+                    size="small"
+                    inputProps={{ style: { cursor: 'pointer', height: 40 } }}
+                  />
+                </Box>
+                <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>
+                  {formData.buttonBackgroundColor || '#007AFF'}
+                </Typography>
+              </Box>
+            </Box>
           </Box>
         </DialogContent>
         <DialogActions>
