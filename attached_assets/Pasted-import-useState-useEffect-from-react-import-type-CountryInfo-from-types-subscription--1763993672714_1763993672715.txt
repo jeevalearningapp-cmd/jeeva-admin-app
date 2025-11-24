@@ -1,0 +1,73 @@
+import { useState, useEffect } from 'react'
+import type { CountryInfo } from '@/types/subscription'
+import { API_BASE_URL } from '@/config/api'
+
+export function useCountryDetection() {
+  const [country, setCountry] = useState<CountryInfo | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    detectCountry()
+  }, [])
+
+  async function detectCountry() {
+    try {
+      setLoading(true)
+      const controller = new AbortController()
+      const timeout = setTimeout(() => controller.abort(), 8000)
+
+      const response = await fetch(`${API_BASE_URL}/api/country/detect`, {
+        signal: controller.signal,
+      })
+      clearTimeout(timeout)
+      if (!response.ok) {
+        throw new Error(`Country detect failed with status ${response.status}`)
+      }
+
+      const data = await response.json()
+
+      setCountry({
+        countryCode: data.countryCode || 'US',
+        countryName: data.countryName || 'United States',
+        currency: data.currency || 'usd',
+        currencySymbol: data.currencySymbol || '$',
+        exchangeRate: typeof data.exchangeRate === 'number' ? data.exchangeRate : 1,
+        paymentProvider: 'stripe',
+      })
+    } catch (error) {
+      console.error('Error detecting country:', error)
+      setDefaultCountry()
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  function setDefaultCountry() {
+    setCountry({
+      countryCode: 'US',
+      countryName: 'United States',
+      currency: 'usd',
+      currencySymbol: '$',
+      exchangeRate: 1,
+      paymentProvider: 'stripe',
+    })
+  }
+
+  function convertPrice(usdPrice: number, countryCode?: string): number {
+    const rate = country?.exchangeRate ?? 1
+    return Math.round(usdPrice * rate * 100) / 100
+  }
+
+  function formatPrice(usdPrice: number, countryCode?: string): string {
+    const converted = convertPrice(usdPrice, countryCode)
+    const symbol = country?.currencySymbol || '$'
+    return `${symbol}${converted}`
+  }
+
+  return {
+    country,
+    loading,
+    convertPrice,
+    formatPrice,
+  }
+}
