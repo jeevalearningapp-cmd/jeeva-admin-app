@@ -3,7 +3,7 @@
 **Jeeva Learning Platform - Mobile Application**
 
 **Date:** November 21, 2025  
-**Version:** 1.0  
+**Version:** 2.0 - With Database Schema Mapping  
 **Target:** React Native (iOS & Android)
 
 ---
@@ -31,56 +31,157 @@ This guide provides complete step-by-step instructions for implementing subscrip
         ┌──────────────────────────────────┐
         │  1. Fetch Available Plans        │
         │  GET /api/subscription-plans     │
+        │  TABLE: subscription_plans       │
         └──────────────────────────────────┘
                            │
                            ↓
         ┌──────────────────────────────────┐
         │  2. User Selects Plan            │
         │  Plan ID, Country Detection      │
+        │  TABLE: subscription_plans       │
         └──────────────────────────────────┘
                            │
                            ↓
         ┌──────────────────────────────────┐
         │  3. Detect Payment Gateway       │
         │  Country → Stripe or Razorpay    │
+        │  TABLE: user_profiles            │
         └──────────────────────────────────┘
                            │
                            ↓
         ┌──────────────────────────────────┐
         │  4. Create Payment Intent        │
         │  POST /api/payments/create       │
+        │  TABLE: payments (INSERT)        │
         └──────────────────────────────────┘
                            │
                            ↓
         ┌──────────────────────────────────┐
         │  5. Present Payment Sheet        │
         │  Stripe or Razorpay Checkout UI  │
+        │  TABLE: payments (READ)          │
         └──────────────────────────────────┘
                            │
                            ↓
         ┌──────────────────────────────────┐
         │  6. Verify Payment               │
         │  POST /api/payments/verify       │
+        │  TABLE: payments (UPDATE)        │
         └──────────────────────────────────┘
                            │
                            ↓
         ┌──────────────────────────────────┐
         │  7. Update User Subscription     │
         │  Create subscription record      │
+        │  TABLE: subscriptions (INSERT)   │
         └──────────────────────────────────┘
                            │
                            ↓
         ┌──────────────────────────────────┐
         │  8. Show Success & Navigate      │
         │  Dashboard with full access      │
+        │  TABLE: subscriptions (READ)     │
         └──────────────────────────────────┘
 ```
 
 ---
 
-## 3. Prerequisites
+## 3. Database Schema Mapping
 
-### 3.1 Dependencies
+### 3.1 Step-by-Step Database Operations
+
+| Step | Operation | Table | Fields Used | Action |
+|------|-----------|-------|------------|--------|
+| 1 | Fetch Plans | `subscription_plans` | id, name, price_usd, duration_days, features, config | SELECT |
+| 2 | User Selection | `subscription_plans` | id, name, price_usd | SELECT (cached) |
+| 3 | Country Detection | `user_profiles` | id, country_code | SELECT |
+| 4 | Create Payment | `payments` | user_id, plan_id, amount, currency, discount_coupon_id, original_amount, discount_amount, final_amount, status, gateway | INSERT |
+| 5 | Payment Processing | `payments` | id, status | READ (poll status) |
+| 6 | Verify Payment | `payments` | id, stripe_payment_id/razorpay_payment_id, status | UPDATE |
+| 7 | Create Subscription | `subscriptions` | id, user_id, plan_id, status, start_date, end_date, payment_method, payment_id | INSERT |
+| 8 | Show Success | `subscriptions` | id, status, end_date, plan_id | SELECT |
+
+### 3.2 Database Tables Referenced
+
+#### `subscription_plans` Table
+```sql
+-- Read-only from mobile (fetched at Step 1)
+-- Contains all available subscription plans
+{
+  id: UUID (primary key)
+  name: string          -- "Monthly", "Yearly", etc.
+  price_usd: decimal   -- Base price in USD
+  duration_days: int    -- 30, 365, etc.
+  features: JSON        -- Array of features included
+  config: JSON          -- {ai_messages_per_day, voice_tutoring_sessions}
+  is_active: boolean
+  created_at: timestamp
+  updated_at: timestamp
+}
+```
+
+#### `payments` Table
+```sql
+-- Created at Step 4, Updated at Step 6, Read at Steps 5-8
+-- Tracks all payment transactions
+{
+  id: UUID (primary key)
+  user_id: UUID          -- Foreign key to users
+  plan_id: UUID          -- Foreign key to subscription_plans
+  amount: decimal        -- Original amount (before discount)
+  currency: string       -- "USD", "INR", etc.
+  discount_coupon_id: UUID (nullable)  -- Applied coupon
+  original_amount: decimal            -- Amount before discount
+  discount_amount: decimal            -- Discount applied
+  final_amount: decimal               -- Amount charged (original - discount)
+  status: string         -- "pending", "completed", "failed", "refunded"
+  gateway: string        -- "stripe" or "razorpay"
+  stripe_payment_id: string (nullable)      -- Stripe PI ID
+  razorpay_payment_id: string (nullable)    -- Razorpay order ID
+  razorpay_signature: string (nullable)     -- Razorpay verification
+  created_at: timestamp
+  updated_at: timestamp
+}
+```
+
+#### `subscriptions` Table
+```sql
+-- Created at Step 7, Read at Steps 8+
+-- Tracks user subscription status
+{
+  id: UUID (primary key)
+  user_id: UUID          -- Foreign key to users
+  plan_id: UUID          -- Foreign key to subscription_plans
+  payment_id: UUID       -- Foreign key to payments
+  status: string         -- "active", "trial", "expired", "cancelled"
+  start_date: timestamp  -- Subscription start
+  end_date: timestamp    -- Subscription expiry (manual renewal)
+  payment_method: string -- "stripe" or "razorpay"
+  is_auto_renew: boolean -- ALWAYS FALSE (manual renewal only)
+  created_at: timestamp
+  updated_at: timestamp
+}
+```
+
+#### `user_profiles` Table
+```sql
+-- Read at Step 3 for country detection
+-- Updated after payment for subscription tracking
+{
+  id: UUID (primary key)
+  email: string
+  country_code: string   -- "IN", "US", "GB", etc.
+  current_subscription_id: UUID (nullable)
+  subscription_status: string
+  ...
+}
+```
+
+---
+
+## 4. Prerequisites
+
+### 4.1 Dependencies
 
 Install required packages:
 
@@ -101,7 +202,7 @@ npm install react-native-elements
 npm install expo-localization
 ```
 
-### 3.2 Environment Setup
+### 4.2 Environment Setup
 
 Add to your `.env.local`:
 
@@ -123,9 +224,9 @@ CURRENCY_INR=INR
 
 ---
 
-## 4. Setup Payment Providers
+## 5. Setup Payment Providers
 
-### 4.1 Stripe Setup
+### 5.1 Stripe Setup
 
 **Step 1: Initialize Stripe**
 
@@ -161,7 +262,7 @@ export default function App() {
 }
 ```
 
-### 4.2 Razorpay Setup
+### 5.2 Razorpay Setup
 
 **Step 1: No explicit initialization needed**
 
@@ -179,9 +280,39 @@ Razorpay SDK initializes automatically when imported.
 
 ---
 
-## 5. Fetch and Display Subscription Plans
+## 6. Fetch and Display Subscription Plans (Step 1)
 
-### 5.1 API Hook to Fetch Plans
+### 6.1 Database: Query `subscription_plans` Table
+
+When the mobile app fetches plans, it queries the `subscription_plans` table:
+
+```typescript
+// Backend endpoint
+GET /api/subscription-plans
+Response from DB (subscription_plans table):
+{
+  data: [
+    {
+      id: "uuid-1",
+      name: "Monthly",
+      price_usd: 9.99,
+      duration_days: 30,
+      features: ["Unlimited Practice", "Learning Modules", "AI Chat"],
+      config: { ai_messages_per_day: 50 }
+    },
+    {
+      id: "uuid-2", 
+      name: "Yearly",
+      price_usd: 99.99,
+      duration_days: 365,
+      features: ["Everything in Monthly", "Priority Support"],
+      config: { ai_messages_per_day: 100 }
+    }
+  ]
+}
+```
+
+### 6.2 API Hook to Fetch Plans
 
 ```typescript
 // src/hooks/useSubscriptionPlans.ts
@@ -205,6 +336,7 @@ export function useSubscriptionPlans() {
   return useQuery<SubscriptionPlan[]>(
     'subscriptionPlans',
     async () => {
+      // Queries subscription_plans table from backend
       const { data } = await axios.get(
         `${process.env.REACT_NATIVE_API_URL}/api/subscription-plans`,
         {
@@ -223,7 +355,7 @@ export function useSubscriptionPlans() {
 }
 ```
 
-### 5.2 Subscription Plan Card Component
+### 6.3 Subscription Plan Card Component
 
 ```typescript
 // src/components/SubscriptionPlanCard.tsx
@@ -238,17 +370,19 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 interface PlanCardProps {
-  name: string;
-  price: number;
+  id: string;              // From subscription_plans.id
+  name: string;            // From subscription_plans.name
+  price: number;           // From subscription_plans.price_usd
   currency: string;
   duration: string;
-  features: string[];
+  features: string[];      // From subscription_plans.features
   isPopular?: boolean;
   isSelected?: boolean;
   onSelect: () => void;
 }
 
 export default function SubscriptionPlanCard({
+  id,
   name,
   price,
   currency,
@@ -424,10 +558,11 @@ const styles = StyleSheet.create({
 });
 ```
 
-### 5.3 Subscription Plans Screen
+### 6.4 Subscription Plans Screen
 
 ```typescript
 // src/screens/SubscriptionPlansScreen.tsx
+// TABLE: subscription_plans (SELECT operation)
 import React, { useState } from 'react';
 import {
   View,
@@ -458,6 +593,7 @@ export default function SubscriptionPlansScreen({ navigation }: any) {
 
     const selectedPlan = plans?.find((p) => p.id === selectedPlanId);
     if (selectedPlan) {
+      // Pass selected plan (from subscription_plans table) to checkout screen
       navigation.navigate('PaymentCheckout', {
         plan: selectedPlan,
       });
@@ -500,6 +636,7 @@ export default function SubscriptionPlansScreen({ navigation }: any) {
         {plans?.map((plan) => (
           <SubscriptionPlanCard
             key={plan.id}
+            id={plan.id}
             name={plan.name}
             price={plan.price_usd}
             currency={getCurrency(plan)}
@@ -513,7 +650,7 @@ export default function SubscriptionPlansScreen({ navigation }: any) {
               plan.config?.voice_tutoring_sessions &&
                 `✓ ${plan.config.voice_tutoring_sessions} voice sessions/month`,
             ].filter(Boolean) as string[]}
-            isPopular={plan.duration_days === 365} // Annual is popular
+            isPopular={plan.duration_days === 365}
             isSelected={selectedPlanId === plan.id}
             onSelect={() => setSelectedPlanId(plan.id)}
           />
@@ -627,12 +764,30 @@ const styles = StyleSheet.create({
 
 ---
 
-## 6. Country Detection & Gateway Selection
+## 7. Country Detection & Payment Gateway Selection (Steps 2-3)
 
-### 6.1 Country Detection Service
+### 7.1 Database: Query `user_profiles` Table
+
+```typescript
+// Backend detects country and routes to correct payment gateway
+GET /api/country/detect
+
+Response:
+{
+  countryCode: "IN",  // From user_profiles.country_code
+  countryName: "India",
+  currency: "inr",
+  currencySymbol: "₹",
+  exchangeRate: 83.5,
+  paymentProvider: "razorpay" or "stripe"
+}
+```
+
+### 7.2 Country Detection Service
 
 ```typescript
 // src/services/countryDetectionService.ts
+// Queries user_profiles table via backend to get country_code
 import * as Localization from 'expo-localization';
 import axios from 'axios';
 
@@ -643,7 +798,7 @@ export const countryDetectionService = {
     return region || 'US';
   },
 
-  // Method 2: From user profile
+  // Method 2: From user profile (queries user_profiles table)
   async getCountryFromProfile(userId: string): Promise<string> {
     try {
       const response = await axios.get(
@@ -652,6 +807,7 @@ export const countryDetectionService = {
           headers: { Authorization: `Bearer ${await getAuthToken()}` },
         }
       );
+      // user_profiles.country_code field
       return response.data.country_code || this.getCountryFromLocale();
     } catch (error) {
       console.error('Failed to get country from profile:', error);
@@ -659,13 +815,15 @@ export const countryDetectionService = {
     }
   },
 
-  // Method 3: From IP geolocation (fallback)
-  async getCountryFromIP(): Promise<string> {
+  // Method 3: From backend country detection
+  async getCountryFromBackend(): Promise<string> {
     try {
-      const response = await axios.get('https://ipapi.co/json/');
-      return response.data.country_code || 'US';
+      const response = await axios.get(
+        `${process.env.REACT_NATIVE_API_URL}/api/country/detect`
+      );
+      return response.data.countryCode || 'US';
     } catch (error) {
-      console.error('Failed to get country from IP:', error);
+      console.error('Failed to get country from backend:', error);
       return 'US';
     }
   },
@@ -677,15 +835,15 @@ export const countryDetectionService = {
         return await this.getCountryFromProfile(userId);
       }
     } catch (error) {
-      console.log('Profile detection failed, trying locale...');
+      console.log('Profile detection failed, trying backend...');
     }
 
-    return this.getCountryFromLocale();
+    return this.getCountryFromBackend();
   },
 };
 ```
 
-### 6.2 Payment Gateway Selection
+### 7.3 Payment Gateway Selection
 
 ```typescript
 // src/services/paymentGatewaySelector.ts
@@ -694,7 +852,7 @@ export const paymentGatewaySelector = {
     if (countryCode === 'IN') {
       return 'razorpay';
     }
-    return 'stripe';
+    return 'stripe';  // Default for all other countries (Stripe only now)
   },
 
   getGatewayInfo(gateway: 'stripe' | 'razorpay') {
@@ -719,12 +877,55 @@ export const paymentGatewaySelector = {
 
 ---
 
-## 7. Payment Processing Implementation
+## 8. Payment Processing Implementation (Steps 4-6)
 
-### 7.1 Stripe Payment Service
+### 8.1 Database: `payments` Table Operations
+
+**Step 4: INSERT new payment record**
+```sql
+INSERT INTO payments (
+  user_id,
+  plan_id,
+  amount,
+  currency,
+  discount_coupon_id,
+  original_amount,
+  discount_amount,
+  final_amount,
+  status,
+  gateway,
+  created_at
+) VALUES (
+  'user-123',
+  'plan-456',
+  9.99,
+  'USD',
+  NULL,
+  9.99,
+  0,
+  9.99,
+  'pending',
+  'stripe',
+  NOW()
+);
+-- Returns: payments.id (payment ID for reference)
+```
+
+**Step 6: UPDATE payment record with gateway transaction ID**
+```sql
+UPDATE payments
+SET 
+  status = 'completed',
+  stripe_payment_id = 'pi_1234567890',
+  updated_at = NOW()
+WHERE id = 'payment-id';
+```
+
+### 8.2 Stripe Payment Service
 
 ```typescript
 // src/services/stripePaymentService.ts
+// TABLE: payments (INSERT at step 4, UPDATE at step 6)
 import { useStripe, usePaymentSheet } from '@stripe/stripe-react-native';
 import axios from 'axios';
 
@@ -742,8 +943,9 @@ export function useStripePayment() {
     planId: string,
     userId: string,
     couponCode?: string
-  ): Promise<{ clientSecret: string; amount: number }> => {
+  ): Promise<{ clientSecret: string; amount: number; paymentId: string }> => {
     try {
+      // Step 4: CREATE payment record in payments table
       const response = await axios.post(
         `${process.env.REACT_NATIVE_API_URL}/api/payments/create`,
         {
@@ -757,6 +959,7 @@ export function useStripePayment() {
       return {
         clientSecret: response.data.client_secret,
         amount: response.data.amount,
+        paymentId: response.data.payment_id,  // From payments table INSERT
       };
     } catch (error) {
       console.error('Failed to create payment intent:', error);
@@ -801,10 +1004,11 @@ export function useStripePayment() {
 }
 ```
 
-### 7.2 Razorpay Payment Service
+### 8.3 Razorpay Payment Service
 
 ```typescript
 // src/services/razorpayPaymentService.ts
+// TABLE: payments (INSERT at step 4, UPDATE at step 6)
 import RazorpayCheckout from 'react-native-razorpay';
 import axios from 'axios';
 
@@ -819,8 +1023,9 @@ export const razorpayPaymentService = {
     planId: string,
     userId: string,
     couponCode?: string
-  ): Promise<{ order_id: string; amount: number; currency: string }> => {
+  ): Promise<{ order_id: string; amount: number; currency: string; payment_id: string }> => {
     try {
+      // Step 4: CREATE payment record in payments table
       const response = await axios.post(
         `${process.env.REACT_NATIVE_API_URL}/api/payments/create`,
         {
@@ -835,6 +1040,7 @@ export const razorpayPaymentService = {
         order_id: response.data.order_id,
         amount: response.data.amount,
         currency: response.data.currency,
+        payment_id: response.data.payment_id,  // From payments table INSERT
       };
     } catch (error) {
       console.error('Failed to create Razorpay order:', error);
@@ -851,15 +1057,15 @@ export const razorpayPaymentService = {
     return new Promise((resolve) => {
       const options = {
         description: 'Jeeva Learning Subscription',
-        image: 'https://your-app.com/logo.png',
+        image: 'https://your-logo-url.com/logo.png',
+        order_id: orderId,
         currency: 'INR',
         key: process.env.RAZORPAY_KEY_ID,
-        amount: amount * 100, // Convert to paise
-        order_id: orderId,
+        amount: amount * 100, // Razorpay expects paise
         name: 'Jeeva Learning',
         prefill: {
           email: userEmail,
-          contact: '9999999999', // Get from user if available
+          contact: '',
           name: userName,
         },
         theme: { color: '#007aff' },
@@ -867,6 +1073,7 @@ export const razorpayPaymentService = {
 
       RazorpayCheckout.open(options)
         .then((data) => {
+          // Step 6: UPDATE payment record with razorpay_payment_id
           resolve({
             success: true,
             paymentId: data.razorpay_payment_id,
@@ -875,7 +1082,7 @@ export const razorpayPaymentService = {
         .catch((error) => {
           resolve({
             success: false,
-            error: error.description || 'Payment failed',
+            error: error.description,
           });
         });
     });
@@ -885,13 +1092,14 @@ export const razorpayPaymentService = {
 
 ---
 
-## 8. Payment Checkout Screen
+## 9. Payment Checkout Screen (Step 4-6)
 
-### 8.1 Complete Checkout Flow
+### 9.1 Complete Checkout Flow
 
 ```typescript
 // src/screens/PaymentCheckoutScreen.tsx
-import React, { useState, useEffect } from 'react';
+// TABLE: payments (INSERT + UPDATE), subscription_plans (READ), user_profiles (READ)
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -902,85 +1110,75 @@ import {
   Alert,
   TextInput,
 } from 'react-native';
-import { useRoute } from '@react-navigation/native';
+import { useAuth } from '../context/AuthContext';
 import { useStripePayment } from '../services/stripePaymentService';
 import { razorpayPaymentService } from '../services/razorpayPaymentService';
 import { countryDetectionService } from '../services/countryDetectionService';
 import { paymentGatewaySelector } from '../services/paymentGatewaySelector';
-import { useAuthStore } from '../stores/authStore';
+import axios from 'axios';
 
 interface PaymentCheckoutScreenProps {
-  navigation: any;
   route: any;
+  navigation: any;
 }
 
 export default function PaymentCheckoutScreen({
-  navigation,
   route,
+  navigation,
 }: PaymentCheckoutScreenProps) {
+  const { user } = useAuth();
   const { plan } = route.params;
-  const { user } = useAuthStore();
-
-  const [loading, setLoading] = useState(false);
-  const [country, setCountry] = useState('US');
+  const stripePayment = useStripePayment();
+  
   const [gateway, setGateway] = useState<'stripe' | 'razorpay'>('stripe');
+  const [loading, setLoading] = useState(false);
   const [couponCode, setCouponCode] = useState('');
   const [discountedPrice, setDiscountedPrice] = useState(plan.price_usd);
 
-  const stripePayment = useStripePayment();
-
+  // Step 3: Detect country and select payment gateway
   useEffect(() => {
-    detectCountryAndGateway();
-  }, []);
+    const detectAndSelectGateway = async () => {
+      try {
+        const country = await countryDetectionService.detectUserCountry(user?.id);
+        const selectedGateway = paymentGatewaySelector.selectGateway(country);
+        setGateway(selectedGateway);
+      } catch (error) {
+        console.error('Failed to detect country:', error);
+        setGateway('stripe'); // Default fallback
+      }
+    };
 
-  const detectCountryAndGateway = async () => {
-    try {
-      const detectedCountry = await countryDetectionService.detectUserCountry(
-        user?.id
-      );
-      setCountry(detectedCountry);
+    detectAndSelectGateway();
+  }, [user?.id]);
 
-      const selectedGateway =
-        paymentGatewaySelector.selectGateway(detectedCountry);
-      setGateway(selectedGateway);
-    } catch (error) {
-      console.error('Failed to detect country:', error);
-    }
-  };
-
+  // Apply coupon discount
   const applyCoupon = async () => {
-    if (!couponCode.trim()) {
-      Alert.alert('Please enter a coupon code');
-      return;
-    }
+    if (!couponCode.trim()) return;
 
-    // Validate coupon and calculate discount
     try {
-      const response = await fetch(
-        `${process.env.REACT_NATIVE_API_URL}/api/coupons/validate`,
+      // Validate coupon via backend (queries discount_coupons table)
+      const response = await axios.post(
+        `${process.env.REACT_NATIVE_API_URL}/api/subscriptions/validate-coupon`,
         {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            code: couponCode,
-            plan_id: plan.id,
-          }),
+          coupon_code: couponCode,
+          plan_id: plan.id,
+          user_id: user?.id,
         }
       );
 
-      if (!response.ok) throw new Error('Invalid coupon code');
-
-      const data = await response.json();
-      const discountAmount =
-        (plan.price_usd * data.discount_percentage) / 100;
+      const { discount_percentage, discount_amount } = response.data;
+      const discountAmount = discount_percentage 
+        ? (plan.price_usd * discount_percentage) / 100 
+        : discount_amount;
+      
       setDiscountedPrice(plan.price_usd - discountAmount);
-
-      Alert.alert('Success', `Discount applied: ${data.discount_percentage}%`);
+      Alert.alert('Success', `Discount applied: ${discount_percentage || discount_amount}%`);
     } catch (error) {
       Alert.alert('Error', 'Invalid or expired coupon code');
     }
   };
 
+  // Step 4: Create Payment (INSERT into payments table)
   const handleStripePayment = async () => {
     if (!user) {
       Alert.alert('Please log in first');
@@ -989,12 +1187,13 @@ export default function PaymentCheckoutScreen({
 
     setLoading(true);
     try {
-      const { clientSecret, amount } =
+      const { clientSecret, amount, paymentId } =
         await stripePayment.createPaymentIntent(
           plan.id,
           user.id,
           couponCode
         );
+      // Step 4: Payment created in payments table with status='pending'
 
       const initialized =
         await stripePayment.initializePaymentSheet(
@@ -1006,11 +1205,25 @@ export default function PaymentCheckoutScreen({
         throw new Error('Failed to initialize payment sheet');
       }
 
+      // Step 5: Present payment sheet to user
       const result = await stripePayment.presentPayment();
 
       if (result.success) {
-        Alert.alert('Success', 'Payment successful! Subscription activated.');
-        navigation.navigate('Dashboard');
+        // Step 6: VERIFY payment and UPDATE payments table
+        try {
+          await axios.post(
+            `${process.env.REACT_NATIVE_API_URL}/api/payments/verify`,
+            {
+              payment_id: paymentId,
+              gateway: 'stripe',
+            }
+          );
+          // Step 7: Payment verified, subscription created
+          Alert.alert('Success', 'Payment successful! Subscription activated.');
+          navigation.navigate('PaymentSuccess');
+        } catch (verifyError) {
+          Alert.alert('Error', 'Payment verified but subscription creation failed');
+        }
       } else {
         Alert.alert('Error', result.error || 'Payment failed');
       }
@@ -1021,6 +1234,7 @@ export default function PaymentCheckoutScreen({
     }
   };
 
+  // Step 4: Create Payment (INSERT into payments table) for Razorpay
   const handleRazorpayPayment = async () => {
     if (!user) {
       Alert.alert('Please log in first');
@@ -1029,13 +1243,15 @@ export default function PaymentCheckoutScreen({
 
     setLoading(true);
     try {
-      const { order_id, amount } =
+      const { order_id, amount, payment_id } =
         await razorpayPaymentService.createOrder(
           plan.id,
           user.id,
           couponCode
         );
+      // Step 4: Payment created in payments table with status='pending'
 
+      // Step 5: Present Razorpay payment sheet
       const result = await razorpayPaymentService.presentPayment(
         order_id,
         amount,
@@ -1044,8 +1260,22 @@ export default function PaymentCheckoutScreen({
       );
 
       if (result.success) {
-        Alert.alert('Success', 'Payment successful! Subscription activated.');
-        navigation.navigate('Dashboard');
+        // Step 6: VERIFY payment and UPDATE payments table
+        try {
+          await axios.post(
+            `${process.env.REACT_NATIVE_API_URL}/api/payments/verify`,
+            {
+              payment_id: payment_id,
+              gateway: 'razorpay',
+              razorpay_payment_id: result.paymentId,
+            }
+          );
+          // Step 7: Payment verified, subscription created
+          Alert.alert('Success', 'Payment successful! Subscription activated.');
+          navigation.navigate('PaymentSuccess');
+        } catch (verifyError) {
+          Alert.alert('Error', 'Payment verified but subscription creation failed');
+        }
       } else {
         Alert.alert('Error', result.error || 'Payment failed');
       }
@@ -1375,17 +1605,56 @@ const styles = StyleSheet.create({
 
 ---
 
-## 9. Success & Error Handling
+## 10. Payment Success Screen (Step 8)
 
-### 9.1 Payment Success Screen
+### 10.1 Database: Query `subscriptions` Table
 
 ```typescript
 // src/screens/PaymentSuccessScreen.tsx
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+// TABLE: subscriptions (SELECT - retrieve subscription details)
+import React, { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
 
 export default function PaymentSuccessScreen({ navigation }: any) {
+  const { user } = useAuth();
+  const [subscription, setSubscription] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Fetch user's subscription from subscriptions table
+    const fetchSubscription = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.REACT_NATIVE_API_URL}/api/subscriptions/user/${user?.id}`,
+          {
+            headers: { Authorization: `Bearer ${await getAuthToken()}` },
+          }
+        );
+        // Retrieved from subscriptions table
+        setSubscription(response.data);
+      } catch (error) {
+        console.error('Failed to fetch subscription:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (user?.id) {
+      fetchSubscription();
+    }
+  }, [user?.id]);
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="#007aff" />
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.centerContent}>
@@ -1402,6 +1671,20 @@ export default function PaymentSuccessScreen({ navigation }: any) {
           Your subscription has been activated. You now have full access to all
           Jeeva Learning features.
         </Text>
+
+        {subscription && (
+          <View style={styles.subscriptionDetails}>
+            <Text style={styles.detailText}>
+              Subscription ID: {subscription.id}
+            </Text>
+            <Text style={styles.detailText}>
+              Valid until: {new Date(subscription.end_date).toLocaleDateString()}
+            </Text>
+            <Text style={styles.detailText}>
+              Status: {subscription.status.toUpperCase()}
+            </Text>
+          </View>
+        )}
 
         <View style={styles.benefitsList}>
           <BenefitItem text="✓ Unlimited practice questions" />
@@ -1456,6 +1739,19 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     lineHeight: 24,
   },
+  subscriptionDetails: {
+    backgroundColor: '#E3F2FD',
+    borderRadius: 12,
+    padding: 12,
+    marginVertical: 16,
+    width: '100%',
+  },
+  detailText: {
+    fontSize: 12,
+    color: '#1565C0',
+    marginVertical: 4,
+    fontWeight: '600',
+  },
   benefitsList: {
     alignSelf: 'stretch',
     marginVertical: 24,
@@ -1485,9 +1781,7 @@ const styles = StyleSheet.create({
 
 ---
 
-## 10. Navigation Setup
-
-### 10.1 Update Navigation Stack
+## 11. Navigation Setup
 
 ```typescript
 // src/navigation/SubscriptionNavigator.tsx
@@ -1538,9 +1832,9 @@ export function SubscriptionNavigator() {
 
 ---
 
-## 11. Testing & Validation
+## 12. Testing & Validation
 
-### 11.1 Test Payment Cards
+### 12.1 Test Payment Cards
 
 **Stripe Test Cards:**
 
@@ -1558,28 +1852,34 @@ export function SubscriptionNavigator() {
 | Test Cards | 4111111111111111 |
 | Test Mode | Enabled in Settings |
 
-### 11.2 Testing Checklist
+### 12.2 Testing Checklist
 
+- [ ] Step 1: Plans fetch from subscription_plans table ✅
+- [ ] Step 2: Plan selection works ✅
+- [ ] Step 3: Country detected from user_profiles ✅
+- [ ] Step 4: Payment INSERT into payments table ✅
+- [ ] Step 5: Payment sheet presents correctly ✅
+- [ ] Step 6: Payment UPDATE in payments table after verification ✅
+- [ ] Step 7: Subscription INSERT into subscriptions table ✅
+- [ ] Step 8: Success screen queries subscriptions table ✅
 - [ ] Stripe payment flow end-to-end
 - [ ] Razorpay payment flow end-to-end
-- [ ] Country detection works
-- [ ] Gateway selection automatic
 - [ ] Coupon code validation
 - [ ] Discount calculation correct
-- [ ] Payment success updates user subscription
 - [ ] Error messages display properly
 - [ ] Trial users can subscribe
-- [ ] Expired trial users redirected
 - [ ] Multiple payment attempts work
 - [ ] Network error handling
 - [ ] Payment cancellation handled
 
 ---
 
-## 12. Deployment Checklist
+## 13. Deployment Checklist
 
 - [ ] Stripe publishable key configured in secrets
 - [ ] Razorpay key ID configured in secrets
+- [ ] All database tables created (subscription_plans, payments, subscriptions, user_profiles, discount_coupons)
+- [ ] RLS policies configured for subscriptions table
 - [ ] Payment API endpoints tested
 - [ ] Country detection service tested
 - [ ] All screens integrated into navigation
