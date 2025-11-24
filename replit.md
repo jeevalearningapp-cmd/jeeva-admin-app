@@ -142,3 +142,68 @@ For mobile app to fetch country, coupons, and plans, ensure these are set:
 - `POST /api/subscriptions/validate-coupon` - Validate coupon codes
 - `GET /api/subscriptions/plans` - Fetch subscription plans
 
+
+## Subscription Plans Table Created (November 24, 2025)
+
+✅ **TABLE CREATED:**
+- `subscription_plans` table with UUID primary key
+- Fields: name, description, price_usd, duration_days, features (array), is_active, display_order, config (JSONB)
+- Indexed on is_active for fast queries
+- Mobile app can now fetch active plans via `/api/subscriptions/plans` endpoint
+
+### Fields:
+- `id` - UUID primary key (auto-generated)
+- `name` - Plan name (e.g., "Monthly", "Yearly")
+- `description` - Plan description
+- `price_usd` - Price in USD (numeric)
+- `duration_days` - How long the plan lasts (e.g., 30 for monthly, 365 for yearly)
+- `features` - Array of feature strings included in the plan
+- `is_active` - Whether plan is available for purchase
+- `display_order` - Order to display plans in UI
+- `config` - Additional configuration as JSON (for future extensibility)
+
+
+## Mobile API Now Working (November 24, 2025)
+
+✅ **ALL THREE MOBILE ENDPOINTS READY:**
+
+### 1. Country Detection
+```
+GET /api/country/detect
+Response: { countryCode, countryName, currency, currencySymbol, exchangeRate, paymentProvider }
+Status: ✅ WORKING
+```
+
+### 2. Subscription Plans
+```
+GET /api/subscriptions/plans
+Returns: Array of active plans with name, price_usd, duration_days, features, display_order
+Sample Plans Created:
+- Monthly: $9.99 for 30 days
+- Quarterly: $24.99 for 90 days  
+- Annual: $79.99 for 365 days
+Status: ✅ WORKING
+```
+
+### 3. Coupon Validation
+```
+POST /api/subscriptions/validate-coupon
+Request: { code, planId }
+Response: { valid, code, discountType, discountValue, description }
+Status: ✅ WORKING
+```
+
+### Mobile App .env Configuration
+```
+EXPO_PUBLIC_BACKEND_URL=http://172.31.96.226:3001  # Local development
+# or
+EXPO_PUBLIC_BACKEND_URL=https://jeeva-admin-portal.vollskick.replit.dev  # Production
+```
+
+### Next Steps for Mobile Team:
+1. Set EXPO_PUBLIC_BACKEND_URL in mobile app .env
+2. Fetch country data to display correct currency
+3. Fetch subscription plans to show pricing options
+4. Validate coupons when user enters discount code
+5. Use hero sections from Supabase directly (no backend needed)
+
