@@ -10,6 +10,10 @@ const mapToHeroSection = (data: any): HeroSection => ({
   ctaLink: data.cta_link,
   isActive: data.is_active,
   displayOrder: data.display_order,
+  titleColor: data.title_color,
+  subtitleColor: data.subtitle_color,
+  buttonTextColor: data.button_text_color,
+  buttonBackgroundColor: data.button_background_color,
   createdAt: data.created_at,
   updatedAt: data.updated_at
 })
@@ -46,7 +50,11 @@ export const heroAPI = {
         cta_text: input.ctaText,
         cta_link: input.ctaLink,
         is_active: input.isActive ?? true,
-        display_order: input.displayOrder ?? 0
+        display_order: input.displayOrder ?? 0,
+        title_color: input.titleColor || '#FFFFFF',
+        subtitle_color: input.subtitleColor || '#FFFFFF',
+        button_text_color: input.buttonTextColor || '#FFFFFF',
+        button_background_color: input.buttonBackgroundColor || '#007AFF'
       }])
       .select()
       .single()
@@ -64,6 +72,10 @@ export const heroAPI = {
     if (input.ctaLink !== undefined) updateData.cta_link = input.ctaLink
     if (input.isActive !== undefined) updateData.is_active = input.isActive
     if (input.displayOrder !== undefined) updateData.display_order = input.displayOrder
+    if (input.titleColor !== undefined) updateData.title_color = input.titleColor
+    if (input.subtitleColor !== undefined) updateData.subtitle_color = input.subtitleColor
+    if (input.buttonTextColor !== undefined) updateData.button_text_color = input.buttonTextColor
+    if (input.buttonBackgroundColor !== undefined) updateData.button_background_color = input.buttonBackgroundColor
 
     const { data, error } = await supabase
       .from('hero_sections')

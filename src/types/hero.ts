@@ -7,6 +7,10 @@ export interface HeroSection {
   ctaLink: string
   isActive: boolean
   displayOrder: number
+  titleColor?: string
+  subtitleColor?: string
+  buttonTextColor?: string
+  buttonBackgroundColor?: string
   createdAt: string
   updatedAt: string
 }
@@ -19,6 +23,10 @@ export interface CreateHeroInput {
   ctaLink: string
   isActive?: boolean
   displayOrder?: number
+  titleColor?: string
+  subtitleColor?: string
+  buttonTextColor?: string
+  buttonBackgroundColor?: string
 }
 
 export interface UpdateHeroInput {
@@ -29,4 +37,8 @@ export interface UpdateHeroInput {
   ctaLink?: string
   isActive?: boolean
   displayOrder?: number
+  titleColor?: string
+  subtitleColor?: string
+  buttonTextColor?: string
+  buttonBackgroundColor?: string
 }
