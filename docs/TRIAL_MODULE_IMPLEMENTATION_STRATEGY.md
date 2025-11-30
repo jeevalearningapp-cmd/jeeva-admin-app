@@ -202,34 +202,126 @@ Topics/Lessons: (add columns)
 
 ### 3.1 Trial Module Content Structure
 
-**A. Practice Trial Section**
+**A. Practice Trial Section** ✅
 ```
-- 10 practice questions (2-3 per topic)
-- Mix of easy & medium difficulty
-- From NMC practice categories
-- Immediate feedback + explanations
+Content Breakdown:
+├── Numerical Questions (3 questions per subtopic)
+│   ├── Dosage calculations
+│   ├── Rate calculations  
+│   ├── Fluid balance
+│   └── Difficulty: Easy to Medium
+│
+└── Clinical Questions (3 questions per subtopic)
+    ├── Scenario-based assessments
+    ├── Patient care decisions
+    ├── Clinical reasoning
+    └── Difficulty: Easy to Medium
+
+Total: 6 questions per subtopic type
+
+Features:
+- Immediate feedback after each question
+- Full explanation with correct answer
 - No time limit
-- Can attempt unlimited times
-- Progress indicator (X/10 completed)
+- Unlimited attempts
+- Progress indicator (X/6 completed per category)
+- Answer review/retry capability
+- Explanation includes: Why correct, Why wrong, Key concept
+
+UI Indicators:
+- "Numerical" section card
+- "Clinical" section card
+- Score display per section
+- Detailed explanation panel
 ```
 
-**B. Learning Trial Section**
+**B. Learning Trial Section** ✅
 ```
-- 2 lessons (from 2 different topics)
-- Simplified 60% unlock threshold (not 80%)
-- Basic text + images only
-- No audio initially
-- Estimated 10-15 min per lesson
-- Track completion separately
+Structure:
+- 1 Topic (e.g., "Patient Safety & Infection Control")
+  └── 2 Subtopics
+
+Subtopic 1 - Content Types:
+├── Video (2-5 min educational clip)
+├── Audio (transcript of video for accessibility)
+├── Text (key points + definitions)
+└── Flashcards (3-5 flashcard set for quick review)
+
+Subtopic 2 - Content Types:
+├── Text (comprehensive lesson)
+├── MCQ Assessment (3 questions to unlock next)
+├── Audio (lesson audio version)
+└── Video (supplementary)
+
+Features:
+- Simplified 60% unlock threshold (vs 80% for paid)
+- Sequential unlock: Complete Subtopic 1 → Unlock Subtopic 2
+- Multiple content formats for different learning styles
+- Progress tracking per content type
+- Completion badges
+- Estimated time: 15-20 minutes total
+
+Unlock Logic:
+1. Start Subtopic 1
+2. View all content (video, text, audio, flashcards)
+3. Take 3-question MCQ
+4. Score ≥60% → Unlock Subtopic 2
+5. Repeat for Subtopic 2
 ```
 
-**C. Mock Exam Trial Section**
+**C. Mock Exam Trial Section** ✅
 ```
-- 1 mini mock exam (10-15 questions)
-- 30 min timed (not full 225 min)
-- Mark for review feature
-- Results with pass/fail + explanation
-- Topic breakdown
+Exam Structure:
+- 20 questions (full representative sample)
+- 30 minutes timed (not full 3h 45m)
+- Mixed question types: MCQs, clinical scenarios
+
+Features During Exam:
+├── Timer display (countdown)
+├── Question navigator (shows all 20)
+├── Mark for review feature
+├── Answer validation before submit
+└── Auto-submit at time limit
+
+Results & Analysis:
+├── Overall Results
+│   ├── Pass/Fail status
+│   ├── Final score (X/20)
+│   ├── Percentage score
+│   └── Time taken
+│
+├── Topic Breakdown
+│   ├── Score per topic
+│   ├── Weak areas identified
+│   ├── Strong areas highlighted
+│   └── Comparison to avg user score
+│
+├── Detailed Review
+│   ├── Each question with your answer
+│   ├── Correct answer highlighted
+│   ├── Full explanation
+│   ├── Topic reference
+│   └── Difficulty level
+│
+├── Performance Suggestions
+│   ├── "You scored below average in Topic X"
+│   ├── "Focus on [specific subtopics]"
+│   ├── "Recommended practice: X questions"
+│   └── "Study suggestions: [specific lessons]"
+│
+└── Next Steps
+    ├── "Upgrade to unlock full mock exams"
+    ├── "Get personalized study plan"
+    ├── "Access more practice questions"
+    └── CTA Button: "Unlock All Features"
+
+Metrics Tracked:
+- Questions attempted
+- Questions correct/incorrect
+- Time per question
+- Question difficulty
+- Topic performance
+- Conversion signal: Did exam completion → subscription?
 ```
 
 ### 3.2 Content Creation Plan
@@ -907,14 +999,36 @@ WHERE tar.created_at >= NOW() - INTERVAL '30 days';
 // Config: trialConfig.ts
 export const TRIAL_CONFIG = {
   MODULE_NAME: 'trial',
-  PRACTICE_QUESTIONS: 10,
-  LEARNING_LESSONS: 2,
-  MOCK_EXAM_QUESTIONS: 15,
+  
+  // Practice Trial
+  PRACTICE_NUMERICAL_QUESTIONS: 3,
+  PRACTICE_CLINICAL_QUESTIONS: 3,
+  PRACTICE_TOTAL_QUESTIONS: 6,
+  PRACTICE_TIME_LIMIT: null, // No time limit
+  PRACTICE_SHOW_FEEDBACK: 'immediate',
+  PRACTICE_ALLOW_RETAKE: true,
+  
+  // Learning Trial
+  LEARNING_TOPICS: 1,
+  LEARNING_SUBTOPICS_PER_TOPIC: 2,
+  LEARNING_UNLOCK_THRESHOLD: 60, // 60% to unlock next subtopic (vs 80% for paid)
+  LEARNING_MCQ_PER_SUBTOPIC: 3,
+  LEARNING_CONTENT_TYPES: ['video', 'audio', 'text', 'flashcard', 'mcq'],
+  LEARNING_ESTIMATED_TIME_MIN: 20,
+  
+  // Mock Exam Trial
+  MOCK_EXAM_QUESTIONS: 20,
   MOCK_EXAM_TIME_LIMIT_MIN: 30,
-  LEARNING_UNLOCK_THRESHOLD: 60, // instead of 80% for paid
+  MOCK_EXAM_ALLOW_MARK_FOR_REVIEW: true,
+  MOCK_EXAM_SHOW_DETAILED_RESULTS: true,
+  MOCK_EXAM_SHOW_TOPIC_BREAKDOWN: true,
+  MOCK_EXAM_SHOW_SUGGESTIONS: true,
+  
+  // General
   TRIAL_EXPIRY_DAYS: null, // No expiry for trial (always available)
   ALLOW_MULTIPLE_TRIALS: true,
-  SHOW_UPGRADE_PROMPT_ON: 'trial_completion',
+  SHOW_UPGRADE_PROMPT_ON: ['practice_complete', 'learning_complete', 'exam_complete'],
+  TRIAL_ANALYTICS_ENABLED: true,
 }
 ```
 
