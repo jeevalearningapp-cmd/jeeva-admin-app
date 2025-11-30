@@ -139,3 +139,16 @@ Questions table includes: `module_type`, `category`, `subdivision`, `lesson_id`,
 - Payment Gateway: `STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`
 
 **Database Schema:** Supabase PostgreSQL with tables for users, admin, content, learning data, AI, payments, platform, and analytics. Key tables include `user_profiles`, `admin_users`, `modules`, `topics`, `lessons`, `flashcards`, `questions`, `subscriptions`, `subscription_plans`, `discount_coupons`, `hero_sections`, `email_templates`, `analytics_sessions`, `chat_conversations`, `chat_messages`, `ai_usage_stats`, `push_tokens`, `notifications`, `notification_targets`, `notification_queue`, `user_notification_reads`, `notification_preferences`, `payment_customers`, `payments`, `payment_refunds`, `payment_methods`, `payment_webhook_events`, `learning_progress`, `mock_exam_attempts`, `prices`, `stripe_products`, `country_currency_map`. Utilizes PostgreSQL RPC functions and comprehensive RLS policies.
+
+## Documentation
+
+**Complete documentation is organized in `/docs/`:**
+- **01-Admin-Portal/** - Admin dashboard UI specs and features
+- **02-Mobile-App/** - Mobile app architecture and implementation
+- **03-Database/** - Database schema and content structure
+- **04-Backend/** - API documentation and services
+- **05-Architecture/** - System design and AI implementation
+- **06-Development/** - Development guides and testing
+- **07-Deployment/** - Deployment and release procedures
+
+**Start with:** [docs/README.md](./docs/README.md) for complete documentation guide.

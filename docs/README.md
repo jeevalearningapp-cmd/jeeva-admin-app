@@ -1,145 +1,153 @@
-# Jeeva Learning App – Admin Portal
+# Jeeva Learning Platform - Complete Documentation
 
-## Overview
+Welcome to the official documentation for the Jeeva Learning Platform. This is your complete reference for building, maintaining, and deploying the platform.
 
-The Jeeva Admin Portal is a modern, scalable React web application designed to manage every aspect of the Jeeva Learning ecosystem, including users, content, subscriptions, analytics, and more. Integrated with Supabase for backend, authentication, and data management, the portal ensures secure, role-based access and a responsive professional UI.
+## 📚 Documentation Structure
 
----
+### **01-Admin-Portal** 📊
+Admin dashboard for managing content, users, subscriptions, payments, and analytics.
+- UI/UX specifications and design system
+- Complete feature specifications
+- Dashboard and management interfaces
+- **Start here:** [Admin Portal Docs](./01-Admin-Portal/INDEX.md)
 
-## Features
+### **02-Mobile-App** 📱
+Student-facing mobile learning application with practice MCQs, lessons, mock exams, and AI tutoring.
+- Architecture and feature overview
+- Setup and development guides
+- Payment integration (Stripe)
+- Push notifications and chatbot
+- **Start here:** [Mobile App Docs](./02-Mobile-App/INDEX.md)
 
-- **Authentication & Role Management:**    
-  Secure Supabase Auth, supporting superadmin, editor, moderator, with complete RLS and access gating.  
-- **User & Subscription Management:**    
-  View, manage, filter users, handle subscriptions, process renewals/refunds.  
-- **Content Management:**    
-  CRUD for modules, topics, lessons, flashcards, MCQs, approval queue, drag-and-drop reordering.  
-- **Hero Banner & Dashboard Manager:**    
-  Create/manage hero entries with images, text, buttons.  
-- **Mock Exam Editor:**    
-  Build/edit mock exams, assign questions, publish/review analytics.  
-- **Content Approvals/Moderation:**    
-  Multi-role review, approval history and audit trail.  
-- **App Settings & Feature Flags:**    
-  Enable/disable major site/app features; edit global notices.  
-- **Analytics & Reports:**    
-  Usage, conversion funnel, engagement, AI recommendation analytics.  
-- **Support & Feedback:**    
-  Track and reply to user queries/issues, FAQ management.  
-- **Audit Logging:**    
-  All admin actions on users/content/settings are audit-logged for compliance.
+### **03-Database** 🗄️
+Database schema, content organization, and data models for the entire platform.
+- Complete PostgreSQL schema documentation
+- Content hierarchy (Modules → Topics → Lessons → Questions)
+- Learning progress tracking
+- Seed data management
+- **Start here:** [Database Docs](./03-Database/INDEX.md)
 
----
+### **04-Backend** 🔧
+Express.js backend API, services, and integrations.
+- REST API endpoint documentation
+- Email service (Resend)
+- Payment processing (Stripe)
+- AI integration (Google Gemini)
+- Webhook handlers
+- **Start here:** [Backend Docs](./04-Backend/INDEX.md)
 
-## File Structure
+### **05-Architecture** 🏗️
+System design, authentication flow, and AI implementation.
+- Authentication and authorization
+- JeevaBot AI chatbot architecture
+- AI security and privacy
+- System design patterns
+- **Start here:** [Architecture Docs](./05-Architecture/INDEX.md)
 
-```
-jeeva-admin-portal/  
- ├── public/  
- │ └── index.html  
- ├── src/  
- │ ├── assets/  
- │ ├── components/  
- │ │ ├── auth/  
- │ │ ├── dashboard/  
- │ │ ├── users/  
- │ │ ├── subscriptions/  
- │ │ ├── content/  
- │ │ │ ├── modules/  
- │ │ │ ├── topics/  
- │ │ │ ├── subtopics/  
- │ │ │ ├── questions/  
- │ │ │ ├── lessons/  
- │ │ │ └── flashcards/  
- │ ├── hero/  
- │ ├── mockexams/  
- │ ├── approvals/  
- │ ├── settings/  
- │ ├── analytics/  
- │ ├── support/  
- │ ├── layout/  
- │ ├── App.js  
- │ ├── index.js  
- │ ├── routes/  
- │ ├── context/  
- │ ├── hooks/  
- │ ├── utils/  
- │ ├── api/  
- │ ├── types/  
- │ └── styles/  
- ├── .env  
- ├── package.json  
- ├── README.md  
- └── ...
-```
+### **06-Development** 🛠️
+Development guides, testing procedures, and quality assurance.
+- Development setup
+- Testing guidelines and procedures
+- Seed data management
+- Quick fix guides
+- Migration guides
+- **Start here:** [Development Docs](./06-Development/INDEX.md)
+
+### **07-Deployment** 🚀
+Deployment procedures, production readiness, and release documentation.
+- Deployment instructions
+- Production readiness checklist
+- Environment setup
+- Release procedures
+- **Start here:** [Deployment Docs](./07-Deployment/INDEX.md)
 
 ---
 
-## Core Dependencies
+## 🎯 Quick Start by Role
 
-| Package                     | Purpose/Usage                     |  
-|-----------------------------|-----------------------------------|  
-| react (v18+)                | UI framework                      |  
-| @mui/material               | UI toolkit, theming               |  
-| @tanstack/react-query       | Server state, async data, caching |  
-| zustand                     | Client/UI state                   |  
-| @supabase/supabase-js       | API, authentication, RLS          |  
-| formik/yup or react-hook-form/zod | Forms and validation        |  
-| axios/fetch                 | HTTP requests                     |  
-| date-fns/dayjs              | Date utils                        |  
-| clsx/classnames             | Class helpers                     |  
-| notistack                   | Notifications (MUI)               |  
+### **For Admin Portal Developers**
+1. Read: [01-Admin-Portal/INDEX.md](./01-Admin-Portal/INDEX.md)
+2. Review: UI_DESIGN_SPECS.md
+3. Check: FEATURE_SPECIFICATIONS.md
 
----
+### **For Mobile App Developers**
+1. Read: [02-Mobile-App/INDEX.md](./02-Mobile-App/INDEX.md)
+2. Follow: SETUP_GUIDE.md
+3. Review: MOBILE_IMPLEMENTATION_CHECKLIST.md
 
-## Theme, Branding & UI
+### **For Backend Developers**
+1. Read: [04-Backend/INDEX.md](./04-Backend/INDEX.md)
+2. Review: [03-Database/INDEX.md](./03-Database/INDEX.md)
+3. Check: API_DOCUMENTATION.md
 
-- **Primary Color:** `#1976D2` (from student app branding, see theme.md)  
-- **Typography:** `"Inter", "Roboto", "Helvetica Neue", Arial, sans-serif"`  
-- **Consistent UI Components:** MUI Table, Modal, Toast, Card, Form, Button.
-
----
-
-## Routing Structure
-
-- All routes (except `/login`) protected by Supabase Auth and role gates  
-- Route/Component breakdown, including modals, dynamic segments, and role-adaptive navigation (see Routing.md for full map).
+### **For DevOps/Deployment**
+1. Read: [07-Deployment/INDEX.md](./07-Deployment/INDEX.md)
+2. Follow: DEPLOYMENT_INSTRUCTIONS.md
+3. Verify: PRODUCTION_READINESS_PLAN.md
 
 ---
 
-## Authentication & Authorization
+## 📖 Root Level Reference Docs
 
-- Supabase Auth (email/password) for admin portal  
-- admin_users table manages all roles (superadmin, editor, moderator)  
-- RLS policies enforced server-side on all sensitive actions  
-- Session management with security for inactive or demoted accounts
-
----
-
-## Getting Started
-
-1. Clone repository  
-2. Add `.env` with Supabase keys  
-3. `npm install`  
-4. `npm run dev` for local development  
-5. Update Supabase tables/RLS as needed (see supabase.md)
+- **SECURITY_BEST_PRACTICES.md** - Security guidelines and best practices
+- **THEME.md** - Design theme and styling system
+- **ROUTING.md** - Application routing structure
+- **AUTHENTICATION.md** - Authentication system overview
+- **supabase.md** - Supabase configuration and usage
 
 ---
 
-## Developer Onboarding
+## 🔄 Key System Components
 
-- See `src/context/README.md` and `src/hooks/README.md` for context, provider, and custom hook usage  
-- All global providers: Auth, Theme, Toast, TanStack Query  
-- Scaffold new features by adding folders/components, updating centralized configs  
-- Update README, theme.md, and routing docs as features/elements are added
+### **Frontend Stack**
+- React 18 + TypeScript
+- Vite 5 for fast development
+- Material-UI (MUI) v7
+- Zustand for state management
+- React Query for data fetching
+
+### **Backend Stack**
+- Express.js + Node.js
+- Supabase PostgreSQL
+- Google Gemini for AI
+- Stripe for payments
+- Resend for email
+- Expo for push notifications
+
+### **Subscription Model**
+- **One-Time Purchases** (no auto-renewal)
+- 3 plans: Starter (30d), Growth (90d), Ultimate (150d)
+- Multi-currency: INR, GBP, USD
+- Automatic tax calculation (18% GST India, 20% VAT UK)
 
 ---
 
-## References
+## 🚀 Getting Started
 
-- theme.md (MUI theme, color palette, branding)  
-- supabase.md (DB schema, RLS, role matrix)  
-- Routing.md (route/component/role breakdown)  
-- replit.md (environment, workspace, deployment)
+### **New Team Member?**
+1. Start with the role-specific quick start above
+2. Read the relevant INDEX.md file
+3. Review the key files for your area
+
+### **Bug Fix or Small Feature?**
+1. Go to [06-Development/QUICK_FIX_GUIDE.md](./06-Development/QUICK_FIX_GUIDE.md)
+2. Follow the relevant section
+3. Reference the specific documentation needed
+
+### **Major Feature or Release?**
+1. Read [07-Deployment/PRODUCTION_READINESS_PLAN.md](./07-Deployment/PRODUCTION_READINESS_PLAN.md)
+2. Follow [07-Deployment/DEPLOYMENT_INSTRUCTIONS.md](./07-Deployment/DEPLOYMENT_INSTRUCTIONS.md)
+3. Verify all checklist items
 
 ---
+
+## 📞 Need Help?
+
+- Check the relevant category docs first
+- Search for specific topics in the appropriate folder
+- Review quick fix guides for common issues
+- Consult the root reference docs for cross-cutting concerns
+
+---
+
+**Last Updated:** November 30, 2025
