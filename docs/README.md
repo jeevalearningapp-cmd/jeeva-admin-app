@@ -61,6 +61,28 @@ Deployment procedures, production readiness, and release documentation.
 - Release procedures
 - **Start here:** [Deployment Docs](./07-Deployment/INDEX.md)
 
+### **08-Mobile-App-Trial-Module-Implementation** 📲
+Mobile app trial module implementation guide with user onboarding flow.
+- Default trial user setup
+- Profile completion to dashboard flow
+- "Let's Try" button on NMC CBT course page
+- Trial Practice, Learning, Mock Exam modules
+- API endpoints and state management
+- Conversion tracking and analytics
+- **Read:** [Mobile Trial Implementation](./08-Mobile-App-Trial-Module-Implementation.md)
+
+### **09-Payment-Gateway-Subscriptions-Implementation** 💳
+Complete payment gateway and subscription implementation guide using Stripe.
+- Location detection and currency conversion
+- One-time purchase payment model (no auto-renewal)
+- Stripe setup for Expo React Native apps
+- Multi-currency pricing: INR, GBP, USD
+- Automatic tax calculation (18% GST India, 20% VAT UK)
+- Payment flow architecture with ChatGPT-like location awareness
+- Complete API endpoints with request/response formats
+- Stripe webhook handling and error management
+- **Read:** [Payment Gateway & Subscriptions](./09-Payment-Gateway-Subscriptions-Implementation.md)
+
 ---
 
 ## 🎯 Quick Start by Role
@@ -74,11 +96,15 @@ Deployment procedures, production readiness, and release documentation.
 1. Read: [02-Mobile-App/INDEX.md](./02-Mobile-App/INDEX.md)
 2. Follow: SETUP_GUIDE.md
 3. Review: MOBILE_IMPLEMENTATION_CHECKLIST.md
+4. **NEW:** Trial Module - [08-Mobile-App-Trial-Module-Implementation.md](./08-Mobile-App-Trial-Module-Implementation.md)
+5. **NEW:** Payment & Subscriptions - [09-Payment-Gateway-Subscriptions-Implementation.md](./09-Payment-Gateway-Subscriptions-Implementation.md)
 
 ### **For Backend Developers**
 1. Read: [04-Backend/INDEX.md](./04-Backend/INDEX.md)
 2. Review: [03-Database/INDEX.md](./03-Database/INDEX.md)
 3. Check: API_DOCUMENTATION.md
+4. **NEW:** Payment APIs - [09-Payment-Gateway-Subscriptions-Implementation.md](./09-Payment-Gateway-Subscriptions-Implementation.md)
+5. **NEW:** Trial APIs - [08-Mobile-App-Trial-Module-Implementation.md](./08-Mobile-App-Trial-Module-Implementation.md)
 
 ### **For DevOps/Deployment**
 1. Read: [07-Deployment/INDEX.md](./07-Deployment/INDEX.md)
@@ -97,14 +123,25 @@ Deployment procedures, production readiness, and release documentation.
 
 ---
 
+## 🆕 Recent Additions (Nov 30, 2025)
+
+- ✅ **Trial Module Admin Panel** - Complete UI with 4 tabs (Practice, Learning, Mock Exam, Analytics)
+- ✅ **Mobile Trial Module Documentation** - User flow, onboarding, and "Let's Try" button
+- ✅ **Payment Gateway Documentation** - Location-aware Stripe integration for Expo
+- ✅ **Supabase Schema** - 6 new tables for trial tracking and analytics
+
+---
+
 ## 🔄 Key System Components
 
 ### **Frontend Stack**
-- React 18 + TypeScript
+- React 18 + TypeScript (Admin Portal)
+- React Native + Expo (Mobile App)
 - Vite 5 for fast development
 - Material-UI (MUI) v7
 - Zustand for state management
 - React Query for data fetching
+- Stripe React Native components
 
 ### **Backend Stack**
 - Express.js + Node.js
@@ -149,5 +186,17 @@ Deployment procedures, production readiness, and release documentation.
 - Consult the root reference docs for cross-cutting concerns
 
 ---
+
+---
+
+## 📋 Implementation Status (Nov 30, 2025)
+
+| Component | Status | Docs |
+|-----------|--------|------|
+| Trial Module Admin UI | ✅ Complete | [Docs](./README.md#new-additions) |
+| Trial Module API | 📋 Ready | [08-Mobile-App-Trial-Module-Implementation.md](./08-Mobile-App-Trial-Module-Implementation.md) |
+| Supabase Schema | ✅ Deployed | Database updated with 6 new tables |
+| Payment Gateway | 📋 Ready | [09-Payment-Gateway-Subscriptions-Implementation.md](./09-Payment-Gateway-Subscriptions-Implementation.md) |
+| Mobile Implementation | 📋 Ready | Complete code examples in both docs |
 
 **Last Updated:** November 30, 2025
