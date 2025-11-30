@@ -10,27 +10,14 @@ const getApiBaseUrl = (): string => {
     return import.meta.env.VITE_API_URL
   }
 
-  // Priority 2: Development - Backend runs on localhost:3001
-  if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
-    return 'http://localhost:3001'
-  }
-
-  // Priority 3: Production (published Replit)
-  if (window?.location?.hostname === 'jeeva-admin-portal.vollskick.replit.dev') {
-    return 'https://jeeva-admin-portal.vollskick.replit.dev'
-  }
-
-  // Priority 4: Replit preview URLs (for Replit dev environment)
-  // Use the same domain as frontend but with port 3001 for API
-  if (window?.location?.hostname?.includes('spock.replit.dev')) {
-    const protocol = window.location.protocol // 'https:' or 'http:'
-    const domain = window.location.hostname
-    // API runs on port 3001 on the same Replit domain
-    return `${protocol}//${domain}:3001`
+  // Priority 2: Use same origin - frontend proxies to backend
+  // Vite dev server proxies /api/* to http://localhost:3001
+  if (typeof window !== 'undefined') {
+    return window.location.origin
   }
 
   // Fallback
-  return 'http://localhost:3001'
+  return 'http://localhost:5000'
 }
 
 // Always call dynamically to ensure correct environment detection
