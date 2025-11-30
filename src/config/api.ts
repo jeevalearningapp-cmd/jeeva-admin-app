@@ -21,33 +21,48 @@ const getApiBaseUrl = (): string => {
   }
 
   // Priority 4: Replit preview URLs (for Replit dev environment)
+  // Use the same domain as frontend but with port 3001 for API
   if (window?.location?.hostname?.includes('spock.replit.dev')) {
-    return 'http://localhost:3001'
+    const protocol = window.location.protocol // 'https:' or 'http:'
+    const domain = window.location.hostname
+    // API runs on port 3001 on the same Replit domain
+    return `${protocol}//${domain}:3001`
   }
 
   // Fallback
   return 'http://localhost:3001'
 }
 
-export const API_BASE_URL = getApiBaseUrl()
-
-// Convenience export
-export const getApiUrl = () => API_BASE_URL
-
-// Debug helper (remove after testing)
-if (typeof window !== 'undefined') {
-  console.log('📡 API_BASE_URL:', API_BASE_URL)
+// Always call dynamically to ensure correct environment detection
+export const getApiUrl = () => {
+  const url = getApiBaseUrl()
+  return url
 }
 
-// API Endpoints
-export const API_ENDPOINTS = {
-  COUNTRY_DETECT: `${API_BASE_URL}/api/country/detect`,
-  COUNTRY_RATES: `${API_BASE_URL}/api/country/rates`,
-  SUBSCRIPTION_PLANS: `${API_BASE_URL}/api/subscriptions/plans`,
-  SUBSCRIPTION_COUPONS: `${API_BASE_URL}/api/subscriptions/coupons`,
-  COUPON_VALIDATE: `${API_BASE_URL}/api/subscriptions/validate-coupon`,
-  PAYMENTS_CREATE: `${API_BASE_URL}/api/payments/create`,
-  PAYMENTS_VERIFY: `${API_BASE_URL}/api/payments/verify`,
-} as const
+// Lazy static API base URL for when it's needed at module load time
+let cachedApiUrl: string | null = null
+export const getStaticApiUrl = () => {
+  if (!cachedApiUrl) {
+    cachedApiUrl = getApiBaseUrl()
+    if (typeof window !== 'undefined') {
+      console.log('📡 API_BASE_URL:', cachedApiUrl)
+    }
+  }
+  return cachedApiUrl
+}
 
-export type ApiEndpoint = keyof typeof API_ENDPOINTS
+// API Endpoints - use lazy evaluation
+export const getApiEndpoints = () => {
+  const baseUrl = getApiUrl()
+  return {
+    COUNTRY_DETECT: `${baseUrl}/api/country/detect`,
+    COUNTRY_RATES: `${baseUrl}/api/country/rates`,
+    SUBSCRIPTION_PLANS: `${baseUrl}/api/subscriptions/plans`,
+    SUBSCRIPTION_COUPONS: `${baseUrl}/api/subscriptions/coupons`,
+    COUPON_VALIDATE: `${baseUrl}/api/subscriptions/validate-coupon`,
+    PAYMENTS_CREATE: `${baseUrl}/api/payments/create`,
+    PAYMENTS_VERIFY: `${baseUrl}/api/payments/verify`,
+  } as const
+}
+
+export type ApiEndpoint = ReturnType<typeof getApiEndpoints>

@@ -60,13 +60,41 @@ export const SubscriptionPlansPage: React.FC = () => {
         const url = `${apiUrl}/api/stripe-admin/prices`
         console.log('📍 Fetching prices from:', url)
 
-        const response = await fetch(url)
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+
+        console.log('📡 Response status:', response.status, response.statusText)
+
         if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: Failed to fetch prices`)
+          const errorText = await response.text()
+          console.error('❌ HTTP Error:', response.status, errorText)
+          throw new Error(`HTTP ${response.status}: ${errorText || 'Failed to fetch prices'}`)
         }
 
-        const prices: Price[] = await response.json()
+        const text = await response.text()
+        console.log('📦 Raw response:', text.length, 'bytes')
+
+        if (!text) {
+          throw new Error('Empty response from server')
+        }
+
+        let prices: Price[]
+        try {
+          prices = JSON.parse(text)
+        } catch (parseErr) {
+          console.error('❌ JSON Parse Error:', parseErr, 'Text:', text.slice(0, 100))
+          throw new Error(`Invalid JSON response: ${text.slice(0, 50)}...`)
+        }
+
         console.log('✅ Prices received:', prices.length)
+
+        if (!Array.isArray(prices)) {
+          throw new Error(`Expected array, got ${typeof prices}`)
+        }
 
         // Group prices by country
         const grouped = prices.reduce((acc: Record<string, Price[]>, price) => {
@@ -94,11 +122,11 @@ export const SubscriptionPlansPage: React.FC = () => {
         setPriceGroups(groups)
         console.log('✅ Price groups ready:', groups.length)
       } catch (err: any) {
-        console.error('❌ Failed to load prices:', err)
-        setError(err.message || 'Failed to load subscription prices')
-        enqueueSnackbar(err.message || 'Failed to load subscription prices', {
-          variant: 'error',
-        })
+        const errorMessage = err instanceof Error ? err.message : String(err)
+        console.error('❌ Failed to load prices - Full error:', err)
+        console.error('❌ Error message:', errorMessage)
+        setError(errorMessage)
+        enqueueSnackbar(errorMessage, { variant: 'error' })
       } finally {
         setLoading(false)
       }
