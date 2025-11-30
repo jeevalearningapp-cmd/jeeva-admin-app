@@ -5,69 +5,25 @@ const router = Router()
 
 /**
  * POST /api/subscriptions/validate-coupon
- * Validate a discount coupon code
+ * Validate a discount coupon code via Stripe API
  */
 router.post('/validate-coupon', async (req: Request, res: Response) => {
   try {
-    const { code, planId } = req.body
+    const { code } = req.body
 
-    if (!code || !planId) {
+    if (!code) {
       return res.status(400).json({
         valid: false,
-        error: 'Missing code or planId'
+        error: 'Missing code'
       })
     }
 
-    // Fetch coupon from database
-    const { data: coupon, error: couponError } = await supabase
-      .from('discount_coupons')
-      .select('*')
-      .eq('code', code.toUpperCase())
-      .eq('is_active', true)
-      .single()
-
-    if (couponError || !coupon) {
-      return res.status(200).json({
-        valid: false,
-        error: 'Invalid or expired coupon'
-      })
-    }
-
-    // Check if coupon has expired
-    if (coupon.valid_until && new Date(coupon.valid_until) < new Date()) {
-      return res.status(200).json({
-        valid: false,
-        error: 'Coupon has expired'
-      })
-    }
-
-    // Check if coupon has reached usage limit
-    if (coupon.usage_limit && coupon.times_used >= coupon.usage_limit) {
-      return res.status(200).json({
-        valid: false,
-        error: 'Coupon usage limit reached'
-      })
-    }
-
-    // Check if coupon is applicable to this plan
-    if (coupon.applicable_plans && coupon.applicable_plans.length > 0) {
-      if (!coupon.applicable_plans.includes(planId)) {
-        return res.status(200).json({
-          valid: false,
-          error: 'This coupon is not applicable to this plan'
-        })
-      }
-    }
-
-    // Return valid coupon
-    res.json({
-      valid: true,
-      code: coupon.code,
-      discountType: coupon.discount_type,
-      discountValue: coupon.discount_value,
-      description: coupon.description
+    // Validate via Stripe coupons - delegated to stripe-coupons endpoint
+    // This is now handled by POST /api/stripe-coupons/validate
+    res.status(410).json({
+      error: 'Deprecated: Use POST /api/stripe-coupons/validate instead',
+      deprecated: true
     })
-
   } catch (error) {
     console.error('❌ Error validating coupon:', error)
     res.status(500).json({
@@ -99,19 +55,14 @@ router.get('/plans', async (req: Request, res: Response) => {
 
 /**
  * GET /api/subscriptions/coupons
- * Get all active discount coupons
+ * Get all active discount coupons (deprecated - use Stripe API)
  */
 router.get('/coupons', async (req: Request, res: Response) => {
   try {
-    const { data: coupons, error } = await supabase
-      .from('discount_coupons')
-      .select('*')
-      .eq('is_active', true)
-      .order('created_at', { ascending: false })
-
-    if (error) throw error
-
-    res.json(coupons || [])
+    res.status(410).json({
+      error: 'Deprecated: Use GET /api/stripe-coupons instead',
+      deprecated: true
+    })
   } catch (error) {
     console.error('❌ Error fetching coupons:', error)
     res.status(500).json({

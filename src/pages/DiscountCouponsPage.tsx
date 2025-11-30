@@ -127,15 +127,28 @@ export const DiscountCouponsPage: React.FC = () => {
       setLoading(true)
       setError(null)
 
-      const { data, error: fetchError } = await supabase
-        .from('discount_coupons')
-        .select('*')
-        .order('created_at', { ascending: false })
+      const response = await fetch(`${apiUrl}/api/stripe-coupons`)
+      if (!response.ok) throw new Error('Failed to fetch coupons')
 
-      if (fetchError) throw fetchError
+      const data = await response.json()
+      
+      const transformedCoupons = data.map((coupon: any) => ({
+        id: coupon.id,
+        code: coupon.code,
+        description: coupon.description,
+        discount_type: coupon.discountType,
+        discount_value: coupon.discountValue,
+        applicable_plans: null,
+        usage_limit: coupon.maxRedemptions,
+        times_used: coupon.timesRedeemed || 0,
+        valid_from: coupon.createdAt,
+        valid_until: null,
+        is_active: coupon.isActive,
+        created_at: coupon.createdAt,
+      })) as DiscountCoupon[]
 
-      setCoupons(data || [])
-      filterCoupons(data || [], search)
+      setCoupons(transformedCoupons)
+      filterCoupons(transformedCoupons, search)
     } catch (err: any) {
       setError(err.message)
       enqueueSnackbar(`Error loading coupons: ${err.message}`, { variant: 'error' })
@@ -213,32 +226,32 @@ export const DiscountCouponsPage: React.FC = () => {
 
       setSubmitting(true)
 
-      const couponData = {
+      const couponPayload = {
         code: formData.code.toUpperCase().trim(),
-        description: formData.description || null,
-        discount_type: formData.discount_type,
-        discount_value: parseFloat(formData.discount_value),
-        applicable_plans: formData.applicable_plans.length > 0 ? formData.applicable_plans : null,
-        usage_limit: formData.usage_limit ? parseInt(formData.usage_limit) : null,
-        valid_from: formData.valid_from,
-        valid_until: formData.valid_until || null,
-        is_active: formData.is_active,
+        description: formData.description || '',
+        discountType: formData.discount_type,
+        discountValue: parseFloat(formData.discount_value),
+        maxRedemptions: formData.usage_limit ? parseInt(formData.usage_limit) : null,
+        durationMonths: 1,
       }
 
       if (editingCoupon) {
-        const { error: updateError } = await supabase
-          .from('discount_coupons')
-          .update(couponData)
-          .eq('id', editingCoupon.id)
+        const response = await fetch(`${apiUrl}/api/stripe-coupons/${editingCoupon.code}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(couponPayload),
+        })
 
-        if (updateError) throw updateError
+        if (!response.ok) throw new Error('Failed to update coupon')
         enqueueSnackbar('Coupon updated successfully', { variant: 'success' })
       } else {
-        const { error: insertError } = await supabase
-          .from('discount_coupons')
-          .insert([couponData])
+        const response = await fetch(`${apiUrl}/api/stripe-coupons`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(couponPayload),
+        })
 
-        if (insertError) throw insertError
+        if (!response.ok) throw new Error('Failed to create coupon')
         enqueueSnackbar('Coupon created successfully', { variant: 'success' })
       }
 
@@ -255,12 +268,11 @@ export const DiscountCouponsPage: React.FC = () => {
     if (!window.confirm(`Delete coupon "${coupon.code}"?`)) return
 
     try {
-      const { error: deleteError } = await supabase
-        .from('discount_coupons')
-        .delete()
-        .eq('id', coupon.id)
+      const response = await fetch(`${apiUrl}/api/stripe-coupons/${coupon.code}`, {
+        method: 'DELETE',
+      })
 
-      if (deleteError) throw deleteError
+      if (!response.ok) throw new Error('Failed to delete coupon')
       enqueueSnackbar('Coupon deleted successfully', { variant: 'success' })
       await fetchCoupons()
     } catch (err: any) {
