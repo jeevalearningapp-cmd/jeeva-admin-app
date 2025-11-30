@@ -11,248 +11,207 @@ import {
   TableRow,
   CircularProgress,
   Alert,
-  TextField,
-  IconButton,
-  Tooltip,
   Chip,
+  Stack,
+  Card,
+  CardContent,
+  Button,
 } from '@mui/material'
-import {
-  SaveOutlined as SaveIcon,
-  EditOutlined as EditIcon,
-  CancelOutlined as CancelIcon,
-} from '@mui/icons-material'
+import { InfoOutlined as InfoIcon } from '@mui/icons-material'
 import { supabase } from '@/lib/supabase'
 import { useSnackbar } from 'notistack'
 import { PageLoader } from '@/components/common'
+import { getApiUrl } from '@/config/api'
 
-interface SubscriptionPlan {
+interface Price {
   id: string
-  name: string
-  duration_days: number
-  price_inr: number
-  price_usd: number
-  config: {
-    ai_messages_per_day?: number
-    [key: string]: any
-  } | null
+  stripe_product_id: string
+  stripe_price_id: string
+  currency: string
+  amount: number
+  country_code: string
+  plan_name: string
+  plan_duration_days: number
   is_active: boolean
-  created_at: string
+}
+
+interface PriceGroup {
+  country: string
+  countryCode: string
+  currency: string
+  prices: Price[]
 }
 
 export const SubscriptionPlansPage: React.FC = () => {
-  const [plans, setPlans] = useState<SubscriptionPlan[]>([])
+  const [priceGroups, setPriceGroups] = useState<PriceGroup[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [editingId, setEditingId] = useState<string | null>(null)
-  const [editValue, setEditValue] = useState<number>(0)
-  const [saving, setSaving] = useState(false)
   const { enqueueSnackbar } = useSnackbar()
+  const apiUrl = getApiUrl()
 
-  const fetchPlans = async () => {
+  const fetchPrices = async () => {
     try {
       setLoading(true)
-      setError(null)
+      const response = await fetch(`${apiUrl}/stripe-admin/prices`)
+      if (!response.ok) throw new Error('Failed to fetch prices')
 
-      const { data, error: fetchError } = await supabase
-        .from('subscription_plans')
-        .select('*')
-        .order('duration_days', { ascending: true })
+      const prices = await response.json()
 
-      if (fetchError) throw fetchError
+      // Group by country
+      const grouped = prices.reduce(
+        (acc: { [key: string]: Price[] }, price: Price) => {
+          if (!acc[price.country_code]) {
+            acc[price.country_code] = []
+          }
+          acc[price.country_code].push(price)
+          return acc
+        },
+        {}
+      )
 
-      setPlans(data || [])
+      // Fetch country names
+      const { data: countries } = await supabase
+        .from('country_currency_map')
+        .select('country_code, country_name, currency')
+
+      const countryMap = new Map(
+        countries?.map((c) => [
+          c.country_code,
+          { name: c.country_name, currency: c.currency },
+        ]) || []
+      )
+
+      const groups: PriceGroup[] = Object.entries(grouped)
+        .map(([countryCode, prices]) => ({
+          country: countryMap.get(countryCode)?.name || countryCode,
+          countryCode,
+          currency: prices[0]?.currency || countryMap.get(countryCode)?.currency || 'USD',
+          prices: prices.sort((a, b) => a.plan_duration_days - b.plan_duration_days),
+        }))
+        .sort((a, b) => {
+          const order = { IN: 1, GB: 2, US: 3 }
+          return (order[a.countryCode as keyof typeof order] || 999) -
+            (order[b.countryCode as keyof typeof order] || 999)
+        })
+
+      setPriceGroups(groups)
     } catch (err: any) {
-      setError(err.message)
-      enqueueSnackbar(`Error loading plans: ${err.message}`, { variant: 'error' })
+      console.error('Failed to load prices:', err)
+      enqueueSnackbar('Failed to load subscription prices', { variant: 'error' })
     } finally {
       setLoading(false)
     }
   }
 
   useEffect(() => {
-    fetchPlans()
+    fetchPrices()
   }, [])
-
-  const handleEdit = (plan: SubscriptionPlan) => {
-    setEditingId(plan.id)
-    setEditValue(plan.config?.ai_messages_per_day || 0)
-  }
-
-  const handleCancel = () => {
-    setEditingId(null)
-    setEditValue(0)
-  }
-
-  const handleSave = async (planId: string) => {
-    try {
-      setSaving(true)
-
-      if (!Number.isFinite(editValue) || editValue < 1) {
-        enqueueSnackbar('AI message limit must be a positive integer (minimum 1)', { variant: 'error' })
-        return
-      }
-
-      const plan = plans.find(p => p.id === planId)
-      if (!plan) return
-
-      const updatedConfig = {
-        ...(plan.config || {}),
-        ai_messages_per_day: editValue,
-      }
-
-      const { error: updateError } = await supabase
-        .from('subscription_plans')
-        .update({ config: updatedConfig })
-        .eq('id', planId)
-
-      if (updateError) throw updateError
-
-      await fetchPlans()
-
-      enqueueSnackbar('AI message limit updated successfully', { variant: 'success' })
-      setEditingId(null)
-      setEditValue(0)
-    } catch (err: any) {
-      enqueueSnackbar(`Error updating plan: ${err.message}`, { variant: 'error' })
-    } finally {
-      setSaving(false)
-    }
-  }
 
   if (loading) return <PageLoader />
 
   return (
-    <Box>
+    <Box sx={{ p: 3 }}>
       <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 600 }}>
-          Subscription Plans
+        <Typography variant="h5" sx={{ mb: 1 }}>
+          Subscription Plans by Country
         </Typography>
-        <Typography variant="body2" color="text.secondary">
-          Manage AI message limits and subscription plan settings
+        <Typography variant="body2" color="textSecondary">
+          Multi-currency pricing managed through Stripe. Tax rates auto-calculated per country.
         </Typography>
       </Box>
 
-      {error && (
-        <Alert severity="error" sx={{ mb: 3 }}>
-          {error}
-        </Alert>
-      )}
+      {/* Info Alert */}
+      <Alert icon={<InfoIcon />} severity="info" sx={{ mb: 4 }}>
+        To add new plans or modify prices, visit{' '}
+        <Typography component="span" sx={{ fontWeight: 600 }}>
+          Payments → Stripe Products
+        </Typography>
+      </Alert>
 
-      <Paper sx={{ borderRadius: 2, overflow: 'hidden' }}>
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow sx={{ bgcolor: 'grey.50' }}>
-                <TableCell sx={{ fontWeight: 600 }}>Plan Name</TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>Duration</TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>Price (INR)</TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>Price (USD)</TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>AI Messages/Day</TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>Status</TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {plans.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={7} align="center" sx={{ py: 4 }}>
-                    <Typography variant="body2" color="text.secondary">
-                      No subscription plans found
-                    </Typography>
-                  </TableCell>
-                </TableRow>
-              ) : (
-                plans.map((plan) => (
-                  <TableRow key={plan.id} hover>
-                    <TableCell>
-                      <Typography variant="body2" fontWeight={500}>
-                        {plan.name}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2">
-                        {plan.duration_days} days
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2">
-                        {plan.price_inr != null ? `₹${plan.price_inr.toFixed(2)}` : 'N/A'}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2">
-                        {plan.price_usd != null ? `$${plan.price_usd.toFixed(2)}` : 'N/A'}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      {editingId === plan.id ? (
-                        <TextField
-                          type="number"
-                          value={editValue}
-                          onChange={(e) => {
-                            const val = parseInt(e.target.value, 10)
-                            setEditValue(Number.isNaN(val) ? 0 : val)
-                          }}
-                          size="small"
-                          disabled={saving}
-                          sx={{ width: 100 }}
-                          inputProps={{ min: 1 }}
-                        />
-                      ) : (
-                        <Typography variant="body2">
-                          {plan.config?.ai_messages_per_day || 0}
-                        </Typography>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <Chip
-                        label={plan.is_active ? 'Active' : 'Inactive'}
-                        color={plan.is_active ? 'success' : 'default'}
-                        size="small"
-                      />
-                    </TableCell>
-                    <TableCell>
-                      {editingId === plan.id ? (
-                        <Box sx={{ display: 'flex', gap: 0.5 }}>
-                          <Tooltip title="Save">
-                            <IconButton
-                              size="small"
-                              onClick={() => handleSave(plan.id)}
-                              disabled={saving}
-                              color="primary"
-                            >
-                              {saving ? <CircularProgress size={20} /> : <SaveIcon fontSize="small" />}
-                            </IconButton>
-                          </Tooltip>
-                          <Tooltip title="Cancel">
-                            <IconButton
-                              size="small"
-                              onClick={handleCancel}
-                              disabled={saving}
-                            >
-                              <CancelIcon fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
-                        </Box>
-                      ) : (
-                        <Tooltip title="Edit AI Limit">
-                          <IconButton
-                            size="small"
-                            onClick={() => handleEdit(plan)}
-                            color="primary"
+      {priceGroups.length === 0 ? (
+        <Paper sx={{ p: 3, textAlign: 'center' }}>
+          <Typography color="textSecondary">No pricing plans configured yet</Typography>
+        </Paper>
+      ) : (
+        <Stack spacing={3}>
+          {priceGroups.map((group) => (
+            <Paper key={group.countryCode} sx={{ p: 3 }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                <Box>
+                  <Typography variant="h6">
+                    {group.country}
+                  </Typography>
+                  <Typography variant="caption" color="textSecondary">
+                    Currency: {group.currency}
+                  </Typography>
+                </Box>
+                <Chip label={`${group.prices.length} plans`} color="primary" variant="outlined" />
+              </Box>
+
+              <TableContainer>
+                <Table size="small">
+                  <TableHead>
+                    <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
+                      <TableCell>Plan Name</TableCell>
+                      <TableCell align="right">Amount</TableCell>
+                      <TableCell>Duration</TableCell>
+                      <TableCell>Stripe Price ID</TableCell>
+                      <TableCell>Status</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {group.prices.map((price) => (
+                      <TableRow key={price.id}>
+                        <TableCell>
+                          <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                            {price.plan_name}
+                          </Typography>
+                        </TableCell>
+                        <TableCell align="right">
+                          <Typography variant="body2" sx={{ fontFamily: 'monospace', fontWeight: 600 }}>
+                            {group.currency} {(price.amount / 100).toFixed(2)}
+                          </Typography>
+                        </TableCell>
+                        <TableCell>
+                          <Typography variant="body2">
+                            {price.plan_duration_days} days
+                            {price.plan_duration_days === 30 && ' (Monthly)'}
+                            {price.plan_duration_days === 90 && ' (Quarterly)'}
+                            {price.plan_duration_days === 365 && ' (Annual)'}
+                          </Typography>
+                        </TableCell>
+                        <TableCell>
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              fontFamily: 'monospace',
+                              color: 'textSecondary',
+                              display: 'block',
+                              maxWidth: '200px',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap',
+                            }}
+                            title={price.stripe_price_id}
                           >
-                            <EditIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Paper>
+                            {price.stripe_price_id.slice(0, 20)}...
+                          </Typography>
+                        </TableCell>
+                        <TableCell>
+                          <Chip
+                            label={price.is_active ? 'Active' : 'Inactive'}
+                            color={price.is_active ? 'success' : 'default'}
+                            size="small"
+                          />
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Paper>
+          ))}
+        </Stack>
+      )}
     </Box>
   )
 }

@@ -28,6 +28,7 @@ import {
   Switch,
   FormControlLabel,
   Stack,
+  FormHelperText,
 } from '@mui/material'
 import {
   SearchOutlined as SearchIcon,
@@ -40,6 +41,7 @@ import { supabase } from '@/lib/supabase'
 import { useSnackbar } from 'notistack'
 import { PageLoader } from '@/components/common'
 import { format } from 'date-fns'
+import { getApiUrl } from '@/config/api'
 
 interface DiscountCoupon {
   id: string
@@ -80,10 +82,11 @@ const initialFormData: CouponFormData = {
   is_active: true,
 }
 
-interface SubscriptionPlan {
+interface Price {
   id: string
-  name: string
-  price_usd: number
+  plan_name: string
+  currency: string
+  country_code: string
 }
 
 export const DiscountCouponsPage: React.FC = () => {
@@ -91,33 +94,31 @@ export const DiscountCouponsPage: React.FC = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10)
   const [search, setSearch] = useState('')
   const [coupons, setCoupons] = useState<DiscountCoupon[]>([])
-  const [totalCount, setTotalCount] = useState(0)
+  const [filteredCoupons, setFilteredCoupons] = useState<DiscountCoupon[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingCoupon, setEditingCoupon] = useState<DiscountCoupon | null>(null)
   const [formData, setFormData] = useState<CouponFormData>(initialFormData)
   const [submitting, setSubmitting] = useState(false)
-  const [subscriptionPlans, setSubscriptionPlans] = useState<SubscriptionPlan[]>([])
-  const [plansLoading, setPlansLoading] = useState(true)
+  const [prices, setPrices] = useState<Price[]>([])
+  const [pricesLoading, setPricesLoading] = useState(true)
   const { enqueueSnackbar } = useSnackbar()
+  const apiUrl = getApiUrl()
 
-  const fetchSubscriptionPlans = async () => {
+  const fetchPrices = async () => {
     try {
-      setPlansLoading(true)
-      const { data, error: fetchError } = await supabase
-        .from('subscription_plans')
-        .select('id, name, price_usd')
-        .eq('is_active', true)
-        .order('price_usd', { ascending: true })
+      setPricesLoading(true)
+      const response = await fetch(`${apiUrl}/stripe-admin/prices`)
+      if (!response.ok) throw new Error('Failed to fetch prices')
 
-      if (fetchError) throw fetchError
-      setSubscriptionPlans(data || [])
+      const priceData = await response.json()
+      setPrices(priceData || [])
     } catch (err: any) {
-      console.error('Failed to load subscription plans:', err)
-      enqueueSnackbar('Failed to load subscription plans', { variant: 'warning' })
+      console.error('Failed to load prices:', err)
+      enqueueSnackbar('Failed to load available plans', { variant: 'warning' })
     } finally {
-      setPlansLoading(false)
+      setPricesLoading(false)
     }
   }
 
@@ -126,73 +127,69 @@ export const DiscountCouponsPage: React.FC = () => {
       setLoading(true)
       setError(null)
 
-      let query = supabase
+      const { data, error: fetchError } = await supabase
         .from('discount_coupons')
-        .select('*', { count: 'exact' })
+        .select('*')
         .order('created_at', { ascending: false })
-
-      if (search) {
-        query = query.or(`code.ilike.%${search}%,description.ilike.%${search}%`)
-      }
-
-      const from = page * rowsPerPage
-      const to = from + rowsPerPage - 1
-      query = query.range(from, to)
-
-      const { data, error: fetchError, count } = await query
 
       if (fetchError) throw fetchError
 
       setCoupons(data || [])
-      setTotalCount(count || 0)
+      filterCoupons(data || [], search)
     } catch (err: any) {
       setError(err.message)
-      enqueueSnackbar('Failed to load coupons', { variant: 'error' })
+      enqueueSnackbar(`Error loading coupons: ${err.message}`, { variant: 'error' })
     } finally {
       setLoading(false)
     }
   }
 
+  const filterCoupons = (allCoupons: DiscountCoupon[], searchTerm: string) => {
+    if (!searchTerm.trim()) {
+      setFilteredCoupons(allCoupons)
+      return
+    }
+
+    const term = searchTerm.toLowerCase()
+    const filtered = allCoupons.filter(
+      (coupon) =>
+        coupon.code.toLowerCase().includes(term) ||
+        coupon.description?.toLowerCase().includes(term)
+    )
+    setFilteredCoupons(filtered)
+  }
+
   useEffect(() => {
-    fetchSubscriptionPlans()
+    fetchPrices()
+    fetchCoupons()
   }, [])
 
-  useEffect(() => {
-    fetchCoupons()
-  }, [page, rowsPerPage, search])
-
-  const handleChangePage = (_: unknown, newPage: number) => {
-    setPage(newPage)
-  }
-
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(parseInt(event.target.value, 10))
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newSearch = e.target.value
+    setSearch(newSearch)
+    filterCoupons(coupons, newSearch)
     setPage(0)
   }
 
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearch(event.target.value)
-    setPage(0)
+  const handleAddClick = () => {
+    setEditingCoupon(null)
+    setFormData(initialFormData)
+    setDialogOpen(true)
   }
 
-  const handleOpenDialog = (coupon?: DiscountCoupon) => {
-    if (coupon) {
-      setEditingCoupon(coupon)
-      setFormData({
-        code: coupon.code,
-        description: coupon.description || '',
-        discount_type: coupon.discount_type,
-        discount_value: coupon.discount_value.toString(),
-        applicable_plans: coupon.applicable_plans || [],
-        usage_limit: coupon.usage_limit?.toString() || '',
-        valid_from: coupon.valid_from.split('T')[0],
-        valid_until: coupon.valid_until?.split('T')[0] || '',
-        is_active: coupon.is_active,
-      })
-    } else {
-      setEditingCoupon(null)
-      setFormData(initialFormData)
-    }
+  const handleEditClick = (coupon: DiscountCoupon) => {
+    setEditingCoupon(coupon)
+    setFormData({
+      code: coupon.code,
+      description: coupon.description || '',
+      discount_type: coupon.discount_type,
+      discount_value: coupon.discount_value.toString(),
+      applicable_plans: coupon.applicable_plans || [],
+      usage_limit: coupon.usage_limit?.toString() || '',
+      valid_from: coupon.valid_from.split('T')[0],
+      valid_until: coupon.valid_until ? coupon.valid_until.split('T')[0] : '',
+      is_active: coupon.is_active,
+    })
     setDialogOpen(true)
   }
 
@@ -202,153 +199,97 @@ export const DiscountCouponsPage: React.FC = () => {
     setFormData(initialFormData)
   }
 
-  const handleFormChange = (field: keyof CouponFormData, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
-  }
-
-  const validateForm = (): boolean => {
-    if (!formData.code.trim()) {
-      enqueueSnackbar('Coupon code is required', { variant: 'error' })
-      return false
-    }
-    if (!formData.discount_value || parseFloat(formData.discount_value) <= 0) {
-      enqueueSnackbar('Discount value must be greater than 0', { variant: 'error' })
-      return false
-    }
-    if (formData.discount_type === 'percentage' && parseFloat(formData.discount_value) > 100) {
-      enqueueSnackbar('Percentage discount cannot exceed 100%', { variant: 'error' })
-      return false
-    }
-    return true
-  }
-
   const handleSubmit = async () => {
-    if (!validateForm()) return
-
     try {
+      if (!formData.code.trim()) {
+        enqueueSnackbar('Coupon code is required', { variant: 'warning' })
+        return
+      }
+
+      if (!formData.discount_value) {
+        enqueueSnackbar('Discount value is required', { variant: 'warning' })
+        return
+      }
+
       setSubmitting(true)
 
       const couponData = {
         code: formData.code.toUpperCase().trim(),
-        description: formData.description.trim() || null,
+        description: formData.description || null,
         discount_type: formData.discount_type,
         discount_value: parseFloat(formData.discount_value),
         applicable_plans: formData.applicable_plans.length > 0 ? formData.applicable_plans : null,
         usage_limit: formData.usage_limit ? parseInt(formData.usage_limit) : null,
-        valid_from: new Date(formData.valid_from).toISOString(),
-        valid_until: formData.valid_until ? new Date(formData.valid_until).toISOString() : null,
+        valid_from: formData.valid_from,
+        valid_until: formData.valid_until || null,
         is_active: formData.is_active,
       }
 
       if (editingCoupon) {
-        const { error } = await supabase
+        const { error: updateError } = await supabase
           .from('discount_coupons')
           .update(couponData)
           .eq('id', editingCoupon.id)
 
-        if (error) throw error
+        if (updateError) throw updateError
         enqueueSnackbar('Coupon updated successfully', { variant: 'success' })
       } else {
-        const { error } = await supabase
+        const { error: insertError } = await supabase
           .from('discount_coupons')
           .insert([couponData])
 
-        if (error) throw error
+        if (insertError) throw insertError
         enqueueSnackbar('Coupon created successfully', { variant: 'success' })
       }
 
       handleCloseDialog()
-      fetchCoupons()
+      await fetchCoupons()
     } catch (err: any) {
-      enqueueSnackbar(err.message || 'Failed to save coupon', { variant: 'error' })
+      enqueueSnackbar(`Error saving coupon: ${err.message}`, { variant: 'error' })
     } finally {
       setSubmitting(false)
     }
   }
 
-  const handleDelete = async (id: string) => {
-    if (!window.confirm('Are you sure you want to delete this coupon?')) return
+  const handleDeleteClick = async (coupon: DiscountCoupon) => {
+    if (!window.confirm(`Delete coupon "${coupon.code}"?`)) return
 
     try {
-      const { error } = await supabase
+      const { error: deleteError } = await supabase
         .from('discount_coupons')
         .delete()
-        .eq('id', id)
-
-      if (error) throw error
-
-      enqueueSnackbar('Coupon deleted successfully', { variant: 'success' })
-      fetchCoupons()
-    } catch (err: any) {
-      enqueueSnackbar('Failed to delete coupon', { variant: 'error' })
-    }
-  }
-
-  const handleToggleActive = async (coupon: DiscountCoupon) => {
-    try {
-      const { error } = await supabase
-        .from('discount_coupons')
-        .update({ is_active: !coupon.is_active })
         .eq('id', coupon.id)
 
-      if (error) throw error
-
-      enqueueSnackbar(
-        `Coupon ${!coupon.is_active ? 'activated' : 'deactivated'} successfully`,
-        { variant: 'success' }
-      )
-      fetchCoupons()
+      if (deleteError) throw deleteError
+      enqueueSnackbar('Coupon deleted successfully', { variant: 'success' })
+      await fetchCoupons()
     } catch (err: any) {
-      enqueueSnackbar('Failed to update coupon status', { variant: 'error' })
+      enqueueSnackbar(`Error deleting coupon: ${err.message}`, { variant: 'error' })
     }
   }
 
-  const isExpired = (validUntil: string | null) => {
-    if (!validUntil) return false
-    return new Date(validUntil) < new Date()
-  }
+  if (loading) return <PageLoader />
 
-  if (loading && coupons.length === 0) {
-    return <PageLoader />
-  }
-
-  if (error && coupons.length === 0) {
-    return (
-      <Box>
-        <Typography variant="h4" gutterBottom>
-          Discount Coupons
-        </Typography>
-        <Alert severity="error" sx={{ mt: 2 }}>
-          Error loading coupons: {error}
-        </Alert>
-      </Box>
-    )
-  }
+  const displayCoupons = filteredCoupons.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
 
   return (
-    <Box>
+    <Box sx={{ p: 3 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Box>
-          <Typography variant="h4">Discount Coupons</Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-            Create and manage discount codes for subscription plans
-          </Typography>
-        </Box>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={() => handleOpenDialog()}
-        >
+        <Typography variant="h5">Discount Coupons</Typography>
+        <Button variant="contained" startIcon={<AddIcon />} onClick={handleAddClick}>
           Create Coupon
         </Button>
       </Box>
 
-      <Paper sx={{ p: 2, mb: 2 }}>
+      {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+
+      <Paper sx={{ mb: 3, p: 2 }}>
         <TextField
           fullWidth
+          size="small"
           placeholder="Search by code or description..."
           value={search}
-          onChange={handleSearchChange}
+          onChange={handleSearch}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -362,103 +303,84 @@ export const DiscountCouponsPage: React.FC = () => {
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
-            <TableRow>
+            <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
               <TableCell>Code</TableCell>
-              <TableCell>Type</TableCell>
-              <TableCell>Value</TableCell>
-              <TableCell>Usage</TableCell>
+              <TableCell>Discount</TableCell>
               <TableCell>Valid Until</TableCell>
+              <TableCell align="center">Used / Limit</TableCell>
               <TableCell>Status</TableCell>
-              <TableCell align="right">Actions</TableCell>
+              <TableCell align="center">Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {loading ? (
+            {displayCoupons.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} align="center" sx={{ py: 4 }}>
-                  <CircularProgress />
-                </TableCell>
-              </TableRow>
-            ) : coupons.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={7} align="center" sx={{ py: 4 }}>
-                  <Typography color="text.secondary">No coupons found</Typography>
+                <TableCell colSpan={6} align="center" sx={{ py: 3 }}>
+                  <Typography color="textSecondary">No coupons found</Typography>
                 </TableCell>
               </TableRow>
             ) : (
-              coupons.map((coupon) => (
-                <TableRow key={coupon.id} hover>
+              displayCoupons.map((coupon) => (
+                <TableRow key={coupon.id}>
                   <TableCell>
-                    <Typography variant="body2" fontWeight={600}>
-                      {coupon.code}
-                    </Typography>
-                    {coupon.description && (
-                      <Typography variant="caption" color="text.secondary">
-                        {coupon.description}
+                    <Stack>
+                      <Typography variant="body2" sx={{ fontFamily: 'monospace', fontWeight: 600 }}>
+                        {coupon.code}
                       </Typography>
-                    )}
+                      {coupon.description && (
+                        <Typography variant="caption" color="textSecondary">
+                          {coupon.description}
+                        </Typography>
+                      )}
+                    </Stack>
                   </TableCell>
                   <TableCell>
-                    <Chip
-                      label={coupon.discount_type === 'percentage' ? 'Percentage' : 'Fixed'}
-                      size="small"
-                      variant="outlined"
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2" fontWeight={600}>
+                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
                       {coupon.discount_type === 'percentage'
                         ? `${coupon.discount_value}%`
-                        : `$${coupon.discount_value}`}
+                        : `₹${coupon.discount_value}`}
                     </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2">
-                      {coupon.times_used}
-                      {coupon.usage_limit ? `/${coupon.usage_limit}` : ''}
-                    </Typography>
-                    {coupon.usage_limit && coupon.times_used >= coupon.usage_limit && (
-                      <Chip label="Limit Reached" size="small" color="warning" sx={{ ml: 1 }} />
-                    )}
                   </TableCell>
                   <TableCell>
                     {coupon.valid_until ? (
-                      <Box>
-                        <Typography variant="body2">
-                          {format(new Date(coupon.valid_until), 'MMM dd, yyyy')}
-                        </Typography>
-                        {isExpired(coupon.valid_until) && (
-                          <Chip label="Expired" size="small" color="error" sx={{ mt: 0.5 }} />
-                        )}
-                      </Box>
+                      <Typography variant="body2">
+                        {format(new Date(coupon.valid_until), 'MMM dd, yyyy')}
+                      </Typography>
                     ) : (
-                      <Typography variant="body2" color="text.secondary">No expiry</Typography>
+                      <Typography variant="caption" color="textSecondary">
+                        No expiry
+                      </Typography>
                     )}
                   </TableCell>
+                  <TableCell align="center">
+                    <Typography variant="body2">
+                      {coupon.times_used}
+                      {coupon.usage_limit ? ` / ${coupon.usage_limit}` : ''}
+                    </Typography>
+                  </TableCell>
                   <TableCell>
-                    <Switch
-                      checked={coupon.is_active}
-                      onChange={() => handleToggleActive(coupon)}
+                    <Chip
+                      label={coupon.is_active ? 'Active' : 'Inactive'}
+                      color={coupon.is_active ? 'success' : 'default'}
                       size="small"
                     />
                   </TableCell>
-                  <TableCell align="right">
-                    <Stack direction="row" spacing={0.5} justifyContent="flex-end">
-                      <IconButton
-                        size="small"
-                        onClick={() => handleOpenDialog(coupon)}
-                        color="primary"
-                      >
-                        <EditIcon fontSize="small" />
-                      </IconButton>
-                      <IconButton
-                        size="small"
-                        onClick={() => handleDelete(coupon.id)}
-                        color="error"
-                      >
-                        <DeleteIcon fontSize="small" />
-                      </IconButton>
-                    </Stack>
+                  <TableCell align="center">
+                    <IconButton
+                      size="small"
+                      onClick={() => handleEditClick(coupon)}
+                      title="Edit"
+                    >
+                      <EditIcon fontSize="small" />
+                    </IconButton>
+                    <IconButton
+                      size="small"
+                      color="error"
+                      onClick={() => handleDeleteClick(coupon)}
+                      title="Delete"
+                    >
+                      <DeleteIcon fontSize="small" />
+                    </IconButton>
                   </TableCell>
                 </TableRow>
               ))
@@ -466,138 +388,126 @@ export const DiscountCouponsPage: React.FC = () => {
           </TableBody>
         </Table>
         <TablePagination
-          rowsPerPageOptions={[5, 10, 25, 50]}
+          rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={totalCount}
+          count={filteredCoupons.length}
           rowsPerPage={rowsPerPage}
           page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
+          onPageChange={(_, newPage) => setPage(newPage)}
+          onRowsPerPageChange={(e) => setRowsPerPage(parseInt(e.target.value, 10))}
         />
       </TableContainer>
 
-      <Dialog open={dialogOpen} onClose={handleCloseDialog} maxWidth="md" fullWidth>
-        <DialogTitle>
-          {editingCoupon ? 'Edit Coupon' : 'Create New Coupon'}
-        </DialogTitle>
-        <DialogContent>
-          <Stack spacing={2} sx={{ mt: 1 }}>
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-              <TextField
-                fullWidth
-                label="Coupon Code"
-                value={formData.code}
-                onChange={(e) => handleFormChange('code', e.target.value.toUpperCase())}
-                placeholder="FIRST20"
-                required
-              />
-              <FormControl fullWidth required>
-                <InputLabel>Discount Type</InputLabel>
-                <Select
-                  value={formData.discount_type}
-                  label="Discount Type"
-                  onChange={(e) => handleFormChange('discount_type', e.target.value)}
-                >
-                  <MenuItem value="percentage">Percentage</MenuItem>
-                  <MenuItem value="fixed_amount">Fixed Amount (USD)</MenuItem>
-                </Select>
-              </FormControl>
-            </Stack>
+      {/* Create/Edit Dialog */}
+      <Dialog open={dialogOpen} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
+        <DialogTitle>{editingCoupon ? 'Edit Coupon' : 'Create New Coupon'}</DialogTitle>
+        <DialogContent sx={{ pt: 2 }}>
+          <Stack spacing={2}>
+            <TextField
+              fullWidth
+              label="Coupon Code"
+              value={formData.code}
+              onChange={(e) =>
+                setFormData({ ...formData, code: e.target.value.toUpperCase() })
+              }
+              placeholder="SAVE20"
+              disabled={!!editingCoupon}
+            />
 
             <TextField
               fullWidth
               label="Description"
               value={formData.description}
-              onChange={(e) => handleFormChange('description', e.target.value)}
-              placeholder="First-time user discount"
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              placeholder="e.g., Summer sale discount"
               multiline
               rows={2}
             />
 
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-              <TextField
-                fullWidth
-                label="Discount Value"
-                type="number"
-                value={formData.discount_value}
-                onChange={(e) => handleFormChange('discount_value', e.target.value)}
-                placeholder={formData.discount_type === 'percentage' ? '20' : '10'}
-                required
-                InputProps={{
-                  endAdornment: formData.discount_type === 'percentage' ? '%' : 'USD'
-                }}
-              />
-              <TextField
-                fullWidth
-                label="Usage Limit"
-                type="number"
-                value={formData.usage_limit}
-                onChange={(e) => handleFormChange('usage_limit', e.target.value)}
-                placeholder="Leave empty for unlimited"
-              />
-            </Stack>
+            <FormControl fullWidth>
+              <InputLabel>Discount Type</InputLabel>
+              <Select
+                value={formData.discount_type}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    discount_type: e.target.value as 'percentage' | 'fixed_amount',
+                  })
+                }
+                label="Discount Type"
+              >
+                <MenuItem value="percentage">Percentage (%)</MenuItem>
+                <MenuItem value="fixed_amount">Fixed Amount (₹)</MenuItem>
+              </Select>
+            </FormControl>
 
-            <Box>
-              <FormControl fullWidth disabled={plansLoading}>
-                <InputLabel>Applicable Plans</InputLabel>
-                <Select
-                  multiple
-                  value={formData.applicable_plans}
-                  label="Applicable Plans"
-                  onChange={(e) => handleFormChange('applicable_plans', e.target.value)}
-                  renderValue={(selected) => (
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                      {selected.map((value) => {
-                        const plan = subscriptionPlans.find(p => p.id === value)
-                        return <Chip key={value} label={plan?.name || value} size="small" />
-                      })}
-                    </Box>
-                  )}
-                >
-                  {subscriptionPlans.length === 0 ? (
-                    <MenuItem disabled>
-                      <em>No active plans available</em>
-                    </MenuItem>
-                  ) : (
-                    subscriptionPlans.map((plan) => (
-                      <MenuItem key={plan.id} value={plan.id}>
-                        {plan.name} (${plan.price_usd})
-                      </MenuItem>
-                    ))
-                  )}
-                </Select>
-              </FormControl>
-              <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                Leave empty to apply to all plans
-              </Typography>
-            </Box>
+            <TextField
+              fullWidth
+              label="Discount Value"
+              type="number"
+              value={formData.discount_value}
+              onChange={(e) => setFormData({ ...formData, discount_value: e.target.value })}
+              inputProps={{ step: '0.01', min: '0' }}
+            />
 
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-              <TextField
-                fullWidth
-                label="Valid From"
-                type="date"
-                value={formData.valid_from}
-                onChange={(e) => handleFormChange('valid_from', e.target.value)}
-                InputLabelProps={{ shrink: true }}
-                required
-              />
-              <TextField
-                fullWidth
-                label="Valid Until"
-                type="date"
-                value={formData.valid_until}
-                onChange={(e) => handleFormChange('valid_until', e.target.value)}
-                InputLabelProps={{ shrink: true }}
-                inputProps={{ min: formData.valid_from }}
-              />
-            </Stack>
+            <FormControl fullWidth>
+              <InputLabel>Applicable to Plans</InputLabel>
+              <Select
+                multiple
+                value={formData.applicable_plans}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    applicable_plans: typeof e.target.value === 'string'
+                      ? e.target.value.split(',')
+                      : e.target.value,
+                  })
+                }
+                label="Applicable to Plans"
+              >
+                {prices.map((price) => (
+                  <MenuItem key={price.id} value={price.id}>
+                    {price.plan_name} ({price.currency})
+                  </MenuItem>
+                ))}
+              </Select>
+              <FormHelperText>Leave empty to apply to all plans</FormHelperText>
+            </FormControl>
+
+            <TextField
+              fullWidth
+              label="Usage Limit"
+              type="number"
+              value={formData.usage_limit}
+              onChange={(e) => setFormData({ ...formData, usage_limit: e.target.value })}
+              placeholder="Leave empty for unlimited"
+              inputProps={{ min: '1' }}
+            />
+
+            <TextField
+              fullWidth
+              label="Valid From"
+              type="date"
+              value={formData.valid_from}
+              onChange={(e) => setFormData({ ...formData, valid_from: e.target.value })}
+              InputLabelProps={{ shrink: true }}
+            />
+
+            <TextField
+              fullWidth
+              label="Valid Until"
+              type="date"
+              value={formData.valid_until}
+              onChange={(e) => setFormData({ ...formData, valid_until: e.target.value })}
+              InputLabelProps={{ shrink: true }}
+              helperText="Leave empty for no expiry"
+            />
 
             <FormControlLabel
               control={
                 <Switch
                   checked={formData.is_active}
-                  onChange={(e) => handleFormChange('is_active', e.target.checked)}
+                  onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
                 />
               }
               label="Active"
@@ -605,13 +515,11 @@ export const DiscountCouponsPage: React.FC = () => {
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDialog}>Cancel</Button>
-          <Button
-            onClick={handleSubmit}
-            variant="contained"
-            disabled={submitting}
-          >
-            {submitting ? 'Saving...' : editingCoupon ? 'Update' : 'Create'}
+          <Button onClick={handleCloseDialog} disabled={submitting}>
+            Cancel
+          </Button>
+          <Button onClick={handleSubmit} variant="contained" disabled={submitting}>
+            {submitting ? <CircularProgress size={24} /> : editingCoupon ? 'Update' : 'Create'}
           </Button>
         </DialogActions>
       </Dialog>
