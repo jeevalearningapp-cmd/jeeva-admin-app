@@ -109,7 +109,7 @@ export const DiscountCouponsPage: React.FC = () => {
   const fetchPrices = async () => {
     try {
       setPricesLoading(true)
-      const response = await fetch(`${apiUrl}/stripe-admin/prices`)
+      const response = await fetch(`${apiUrl}/api/stripe-admin/prices`)
       if (!response.ok) throw new Error('Failed to fetch prices')
 
       const priceData = await response.json()

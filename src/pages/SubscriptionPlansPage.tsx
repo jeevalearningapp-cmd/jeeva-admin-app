@@ -51,7 +51,7 @@ export const SubscriptionPlansPage: React.FC = () => {
   const fetchPrices = async () => {
     try {
       setLoading(true)
-      const response = await fetch(`${apiUrl}/stripe-admin/prices`)
+      const response = await fetch(`${apiUrl}/api/stripe-admin/prices`)
       if (!response.ok) throw new Error('Failed to fetch prices')
 
       const prices = await response.json()
