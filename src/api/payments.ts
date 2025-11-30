@@ -62,7 +62,6 @@ export const paymentsAPI = {
     originalAmount: number
     discountAmount: number
     stripePaymentIntentId?: string
-    razorpayOrderId?: string
     metadata?: any
   }): Promise<Payment> {
     const { data, error } = await supabase
@@ -79,7 +78,6 @@ export const paymentsAPI = {
         discount_amount: input.discountAmount,
         final_amount: input.amount,
         stripe_payment_intent_id: input.stripePaymentIntentId,
-        razorpay_order_id: input.razorpayOrderId,
         status: 'pending',
         metadata: input.metadata || {},
       })
@@ -107,7 +105,6 @@ export const paymentsAPI = {
     const updateData: any = {}
 
     if (update.status) updateData.status = update.status
-    if (update.razorpayPaymentId) updateData.razorpay_payment_id = update.razorpayPaymentId
     if (update.failureCode) updateData.failure_code = update.failureCode
     if (update.failureMessage) updateData.failure_message = update.failureMessage
     if (update.gatewayResponse) updateData.gateway_response = update.gatewayResponse
@@ -219,14 +216,12 @@ export const paymentsAPI = {
     update: {
       status?: PaymentStatus
       stripeRefundId?: string
-      razorpayRefundId?: string
     }
   ): Promise<PaymentRefund> {
     const updateData: any = {}
 
     if (update.status) updateData.status = update.status
     if (update.stripeRefundId) updateData.stripe_refund_id = update.stripeRefundId
-    if (update.razorpayRefundId) updateData.razorpay_refund_id = update.razorpayRefundId
 
     const { data, error } = await supabase
       .from('payment_refunds')
@@ -331,7 +326,6 @@ function transformPaymentCustomerFromDB(data: any): PaymentCustomer {
     userId: data.user_id,
     gateway: data.gateway,
     stripeCustomerId: data.stripe_customer_id,
-    razorpayCustomerId: data.razorpay_customer_id,
     email: data.email,
     fullName: data.full_name,
     phone: data.phone,
@@ -348,8 +342,6 @@ function transformPaymentFromDB(data: any): Payment {
     paymentCustomerId: data.payment_customer_id,
     gateway: data.gateway,
     stripePaymentIntentId: data.stripe_payment_intent_id,
-    razorpayOrderId: data.razorpay_order_id,
-    razorpayPaymentId: data.razorpay_payment_id,
     amount: parseFloat(data.amount),
     currency: data.currency,
     status: data.status,
@@ -379,7 +371,6 @@ function transformPaymentRefundFromDB(data: any): PaymentRefund {
     paymentId: data.payment_id,
     gateway: data.gateway,
     stripeRefundId: data.stripe_refund_id,
-    razorpayRefundId: data.razorpay_refund_id,
     amount: parseFloat(data.amount),
     currency: data.currency,
     reason: data.reason,
