@@ -6,9 +6,9 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     port: 5000,
-    allowedHosts: ['*.replit.dev', 'localhost'],
+    allowedHosts: 'all',
     proxy: {
-      '/api/email': {
+      '/api': {
         target: 'http://localhost:3001',
         changeOrigin: true,
       },
