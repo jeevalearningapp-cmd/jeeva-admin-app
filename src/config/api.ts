@@ -10,18 +10,23 @@ const getApiBaseUrl = (): string => {
     return import.meta.env.VITE_API_URL
   }
 
-  // Priority 2: Check if running in production (published Replit)
+  // Priority 2: Development - Backend runs on localhost:3001
+  if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+    return 'http://localhost:3001'
+  }
+
+  // Priority 3: Production (published Replit)
   if (window?.location?.hostname === 'jeeva-admin-portal.vollskick.replit.dev') {
     return 'https://jeeva-admin-portal.vollskick.replit.dev'
   }
 
-  // Priority 3: Development - use current origin (works through Replit proxy)
-  if (window?.location?.origin) {
-    return window.location.origin
+  // Priority 4: Replit preview URLs (for Replit dev environment)
+  if (window?.location?.hostname?.includes('spock.replit.dev')) {
+    return 'http://localhost:3001'
   }
 
   // Fallback
-  return 'http://localhost:5000'
+  return 'http://localhost:3001'
 }
 
 export const API_BASE_URL = getApiBaseUrl()
