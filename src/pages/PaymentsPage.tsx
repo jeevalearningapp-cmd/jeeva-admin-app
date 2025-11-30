@@ -126,7 +126,7 @@ export const PaymentsPage: React.FC = () => {
               Total Revenue
             </Typography>
             <Typography variant="h5">
-              ${summary.totalAmount.toFixed(2)}
+              £{summary.totalAmount.toFixed(2)}
             </Typography>
           </CardContent>
         </Card>
@@ -225,7 +225,7 @@ export const PaymentsPage: React.FC = () => {
                     {payment.id.substring(0, 8)}...
                   </TableCell>
                   <TableCell>{payment.userId.substring(0, 8)}...</TableCell>
-                  <TableCell>${payment.finalAmount.toFixed(2)}</TableCell>
+                  <TableCell>£{payment.finalAmount.toFixed(2)}</TableCell>
                   <TableCell>
                     <Chip label={getGatewayLabel(payment.gateway)} size="small" />
                   </TableCell>
@@ -293,16 +293,16 @@ export const PaymentsPage: React.FC = () => {
             <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
               <Box>
                 <Typography variant="caption" color="text.secondary">Original Amount</Typography>
-                <Typography>${selectedPayment.originalAmount.toFixed(2)}</Typography>
+                <Typography>£{selectedPayment.originalAmount.toFixed(2)}</Typography>
               </Box>
               <Box>
                 <Typography variant="caption" color="text.secondary">Discount</Typography>
-                <Typography>${selectedPayment.discountAmount.toFixed(2)}</Typography>
+                <Typography>£{selectedPayment.discountAmount.toFixed(2)}</Typography>
               </Box>
             </Box>
             <Box>
               <Typography variant="caption" color="text.secondary">Final Amount</Typography>
-              <Typography variant="h6">${selectedPayment.finalAmount.toFixed(2)}</Typography>
+              <Typography variant="h6">£{selectedPayment.finalAmount.toFixed(2)}</Typography>
             </Box>
             <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
               <Box>
@@ -352,7 +352,7 @@ export const PaymentsPage: React.FC = () => {
           <DialogContent sx={{ pt: 3, display: 'flex', flexDirection: 'column', gap: 2 }}>
             <Box>
               <Typography variant="caption" color="text.secondary">Payment Amount</Typography>
-              <Typography variant="h6">${selectedPayment.finalAmount.toFixed(2)}</Typography>
+              <Typography variant="h6">£{selectedPayment.finalAmount.toFixed(2)}</Typography>
             </Box>
             <TextField
               label="Refund Amount"
