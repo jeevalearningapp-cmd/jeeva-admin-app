@@ -22,6 +22,8 @@ import {
   ListItemSecondaryAction,
   IconButton,
   Chip,
+  LinearProgress,
+  Paper,
 } from '@mui/material'
 import { DeleteOutlined, EditOutlined, AddOutlined } from '@mui/icons-material'
 
@@ -316,6 +318,3 @@ export default function TrialPracticeManager({ onStatusChange }: PracticeManager
     </Box>
   )
 }
-
-// LinearProgress component from MUI
-import { LinearProgress } from '@mui/material'

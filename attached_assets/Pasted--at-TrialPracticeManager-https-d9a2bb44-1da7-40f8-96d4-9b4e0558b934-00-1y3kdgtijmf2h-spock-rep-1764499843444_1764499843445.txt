@@ -1,0 +1,43 @@
+    at TrialPracticeManager (https://d9a2bb44-1da7-40f8-96d4-9b4e0558b934-00-1y3kdgtijmf2h.spock.replit.dev/src/components/TrialModuleManagement/TrialPracticeManager.tsx:44:48)
+    at div
+    at https://d9a2bb44-1da7-40f8-96d4-9b4e0558b934-00-1y3kdgtijmf2h.spock.replit.dev/node_modules/.vite/deps/chunk-ISALQO6H.js?v=ff29a7c1:2394:45
+    at Box3 (https://d9a2bb44-1da7-40f8-96d4-9b4e0558b934-00-1y3kdgtijmf2h.spock.replit.dev/node_modules/.vite/deps/chunk-ISALQO6H.js?v=ff29a7c1:5351:19)
+    at div
+    at TabPanel (https://d9a2bb44-1da7-40f8-96d4-9b4e0558b934-00-1y3kdgtijmf2h.spock.replit.dev/src/pages/TrialModuleManagementPage.tsx:32:11)
+    at div
+    at https://d9a2bb44-1da7-40f8-96d4-9b4e0558b934-00-1y3kdgtijmf2h.spock.replit.dev/node_modules/.vite/deps/chunk-ISALQO6H.js?v=ff29a7c1:2394:45
+    at Box3 (https://d9a2bb44-1da7-40f8-96d4-9b4e0558b934-00-1y3kdgtijmf2h.spock.replit.dev/node_modules/.vite/deps/chunk-ISALQO6H.js?v=ff29a7c1:5351:19)
+    at div
+    at https://d9a2bb44-1da7-40f8-96d4-9b4e0558b934-00-1y3kdgtijmf2h.spock.replit.dev/node_modules/.vite/deps/chunk-ISALQO6H.js?v=ff29a7c1:2394:45
+    at Paper2 (https://d9a2bb44-1da7-40f8-96d4-9b4e0558b934-00-1y3kdgtijmf2h.spock.replit.dev/node_modules/.vite/deps/chunk-EISND4W2.js?v=ff29a7c1:7592:17)
+    at div
+    at https://d9a2bb44-1da7-40f8-96d4-9b4e0558b934-00-1y3kdgtijmf2h.spock.replit.dev/node_modules/.vite/deps/chunk-ISALQO6H.js?v=ff29a7c1:2394:45
+    at Box3 (https://d9a2bb44-1da7-40f8-96d4-9b4e0558b934-00-1y3kdgtijmf2h.spock.replit.dev/node_modules/.vite/deps/chunk-ISALQO6H.js?v=ff29a7c1:5351:19)
+    at TrialModuleManagementPage (https://d9a2bb44-1da7-40f8-96d4-9b4e0558b934-00-1y3kdgtijmf2h.spock.replit.dev/src/pages/TrialModuleManagementPage.tsx:60:35)
+    at div
+    at https://d9a2bb44-1da7-40f8-96d4-9b4e0558b934-00-1y3kdgtijmf2h.spock.replit.dev/node_modules/.vite/deps/chunk-ISALQO6H.js?v=ff29a7c1:2394:45
+    at Box3 (https://d9a2bb44-1da7-40f8-96d4-9b4e0558b934-00-1y3kdgtijmf2h.spock.replit.dev/node_modules/.vite/deps/chunk-ISALQO6H.js?v=ff29a7c1:5351:19)
+    at main
+    at https://d9a2bb44-1da7-40f8-96d4-9b4e0558b934-00-1y3kdgtijmf2h.spock.replit.dev/node_modules/.vite/deps/chunk-ISALQO6H.js?v=ff29a7c1:2394:45
+    at Box3 (https://d9a2bb44-1da7-40f8-96d4-9b4e0558b934-00-1y3kdgtijmf2h.spock.replit.dev/node_modules/.vite/deps/chunk-ISALQO6H.js?v=ff29a7c1:5351:19)
+    at div
+    at https://d9a2bb44-1da7-40f8-96d4-9b4e0558b934-00-1y3kdgtijmf2h.spock.replit.dev/node_modules/.vite/deps/chunk-ISALQO6H.js?v=ff29a7c1:2394:45
+    at Box3 (https://d9a2bb44-1da7-40f8-96d4-9b4e0558b934-00-1y3kdgtijmf2h.spock.replit.dev/node_modules/.vite/deps/chunk-ISALQO6H.js?v=ff29a7c1:5351:19)
+    at MainLayout (https://d9a2bb44-1da7-40f8-96d4-9b4e0558b934-00-1y3kdgtijmf2h.spock.replit.dev/src/components/layout/MainLayout.tsx:23:30)
+    at ProtectedRoute (https://d9a2bb44-1da7-40f8-96d4-9b4e0558b934-00-1y3kdgtijmf2h.spock.replit.dev/src/components/auth/ProtectedRoute.tsx:21:34)
+    at RenderedRoute (https://d9a2bb44-1da7-40f8-96d4-9b4e0558b934-00-1y3kdgtijmf2h.spock.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=ff29a7c1:6111:26)
+    at Routes (https://d9a2bb44-1da7-40f8-96d4-9b4e0558b934-00-1y3kdgtijmf2h.spock.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=ff29a7c1:6905:3)
+    at Router (https://d9a2bb44-1da7-40f8-96d4-9b4e0558b934-00-1y3kdgtijmf2h.spock.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=ff29a7c1:6848:13)
+    at BrowserRouter (https://d9a2bb44-1da7-40f8-96d4-9b4e0558b934-00-1y3kdgtijmf2h.spock.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=ff29a7c1:9968:3)
+    at AuthProvider (https://d9a2bb44-1da7-40f8-96d4-9b4e0558b934-00-1y3kdgtijmf2h.spock.replit.dev/src/context/AuthContext.tsx:21:32)
+    at DefaultPropsProvider (https://d9a2bb44-1da7-40f8-96d4-9b4e0558b934-00-1y3kdgtijmf2h.spock.replit.dev/node_modules/.vite/deps/chunk-ISALQO6H.js?v=ff29a7c1:6016:3)
+    at RtlProvider (https://d9a2bb44-1da7-40f8-96d4-9b4e0558b934-00-1y3kdgtijmf2h.spock.replit.dev/node_modules/.vite/deps/chunk-ISALQO6H.js?v=ff29a7c1:5992:3)
+    at ThemeProvider2 (https://d9a2bb44-1da7-40f8-96d4-9b4e0558b934-00-1y3kdgtijmf2h.spock.replit.dev/node_modules/.vite/deps/chunk-ISALQO6H.js?v=ff29a7c1:5948:5)
+    at ThemeProvider3 (https://d9a2bb44-1da7-40f8-96d4-9b4e0558b934-00-1y3kdgtijmf2h.spock.replit.dev/node_modules/.vite/deps/chunk-ISALQO6H.js?v=ff29a7c1:6168:5)
+    at ThemeProviderNoVars (https://d9a2bb44-1da7-40f8-96d4-9b4e0558b934-00-1y3kdgtijmf2h.spock.replit.dev/node_modules/.vite/deps/chunk-XFFQKW7S.js?v=ff29a7c1:277:10)
+    at ThemeProvider (https://d9a2bb44-1da7-40f8-96d4-9b4e0558b934-00-1y3kdgtijmf2h.spock.replit.dev/node_modules/.vite/deps/chunk-XFFQKW7S.js?v=ff29a7c1:426:3)
+    at ThemeProvider (https://d9a2bb44-1da7-40f8-96d4-9b4e0558b934-00-1y3kdgtijmf2h.spock.replit.dev/src/context/ThemeContext.tsx:22:33)
+    at SnackbarProvider2 (https://d9a2bb44-1da7-40f8-96d4-9b4e0558b934-00-1y3kdgtijmf2h.spock.replit.dev/node_modules/.vite/deps/notistack.js?v=ff29a7c1:1232:24)
+    at QueryClientProvider (https://d9a2bb44-1da7-40f8-96d4-9b4e0558b934-00-1y3kdgtijmf2h.spock.replit.dev/node_modules/.vite/deps/@tanstack_react-query.js?v=ff29a7c1:3096:3)
+    at ErrorBoundary (https://d9a2bb44-1da7-40f8-96d4-9b4e0558b934-00-1y3kdgtijmf2h.spock.replit.dev/src/components/common/ErrorBoundary.tsx:9:5)
+    at App
