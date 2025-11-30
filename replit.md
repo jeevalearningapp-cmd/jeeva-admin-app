@@ -58,6 +58,36 @@ Preferred communication style: Simple, everyday language.
 ### Database Schema for Questions
 Questions table includes: `module_type`, `category`, `subdivision`, `lesson_id`, `question_type`, `difficulty`, `points`, `explanation`, `is_active`.
 
+## Supabase Tables - Cleanup Status (Nov 30, 2025)
+
+**DEPRECATED TABLES** (Old payment system - NO LONGER USED):
+- ❌ `subscription_plans` - Replaced by Stripe products/prices
+- ❌ `subscriptions` - Replaced by Stripe API
+- ❌ `prices` - Replaced by Stripe prices
+
+**ACTIVE TABLES** (Still in use):
+- ✅ `discount_coupons` - Coupon validation
+- ✅ `user_profiles` - User data
+- ✅ `payment_customers` - Maps users to Stripe/Razorpay customers
+- ✅ `payments` - Payment records
+- ✅ `payment_refunds` - Refund tracking
+- ✅ `notification_*` - Push notifications
+- ✅ `chat_*` - AI chatbot conversations
+- ✅ `content_*` - Learning content and approvals
+
+**Code Cleanup Done:**
+- ✅ Removed Supabase queries from SubscriptionPlansPage (now uses Stripe API)
+- ✅ Updated DiscountCouponsPage (uses Supabase, still needed)
+- ✅ Fixed API URL configuration for Replit preview environment
+- ✅ Updated /api/subscriptions/plans endpoint (now deprecated, points to Stripe API)
+- ✅ Marked calculatePricing() as deprecated in payment.ts
+- ✅ Marked activateSubscription() as deprecated in payment.ts
+
+**Recommended Supabase Cleanup** (when ready):
+- Delete unused tables: `subscription_plans`, `subscriptions`, `prices`
+- Migrate coupon data to Stripe coupons if needed
+- Update RLS policies to reflect new payment system
+
 ## External Dependencies
 
 **Third-Party Services:**

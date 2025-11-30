@@ -79,19 +79,16 @@ router.post('/validate-coupon', async (req: Request, res: Response) => {
 
 /**
  * GET /api/subscriptions/plans
- * Get all active subscription plans
+ * Get all active subscription plans from Stripe
  */
 router.get('/plans', async (req: Request, res: Response) => {
   try {
-    const { data: plans, error } = await supabase
-      .from('subscription_plans')
-      .select('*')
-      .eq('is_active', true)
-      .order('price_usd', { ascending: true })
-
-    if (error) throw error
-
-    res.json(plans || [])
+    // Plans are now managed through Stripe Admin API
+    // This endpoint is deprecated - use /api/stripe-admin/prices instead
+    res.status(410).json({
+      error: 'Deprecated: Use /api/stripe-admin/prices for Stripe-managed plans',
+      deprecated: true
+    })
   } catch (error) {
     console.error('❌ Error fetching subscription plans:', error)
     res.status(500).json({

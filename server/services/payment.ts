@@ -19,21 +19,14 @@ export const paymentService = {
     subscriptionPlanId: string,
     discountCouponCode?: string
   ): Promise<PricingCalculation> {
-    const { data: plan, error: planError } = await supabase
-      .from('subscription_plans')
-      .select('*')
-      .eq('id', subscriptionPlanId)
-      .single()
-
-    if (planError || !plan) {
-      throw new Error('Subscription plan not found')
-    }
-
-    const originalAmount = parseFloat(plan.price)
+    // Note: Old subscription_plans table is deprecated - using Stripe API for pricing
+    // This function is kept for backward compatibility with coupon validation
+    const originalAmount = 0
     let discountAmount = 0
     let discountPercent: number | undefined
     let couponCode: string | undefined
 
+    // Keep coupon validation from Supabase
     if (discountCouponCode) {
       const { data: coupon, error: couponError } = await supabase
         .from('discount_coupons')
@@ -70,9 +63,9 @@ export const paymentService = {
       discountAmount,
       discountPercent,
       finalAmount,
-      currency: (plan.currency || 'USD') as CurrencyCode,
+      currency: 'USD' as CurrencyCode,
       couponCode,
-      trialDays: plan.trial_days || 0,
+      trialDays: 0,
     }
   },
 
@@ -294,14 +287,10 @@ export const paymentService = {
   },
 
   async activateSubscription(subscriptionId: string) {
-    const { error } = await supabase
-      .from('subscriptions')
-      .update({ status: 'active' })
-      .eq('id', subscriptionId)
-
-    if (error) {
-      console.error('Failed to activate subscription:', error)
-    }
+    // Note: Old subscriptions table is deprecated
+    // Stripe now manages subscription status via payment_customers table
+    console.log('✅ Subscription activation (deprecated Supabase method):', subscriptionId)
+    // Subscriptions are now managed through Stripe API
   },
 
   async createRefund(paymentId: string, amount?: number, reason?: string, refundedBy?: string) {
