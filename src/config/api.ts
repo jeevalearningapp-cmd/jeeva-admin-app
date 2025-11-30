@@ -26,6 +26,9 @@ const getApiBaseUrl = (): string => {
 
 export const API_BASE_URL = getApiBaseUrl()
 
+// Convenience export
+export const getApiUrl = () => API_BASE_URL
+
 // Debug helper (remove after testing)
 if (typeof window !== 'undefined') {
   console.log('📡 API_BASE_URL:', API_BASE_URL)

@@ -22,10 +22,14 @@ import {
   Chip,
   CircularProgress,
   Alert,
+  Stack,
+  Card,
+  CardContent,
 } from '@mui/material'
-import { AddOutlined as AddIcon } from '@mui/icons-material'
+import { AddOutlined as AddIcon, DeleteOutlined as DeleteIcon } from '@mui/icons-material'
 import { supabase } from '@/lib/supabase'
 import { useSnackbar } from 'notistack'
+import { getApiUrl } from '@/config/api'
 
 interface Price {
   id: string
@@ -35,6 +39,7 @@ interface Price {
   amount: number
   country_code: string
   plan_name: string
+  plan_duration_days: number
   is_active: boolean
 }
 
@@ -44,11 +49,20 @@ interface Country {
   currency: string
 }
 
+interface StripeProduct {
+  id: string
+  name: string
+  description?: string
+}
+
 export const StripeProductsPage: React.FC = () => {
   const [prices, setPrices] = useState<Price[]>([])
   const [countries, setCountries] = useState<Country[]>([])
+  const [stripeProducts, setStripeProducts] = useState<StripeProduct[]>([])
   const [loading, setLoading] = useState(true)
+  const [submitting, setSubmitting] = useState(false)
   const [dialogOpen, setDialogOpen] = useState(false)
+  const [createProductDialogOpen, setCreateProductDialogOpen] = useState(false)
   const [formData, setFormData] = useState({
     stripe_product_id: '',
     country_code: '',
@@ -56,26 +70,45 @@ export const StripeProductsPage: React.FC = () => {
     plan_name: '',
     plan_duration_days: '30',
   })
+  const [productFormData, setProductFormData] = useState({
+    name: '',
+    description: '',
+  })
   const { enqueueSnackbar } = useSnackbar()
+  const apiUrl = getApiUrl()
 
   useEffect(() => {
-    fetchPrices()
-    fetchCountries()
+    fetchInitialData()
   }, [])
+
+  const fetchInitialData = async () => {
+    setLoading(true)
+    try {
+      await Promise.all([fetchPrices(), fetchCountries(), fetchStripeProducts()])
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const fetchPrices = async () => {
     try {
-      const { data, error } = await supabase
-        .from('prices')
-        .select('*')
-        .order('plan_name', { ascending: true })
-
-      if (error) throw error
+      const response = await fetch(`${apiUrl}/stripe-admin/prices`)
+      if (!response.ok) throw new Error('Failed to fetch prices')
+      const data = await response.json()
       setPrices(data || [])
     } catch (err: any) {
       enqueueSnackbar('Failed to load prices', { variant: 'error' })
-    } finally {
-      setLoading(false)
+    }
+  }
+
+  const fetchStripeProducts = async () => {
+    try {
+      const response = await fetch(`${apiUrl}/stripe-admin/products`)
+      if (!response.ok) throw new Error('Failed to fetch products')
+      const data = await response.json()
+      setStripeProducts(data || [])
+    } catch (err: any) {
+      console.error('Failed to load Stripe products:', err)
     }
   }
 
@@ -92,29 +125,72 @@ export const StripeProductsPage: React.FC = () => {
     }
   }
 
+  const handleCreateProduct = async () => {
+    try {
+      if (!productFormData.name.trim()) {
+        enqueueSnackbar('Product name is required', { variant: 'warning' })
+        return
+      }
+
+      setSubmitting(true)
+      const response = await fetch(`${apiUrl}/stripe-admin/products`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: productFormData.name,
+          description: productFormData.description,
+        }),
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Failed to create product')
+      }
+
+      const result = await response.json()
+      enqueueSnackbar('Product created successfully', { variant: 'success' })
+      setProductFormData({ name: '', description: '' })
+      setCreateProductDialogOpen(false)
+      await fetchStripeProducts()
+    } catch (err: any) {
+      enqueueSnackbar(`Error: ${err.message}`, { variant: 'error' })
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
   const handleSubmit = async () => {
     try {
-      if (!formData.stripe_product_id || !formData.country_code || !formData.amount) {
+      if (
+        !formData.stripe_product_id ||
+        !formData.country_code ||
+        !formData.amount ||
+        !formData.plan_name
+      ) {
         enqueueSnackbar('Please fill all required fields', { variant: 'warning' })
         return
       }
 
-      const { data, error } = await supabase
-        .from('prices')
-        .insert({
+      setSubmitting(true)
+      const response = await fetch(`${apiUrl}/stripe-admin/prices`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           stripe_product_id: formData.stripe_product_id,
           country_code: formData.country_code,
-          currency: countries.find(c => c.country_code === formData.country_code)?.currency || 'USD',
           amount: parseFloat(formData.amount),
           plan_name: formData.plan_name,
           plan_duration_days: parseInt(formData.plan_duration_days),
-          is_active: true,
-        })
-        .select()
+        }),
+      })
 
-      if (error) throw error
-      enqueueSnackbar('Price added successfully', { variant: 'success' })
-      setPrices([...prices, data[0]])
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Failed to add price')
+      }
+
+      const result = await response.json()
+      enqueueSnackbar('Price added successfully to Stripe & database', { variant: 'success' })
       setDialogOpen(false)
       setFormData({
         stripe_product_id: '',
@@ -123,8 +199,28 @@ export const StripeProductsPage: React.FC = () => {
         plan_name: '',
         plan_duration_days: '30',
       })
+      await fetchPrices()
     } catch (err: any) {
-      enqueueSnackbar('Failed to add price: ' + err.message, { variant: 'error' })
+      enqueueSnackbar(`Error: ${err.message}`, { variant: 'error' })
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  const handleDeletePrice = async (priceId: string) => {
+    if (!window.confirm('Are you sure you want to deactivate this price?')) return
+
+    try {
+      const response = await fetch(`${apiUrl}/stripe-admin/prices/${priceId}`, {
+        method: 'DELETE',
+      })
+
+      if (!response.ok) throw new Error('Failed to delete price')
+
+      enqueueSnackbar('Price deactivated successfully', { variant: 'success' })
+      await fetchPrices()
+    } catch (err: any) {
+      enqueueSnackbar(`Error: ${err.message}`, { variant: 'error' })
     }
   }
 
@@ -132,18 +228,32 @@ export const StripeProductsPage: React.FC = () => {
 
   return (
     <Box sx={{ p: 3 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+      {/* Header */}
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
         <Typography variant="h5">Stripe Products & Prices</Typography>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={() => setDialogOpen(true)}
-        >
-          Add Price
-        </Button>
+        <Stack direction="row" spacing={2}>
+          <Button
+            variant="outlined"
+            startIcon={<AddIcon />}
+            onClick={() => setCreateProductDialogOpen(true)}
+          >
+            Create Product
+          </Button>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => setDialogOpen(true)}
+          >
+            Add Price
+          </Button>
+        </Stack>
       </Box>
 
-      <TableContainer component={Paper}>
+      {/* Prices Table */}
+      <Typography variant="h6" sx={{ mb: 2 }}>
+        Configured Prices
+      </Typography>
+      <TableContainer component={Paper} sx={{ mb: 4 }}>
         <Table>
           <TableHead>
             <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
@@ -152,55 +262,113 @@ export const StripeProductsPage: React.FC = () => {
               <TableCell>Country</TableCell>
               <TableCell align="right">Amount</TableCell>
               <TableCell>Currency</TableCell>
+              <TableCell>Duration</TableCell>
               <TableCell>Status</TableCell>
+              <TableCell align="center">Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {prices.map((price) => (
-              <TableRow key={price.id}>
-                <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.85rem' }}>
-                  {price.stripe_product_id.slice(0, 12)}...
-                </TableCell>
-                <TableCell>{price.plan_name}</TableCell>
-                <TableCell>{price.country_code}</TableCell>
-                <TableCell align="right">{price.amount}</TableCell>
-                <TableCell>{price.currency}</TableCell>
-                <TableCell>
-                  <Chip
-                    label={price.is_active ? 'Active' : 'Inactive'}
-                    color={price.is_active ? 'success' : 'default'}
-                    size="small"
-                  />
+            {prices.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={8} align="center" sx={{ py: 3 }}>
+                  <Typography color="textSecondary">No prices configured yet</Typography>
                 </TableCell>
               </TableRow>
-            ))}
+            ) : (
+              prices.map((price) => (
+                <TableRow key={price.id}>
+                  <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.85rem' }}>
+                    {price.stripe_product_id.slice(0, 12)}...
+                  </TableCell>
+                  <TableCell>{price.plan_name}</TableCell>
+                  <TableCell>{price.country_code}</TableCell>
+                  <TableCell align="right">{price.amount.toFixed(2)}</TableCell>
+                  <TableCell>{price.currency}</TableCell>
+                  <TableCell>{price.plan_duration_days} days</TableCell>
+                  <TableCell>
+                    <Chip
+                      label={price.is_active ? 'Active' : 'Inactive'}
+                      color={price.is_active ? 'success' : 'default'}
+                      size="small"
+                    />
+                  </TableCell>
+                  <TableCell align="center">
+                    <Button
+                      size="small"
+                      color="error"
+                      startIcon={<DeleteIcon />}
+                      onClick={() => handleDeletePrice(price.id)}
+                    >
+                      Deactivate
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </TableContainer>
 
-      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
+      {/* Available Stripe Products */}
+      {stripeProducts.length > 0 && (
+        <>
+          <Typography variant="h6" sx={{ mb: 2 }}>
+            Available Stripe Products ({stripeProducts.length})
+          </Typography>
+          <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 2, mb: 4 }}>
+            {stripeProducts.map((product) => (
+              <Card key={product.id}>
+                <CardContent>
+                  <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                    {product.name}
+                  </Typography>
+                  <Typography variant="caption" sx={{ fontFamily: 'monospace', color: 'textSecondary' }}>
+                    {product.id}
+                  </Typography>
+                  {product.description && (
+                    <Typography variant="body2" sx={{ mt: 1, color: 'textSecondary' }}>
+                      {product.description}
+                    </Typography>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </Box>
+        </>
+      )}
+
+      {/* Add Price Dialog */}
+      <Dialog open={dialogOpen} onClose={() => !submitting && setDialogOpen(false)} maxWidth="sm" fullWidth>
         <DialogTitle>Add New Price</DialogTitle>
-        <DialogContent sx={{ minWidth: '400px', pt: 2 }}>
-          <TextField
-            fullWidth
-            label="Stripe Product ID"
-            margin="normal"
-            value={formData.stripe_product_id}
-            onChange={(e) => setFormData({ ...formData, stripe_product_id: e.target.value })}
-            placeholder="prod_xxx"
-          />
+        <DialogContent sx={{ pt: 2 }}>
+          <FormControl fullWidth margin="normal">
+            <InputLabel>Stripe Product</InputLabel>
+            <Select
+              value={formData.stripe_product_id}
+              onChange={(e) => setFormData({ ...formData, stripe_product_id: e.target.value })}
+              label="Stripe Product"
+            >
+              {stripeProducts.map((p) => (
+                <MenuItem key={p.id} value={p.id}>
+                  {p.name} ({p.id})
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
           <TextField
             fullWidth
             label="Plan Name"
             margin="normal"
             value={formData.plan_name}
             onChange={(e) => setFormData({ ...formData, plan_name: e.target.value })}
+            placeholder="Premium Monthly"
           />
           <FormControl fullWidth margin="normal">
             <InputLabel>Country</InputLabel>
             <Select
               value={formData.country_code}
               onChange={(e) => setFormData({ ...formData, country_code: e.target.value })}
+              label="Country"
             >
               {countries.map((c) => (
                 <MenuItem key={c.country_code} value={c.country_code}>
@@ -214,26 +382,73 @@ export const StripeProductsPage: React.FC = () => {
             label="Amount"
             margin="normal"
             type="number"
-            inputProps={{ step: '0.01' }}
+            inputProps={{ step: '0.01', min: '0' }}
             value={formData.amount}
             onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+            placeholder="25.00"
           />
           <FormControl fullWidth margin="normal">
             <InputLabel>Duration</InputLabel>
             <Select
               value={formData.plan_duration_days}
               onChange={(e) => setFormData({ ...formData, plan_duration_days: e.target.value })}
+              label="Duration"
             >
-              <MenuItem value="30">30 Days</MenuItem>
-              <MenuItem value="90">90 Days</MenuItem>
-              <MenuItem value="365">365 Days</MenuItem>
+              <MenuItem value="30">30 Days (1 Month)</MenuItem>
+              <MenuItem value="90">90 Days (3 Months)</MenuItem>
+              <MenuItem value="365">365 Days (1 Year)</MenuItem>
             </Select>
           </FormControl>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
-          <Button onClick={handleSubmit} variant="contained">
-            Add Price
+          <Button onClick={() => setDialogOpen(false)} disabled={submitting}>
+            Cancel
+          </Button>
+          <Button onClick={handleSubmit} variant="contained" disabled={submitting} sx={{ minWidth: '100px' }}>
+            {submitting ? <CircularProgress size={24} /> : 'Add Price'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Create Product Dialog */}
+      <Dialog
+        open={createProductDialogOpen}
+        onClose={() => !submitting && setCreateProductDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>Create Stripe Product</DialogTitle>
+        <DialogContent sx={{ pt: 2 }}>
+          <TextField
+            fullWidth
+            label="Product Name"
+            margin="normal"
+            value={productFormData.name}
+            onChange={(e) => setProductFormData({ ...productFormData, name: e.target.value })}
+            placeholder="Premium Plan"
+          />
+          <TextField
+            fullWidth
+            label="Description (Optional)"
+            margin="normal"
+            multiline
+            rows={3}
+            value={productFormData.description}
+            onChange={(e) => setProductFormData({ ...productFormData, description: e.target.value })}
+            placeholder="Add product description..."
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setCreateProductDialogOpen(false)} disabled={submitting}>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleCreateProduct}
+            variant="contained"
+            disabled={submitting}
+            sx={{ minWidth: '100px' }}
+          >
+            {submitting ? <CircularProgress size={24} /> : 'Create'}
           </Button>
         </DialogActions>
       </Dialog>

@@ -6,10 +6,11 @@ import paymentRoutes from "./routes/payments.js";
 import notificationRoutes from "./routes/notifications.js";
 import countryRoutes from "./routes/country.js";
 import subscriptionRoutes from "./routes/subscriptions.js";
+import stripeAdminRoutes from "./routes/stripe-admin.js";
 import { notificationService } from "./services/notifications.js";
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = parseInt(process.env.PORT || '3001', 10);
 
 app.use(cors());
 
@@ -24,6 +25,7 @@ app.use("/api/payments", paymentRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/country", countryRoutes);
 app.use("/api/subscriptions", subscriptionRoutes);
+app.use("/api/stripe-admin", stripeAdminRoutes);
 
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok", message: "API server running (Email + AI Chat + Payments + Notifications + Country Detection)" });
@@ -55,6 +57,7 @@ app.listen(PORT, "0.0.0.0", () => {
   console.log(`   - Notifications API: /api/notifications`);
   console.log(`   - Country API: /api/country`);
   console.log(`   - Subscriptions API: /api/subscriptions`);
+  console.log(`   - Stripe Admin API: /api/stripe-admin`);
   console.log(`\n🔔 Push notification service started`);
   console.log(`   - Queue processor: every 2 minutes`);
   console.log(`   - Receipt checker: every 5 minutes`);
