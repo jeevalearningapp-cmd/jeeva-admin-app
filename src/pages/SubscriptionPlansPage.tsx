@@ -13,12 +13,8 @@ import {
   Alert,
   Chip,
   Stack,
-  Card,
-  CardContent,
-  Button,
 } from '@mui/material'
 import { InfoOutlined as InfoIcon } from '@mui/icons-material'
-import { supabase } from '@/lib/supabase'
 import { useSnackbar } from 'notistack'
 import { PageLoader } from '@/components/common'
 import { getApiUrl } from '@/config/api'
@@ -42,71 +38,74 @@ interface PriceGroup {
   prices: Price[]
 }
 
+// Country name mapping
+const COUNTRY_NAMES: Record<string, string> = {
+  IN: 'India',
+  GB: 'United Kingdom',
+  US: 'International',
+}
+
 export const SubscriptionPlansPage: React.FC = () => {
   const [priceGroups, setPriceGroups] = useState<PriceGroup[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const { enqueueSnackbar } = useSnackbar()
   const apiUrl = getApiUrl()
 
-  const fetchPrices = async () => {
-    try {
-      setLoading(true)
-      const url = `${apiUrl}/api/stripe-admin/prices`
-      console.log('📍 Fetching prices from:', url)
-      const response = await fetch(url)
-      if (!response.ok) throw new Error(`HTTP ${response.status}: Failed to fetch prices`)
+  useEffect(() => {
+    const fetchPrices = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+        const url = `${apiUrl}/api/stripe-admin/prices`
+        console.log('📍 Fetching prices from:', url)
 
-      const prices = await response.json()
+        const response = await fetch(url)
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: Failed to fetch prices`)
+        }
 
-      // Group by country
-      const grouped = prices.reduce(
-        (acc: { [key: string]: Price[] }, price: Price) => {
+        const prices: Price[] = await response.json()
+        console.log('✅ Prices received:', prices.length)
+
+        // Group prices by country
+        const grouped = prices.reduce((acc: Record<string, Price[]>, price) => {
           if (!acc[price.country_code]) {
             acc[price.country_code] = []
           }
           acc[price.country_code].push(price)
           return acc
-        },
-        {}
-      )
+        }, {})
 
-      // Fetch country names
-      const { data: countries } = await supabase
-        .from('country_currency_map')
-        .select('country_code, country_name, currency')
+        // Create price groups with sorted display
+        const groups: PriceGroup[] = Object.entries(grouped)
+          .map(([countryCode, countryPrices]) => ({
+            country: COUNTRY_NAMES[countryCode] || countryCode,
+            countryCode,
+            currency: countryPrices[0]?.currency || 'USD',
+            prices: countryPrices.sort((a, b) => a.plan_duration_days - b.plan_duration_days),
+          }))
+          .sort((a, b) => {
+            const order = { IN: 1, GB: 2, US: 3 }
+            return (order[a.countryCode as keyof typeof order] || 999) -
+              (order[b.countryCode as keyof typeof order] || 999)
+          })
 
-      const countryMap = new Map(
-        countries?.map((c) => [
-          c.country_code,
-          { name: c.country_name, currency: c.currency },
-        ]) || []
-      )
-
-      const groups: PriceGroup[] = Object.entries(grouped)
-        .map(([countryCode, prices]) => ({
-          country: countryMap.get(countryCode)?.name || countryCode,
-          countryCode,
-          currency: prices[0]?.currency || countryMap.get(countryCode)?.currency || 'USD',
-          prices: prices.sort((a, b) => a.plan_duration_days - b.plan_duration_days),
-        }))
-        .sort((a, b) => {
-          const order = { IN: 1, GB: 2, US: 3 }
-          return (order[a.countryCode as keyof typeof order] || 999) -
-            (order[b.countryCode as keyof typeof order] || 999)
+        setPriceGroups(groups)
+        console.log('✅ Price groups ready:', groups.length)
+      } catch (err: any) {
+        console.error('❌ Failed to load prices:', err)
+        setError(err.message || 'Failed to load subscription prices')
+        enqueueSnackbar(err.message || 'Failed to load subscription prices', {
+          variant: 'error',
         })
-
-      setPriceGroups(groups)
-    } catch (err: any) {
-      console.error('❌ Failed to load prices:', err)
-      enqueueSnackbar(err.message || 'Failed to load subscription prices', { variant: 'error' })
-    } finally {
-      setLoading(false)
+      } finally {
+        setLoading(false)
+      }
     }
-  }
 
-  useEffect(() => {
     fetchPrices()
-  }, [])
+  }, [apiUrl, enqueueSnackbar])
 
   if (loading) return <PageLoader />
 
@@ -129,6 +128,12 @@ export const SubscriptionPlansPage: React.FC = () => {
         </Typography>
       </Alert>
 
+      {error && (
+        <Alert severity="error" sx={{ mb: 3 }}>
+          {error}
+        </Alert>
+      )}
+
       {priceGroups.length === 0 ? (
         <Paper sx={{ p: 3, textAlign: 'center' }}>
           <Typography color="textSecondary">No pricing plans configured yet</Typography>
@@ -137,16 +142,25 @@ export const SubscriptionPlansPage: React.FC = () => {
         <Stack spacing={3}>
           {priceGroups.map((group) => (
             <Paper key={group.countryCode} sx={{ p: 3 }}>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  mb: 2,
+                }}
+              >
                 <Box>
-                  <Typography variant="h6">
-                    {group.country}
-                  </Typography>
+                  <Typography variant="h6">{group.country}</Typography>
                   <Typography variant="caption" color="textSecondary">
                     Currency: {group.currency}
                   </Typography>
                 </Box>
-                <Chip label={`${group.prices.length} plans`} color="primary" variant="outlined" />
+                <Chip
+                  label={`${group.prices.length} plans`}
+                  color="primary"
+                  variant="outlined"
+                />
               </Box>
 
               <TableContainer>
