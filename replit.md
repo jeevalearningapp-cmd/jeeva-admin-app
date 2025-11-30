@@ -58,12 +58,12 @@ Preferred communication style: Simple, everyday language.
 ### Database Schema for Questions
 Questions table includes: `module_type`, `category`, `subdivision`, `lesson_id`, `question_type`, `difficulty`, `points`, `explanation`, `is_active`.
 
-## Supabase Tables - Cleanup Status (Nov 30, 2025)
+## Supabase Tables - Cleanup Status (Nov 30, 2025) ✅ FULLY MIGRATED
 
-**DEPRECATED TABLES** (Old payment system - NO LONGER USED):
-- ❌ `subscription_plans` - Replaced by Stripe products/prices
-- ❌ `subscriptions` - Replaced by Stripe API
-- ❌ `prices` - Replaced by Stripe prices
+**COMPLETELY REMOVED** (No longer used anywhere):
+- ❌ `subscription_plans` - REMOVED from all code
+- ❌ `subscriptions` - REMOVED from all code
+- ❌ `prices` - REMOVED from all code
 
 **ACTIVE TABLES** (Still in use):
 - ✅ `discount_coupons` - Coupon validation
@@ -75,18 +75,18 @@ Questions table includes: `module_type`, `category`, `subdivision`, `lesson_id`,
 - ✅ `chat_*` - AI chatbot conversations
 - ✅ `content_*` - Learning content and approvals
 
-**Code Cleanup Done:**
+**Code Cleanup Done (Nov 30, 2025):**
 - ✅ Removed Supabase queries from SubscriptionPlansPage (now uses Stripe API)
-- ✅ Updated DiscountCouponsPage (uses Supabase, still needed)
-- ✅ Fixed API URL configuration for Replit preview environment
-- ✅ Updated /api/subscriptions/plans endpoint (now deprecated, points to Stripe API)
-- ✅ Marked calculatePricing() as deprecated in payment.ts
-- ✅ Marked activateSubscription() as deprecated in payment.ts
+- ✅ Removed Supabase queries from stripe-admin.ts endpoints
+- ✅ Fixed API URL configuration for Replit preview environment (dynamic domain detection)
+- ✅ Updated /api/subscriptions/plans endpoint (deprecated, returns 410)
+- ✅ Updated /api/stripe-admin/prices to fetch directly from Stripe API
+- ✅ Updated /api/stripe-admin/prices DELETE to use Stripe API
+- ✅ Marked calculatePricing() as deprecated (kept for backward compat)
+- ✅ Marked activateSubscription() as deprecated (kept for backward compat)
+- ✅ Removed schema cache error warnings (no more Supabase queries for prices)
 
-**Recommended Supabase Cleanup** (when ready):
-- Delete unused tables: `subscription_plans`, `subscriptions`, `prices`
-- Migrate coupon data to Stripe coupons if needed
-- Update RLS policies to reflect new payment system
+**Result:** All pricing is now 100% managed by Stripe. No Supabase database queries for subscription data.
 
 ## External Dependencies
 

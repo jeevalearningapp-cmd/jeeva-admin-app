@@ -90,24 +90,8 @@ router.post('/prices', async (req: Request, res: Response) => {
       },
     })
 
-    // Save to database
-    const { data: dbPrice, error: dbError } = await supabase
-      .from('prices')
-      .insert({
-        stripe_product_id,
-        stripe_price_id: price.id,
-        country_code,
-        currency: country.currency,
-        amount,
-        plan_name,
-        plan_duration_days,
-        is_active: true,
-      })
-      .select()
-
-    if (dbError) {
-      return res.status(400).json({ error: dbError.message })
-    }
+    // Note: Prices are now stored in Stripe only (no Supabase dependency)
+    console.log('✅ Price created in Stripe:', price.id)
 
     res.json({
       success: true,
@@ -118,7 +102,6 @@ router.post('/prices', async (req: Request, res: Response) => {
         country_code,
         plan_name,
       },
-      databaseRecord: dbPrice?.[0],
     })
   } catch (error: any) {
     console.error('❌ Error creating Stripe price:', error)
@@ -128,38 +111,45 @@ router.post('/prices', async (req: Request, res: Response) => {
 
 /**
  * GET /api/stripe-admin/prices
- * Get all prices from database
+ * Get all prices from Stripe (no Supabase dependency)
  */
 router.get('/prices', async (req: Request, res: Response) => {
   try {
-    const { data: prices, error } = await supabase
-      .from('prices')
-      .select('*')
-      .order('plan_name', { ascending: true })
+    // Fetch all prices from Stripe
+    const prices = await stripe.prices.list({ limit: 100 })
+    
+    // Transform Stripe prices to our format with country mapping
+    const transformedPrices = prices.data
+      .filter(p => p.active) // Only active prices
+      .map((price, index) => ({
+        id: String(index + 1),
+        stripe_product_id: typeof price.product === 'string' ? price.product : price.product?.id,
+        stripe_price_id: price.id,
+        currency: price.currency.toUpperCase(),
+        amount: (price.unit_amount || 0) / 100, // Convert from cents
+        country_code: price.metadata?.country_code || 'US',
+        plan_name: price.metadata?.plan_name || 'Plan',
+        plan_duration_days: parseInt(price.metadata?.plan_duration_days || '30'),
+        is_active: price.active,
+      }))
+      .sort((a, b) => {
+        // Sort by country then plan name
+        const countryOrder = { IN: 1, GB: 2, US: 3 }
+        const aOrder = countryOrder[a.country_code as keyof typeof countryOrder] || 999
+        const bOrder = countryOrder[b.country_code as keyof typeof countryOrder] || 999
+        return aOrder - bOrder || a.plan_name.localeCompare(b.plan_name)
+      })
 
-    if (error) {
-      console.warn('⚠️ Schema cache issue, returning cached test data:', error.message)
-      // Return test data for now - real data exists but schema cache needs refresh
-      return res.json([
-        { id: '1', stripe_product_id: 'prod_TW7iw13rvvDlrW', stripe_price_id: 'price_1234_inr_monthly', currency: 'INR', amount: 2099, country_code: 'IN', plan_name: 'Premium Monthly', plan_duration_days: 30, is_active: true },
-        { id: '2', stripe_product_id: 'prod_TW7iw13rvvDlrW', stripe_price_id: 'price_1234_inr_quarterly', currency: 'INR', amount: 5499, country_code: 'IN', plan_name: 'Premium Quarterly', plan_duration_days: 90, is_active: true },
-        { id: '3', stripe_product_id: 'prod_TW7i0BIsFTLyUJ', stripe_price_id: 'price_1234_gbp_monthly', currency: 'GBP', amount: 19.99, country_code: 'GB', plan_name: 'Premium Monthly', plan_duration_days: 30, is_active: true },
-        { id: '4', stripe_product_id: 'prod_TW7i0BIsFTLyUJ', stripe_price_id: 'price_1234_gbp_annual', currency: 'GBP', amount: 189.99, country_code: 'GB', plan_name: 'Premium Annual', plan_duration_days: 365, is_active: true },
-        { id: '5', stripe_product_id: 'prod_TW7irfeARsrN9m', stripe_price_id: 'price_1234_usd_monthly', currency: 'USD', amount: 24.99, country_code: 'US', plan_name: 'Premium Monthly', plan_duration_days: 30, is_active: true },
-        { id: '6', stripe_product_id: 'prod_TW7irfeARsrN9m', stripe_price_id: 'price_1234_usd_annual', currency: 'USD', amount: 239.99, country_code: 'US', plan_name: 'Premium Annual', plan_duration_days: 365, is_active: true },
-      ])
-    }
-
-    res.json(prices || [])
+    res.json(transformedPrices)
   } catch (error: any) {
-    console.error('❌ Error fetching prices:', error)
+    console.error('❌ Error fetching prices from Stripe:', error)
     res.status(500).json({ error: error.message })
   }
 })
 
 /**
  * DELETE /api/stripe-admin/prices/:priceId
- * Deactivate a price
+ * Deactivate a price in Stripe
  */
 router.delete('/prices/:priceId', async (req: Request, res: Response) => {
   try {
@@ -169,19 +159,16 @@ router.delete('/prices/:priceId', async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Price ID is required' })
     }
 
-    // Update in database
-    const { data, error } = await supabase
-      .from('prices')
-      .update({ is_active: false })
-      .eq('id', priceId)
-      .select()
-
-    if (error) throw error
+    // Deactivate in Stripe (prices can't be deleted, only deactivated)
+    const deactivatedPrice = await stripe.prices.update(priceId, {
+      active: false,
+    })
 
     res.json({
       success: true,
       message: 'Price deactivated successfully',
-      price: data?.[0],
+      priceId: deactivatedPrice.id,
+      active: deactivatedPrice.active,
     })
   } catch (error: any) {
     console.error('❌ Error deactivating price:', error)
