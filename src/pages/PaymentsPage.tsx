@@ -39,7 +39,7 @@ import { format } from 'date-fns'
 import { DownloadOutlined } from '@mui/icons-material'
 
 const statuses: PaymentStatus[] = ['pending', 'processing', 'succeeded', 'failed', 'cancelled', 'refunded']
-const gateways: PaymentGateway[] = ['stripe', 'razorpay']
+const gateways: PaymentGateway[] = ['stripe']
 
 export const PaymentsPage: React.FC = () => {
   const [filters, setFilters] = useState<PaymentFilters>({})

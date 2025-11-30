@@ -1,6 +1,5 @@
 import { supabase } from '../lib/supabase'
 import { stripeService } from './stripe'
-import { razorpayService } from './razorpay'
 import { paymentsDB } from '../lib/paymentsDB'
 import type {
   PaymentGateway,
@@ -12,7 +11,7 @@ import type {
 
 export const paymentService = {
   selectGateway(countryCode: string): PaymentGateway {
-    return countryCode === 'IN' ? 'razorpay' : 'stripe'
+    return 'stripe' // All countries use Stripe
   },
 
   async calculatePricing(
@@ -139,54 +138,7 @@ export const paymentService = {
         currency: pricing.currency,
       }
     } else {
-      if (!paymentCustomer) {
-        const razorpayCustomer = await razorpayService.createCustomer(
-          email,
-          fullName,
-          phone
-        )
-
-        paymentCustomer = await paymentsDB.createPaymentCustomer({
-          userId: input.userId,
-          gateway: 'razorpay',
-          razorpayCustomerId: razorpayCustomer.id,
-          email,
-          fullName,
-          phone,
-          countryCode: input.countryCode,
-        })
-      }
-
-      const order = await razorpayService.createOrder({
-        amount: pricing.finalAmount,
-        currency: pricing.currency,
-        receipt: `order_${Date.now()}`,
-        notes: {
-          userId: input.userId,
-          subscriptionPlanId: input.subscriptionPlanId,
-          ...input.metadata,
-        },
-      })
-
-      const payment = await paymentsDB.createPayment({
-        userId: input.userId,
-        gateway: 'razorpay',
-        amount: pricing.finalAmount,
-        currency: pricing.currency,
-        subscriptionPlanId: input.subscriptionPlanId,
-        originalAmount: pricing.originalAmount,
-        discountAmount: pricing.discountAmount,
-        razorpayOrderId: order.id,
-        metadata: input.metadata,
-      })
-
-      return {
-        paymentId: payment.id,
-        gateway: 'razorpay',
-        orderId: order.id,
-        amount: pricing.finalAmount,
-        currency: pricing.currency,
-      }
+      throw new Error('Only Stripe payment gateway is supported')
     }
   },
 

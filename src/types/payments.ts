@@ -1,4 +1,4 @@
-export type PaymentGateway = 'stripe' | 'razorpay'
+export type PaymentGateway = 'stripe'
 
 export type PaymentStatus = 
   | 'pending' 
@@ -16,8 +16,7 @@ export interface PaymentCustomer {
   id: string
   userId: string
   gateway: PaymentGateway
-  stripeCustomerId?: string
-  razorpayCustomerId?: string
+  stripeCustomerId: string
   email: string
   fullName?: string
   phone?: string
@@ -30,8 +29,7 @@ export interface PaymentMethod {
   id: string
   paymentCustomerId: string
   gateway: PaymentGateway
-  stripePaymentMethodId?: string
-  razorpayTokenId?: string
+  stripePaymentMethodId: string
   methodType: PaymentMethodType
   last4?: string
   cardBrand?: string
@@ -48,9 +46,7 @@ export interface Payment {
   userId: string
   paymentCustomerId?: string
   gateway: PaymentGateway
-  stripePaymentIntentId?: string
-  razorpayOrderId?: string
-  razorpayPaymentId?: string
+  stripePaymentIntentId: string
   amount: number
   currency: CurrencyCode
   status: PaymentStatus
@@ -77,8 +73,7 @@ export interface PaymentRefund {
   id: string
   paymentId: string
   gateway: PaymentGateway
-  stripeRefundId?: string
-  razorpayRefundId?: string
+  stripeRefundId: string
   amount: number
   currency: CurrencyCode
   reason?: string
@@ -131,10 +126,7 @@ export interface CreateRazorpayOrderInput {
 export interface VerifyPaymentInput {
   paymentId: string
   gateway: PaymentGateway
-  stripePaymentIntentId?: string
-  razorpayOrderId?: string
-  razorpayPaymentId?: string
-  razorpaySignature?: string
+  stripePaymentIntentId: string
 }
 
 export interface PaymentSummary {
@@ -157,8 +149,7 @@ export interface PaymentFilters {
 export interface CreatePaymentCustomerInput {
   userId: string
   gateway: PaymentGateway
-  stripeCustomerId?: string
-  razorpayCustomerId?: string
+  stripeCustomerId: string
   email: string
   fullName?: string
   phone?: string

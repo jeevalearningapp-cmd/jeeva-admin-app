@@ -23,8 +23,8 @@ Preferred communication style: Simple, everyday language.
 **Backend-as-a-Service:** Supabase (PostgreSQL database, authentication, real-time) with Row Level Security (RLS).
 **Authentication & Authorization:** Supabase Auth, role-based access (Superadmin, Editor, Moderator), `AuthContext` for global state, `ProtectedRoute` for enforcement.
 **Data Architecture:** Relational model with UUID primary keys.
-**Backend API Server:** Express.js server providing email services, AI chat endpoints (JeevaBot), payment processing endpoints, and server-side operations bypassing RLS policies where necessary.
-**Payment Gateway Architecture:** Dual payment gateway system with smart country-based routing (Stripe for international, Razorpay for India). Backend services include `stripe.ts`, `razorpay.ts`, and `payment.ts` (unified routing).
+**Backend API Server:** Express.js server providing email services, AI chat endpoints (JeevaBot), Stripe payment processing endpoints, and server-side operations bypassing RLS policies where necessary.
+**Payment Gateway Architecture:** Unified Stripe payment system for all countries and all payment methods. Backend service: `stripe.ts` with integrated coupon management via `stripe-coupons.ts`.
 
 ### Feature Specifications
 **Admin Portal Features:**
@@ -41,7 +41,7 @@ Preferred communication style: Simple, everyday language.
 **Mobile App Features:**
 - **Authentication:** Google/Apple Sign-In, profile completion.
 - **Content Gating:** Free trial mode with upgrade prompts.
-- **Payment Integration:** Country-based routing to Stripe or Razorpay.
+- **Payment Integration:** Stripe payment processing for all countries (global reach).
 - **Core Learning Modules:** Practice MCQs, Learning Content (text, images, audio), Mock Exams.
 - **Performance Dashboard:** Progress tracking, exam readiness scores.
 - **AI-Powered Features:** JeevaBot (chatbot), personalized weekly study recommendations.
@@ -123,8 +123,7 @@ Questions table includes: `module_type`, `category`, `subdivision`, `lesson_id`,
 **Third-Party Services:**
 - **Supabase:** Database, authentication, user management, RLS, storage.
 - **Resend:** Transactional email service.
-- **Stripe:** International payment processing.
-- **Razorpay:** Indian payment processing.
+- **Stripe:** Global payment processing (all countries and currencies).
 - **Google Gemini AI:** Powers JeevaBot and AI recommendations.
 - **Expo Push:** Mobile push notification service.
 
@@ -135,8 +134,8 @@ Questions table includes: `module_type`, `category`, `subdivision`, `lesson_id`,
 - **Export & PDF:** `jsPDF`, `html2canvas`, `papaparse`.
 
 **Environment Configuration:**
-- Frontend: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`
+- Frontend: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `STRIPE_PUBLISHABLE_KEY`
 - Backend Server: `SUPABASE_SERVICE_ROLE_KEY`, `GEMINI_API_KEY`, `RESEND_API_KEY`, `EXPO_ACCESS_TOKEN`
-- Payment Gateways: `STRIPE_SECRET_KEY`, `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`
+- Payment Gateway: `STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`
 
 **Database Schema:** Supabase PostgreSQL with tables for users, admin, content, learning data, AI, payments, platform, and analytics. Key tables include `user_profiles`, `admin_users`, `modules`, `topics`, `lessons`, `flashcards`, `questions`, `subscriptions`, `subscription_plans`, `discount_coupons`, `hero_sections`, `email_templates`, `analytics_sessions`, `chat_conversations`, `chat_messages`, `ai_usage_stats`, `push_tokens`, `notifications`, `notification_targets`, `notification_queue`, `user_notification_reads`, `notification_preferences`, `payment_customers`, `payments`, `payment_refunds`, `payment_methods`, `payment_webhook_events`, `learning_progress`, `mock_exam_attempts`, `prices`, `stripe_products`, `country_currency_map`. Utilizes PostgreSQL RPC functions and comprehensive RLS policies.

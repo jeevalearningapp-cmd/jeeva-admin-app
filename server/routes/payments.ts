@@ -1,7 +1,6 @@
 import express from 'express'
 import { paymentService } from '../services/payment'
 import { stripeService } from '../services/stripe'
-import { razorpayService } from '../services/razorpay'
 import { paymentsDB } from '../lib/paymentsDB'
 
 const router = express.Router()
@@ -52,9 +51,6 @@ router.post('/verify', async (req, res) => {
       paymentId,
       gateway,
       stripePaymentIntentId,
-      razorpayOrderId,
-      razorpayPaymentId,
-      razorpaySignature,
     })
 
     res.json(result)
@@ -86,9 +82,6 @@ router.get('/config', async (req, res) => {
     res.json({
       stripe: {
         publishableKey: stripeService.getPublishableKey(),
-      },
-      razorpay: {
-        keyId: razorpayService.getKeyId(),
       },
     })
   } catch (error: any) {
