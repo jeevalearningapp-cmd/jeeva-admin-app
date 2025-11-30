@@ -58,15 +58,38 @@ Preferred communication style: Simple, everyday language.
 ### Database Schema for Questions
 Questions table includes: `module_type`, `category`, `subdivision`, `lesson_id`, `question_type`, `difficulty`, `points`, `explanation`, `is_active`.
 
+## Stripe Subscription Plans (Nov 30, 2025) ✅ ONE-TIME PURCHASES
+
+**3 New One-Time Subscription Plans Created in Stripe:**
+
+1. **Starter Plan** (30 Days)
+   - Product ID: `prod_TW9ffn91BDwKAT`
+   - INR 3,000 | USD $34 | GBP £25
+   - Features: Practice MCQs, Learning Content, Basic Study Materials, Email Support
+
+2. **Growth Plan** (90 Days)
+   - Product ID: `prod_TW9fWEi8Dq294V`
+   - INR 8,000 | USD $90 | GBP £68
+   - Features: All Starter + Mock Exams, Performance Analytics, Priority Support, Weekly Recommendations
+
+3. **Ultimate Plan** (150 Days)
+   - Product ID: `prod_TW9fNFKlB9Pfsn`
+   - INR 15,000 | USD $168 | GBP £127
+   - Features: All Growth + AI JeevaBot, Priority Support, Unlimited Questions, Personalized Study Plan
+
+**Payment Model:** One-time purchase (NO automatic recurring charges - manual renewal only)
+
+**Tax Configuration:** 18% GST (India), 20% VAT (UK), auto-calculated by Stripe
+
 ## Supabase Tables - Cleanup Status (Nov 30, 2025) ✅ FULLY MIGRATED
 
 **COMPLETELY REMOVED** (No longer used anywhere):
 - ❌ `subscription_plans` - REMOVED from all code
 - ❌ `subscriptions` - REMOVED from all code
 - ❌ `prices` - REMOVED from all code
+- ❌ `discount_coupons` - Migrated to Stripe API
 
 **ACTIVE TABLES** (Still in use):
-- ✅ `discount_coupons` - Coupon validation
 - ✅ `user_profiles` - User data
 - ✅ `payment_customers` - Maps users to Stripe/Razorpay customers
 - ✅ `payments` - Payment records
@@ -75,18 +98,19 @@ Questions table includes: `module_type`, `category`, `subdivision`, `lesson_id`,
 - ✅ `chat_*` - AI chatbot conversations
 - ✅ `content_*` - Learning content and approvals
 
-**Code Cleanup Done (Nov 30, 2025):**
+**Code Migration Done (Nov 30, 2025):**
+- ✅ Removed Supabase queries from DiscountCouponsPage (now uses Stripe API `/api/stripe-coupons`)
 - ✅ Removed Supabase queries from SubscriptionPlansPage (now uses Stripe API)
-- ✅ Removed Supabase queries from stripe-admin.ts endpoints
 - ✅ Fixed API URL configuration for Replit preview environment (dynamic domain detection)
-- ✅ Updated /api/subscriptions/plans endpoint (deprecated, returns 410)
+- ✅ Updated /api/subscriptions/* endpoints (deprecated, returns 410)
 - ✅ Updated /api/stripe-admin/prices to fetch directly from Stripe API
-- ✅ Updated /api/stripe-admin/prices DELETE to use Stripe API
-- ✅ Marked calculatePricing() as deprecated (kept for backward compat)
-- ✅ Marked activateSubscription() as deprecated (kept for backward compat)
-- ✅ Removed schema cache error warnings (no more Supabase queries for prices)
+- ✅ Added `/api/stripe-coupons` CRUD endpoints (Create, Read, Update, Delete, Validate)
+- ✅ Added `/api/stripe-admin/setup-plans` endpoint to batch create new plans
+- ✅ Modified POST /api/stripe-admin/prices to support one-time (non-recurring) pricing
+- ✅ Updated DiscountCouponsPage to use Stripe coupons instead of Supabase
+- ✅ Full TypeScript implementation with proper error handling
 
-**Result:** All pricing is now 100% managed by Stripe. No Supabase database queries for subscription data.
+**Result:** All pricing and coupons are now 100% managed by Stripe. Zero Supabase database queries for subscription data.
 
 ## External Dependencies
 

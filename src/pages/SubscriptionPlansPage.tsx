@@ -29,6 +29,7 @@ interface Price {
   plan_name: string
   plan_duration_days: number
   is_active: boolean
+  recurring?: boolean
 }
 
 interface PriceGroup {

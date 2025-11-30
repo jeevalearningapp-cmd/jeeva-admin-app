@@ -45,7 +45,7 @@ router.post('/products', async (req: Request, res: Response) => {
 
 /**
  * POST /api/stripe-admin/prices
- * Create a Stripe price and save to database
+ * Create a Stripe price (recurring or one-time)
  */
 router.post('/prices', async (req: Request, res: Response) => {
   try {
@@ -55,6 +55,7 @@ router.post('/prices', async (req: Request, res: Response) => {
       amount,
       plan_name,
       plan_duration_days = 30,
+      recurring = true, // NEW: Support one-time purchases
     } = req.body
 
     if (!stripe_product_id || !country_code || !amount || !plan_name) {
@@ -75,22 +76,28 @@ router.post('/prices', async (req: Request, res: Response) => {
     }
 
     // Create price in Stripe
-    const price = await stripe.prices.create({
+    const priceData: Stripe.PriceCreateParams = {
       product: stripe_product_id,
       unit_amount: Math.round(amount * 100), // Convert to cents
       currency: country.currency.toLowerCase(),
-      recurring: {
-        interval: 'month',
-        interval_count: Math.ceil(plan_duration_days / 30),
-      },
       metadata: {
         plan_name,
         country_code,
         plan_duration_days: plan_duration_days.toString(),
+        recurring: recurring.toString(),
       },
-    })
+    }
 
-    // Note: Prices are now stored in Stripe only (no Supabase dependency)
+    // Add recurring config if needed
+    if (recurring) {
+      priceData.recurring = {
+        interval: 'month',
+        interval_count: Math.ceil(plan_duration_days / 30),
+      }
+    }
+
+    const price = await stripe.prices.create(priceData)
+
     console.log('✅ Price created in Stripe:', price.id)
 
     res.json({
@@ -101,6 +108,7 @@ router.post('/prices', async (req: Request, res: Response) => {
         currency: country.currency,
         country_code,
         plan_name,
+        recurring,
       },
     })
   } catch (error: any) {
@@ -197,6 +205,145 @@ router.get('/products', async (req: Request, res: Response) => {
     )
   } catch (error: any) {
     console.error('❌ Error fetching Stripe products:', error)
+    res.status(500).json({ error: error.message })
+  }
+})
+
+/**
+ * POST /api/stripe-admin/setup-plans
+ * Setup 3 one-time subscription plans (Starter, Growth, Ultimate) with all currencies
+ */
+router.post('/setup-plans', async (req: Request, res: Response) => {
+  try {
+    const plans = [
+      {
+        name: 'Starter',
+        description: 'Perfect for beginners - 30 days of access to all learning materials',
+        days: 30,
+        priceINR: 3000,
+        priceUSD: 34,
+        priceGBP: 25,
+        features: [
+          'Access to Practice MCQs',
+          'Access to Learning Content',
+          'Basic Study Materials',
+          '30 Days Access',
+          'Email Support'
+        ]
+      },
+      {
+        name: 'Growth',
+        description: 'Accelerated learning - 90 days comprehensive study plan with advanced features',
+        days: 90,
+        priceINR: 8000,
+        priceUSD: 90,
+        priceGBP: 68,
+        features: [
+          'All Starter Features',
+          'Mock Exams Access',
+          'Performance Analytics',
+          '90 Days Access',
+          'Priority Email Support',
+          'Weekly Study Recommendations'
+        ]
+      },
+      {
+        name: 'Ultimate',
+        description: 'Complete mastery - 150 days intensive preparation with premium support',
+        days: 150,
+        priceINR: 15000,
+        priceUSD: 168,
+        priceGBP: 127,
+        features: [
+          'All Growth Features',
+          'Priority Support',
+          'AI-Powered JeevaBot Access',
+          '150 Days Access',
+          'Unlimited Questions',
+          'Personalized Study Plan',
+          'Voice Tutoring (Coming Soon)'
+        ]
+      }
+    ]
+
+    const results = []
+
+    for (const plan of plans) {
+      // Create product
+      const product = await stripe.products.create({
+        name: plan.name,
+        description: plan.description,
+        metadata: {
+          plan_type: 'one_time',
+          features: JSON.stringify(plan.features),
+          created_via: 'setup_endpoint',
+        },
+      })
+
+      console.log(`✅ Created product: ${plan.name} (${product.id})`)
+
+      const prices = []
+
+      // Create INR price
+      const priceINR = await stripe.prices.create({
+        product: product.id,
+        unit_amount: plan.priceINR * 100,
+        currency: 'inr',
+        metadata: {
+          plan_name: plan.name,
+          country_code: 'IN',
+          plan_duration_days: plan.days.toString(),
+          recurring: 'false',
+        },
+      })
+      prices.push({ currency: 'INR', id: priceINR.id, amount: plan.priceINR })
+
+      // Create USD price
+      const priceUSD = await stripe.prices.create({
+        product: product.id,
+        unit_amount: plan.priceUSD * 100,
+        currency: 'usd',
+        metadata: {
+          plan_name: plan.name,
+          country_code: 'US',
+          plan_duration_days: plan.days.toString(),
+          recurring: 'false',
+        },
+      })
+      prices.push({ currency: 'USD', id: priceUSD.id, amount: plan.priceUSD })
+
+      // Create GBP price
+      const priceGBP = await stripe.prices.create({
+        product: product.id,
+        unit_amount: plan.priceGBP * 100,
+        currency: 'gbp',
+        metadata: {
+          plan_name: plan.name,
+          country_code: 'GB',
+          plan_duration_days: plan.days.toString(),
+          recurring: 'false',
+        },
+      })
+      prices.push({ currency: 'GBP', id: priceGBP.id, amount: plan.priceGBP })
+
+      results.push({
+        product: {
+          id: product.id,
+          name: plan.name,
+          description: plan.description,
+          features: plan.features,
+        },
+        prices,
+      })
+    }
+
+    res.json({
+      success: true,
+      message: 'All 3 plans created successfully with 3 currencies each (9 prices total)',
+      plans: results,
+    })
+  } catch (error: any) {
+    console.error('❌ Error setting up plans:', error)
     res.status(500).json({ error: error.message })
   }
 })
