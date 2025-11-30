@@ -1,6 +1,7 @@
--- Trial Module Schema - Supabase Migration
+-- Trial Module Schema - Supabase Migration (FIXED)
 -- Version: 1.0
 -- Date: November 30, 2025
+-- Fixed: Reserved keyword "order" properly quoted
 
 -- ============================================================================
 -- 1. ENHANCED: modules table (add trial fields)
@@ -61,7 +62,6 @@ ON CONFLICT DO NOTHING;
 -- ============================================================================
 
 ALTER TABLE topics ADD COLUMN IF NOT EXISTS is_trial_content BOOLEAN DEFAULT false;
-
 CREATE INDEX IF NOT EXISTS idx_topics_is_trial ON topics(is_trial_content);
 
 -- ============================================================================
@@ -233,63 +233,21 @@ CREATE INDEX IF NOT EXISTS idx_trial_exam_attempts_exam ON trial_exam_attempts(e
 CREATE INDEX IF NOT EXISTS idx_trial_exam_attempts_passed ON trial_exam_attempts(is_passed);
 
 -- ============================================================================
--- 11. NEW: Helper Functions
+-- 11. Enable RLS on all new tables
 -- ============================================================================
 
-CREATE OR REPLACE FUNCTION check_module_access(
-  p_user_id UUID,
-  p_module_id UUID
-) RETURNS TABLE(
-  can_access BOOLEAN,
-  access_type VARCHAR,
-  message TEXT
-) AS $$
-BEGIN
-  RETURN QUERY
-  WITH module_info AS (
-    SELECT m.id, m.is_trial, mar.access_type
-    FROM modules m
-    LEFT JOIN module_access_rules mar ON m.id = mar.module_id
-    WHERE m.id = p_module_id AND m.is_active = true
-  ),
-  user_subscription AS (
-    SELECT COUNT(*) > 0 as has_active_subscription
-    FROM subscriptions
-    WHERE user_id = p_user_id AND status = 'active'
-  )
-  SELECT
-    CASE 
-      WHEN mi.is_trial THEN true
-      WHEN us.has_active_subscription THEN true
-      ELSE false
-    END as can_access,
-    COALESCE(mi.access_type, 'none') as access_type,
-    CASE 
-      WHEN mi.is_trial THEN 'Trial module - free access'
-      WHEN us.has_active_subscription THEN 'Active subscription'
-      ELSE 'No access - subscription required'
-    END as message
-  FROM module_info mi, user_subscription us;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+ALTER TABLE module_access_rules ENABLE ROW LEVEL SECURITY;
+ALTER TABLE lesson_content ENABLE ROW LEVEL SECURITY;
+ALTER TABLE trial_attempt_records ENABLE ROW LEVEL SECURITY;
+ALTER TABLE trial_learning_progress ENABLE ROW LEVEL SECURITY;
+ALTER TABLE trial_mock_exams ENABLE ROW LEVEL SECURITY;
+ALTER TABLE trial_exam_attempts ENABLE ROW LEVEL SECURITY;
 
 -- ============================================================================
 -- 12. RLS POLICIES
 -- ============================================================================
 
--- modules
-ALTER TABLE modules ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY IF NOT EXISTS "modules_read_public" ON modules
-FOR SELECT USING (is_active = true);
-
-CREATE POLICY IF NOT EXISTS "modules_admin_all" ON modules
-FOR ALL USING (auth.jwt() ->> 'role' IN ('admin', 'superadmin'))
-WITH CHECK (auth.jwt() ->> 'role' IN ('admin', 'superadmin'));
-
--- module_access_rules
-ALTER TABLE module_access_rules ENABLE ROW LEVEL SECURITY;
-
+-- module_access_rules policies
 CREATE POLICY IF NOT EXISTS "access_rules_read_public" ON module_access_rules
 FOR SELECT USING (is_active = true);
 
@@ -297,9 +255,7 @@ CREATE POLICY IF NOT EXISTS "access_rules_admin_all" ON module_access_rules
 FOR ALL USING (auth.jwt() ->> 'role' IN ('admin', 'superadmin'))
 WITH CHECK (auth.jwt() ->> 'role' IN ('admin', 'superadmin'));
 
--- lesson_content
-ALTER TABLE lesson_content ENABLE ROW LEVEL SECURITY;
-
+-- lesson_content policies
 CREATE POLICY IF NOT EXISTS "lesson_content_read_trial" ON lesson_content
 FOR SELECT USING (
   EXISTS (
@@ -326,9 +282,7 @@ CREATE POLICY IF NOT EXISTS "lesson_content_admin_all" ON lesson_content
 FOR ALL USING (auth.jwt() ->> 'role' IN ('admin', 'superadmin'))
 WITH CHECK (auth.jwt() ->> 'role' IN ('admin', 'superadmin'));
 
--- trial_attempt_records
-ALTER TABLE trial_attempt_records ENABLE ROW LEVEL SECURITY;
-
+-- trial_attempt_records policies
 CREATE POLICY IF NOT EXISTS "trial_attempts_user_own" ON trial_attempt_records
 FOR SELECT USING (user_id = auth.uid());
 
@@ -342,9 +296,7 @@ WITH CHECK (user_id = auth.uid());
 CREATE POLICY IF NOT EXISTS "trial_attempts_admin_read" ON trial_attempt_records
 FOR SELECT USING (auth.jwt() ->> 'role' IN ('admin', 'superadmin'));
 
--- trial_learning_progress
-ALTER TABLE trial_learning_progress ENABLE ROW LEVEL SECURITY;
-
+-- trial_learning_progress policies
 CREATE POLICY IF NOT EXISTS "trial_learning_user_own" ON trial_learning_progress
 FOR SELECT USING (user_id = auth.uid());
 
@@ -358,9 +310,7 @@ WITH CHECK (user_id = auth.uid());
 CREATE POLICY IF NOT EXISTS "trial_learning_admin_read" ON trial_learning_progress
 FOR SELECT USING (auth.jwt() ->> 'role' IN ('admin', 'superadmin'));
 
--- trial_mock_exams
-ALTER TABLE trial_mock_exams ENABLE ROW LEVEL SECURITY;
-
+-- trial_mock_exams policies
 CREATE POLICY IF NOT EXISTS "trial_exams_read_public" ON trial_mock_exams
 FOR SELECT USING (is_active = true);
 
@@ -368,9 +318,7 @@ CREATE POLICY IF NOT EXISTS "trial_exams_admin_all" ON trial_mock_exams
 FOR ALL USING (auth.jwt() ->> 'role' IN ('admin', 'superadmin'))
 WITH CHECK (auth.jwt() ->> 'role' IN ('admin', 'superadmin'));
 
--- trial_exam_attempts
-ALTER TABLE trial_exam_attempts ENABLE ROW LEVEL SECURITY;
-
+-- trial_exam_attempts policies
 CREATE POLICY IF NOT EXISTS "trial_exam_attempts_user_read" ON trial_exam_attempts
 FOR SELECT USING (user_id = auth.uid());
 
