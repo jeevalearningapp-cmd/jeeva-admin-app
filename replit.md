@@ -58,28 +58,34 @@ Preferred communication style: Simple, everyday language.
 ### Database Schema for Questions
 Questions table includes: `module_type`, `category`, `subdivision`, `lesson_id`, `question_type`, `difficulty`, `points`, `explanation`, `is_active`.
 
-## Stripe Subscription Plans (Nov 30, 2025) ✅ ONE-TIME PURCHASES
+## Stripe Subscription Plans (Nov 30, 2025 - UPDATED) ✅ ONE-TIME PURCHASES
 
-**3 New One-Time Subscription Plans Created in Stripe:**
+**3 One-Time Subscription Plans (CLEANED & RECREATED):**
 
 1. **Starter Plan** (30 Days)
-   - Product ID: `prod_TW9ffn91BDwKAT`
-   - INR 3,000 | USD $34 | GBP £25
+   - Product ID: `prod_TW9ia1yVYrTLf9` (NEW - Deactivated duplicates)
+   - INR 3,000 | USD $34 | GBP £25 ✅
    - Features: Practice MCQs, Learning Content, Basic Study Materials, Email Support
 
 2. **Growth Plan** (90 Days)
-   - Product ID: `prod_TW9fWEi8Dq294V`
-   - INR 8,000 | USD $90 | GBP £68
+   - Product ID: `prod_TW9iUXDnA340NL` (NEW - Deactivated duplicates)
+   - INR 8,000 | USD $90 | GBP £68 ✅
    - Features: All Starter + Mock Exams, Performance Analytics, Priority Support, Weekly Recommendations
 
 3. **Ultimate Plan** (150 Days)
-   - Product ID: `prod_TW9fNFKlB9Pfsn`
-   - INR 15,000 | USD $168 | GBP £127
+   - Product ID: `prod_TW9ix6XY2ikEzJ` (NEW - Deactivated duplicates)
+   - INR 15,000 | USD $168 | GBP £127 ✅
    - Features: All Growth + AI JeevaBot, Priority Support, Unlimited Questions, Personalized Study Plan
 
 **Payment Model:** One-time purchase (NO automatic recurring charges - manual renewal only)
 
 **Tax Configuration:** 18% GST (India), 20% VAT (UK), auto-calculated by Stripe
+
+**Cleanup Done:**
+- ✅ Created 3 fresh products with exact correct pricing
+- ✅ Deactivated 9 old duplicate products from previous attempts
+- ✅ API now returns only active, correct prices
+- ✅ Admin UI displays correct amounts per country
 
 ## Supabase Tables - Cleanup Status (Nov 30, 2025) ✅ FULLY MIGRATED
 

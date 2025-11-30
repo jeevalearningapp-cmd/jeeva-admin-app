@@ -8,6 +8,8 @@ import countryRoutes from "./routes/country.js";
 import subscriptionRoutes from "./routes/subscriptions.js";
 import stripeAdminRoutes from "./routes/stripe-admin.js";
 import stripeCouponsRoutes from "./routes/stripe-coupons.js";
+import stripeCleanupRoutes from "./routes/stripe-cleanup.js";
+import stripeDeactivateRoutes from "./routes/stripe-deactivate.js";
 import { notificationService } from "./services/notifications.js";
 
 const app = express();
@@ -28,6 +30,8 @@ app.use("/api/country", countryRoutes);
 app.use("/api/subscriptions", subscriptionRoutes);
 app.use("/api/stripe-admin", stripeAdminRoutes);
 app.use("/api/stripe-coupons", stripeCouponsRoutes);
+app.use("/api/stripe-cleanup", stripeCleanupRoutes);
+app.use("/api/stripe-deactivate", stripeDeactivateRoutes);
 
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok", message: "API server running (Email + AI Chat + Payments + Notifications + Country Detection)" });
