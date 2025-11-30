@@ -207,3 +207,38 @@ EXPO_PUBLIC_BACKEND_URL=https://jeeva-admin-portal.vollskick.replit.dev  # Produ
 4. Validate coupons when user enters discount code
 5. Use hero sections from Supabase directly (no backend needed)
 
+
+## Multi-Currency Payment System - Architecture Ready (November 30, 2025)
+
+✅ **DATABASE SCHEMA CREATED:**
+- `prices` table - Stores Stripe Price IDs linked to countries/currencies
+- `stripe_products` table - Manages Stripe products  
+- `country_currency_map` table - Pre-populated with 11 countries (UK £, EU €, India ₹, US $, etc.) with tax rates and payment methods
+
+✅ **BACKEND INFRASTRUCTURE DESIGNED:**
+- Stripe Admin API routes for product/price management (ready to integrate)
+- Checkout session route for country-based pricing
+- Automatic tax calculation through Stripe (20% VAT for UK, 18% GST for India, etc.)
+
+✅ **ADMIN PANEL UI READY:**
+- StripeProductsPage component for managing products and prices by country
+
+**Next Steps to Complete Integration:**
+1. Request STRIPE_SECRET_KEY from user
+2. Install Stripe npm package: `npm install stripe`
+3. Register Stripe API routes in backend
+4. Connect Admin Panel UI to Stripe routes
+5. Build mobile app payment flow using `/api/checkout/session` endpoint
+
+**Price Structure (Example):**
+- Premium Monthly: £25/month (UK), €29/month (EU), ₹2099/month (India), $30/month (US)
+- All prices stored in Supabase prices table with country_code mapping
+- Mobile app detects user country → fetches correct price → initiates checkout with localized currency + auto-calculated taxes
+
+**Key Features:**
+- Country-based price detection
+- Automatic tax compliance (Stripe handles it)
+- Multi-currency support with real exchange rates
+- Admin ability to manage prices per country
+- Mobile checkout with localized payment methods (UPI for India, iDEAL for EU, etc.)
+
