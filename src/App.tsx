@@ -22,6 +22,7 @@ import {
   NotificationsPage,
   PaymentsPage,
 } from './pages'
+import TrialModuleManagementPage from './pages/TrialModuleManagementPage'
 import { SplashScreen } from './pages/SplashScreen'
 import { EmailTestPage } from './pages/EmailTestPage'
 
@@ -102,6 +103,17 @@ function App() {
                 <ProtectedRoute allowedRoles={['superadmin', 'editor']}>
                   <MainLayout>
                     <PaymentsPage />
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+            
+            <Route
+              path="/trial-module"
+              element={
+                <ProtectedRoute allowedRoles={['superadmin', 'editor']}>
+                  <MainLayout>
+                    <TrialModuleManagementPage />
                   </MainLayout>
                 </ProtectedRoute>
               }

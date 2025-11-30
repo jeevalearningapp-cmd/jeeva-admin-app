@@ -14,9 +14,9 @@ Preferred communication style: Simple, everyday language.
 ## System Architecture
 
 ### Frontend Architecture
-**Technology Stack:** React 18, TypeScript, Vite 5, Material-UI (MUI) v7 with Emotion, React Router DOM v7, Zustand, TanStack React Query (v5), Notistack.
+**Technology Stack:** React 18, TypeScript, Vite 5, Material-UI (MUI) v7 with Emotion, React Router DOM v7, Zustand, TanStack React Query (v5), Notistack, Recharts (analytics).
 **Design Patterns:** Component-based architecture by feature, path aliases (`@/*`), strict TypeScript, CSS-in-JS (Emotion).
-**Routing Structure:** Public (`/login`) and protected routes (`/dashboard`, `/content/*`), with nested and dynamic routes, utilizing `ProtectedRoute` and `MainLayout`.
+**Routing Structure:** Public (`/login`) and protected routes (`/dashboard`, `/content/*`, `/trial-module`), with nested and dynamic routes, utilizing `ProtectedRoute` and `MainLayout`.
 **UI/UX Approach:** Material Design with custom theming (8px borderRadius), full-height collapsible sidebar, responsive header, modal/drawer overlays with gradients, role-adaptive menus, consistent color palette (primary #007aff, secondary #181C32), Inter font family, professional form components, interactive card layouts, light/dark mode support with `localStorage` persistence.
 
 ### Backend Architecture
@@ -29,6 +29,11 @@ Preferred communication style: Simple, everyday language.
 ### Feature Specifications
 **Admin Portal Features:**
 - **Content Management System:** CRUD for a 3-module structure (Practice, Learning, Mock Exams) with hierarchical content, rich text editing, and bulk CSV upload.
+- **Trial Module Management (NEW):** Dedicated admin page for managing free trial content with 4 tabs:
+  - Practice Manager: Add/edit/delete 6 trial questions (3 numerical + 3 clinical), difficulty levels, explanations
+  - Learning Manager: Manage 2 trial lessons with 5 content types (video, audio, text, flashcard, MCQ), 60% unlock threshold
+  - Mock Exam Manager: Configure 20-question 30-min trial exam with features (mark for review, answer changes, auto-submit, immediate results), detailed results display, topic breakdown, suggestions
+  - Analytics Dashboard: KPIs (trial users, completion rate, avg score, conversion), trends, section breakdown, conversion funnel
 - **User Management:** Student and Admin user profiles, OAuth tracking, subscription status, performance metrics, role assignment.
 - **Subscription Management:** CRUD for plans and user subscriptions, discount codes, AI message limits, and plan configurations.
 - **Dashboard Hero Management:** CRUD for mobile app promotional banners with color customization.
@@ -51,9 +56,14 @@ Preferred communication style: Simple, everyday language.
 - **Voice Tutoring:** Real-time voice tutoring with instructors (premium feature, pending implementation).
 
 ### Module Architecture & Question Logic
-**1. Practice Module:** Free navigation, unlimited practice, immediate feedback with explanations.
-**2. Learning Module:** Structured sequential learning with assessment. Requires ≥80% to unlock the next subtopic, unlimited attempts.
-**3. Mock Exam Module:** Real exam simulation. Timed format (3 hours 45 minutes), full question bank, mark for review, auto-submit. Provides detailed results including pass/fail, topic breakdown, and comparison.
+**1. Trial Module (NEW):** Free trial with features from all modules. Access by unauthenticated users.
+   - Practice: 3 numerical + 3 clinical questions per subtopic, unlimited attempts, immediate feedback
+   - Learning: 1 topic with 2 subtopics, 60% unlock threshold, video/audio/text/flashcard/MCQ content
+   - Mock Exam: 20 questions, 30 minutes, auto-submit, detailed results with topic breakdown and suggestions
+
+**2. Practice Module:** Free navigation, unlimited practice, immediate feedback with explanations.
+**3. Learning Module:** Structured sequential learning with assessment. Requires ≥80% to unlock the next subtopic, unlimited attempts.
+**4. Mock Exam Module:** Real exam simulation. Timed format (3 hours 45 minutes), full question bank, mark for review, auto-submit. Provides detailed results including pass/fail, topic breakdown, and comparison.
 
 ### Database Schema for Questions
 Questions table includes: `module_type`, `category`, `subdivision`, `lesson_id`, `question_type`, `difficulty`, `points`, `explanation`, `is_active`.
