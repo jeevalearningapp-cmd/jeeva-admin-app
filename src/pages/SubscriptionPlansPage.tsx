@@ -51,8 +51,10 @@ export const SubscriptionPlansPage: React.FC = () => {
   const fetchPrices = async () => {
     try {
       setLoading(true)
-      const response = await fetch(`${apiUrl}/api/stripe-admin/prices`)
-      if (!response.ok) throw new Error('Failed to fetch prices')
+      const url = `${apiUrl}/api/stripe-admin/prices`
+      console.log('📍 Fetching prices from:', url)
+      const response = await fetch(url)
+      if (!response.ok) throw new Error(`HTTP ${response.status}: Failed to fetch prices`)
 
       const prices = await response.json()
 
@@ -95,8 +97,8 @@ export const SubscriptionPlansPage: React.FC = () => {
 
       setPriceGroups(groups)
     } catch (err: any) {
-      console.error('Failed to load prices:', err)
-      enqueueSnackbar('Failed to load subscription prices', { variant: 'error' })
+      console.error('❌ Failed to load prices:', err)
+      enqueueSnackbar(err.message || 'Failed to load subscription prices', { variant: 'error' })
     } finally {
       setLoading(false)
     }

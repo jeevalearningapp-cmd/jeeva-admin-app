@@ -10,7 +10,6 @@ import { ErrorBoundary } from './components/common'
 import {
   DashboardPage,
   AdminUsersPage,
-  SubscriptionsPage,
   SubscriptionPlansPage,
   ContentManagementPage,
   ApprovalsPage,
@@ -70,17 +69,6 @@ function App() {
                 <ProtectedRoute allowedRoles={['superadmin']}>
                   <MainLayout>
                     <AdminUsersPage />
-                  </MainLayout>
-                </ProtectedRoute>
-              }
-            />
-            
-            <Route
-              path="/subscriptions"
-              element={
-                <ProtectedRoute allowedRoles={['superadmin', 'editor']}>
-                  <MainLayout>
-                    <SubscriptionsPage />
                   </MainLayout>
                 </ProtectedRoute>
               }
