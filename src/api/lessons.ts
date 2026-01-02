@@ -8,6 +8,9 @@ const mapToLesson = (data: any): Lesson => ({
   content: data.content,
   videoUrl: data.video_url,
   audioUrl: data.audio_url,
+  podcastUrl: data.podcast_url,
+  contentType: data.content_type,
+  isMandatory: data.is_mandatory,
   lessonType: data.lesson_type,
   passingScorePercentage: data.passing_score_percentage,
   category: data.category,
@@ -91,6 +94,9 @@ export const lessonsAPI = {
     if (input.content !== undefined) updateData.content = input.content
     if (input.videoUrl !== undefined) updateData.video_url = input.videoUrl
     if (input.audioUrl !== undefined) updateData.audio_url = input.audioUrl
+    if (input.podcastUrl !== undefined) updateData.podcast_url = input.podcastUrl
+    if (input.contentType !== undefined) updateData.content_type = input.contentType
+    if (input.isMandatory !== undefined) updateData.is_mandatory = input.isMandatory
     if (input.lessonType !== undefined) updateData.lesson_type = input.lessonType
     if (input.passingScorePercentage !== undefined) updateData.passing_score_percentage = input.passingScorePercentage
     if (input.category !== undefined) updateData.category = input.category

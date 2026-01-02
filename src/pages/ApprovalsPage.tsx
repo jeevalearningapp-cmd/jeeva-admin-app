@@ -438,3 +438,5 @@ export const ApprovalsPage: React.FC = () => {
     </Box>
   )
 }
+
+export default ApprovalsPage

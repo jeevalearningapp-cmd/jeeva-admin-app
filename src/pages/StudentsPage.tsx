@@ -32,6 +32,7 @@ import {
   DownloadOutlined as DownloadIcon,
   PersonOutlined as PersonIcon,
   SchoolOutlined as SchoolIcon,
+  PaymentOutlined as PaymentIcon,
 } from '@mui/icons-material'
 import { supabase } from '@/lib/supabase'
 import { useSnackbar } from 'notistack'
@@ -55,6 +56,10 @@ interface StudentProfile {
   subscription_status: string | null
   subscription_end_date: string | null
   days_remaining: number | null
+  // Last payment info for Stripe Adaptive Pricing (Requirements 5.1, 5.2)
+  last_payment_currency: string | null
+  last_payment_amount: number | null
+  last_payment_source: string | null
 }
 
 export const StudentsPage: React.FC = () => {
@@ -79,24 +84,56 @@ export const StudentsPage: React.FC = () => {
 
       if (rpcError) throw rpcError
 
-      let enrichedStudents: StudentProfile[] = (data || []).map((student: any) => ({
-        id: student.profile_id,
-        user_id: student.user_id,
-        full_name: student.full_name,
-        email: student.email,
-        phone_number: student.phone_number,
-        current_country: student.current_country,
-        date_of_birth: student.date_of_birth,
-        gender: student.gender,
-        nmc_attempts: student.nmc_attempts,
-        uses_coaching: student.uses_coaching,
-        profile_completed: student.profile_completed,
-        created_at: student.created_at,
-        oauth_provider: 'email',
-        subscription_status: student.subscription_status,
-        subscription_end_date: student.subscription_end_date,
-        days_remaining: student.days_remaining
-      }))
+      // Fetch last successful payment for each student (Requirements 5.1, 5.2)
+      const userIds = (data || []).map((s: any) => s.user_id).filter(Boolean)
+      let paymentsMap: Record<string, { currency: string; amount: number; source: string }> = {}
+      
+      if (userIds.length > 0) {
+        const { data: paymentsData } = await supabase
+          .from('payments')
+          .select('user_id, currency_charged_local, amount_charged_local, stripe_checkout_session_id, currency, final_amount, created_at')
+          .in('user_id', userIds)
+          .eq('status', 'succeeded')
+          .order('created_at', { ascending: false })
+
+        // Group by user_id and take the most recent payment
+        if (paymentsData) {
+          for (const payment of paymentsData) {
+            if (!paymentsMap[payment.user_id]) {
+              // Use presentment currency/amount if available, otherwise fall back to base currency
+              const currency = payment.currency_charged_local || payment.currency || 'GBP'
+              const amount = payment.amount_charged_local ?? payment.final_amount ?? 0
+              const source = payment.stripe_checkout_session_id ? 'Stripe Checkout' : 'Stripe'
+              paymentsMap[payment.user_id] = { currency, amount, source }
+            }
+          }
+        }
+      }
+
+      let enrichedStudents: StudentProfile[] = (data || []).map((student: any) => {
+        const lastPayment = paymentsMap[student.user_id]
+        return {
+          id: student.profile_id,
+          user_id: student.user_id,
+          full_name: student.full_name,
+          email: student.email,
+          phone_number: student.phone_number,
+          current_country: student.current_country,
+          date_of_birth: student.date_of_birth,
+          gender: student.gender,
+          nmc_attempts: student.nmc_attempts,
+          uses_coaching: student.uses_coaching,
+          profile_completed: student.profile_completed,
+          created_at: student.created_at,
+          oauth_provider: 'email',
+          subscription_status: student.subscription_status,
+          subscription_end_date: student.subscription_end_date,
+          days_remaining: student.days_remaining,
+          last_payment_currency: lastPayment?.currency || null,
+          last_payment_amount: lastPayment?.amount || null,
+          last_payment_source: lastPayment?.source || null,
+        }
+      })
 
       if (search) {
         const searchLower = search.toLowerCase()
@@ -490,6 +527,39 @@ export const StudentsPage: React.FC = () => {
                   </Box>
                 </Stack>
               </Box>
+
+              {/* Payment Information - Requirements 5.1, 5.2 */}
+              <Box>
+                <Typography variant="overline" color="text.secondary">Payment Information</Typography>
+                <Divider sx={{ my: 1 }} />
+                <Stack spacing={1.5}>
+                  <Box>
+                    <Typography variant="caption" color="text.secondary">Last Payment</Typography>
+                    {selectedStudent.last_payment_amount !== null && selectedStudent.last_payment_currency ? (
+                      <Typography variant="body1">
+                        {selectedStudent.last_payment_currency.toUpperCase()} {selectedStudent.last_payment_amount.toFixed(2)}
+                      </Typography>
+                    ) : (
+                      <Typography variant="body2" color="text.secondary">No payments recorded</Typography>
+                    )}
+                  </Box>
+                  <Box>
+                    <Typography variant="caption" color="text.secondary">Payment Source</Typography>
+                    {selectedStudent.last_payment_source ? (
+                      <Chip 
+                        icon={<PaymentIcon fontSize="small" />}
+                        label={selectedStudent.last_payment_source}
+                        size="small"
+                        color="primary"
+                        variant="outlined"
+                        sx={{ mt: 0.5 }}
+                      />
+                    ) : (
+                      <Typography variant="body2" color="text.secondary">-</Typography>
+                    )}
+                  </Box>
+                </Stack>
+              </Box>
             </Stack>
           </Box>
         )}
@@ -497,3 +567,5 @@ export const StudentsPage: React.FC = () => {
     </Box>
   )
 }
+
+export default StudentsPage

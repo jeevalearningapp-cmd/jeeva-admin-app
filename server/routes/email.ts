@@ -1,38 +1,24 @@
 import { Router } from 'express'
-import { Resend } from 'resend'
+import { emailService } from '../services/emailService'
 
 const router = Router()
-const resend = process.env.RESEND_API_KEY 
-  ? new Resend(process.env.RESEND_API_KEY)
-  : null
 
 router.post('/send', async (req, res) => {
   try {
-    if (!resend) {
-      return res.status(503).json({ 
-        error: 'Email service not configured. Please set RESEND_API_KEY environment variable.' 
-      })
-    }
-
-    const { to, subject, html, from = 'Jeeva Learning <noreply@yourdomain.com>' } = req.body
+    const { to, subject, html, from } = req.body
 
     if (!to || !subject || !html) {
-      return res.status(400).json({ 
-        error: 'Missing required fields: to, subject, html' 
+      return res.status(400).json({
+        error: 'Missing required fields: to, subject, html'
       })
     }
 
-    const { data, error } = await resend.emails.send({
-      from,
-      to: Array.isArray(to) ? to : [to],
+    const data = await emailService.sendEmail({
+      to,
       subject,
       html,
+      from
     })
-
-    if (error) {
-      console.error('Resend error:', error)
-      return res.status(500).json({ error: error.message })
-    }
 
     res.json({ success: true, data })
   } catch (error: any) {
@@ -43,12 +29,6 @@ router.post('/send', async (req, res) => {
 
 router.post('/welcome', async (req, res) => {
   try {
-    if (!resend) {
-      return res.status(503).json({ 
-        error: 'Email service not configured. Please set RESEND_API_KEY environment variable.' 
-      })
-    }
-
     const { to, userName, confirmationUrl } = req.body
 
     const html = `
@@ -105,16 +85,11 @@ router.post('/welcome', async (req, res) => {
       </html>
     `
 
-    const { data, error } = await resend.emails.send({
-      from: 'Jeeva Learning <noreply@yourdomain.com>',
+    const data = await emailService.sendEmail({
       to,
       subject: 'Welcome to Jeeva Learning - Confirm Your Email 🎓',
       html,
     })
-
-    if (error) {
-      return res.status(500).json({ error: error.message })
-    }
 
     res.json({ success: true, data })
   } catch (error: any) {
@@ -124,12 +99,6 @@ router.post('/welcome', async (req, res) => {
 
 router.post('/subscription-confirmation', async (req, res) => {
   try {
-    if (!resend) {
-      return res.status(503).json({ 
-        error: 'Email service not configured. Please set RESEND_API_KEY environment variable.' 
-      })
-    }
-
     const { to, userName, planName, price, billingCycle, startDate, nextBillingDate, appUrl } = req.body
 
     const html = `
@@ -190,16 +159,11 @@ router.post('/subscription-confirmation', async (req, res) => {
       </html>
     `
 
-    const { data, error } = await resend.emails.send({
-      from: 'Jeeva Learning <noreply@yourdomain.com>',
+    const data = await emailService.sendEmail({
       to,
       subject: `🎉 Welcome to ${planName} - Subscription Confirmed!`,
       html,
     })
-
-    if (error) {
-      return res.status(500).json({ error: error.message })
-    }
 
     res.json({ success: true, data })
   } catch (error: any) {
@@ -209,36 +173,25 @@ router.post('/subscription-confirmation', async (req, res) => {
 
 router.post('/test', async (req, res) => {
   try {
-    if (!resend) {
-      return res.status(503).json({ 
-        error: 'Email service not configured. Please set RESEND_API_KEY environment variable.' 
-      })
-    }
-
     const { to } = req.body
 
     if (!to) {
       return res.status(400).json({ error: 'Email address required' })
     }
 
-    const { data, error } = await resend.emails.send({
-      from: 'Jeeva Learning <noreply@yourdomain.com>',
+    const data = await emailService.sendEmail({
       to,
-      subject: '✅ Resend Integration Test - Jeeva Learning',
+      subject: '✅ Brevo Integration Test - Jeeva Learning',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
           <h2 style="color: #007aff;">✅ Email Integration Success!</h2>
           <p>This is a test email from Jeeva Learning Admin Portal.</p>
-          <p>Your Resend integration is working perfectly!</p>
+          <p>Your Brevo integration is working perfectly!</p>
           <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;">
-          <p style="color: #666; font-size: 14px;">Sent via Resend API</p>
+          <p style="color: #666; font-size: 14px;">Sent via Brevo API/SMTP</p>
         </div>
       `,
     })
-
-    if (error) {
-      return res.status(500).json({ error: error.message })
-    }
 
     res.json({ success: true, message: 'Test email sent successfully!', data })
   } catch (error: any) {

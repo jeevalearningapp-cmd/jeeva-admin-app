@@ -65,7 +65,7 @@ export default function TrialMockExamManager({ onStatusChange }: MockExamManager
 
       {/* Summary Cards */}
       <Grid container spacing={2} sx={{ mb: 3 }}>
-        <Grid xs={12} sm={6} md={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Card>
             <CardContent>
               <Typography color="text.secondary" gutterBottom>
@@ -78,7 +78,7 @@ export default function TrialMockExamManager({ onStatusChange }: MockExamManager
             </CardContent>
           </Card>
         </Grid>
-        <Grid xs={12} sm={6} md={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Card>
             <CardContent>
               <Typography color="text.secondary" gutterBottom>
@@ -91,7 +91,7 @@ export default function TrialMockExamManager({ onStatusChange }: MockExamManager
             </CardContent>
           </Card>
         </Grid>
-        <Grid xs={12} sm={6} md={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Card>
             <CardContent>
               <Typography color="text.secondary" gutterBottom>
@@ -104,7 +104,7 @@ export default function TrialMockExamManager({ onStatusChange }: MockExamManager
             </CardContent>
           </Card>
         </Grid>
-        <Grid xs={12} sm={6} md={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Card>
             <CardContent>
               <Typography color="text.secondary" gutterBottom>
@@ -130,7 +130,7 @@ export default function TrialMockExamManager({ onStatusChange }: MockExamManager
         <Divider sx={{ my: 2 }} />
 
         <Grid container spacing={3}>
-          <Grid xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Box>
               <FormControlLabel
                 control={
@@ -152,7 +152,7 @@ export default function TrialMockExamManager({ onStatusChange }: MockExamManager
             </Box>
           </Grid>
 
-          <Grid xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Box>
               <FormControlLabel
                 control={
@@ -174,7 +174,7 @@ export default function TrialMockExamManager({ onStatusChange }: MockExamManager
             </Box>
           </Grid>
 
-          <Grid xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Box>
               <FormControlLabel
                 control={
@@ -196,7 +196,7 @@ export default function TrialMockExamManager({ onStatusChange }: MockExamManager
             </Box>
           </Grid>
 
-          <Grid xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Box>
               <FormControlLabel
                 control={
@@ -218,7 +218,7 @@ export default function TrialMockExamManager({ onStatusChange }: MockExamManager
             </Box>
           </Grid>
 
-          <Grid xs={12}>
+          <Grid size={{ xs: 12 }}>
             <Box>
               <FormControlLabel
                 control={
@@ -250,7 +250,7 @@ export default function TrialMockExamManager({ onStatusChange }: MockExamManager
         <Divider sx={{ my: 2 }} />
 
         <Grid container spacing={2}>
-          <Grid xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Typography variant="subtitle2" gutterBottom>
               Overall Results
             </Typography>
@@ -262,7 +262,7 @@ export default function TrialMockExamManager({ onStatusChange }: MockExamManager
             </ul>
           </Grid>
 
-          <Grid xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Typography variant="subtitle2" gutterBottom>
               Topic Breakdown
             </Typography>
@@ -274,7 +274,7 @@ export default function TrialMockExamManager({ onStatusChange }: MockExamManager
             </ul>
           </Grid>
 
-          <Grid xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Typography variant="subtitle2" gutterBottom>
               Detailed Review
             </Typography>
@@ -286,7 +286,7 @@ export default function TrialMockExamManager({ onStatusChange }: MockExamManager
             </ul>
           </Grid>
 
-          <Grid xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Typography variant="subtitle2" gutterBottom>
               Suggestions
             </Typography>

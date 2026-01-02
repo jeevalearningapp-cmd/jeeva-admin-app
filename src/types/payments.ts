@@ -60,13 +60,21 @@ export interface Payment {
   paymentMethodType?: PaymentMethodType
   failureCode?: string
   failureMessage?: string
-  gatewayResponse?: any
+  gatewayResponse?: Record<string, unknown>
   receiptUrl?: string
   invoicePdf?: string
-  metadata?: Record<string, any>
+  metadata?: Record<string, string | number | boolean | null>
   createdAt: string
   updatedAt: string
   completedAt?: string
+  
+  // Stripe Adaptive Pricing presentment fields
+  stripeCheckoutSessionId?: string    // Checkout Session ID (cs_xxx)
+  amountChargedLocal?: number         // Amount in presentment currency
+  currencyChargedLocal?: string       // Presentment currency code (INR, USD, GBP)
+  amountChargedGbp?: number           // Amount in GBP (settlement currency)
+  fxRateApplied?: number              // FX rate used (local/gbp)
+  countryDetected?: string            // Customer country code (ISO 3166-1 alpha-2)
 }
 
 export interface PaymentRefund {
@@ -89,7 +97,7 @@ export interface PaymentWebhookEvent {
   gateway: PaymentGateway
   eventId: string
   eventType: string
-  payload: any
+  payload: Record<string, unknown>
   processed: boolean
   processedAt?: string
   errorMessage?: string
@@ -105,7 +113,7 @@ export interface CreatePaymentInput {
   discountCouponCode?: string
   countryCode: string
   gatewayOverride?: PaymentGateway
-  metadata?: Record<string, any>
+  metadata?: Record<string, string | number | boolean | null>
 }
 
 export interface CreateStripePaymentIntentInput {
@@ -113,14 +121,14 @@ export interface CreateStripePaymentIntentInput {
   currency: CurrencyCode
   customerId?: string
   paymentMethodId?: string
-  metadata?: Record<string, any>
+  metadata?: Record<string, string | number | boolean | null>
 }
 
 export interface CreateRazorpayOrderInput {
   amount: number
   currency: CurrencyCode
   receipt?: string
-  notes?: Record<string, any>
+  notes?: Record<string, string | number | boolean | null>
 }
 
 export interface VerifyPaymentInput {
@@ -179,4 +187,30 @@ export interface PricingCalculation {
   currency: CurrencyCode
   couponCode?: string
   trialDays?: number
+}
+
+/**
+ * Catalog Plan for Stripe Adaptive Pricing
+ * Represents a subscription plan with GBP-only pricing.
+ * No country-based grouping - Stripe handles currency conversion automatically.
+ * 
+ * Requirements: 1.2, 1.4, 7.3
+ */
+export interface CatalogPlan {
+  planId: string              // Stripe Product ID
+  name: string                // Plan tier name (Starter, Growth, Ultimate)
+  description: string         // Plan description
+  durationDays: number        // Subscription duration in days
+  stripePriceIdGbp: string    // Stripe Price ID (price_xxx)
+  unitAmountGbp: number       // Amount in pence (e.g., 2500 = £25.00)
+  active: boolean             // Whether the plan is active
+  features: string[]          // List of plan features
+}
+
+/**
+ * Catalog API Response
+ * Returns all active GBP plans without country grouping.
+ */
+export interface CatalogResponse {
+  plans: CatalogPlan[]
 }

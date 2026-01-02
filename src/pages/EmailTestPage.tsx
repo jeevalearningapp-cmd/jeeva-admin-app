@@ -45,7 +45,7 @@ export const EmailTestPage: React.FC = () => {
           📧 Email System Testing
         </Typography>
         <Typography variant="body1" color="text.secondary">
-          Test your Resend email integration and send sample emails
+          Test your Brevo email integration and send sample emails
         </Typography>
       </Box>
 
@@ -62,7 +62,7 @@ export const EmailTestPage: React.FC = () => {
             <Typography variant="h6">Quick Test Email</Typography>
           </Box>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-            Send a simple test email to verify your Resend integration is working
+            Send a simple test email to verify your Brevo integration is working
           </Typography>
 
           <TextField
@@ -91,7 +91,7 @@ export const EmailTestPage: React.FC = () => {
         <Divider sx={{ mb: 2 }} />
         <Alert severity="info">
           <Typography variant="body2">
-            <strong>Note:</strong> Make sure your Resend account is verified and you're using a verified sender email domain. 
+            <strong>Note:</strong> Make sure your Brevo account is verified and you're using a verified sender email domain.
             The API server must be running on port 3001 for these tests to work.
           </Typography>
         </Alert>
@@ -115,3 +115,5 @@ export const EmailTestPage: React.FC = () => {
     </Box>
   )
 }
+
+export default EmailTestPage

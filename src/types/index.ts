@@ -2,7 +2,15 @@ export * from './auth'
 export * from './user'
 export * from './dashboard'
 export * from './subscription'
-export * from './analytics'
+export type {
+  DateRange,
+  UserAnalytics,
+  ContentPerformance,
+  RevenueMetrics,
+  EngagementTrend,
+  ConversionMetric,
+  AnalyticsData as DetailedAnalyticsData,
+} from './analytics'
 export * from './hero'
 export * from './content'
 export * from './approval'

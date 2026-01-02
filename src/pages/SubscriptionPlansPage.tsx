@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import {
   Box,
   Typography,
@@ -9,254 +9,210 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  CircularProgress,
   Alert,
   Chip,
-  Stack,
+  Button,
+  IconButton,
+  Tooltip,
 } from '@mui/material'
-import { InfoOutlined as InfoIcon } from '@mui/icons-material'
+import {
+  CurrencyPound as CurrencyPoundIcon,
+  Add as AddIcon,
+  Edit as EditIcon,
+  Delete as DeleteIcon,
+  Refresh as RefreshIcon,
+} from '@mui/icons-material'
 import { useSnackbar } from 'notistack'
 import { PageLoader } from '@/components/common'
-import { getApiUrl } from '@/config/api'
-
-interface Price {
-  id: string
-  stripe_product_id: string
-  stripe_price_id: string
-  currency: string
-  amount: number
-  country_code: string
-  plan_name: string
-  plan_duration_days: number
-  is_active: boolean
-  recurring?: boolean
-}
-
-interface PriceGroup {
-  country: string
-  countryCode: string
-  currency: string
-  prices: Price[]
-}
-
-// Country name mapping
-const COUNTRY_NAMES: Record<string, string> = {
-  IN: 'India',
-  GB: 'United Kingdom',
-  US: 'International',
-}
+import { useSubscriptionPlans } from '@/hooks/useSubscriptionPlans'
 
 export const SubscriptionPlansPage: React.FC = () => {
-  const [priceGroups, setPriceGroups] = useState<PriceGroup[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const { data: plans = [], isLoading: loading, error, refetch } = useSubscriptionPlans()
   const { enqueueSnackbar } = useSnackbar()
-  const apiUrl = getApiUrl()
 
-  useEffect(() => {
-    const fetchPrices = async () => {
-      try {
-        setLoading(true)
-        setError(null)
-        const url = `${apiUrl}/api/stripe-admin/prices`
-        console.log('📍 Fetching prices from:', url)
+  // Handle refresh
+  const handleRefresh = () => {
+    refetch()
+    enqueueSnackbar('Refreshing subscription plans...', { variant: 'info' })
+  }
 
-        const response = await fetch(url, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        })
+  // Format price
+  const formatPrice = (price: number): string => {
+    return `$${price.toFixed(2)}`
+  }
 
-        console.log('📡 Response status:', response.status, response.statusText)
+  // Get billing cycle label
+  const getBillingCycleLabel = (cycle: string): string => {
+    if (cycle === 'monthly') return 'Monthly'
+    if (cycle === 'yearly') return 'Yearly'
+    if (cycle === 'lifetime') return 'Lifetime'
+    return cycle
+  }
 
-        if (!response.ok) {
-          const errorText = await response.text()
-          console.error('❌ HTTP Error:', response.status, errorText)
-          throw new Error(`HTTP ${response.status}: ${errorText || 'Failed to fetch prices'}`)
-        }
-
-        const text = await response.text()
-        console.log('📦 Raw response:', text.length, 'bytes')
-
-        if (!text) {
-          throw new Error('Empty response from server')
-        }
-
-        let prices: Price[]
-        try {
-          prices = JSON.parse(text)
-        } catch (parseErr) {
-          console.error('❌ JSON Parse Error:', parseErr, 'Text:', text.slice(0, 100))
-          throw new Error(`Invalid JSON response: ${text.slice(0, 50)}...`)
-        }
-
-        console.log('✅ Prices received:', prices.length)
-
-        if (!Array.isArray(prices)) {
-          throw new Error(`Expected array, got ${typeof prices}`)
-        }
-
-        // Group prices by country
-        const grouped = prices.reduce((acc: Record<string, Price[]>, price) => {
-          if (!acc[price.country_code]) {
-            acc[price.country_code] = []
-          }
-          acc[price.country_code].push(price)
-          return acc
-        }, {})
-
-        // Create price groups with sorted display
-        const groups: PriceGroup[] = Object.entries(grouped)
-          .map(([countryCode, countryPrices]) => ({
-            country: COUNTRY_NAMES[countryCode] || countryCode,
-            countryCode,
-            currency: countryPrices[0]?.currency || 'USD',
-            prices: countryPrices.sort((a, b) => a.plan_duration_days - b.plan_duration_days),
-          }))
-          .sort((a, b) => {
-            const order = { IN: 1, GB: 2, US: 3 }
-            return (order[a.countryCode as keyof typeof order] || 999) -
-              (order[b.countryCode as keyof typeof order] || 999)
-          })
-
-        setPriceGroups(groups)
-        console.log('✅ Price groups ready:', groups.length)
-      } catch (err: any) {
-        const errorMessage = err instanceof Error ? err.message : String(err)
-        console.error('❌ Failed to load prices - Full error:', err)
-        console.error('❌ Error message:', errorMessage)
-        setError(errorMessage)
-        enqueueSnackbar(errorMessage, { variant: 'error' })
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchPrices()
-  }, [apiUrl, enqueueSnackbar])
+  // Get tier color
+  const getTierColor = (name: string): 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'info' => {
+    const lowerName = name.toLowerCase()
+    if (lowerName.includes('starter') || lowerName.includes('basic')) return 'info'
+    if (lowerName.includes('growth') || lowerName.includes('pro')) return 'primary'
+    if (lowerName.includes('ultimate') || lowerName.includes('premium')) return 'success'
+    return 'default'
+  }
 
   if (loading) return <PageLoader />
 
   return (
     <Box sx={{ p: 3 }}>
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h5" sx={{ mb: 1 }}>
-          Subscription Plans by Country
-        </Typography>
-        <Typography variant="body2" color="textSecondary">
-          Multi-currency pricing managed through Stripe. Tax rates auto-calculated per country.
-        </Typography>
+      <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Box>
+          <Typography variant="h5" sx={{ mb: 1 }}>
+            Subscription Plans
+          </Typography>
+          <Typography variant="body2" color="textSecondary">
+            Manage subscription plans and pricing tiers for your application.
+          </Typography>
+        </Box>
+        <Box sx={{ display: 'flex', gap: 2 }}>
+          <Tooltip title="Refresh">
+            <IconButton onClick={handleRefresh} color="primary">
+              <RefreshIcon />
+            </IconButton>
+          </Tooltip>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => enqueueSnackbar('Add plan feature coming soon', { variant: 'info' })}
+          >
+            Add Plan
+          </Button>
+        </Box>
       </Box>
-
-      {/* Info Alert */}
-      <Alert icon={<InfoIcon />} severity="info" sx={{ mb: 4 }}>
-        To add new plans or modify prices, visit{' '}
-        <Typography component="span" sx={{ fontWeight: 600 }}>
-          Payments → Stripe Products
-        </Typography>
-      </Alert>
 
       {error && (
         <Alert severity="error" sx={{ mb: 3 }}>
-          {error}
+          {error.message || 'Failed to load subscription plans'}
         </Alert>
       )}
 
-      {priceGroups.length === 0 ? (
-        <Paper sx={{ p: 3, textAlign: 'center' }}>
-          <Typography color="textSecondary">No pricing plans configured yet</Typography>
-        </Paper>
-      ) : (
-        <Stack spacing={3}>
-          {priceGroups.map((group) => (
-            <Paper key={group.countryCode} sx={{ p: 3 }}>
-              <Box
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  mb: 2,
-                }}
-              >
-                <Box>
-                  <Typography variant="h6">{group.country}</Typography>
-                  <Typography variant="caption" color="textSecondary">
-                    Currency: {group.currency}
-                  </Typography>
-                </Box>
-                <Chip
-                  label={`${group.prices.length} plans`}
-                  color="primary"
-                  variant="outlined"
-                />
-              </Box>
+      {/* Subscription Plans Table */}
+      <Paper sx={{ p: 3 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+          <CurrencyPoundIcon sx={{ mr: 1, color: 'primary.main' }} />
+          <Typography variant="h6">Subscription Plans</Typography>
+        </Box>
 
-              <TableContainer>
-                <Table size="small">
-                  <TableHead>
-                    <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
-                      <TableCell>Plan Name</TableCell>
-                      <TableCell align="right">Amount</TableCell>
-                      <TableCell>Duration</TableCell>
-                      <TableCell>Stripe Price ID</TableCell>
-                      <TableCell>Status</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {group.prices.map((price) => (
-                      <TableRow key={price.id}>
-                        <TableCell>
-                          <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                            {price.plan_name}
-                          </Typography>
-                        </TableCell>
-                        <TableCell align="right">
-                          <Typography variant="body2" sx={{ fontFamily: 'monospace', fontWeight: 600 }}>
-                            {group.currency} {(price.amount / 100).toFixed(2)}
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Typography variant="body2">
-                            {price.plan_duration_days} days
-                            {price.plan_duration_days === 30 && ' (Monthly)'}
-                            {price.plan_duration_days === 90 && ' (Quarterly)'}
-                            {price.plan_duration_days === 365 && ' (Annual)'}
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Typography
-                            variant="caption"
-                            sx={{
-                              fontFamily: 'monospace',
-                              color: 'textSecondary',
-                              display: 'block',
-                              maxWidth: '200px',
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                              whiteSpace: 'nowrap',
-                            }}
-                            title={price.stripe_price_id}
-                          >
-                            {price.stripe_price_id.slice(0, 20)}...
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
+        {plans.length === 0 && !loading ? (
+          <Box sx={{ textAlign: 'center', py: 6 }}>
+            <Typography color="textSecondary" sx={{ mb: 2 }}>
+              No subscription plans found. Create your first plan to get started.
+            </Typography>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={() => enqueueSnackbar('Add plan feature coming soon', { variant: 'info' })}
+            >
+              Create First Plan
+            </Button>
+          </Box>
+        ) : (
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
+                  <TableCell>Plan Name</TableCell>
+                  <TableCell>Description</TableCell>
+                  <TableCell align="right">Price (USD)</TableCell>
+                  <TableCell>Billing Cycle</TableCell>
+                  <TableCell>Features</TableCell>
+                  <TableCell>Status</TableCell>
+                  <TableCell align="center">Actions</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {plans.map((plan) => (
+                  <TableRow key={plan.id} hover>
+                    <TableCell>
+                      <Chip
+                        label={plan.name}
+                        color={getTierColor(plan.name)}
+                        size="small"
+                        sx={{ fontWeight: 600 }}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2" sx={{ maxWidth: 400 }}>
+                        {plan.description || '-'}
+                      </Typography>
+                    </TableCell>
+                    <TableCell align="right">
+                      <Typography variant="body2" sx={{ fontFamily: 'monospace', fontWeight: 600 }}>
+                        {formatPrice(plan.price)}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Chip
+                        label={getBillingCycleLabel(plan.billingCycle)}
+                        size="small"
+                        variant="outlined"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                        {plan.features.slice(0, 3).map((feature, idx) => (
                           <Chip
-                            label={price.is_active ? 'Active' : 'Inactive'}
-                            color={price.is_active ? 'success' : 'default'}
+                            key={idx}
+                            label={feature}
                             size="small"
+                            variant="outlined"
+                            sx={{ fontSize: '0.7rem' }}
                           />
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </Paper>
-          ))}
-        </Stack>
-      )}
+                        ))}
+                        {plan.features.length > 3 && (
+                          <Chip
+                            label={`+${plan.features.length - 3} more`}
+                            size="small"
+                            variant="outlined"
+                            sx={{ fontSize: '0.7rem' }}
+                          />
+                        )}
+                      </Box>
+                    </TableCell>
+                    <TableCell>
+                      <Chip
+                        label={plan.isActive ? 'Active' : 'Inactive'}
+                        color={plan.isActive ? 'success' : 'default'}
+                        size="small"
+                      />
+                    </TableCell>
+                    <TableCell align="center">
+                      <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
+                        <Tooltip title="Edit">
+                          <IconButton
+                            size="small"
+                            onClick={() => enqueueSnackbar('Edit feature coming soon', { variant: 'info' })}
+                          >
+                            <EditIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Delete">
+                          <IconButton
+                            size="small"
+                            color="error"
+                            onClick={() => enqueueSnackbar('Delete feature coming soon', { variant: 'info' })}
+                          >
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
+      </Paper>
     </Box>
   )
 }
+
+export default SubscriptionPlansPage

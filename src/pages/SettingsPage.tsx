@@ -797,3 +797,5 @@ export const SettingsPage: React.FC = () => {
     </Box>
   )
 }
+
+export default SettingsPage

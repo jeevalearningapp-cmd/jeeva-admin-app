@@ -8,7 +8,7 @@ Backend API endpoints, services, and integrations for the Jeeva Learning Platfor
 
 ## Services
 - Express.js server
-- Email service (Resend)
+- Email service (Brevo)
 - AI Chat service (Google Gemini)
 - Payment processing (Stripe)
 - Push notifications (Expo)

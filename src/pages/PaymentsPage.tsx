@@ -30,16 +30,33 @@ import {
   GetAppOutlined,
   MoneyOffOutlined,
   VisibilityOutlined,
+  SyncOutlined,
 } from '@mui/icons-material'
 import { usePayments } from '@/hooks/usePayments'
 import { ExportDialog } from '@/components/payments/ExportDialog'
 import type { PaymentFilters, Payment, PaymentStatus, PaymentGateway } from '@/types/payments'
+import { useSnackbar } from 'notistack'
+import { getApiUrl } from '@/config/api'
 import type { StatementData } from '@/types/export'
 import { format } from 'date-fns'
 import { DownloadOutlined } from '@mui/icons-material'
 
 const statuses: PaymentStatus[] = ['pending', 'processing', 'succeeded', 'failed', 'cancelled', 'refunded']
 const gateways: PaymentGateway[] = ['stripe']
+
+// Currency symbols for presentment display
+const currencySymbols: Record<string, string> = {
+  GBP: '£',
+  USD: '$',
+  EUR: '€',
+  INR: '₹',
+}
+
+// Format amount with currency symbol
+const formatCurrencyAmount = (amount: number, currency: string): string => {
+  const symbol = currencySymbols[currency.toUpperCase()] || currency
+  return `${symbol}${amount.toFixed(2)}`
+}
 
 export const PaymentsPage: React.FC = () => {
   const [filters, setFilters] = useState<PaymentFilters>({})
@@ -51,7 +68,39 @@ export const PaymentsPage: React.FC = () => {
   const [refundReason, setRefundReason] = useState('')
   const [exportOpen, setExportOpen] = useState(false)
 
-  const { payments, summary, isLoading, refund, isRefunding } = usePayments(filters)
+  const { payments, summary, isLoading, refund, isRefunding, refetch } = usePayments(filters)
+  const { enqueueSnackbar } = useSnackbar()
+  const [syncing, setSyncing] = useState(false)
+  const apiUrl = getApiUrl()
+
+  const handleSyncFromStripe = async () => {
+    try {
+      setSyncing(true)
+      const response = await fetch(`${apiUrl}/api/stripe-sync/payments`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ limit: 100 }),
+      })
+      
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Sync failed')
+      }
+      
+      const result = await response.json()
+      enqueueSnackbar(
+        `Sync complete: ${result.imported} imported, ${result.skipped} skipped${result.failed > 0 ? `, ${result.failed} failed` : ''}`,
+        { variant: result.imported > 0 ? 'success' : 'info' }
+      )
+      
+      // Refresh payments list
+      refetch()
+    } catch (error: any) {
+      enqueueSnackbar(`Sync failed: ${error.message}`, { variant: 'error' })
+    } finally {
+      setSyncing(false)
+    }
+  }
 
   const prepareStatementData = (): StatementData => {
     return {
@@ -98,6 +147,15 @@ export const PaymentsPage: React.FC = () => {
             View and manage all payment transactions
           </Typography>
         </Box>
+        <Button
+          variant="outlined"
+          startIcon={syncing ? <CircularProgress size={18} /> : <SyncOutlined />}
+          onClick={handleSyncFromStripe}
+          disabled={syncing}
+          sx={{ textTransform: 'none', mr: 1 }}
+        >
+          {syncing ? 'Syncing...' : 'Sync from Stripe'}
+        </Button>
         <Button
           variant="contained"
           startIcon={<DownloadOutlined />}
@@ -211,7 +269,9 @@ export const PaymentsPage: React.FC = () => {
               <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
                 <TableCell>Payment ID</TableCell>
                 <TableCell>User ID</TableCell>
-                <TableCell>Amount</TableCell>
+                <TableCell>Paid (Local)</TableCell>
+                <TableCell>Base (GBP)</TableCell>
+                <TableCell>FX Rate</TableCell>
                 <TableCell>Gateway</TableCell>
                 <TableCell>Status</TableCell>
                 <TableCell>Date</TableCell>
@@ -225,7 +285,40 @@ export const PaymentsPage: React.FC = () => {
                     {payment.id.substring(0, 8)}...
                   </TableCell>
                   <TableCell>{payment.userId.substring(0, 8)}...</TableCell>
-                  <TableCell>£{payment.finalAmount.toFixed(2)}</TableCell>
+                  <TableCell>
+                    {payment.amountChargedLocal && payment.currencyChargedLocal ? (
+                      <Box>
+                        <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                          {formatCurrencyAmount(payment.amountChargedLocal, payment.currencyChargedLocal)}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {payment.currencyChargedLocal}
+                        </Typography>
+                      </Box>
+                    ) : (
+                      <Typography variant="body2" color="text.secondary">—</Typography>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {payment.amountChargedGbp ? (
+                      <Typography variant="body2">
+                        £{payment.amountChargedGbp.toFixed(2)}
+                      </Typography>
+                    ) : (
+                      <Typography variant="body2">
+                        £{payment.finalAmount.toFixed(2)}
+                      </Typography>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {payment.fxRateApplied ? (
+                      <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.85rem' }}>
+                        {payment.fxRateApplied.toFixed(4)}
+                      </Typography>
+                    ) : (
+                      <Typography variant="body2" color="text.secondary">—</Typography>
+                    )}
+                  </TableCell>
                   <TableCell>
                     <Chip label={getGatewayLabel(payment.gateway)} size="small" />
                   </TableCell>
@@ -275,9 +368,10 @@ export const PaymentsPage: React.FC = () => {
 
       {/* Details Dialog */}
       {selectedPayment && (
-        <Dialog open={detailsOpen} onClose={() => setDetailsOpen(false)} maxWidth="sm" fullWidth>
+        <Dialog open={detailsOpen} onClose={() => setDetailsOpen(false)} maxWidth="md" fullWidth>
           <DialogTitle>Payment Details</DialogTitle>
           <DialogContent sx={{ pt: 3, display: 'flex', flexDirection: 'column', gap: 2 }}>
+            {/* Basic Info */}
             <Box>
               <Typography variant="caption" color="text.secondary">Payment ID</Typography>
               <Typography sx={{ fontFamily: 'monospace', wordBreak: 'break-all' }}>
@@ -290,6 +384,97 @@ export const PaymentsPage: React.FC = () => {
                 {selectedPayment.userId}
               </Typography>
             </Box>
+
+            {/* Stripe IDs Section */}
+            <Box sx={{ p: 2, bgcolor: '#f5f5f5', borderRadius: 1 }}>
+              <Typography variant="subtitle2" sx={{ mb: 1.5 }}>Stripe References</Typography>
+              <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 2 }}>
+                {selectedPayment.stripeCheckoutSessionId && (
+                  <Box>
+                    <Typography variant="caption" color="text.secondary">Checkout Session ID</Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Typography sx={{ fontFamily: 'monospace', fontSize: '0.85rem' }}>
+                        {selectedPayment.stripeCheckoutSessionId}
+                      </Typography>
+                      <Button
+                        size="small"
+                        href={`https://dashboard.stripe.com/checkout/sessions/${selectedPayment.stripeCheckoutSessionId}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        sx={{ minWidth: 'auto', textTransform: 'none', fontSize: '0.75rem' }}
+                      >
+                        View in Stripe
+                      </Button>
+                    </Box>
+                  </Box>
+                )}
+                {selectedPayment.stripePaymentIntentId && (
+                  <Box>
+                    <Typography variant="caption" color="text.secondary">Payment Intent ID</Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Typography sx={{ fontFamily: 'monospace', fontSize: '0.85rem' }}>
+                        {selectedPayment.stripePaymentIntentId}
+                      </Typography>
+                      <Button
+                        size="small"
+                        href={`https://dashboard.stripe.com/payments/${selectedPayment.stripePaymentIntentId}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        sx={{ minWidth: 'auto', textTransform: 'none', fontSize: '0.75rem' }}
+                      >
+                        View in Stripe
+                      </Button>
+                    </Box>
+                  </Box>
+                )}
+              </Box>
+            </Box>
+
+            {/* Presentment Data Section */}
+            {(selectedPayment.amountChargedLocal || selectedPayment.amountChargedGbp) && (
+              <Box sx={{ p: 2, bgcolor: '#e3f2fd', borderRadius: 1 }}>
+                <Typography variant="subtitle2" sx={{ mb: 1.5 }}>Adaptive Pricing Details</Typography>
+                <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr 1fr' }, gap: 2 }}>
+                  {selectedPayment.amountChargedLocal && selectedPayment.currencyChargedLocal && (
+                    <Box>
+                      <Typography variant="caption" color="text.secondary">Customer Paid (Local)</Typography>
+                      <Typography variant="h6">
+                        {formatCurrencyAmount(selectedPayment.amountChargedLocal, selectedPayment.currencyChargedLocal)}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {selectedPayment.currencyChargedLocal}
+                      </Typography>
+                    </Box>
+                  )}
+                  {selectedPayment.amountChargedGbp && (
+                    <Box>
+                      <Typography variant="caption" color="text.secondary">Settlement (GBP)</Typography>
+                      <Typography variant="h6">
+                        £{selectedPayment.amountChargedGbp.toFixed(2)}
+                      </Typography>
+                    </Box>
+                  )}
+                  {selectedPayment.fxRateApplied && (
+                    <Box>
+                      <Typography variant="caption" color="text.secondary">FX Rate Applied</Typography>
+                      <Typography variant="h6" sx={{ fontFamily: 'monospace' }}>
+                        {selectedPayment.fxRateApplied.toFixed(6)}
+                      </Typography>
+                    </Box>
+                  )}
+                  {selectedPayment.countryDetected && (
+                    <Box>
+                      <Typography variant="caption" color="text.secondary">Customer Country</Typography>
+                      <Typography variant="body1">
+                        {selectedPayment.countryDetected}
+                      </Typography>
+                    </Box>
+                  )}
+                </Box>
+              </Box>
+            )}
+
+            {/* Amount Breakdown */}
             <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
               <Box>
                 <Typography variant="caption" color="text.secondary">Original Amount</Typography>
@@ -304,6 +489,8 @@ export const PaymentsPage: React.FC = () => {
               <Typography variant="caption" color="text.secondary">Final Amount</Typography>
               <Typography variant="h6">£{selectedPayment.finalAmount.toFixed(2)}</Typography>
             </Box>
+
+            {/* Status Info */}
             <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
               <Box>
                 <Typography variant="caption" color="text.secondary">Gateway</Typography>
@@ -396,3 +583,5 @@ export const PaymentsPage: React.FC = () => {
     </Box>
   )
 }
+
+export default PaymentsPage

@@ -3,7 +3,7 @@ import Stripe from 'stripe'
 
 const router = Router()
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2023-10-16' as any,
+  apiVersion: '2024-11-20.acacia' as any,
 })
 
 /**
@@ -174,50 +174,86 @@ router.delete('/:couponId', async (req: Request, res: Response) => {
 
 /**
  * POST /api/stripe-coupons/validate
- * Validate a Stripe coupon code
+ * Validate a Stripe coupon code for eligibility only
+ * 
+ * With Adaptive Pricing, Stripe Checkout handles discount calculation automatically.
+ * This endpoint only checks eligibility criteria:
+ * - Coupon exists and is not deleted (active status)
+ * - Max redemptions not exceeded
+ * - Plan applicability (via applicable_products in metadata, if specified)
+ * 
+ * Requirements: 6.2 - Check only eligibility without validating against dynamic amounts
  */
 router.post('/validate', async (req: Request, res: Response) => {
   try {
-    const { code } = req.body
+    const { code, planId } = req.body
 
     if (!code) {
       return res.status(400).json({
         valid: false,
-        error: 'Coupon code is required',
+        error: 'MISSING_CODE',
+        message: 'Coupon code is required',
       })
     }
 
-    const coupon = await stripe.coupons.retrieve(code.toUpperCase())
+    let coupon: Stripe.Coupon
+    try {
+      coupon = await stripe.coupons.retrieve(code.toUpperCase())
+    } catch (retrieveError: any) {
+      // Coupon not found in Stripe
+      return res.json({
+        valid: false,
+        error: 'INVALID_COUPON',
+        message: 'Invalid coupon code',
+      })
+    }
 
+    // Check 1: Active status (not deleted)
     if (!coupon || coupon.deleted) {
       return res.json({
         valid: false,
-        error: 'Invalid or deleted coupon',
+        error: 'COUPON_INACTIVE',
+        message: 'This coupon is no longer active',
       })
     }
 
-    // Check if max redemptions reached
+    // Check 2: Max redemptions not exceeded
     if (coupon.max_redemptions && coupon.times_redeemed >= coupon.max_redemptions) {
       return res.json({
         valid: false,
-        error: 'Coupon usage limit reached',
+        error: 'COUPON_EXHAUSTED',
+        message: 'This coupon has reached its usage limit',
       })
     }
 
+    // Check 3: Plan applicability (if applicable_products specified in metadata)
+    const applicableProducts = coupon.metadata?.applicable_products
+    if (applicableProducts && planId) {
+      const productList = applicableProducts.split(',').map((p: string) => p.trim())
+      if (!productList.includes(planId) && !productList.includes('*')) {
+        return res.json({
+          valid: false,
+          error: 'NOT_APPLICABLE_TO_PLAN',
+          message: 'This coupon is not valid for the selected plan',
+        })
+      }
+    }
+
+    // Coupon is eligible - return eligibility info only (no amount-based data)
+    // Stripe Checkout with Adaptive Pricing handles discount calculation automatically
     res.json({
       valid: true,
       code: coupon.id,
-      discountType: coupon.percent_off ? 'percentage' : 'fixed_amount',
-      discountValue: coupon.percent_off || (coupon.amount_off ? coupon.amount_off / 100 : 0),
       description: coupon.metadata?.description || '',
-      timesRedeemed: coupon.times_redeemed,
-      maxRedemptions: coupon.max_redemptions,
+      // Eligibility metadata only - no discount amounts
+      // Discount is applied automatically by Stripe Checkout with allow_promotion_codes: true
     })
   } catch (error: any) {
     console.error('❌ Error validating coupon:', error)
     res.status(500).json({
       valid: false,
-      error: 'Failed to validate coupon',
+      error: 'VALIDATION_ERROR',
+      message: 'Failed to validate coupon',
     })
   }
 })

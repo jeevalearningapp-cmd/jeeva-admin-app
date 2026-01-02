@@ -104,7 +104,12 @@ router.post('/webhooks/stripe', express.raw({ type: 'application/json' }), async
 
     const result = await stripeService.handleWebhookEvent(event)
 
-    if (result.type === 'payment_succeeded') {
+    if (result.type === 'checkout_session_completed') {
+      // Handle Stripe Checkout Session completed (Adaptive Pricing flow)
+      // Requirements: 2.3, 2.4, 4.4
+      await handleCheckoutSessionCompleted(result.data as CheckoutSessionCompletedData)
+    } else if (result.type === 'payment_succeeded') {
+      // Handle legacy PaymentIntent flow
       const { supabase } = await import('../lib/supabase')
 
       const { data: payments } = await supabase
@@ -134,6 +139,121 @@ router.post('/webhooks/stripe', express.raw({ type: 'application/json' }), async
     res.status(400).send(`Webhook Error: ${error.message}`)
   }
 })
+
+/**
+ * Data structure for checkout.session.completed webhook event
+ */
+interface CheckoutSessionCompletedData {
+  sessionId: string
+  paymentIntentId: string | null
+  chargeId: string | null
+  customerId: string | null
+  customerEmail: string | null
+  presentmentCurrency: string
+  presentmentAmount: number
+  gbpAmount: number | null
+  fxRate: number | null
+  countryDetected: string | null
+  userId: string | null
+  subscriptionPlanId: string | null
+  totalDiscount: number
+  metadata: Record<string, string>
+}
+
+/**
+ * Handles checkout.session.completed webhook event.
+ * Creates payment record with presentment data and activates subscription.
+ * 
+ * Requirements:
+ * - 2.3: Extract and store presentment currency, local amount, GBP amount, and FX rate
+ * - 2.4: Activate user's subscription in the database
+ * - 4.4: Persist stripe_checkout_session_id, amount_charged_gbp, amount_charged_local, 
+ *        currency_charged_local, and computed fx_rate
+ */
+async function handleCheckoutSessionCompleted(data: CheckoutSessionCompletedData): Promise<void> {
+  const { supabase } = await import('../lib/supabase')
+  
+  console.log('🔄 Processing checkout.session.completed webhook:', data.sessionId)
+  
+  // Validate required fields
+  if (!data.userId) {
+    console.error('❌ Missing userId in checkout session metadata')
+    throw new Error('Missing userId in checkout session metadata')
+  }
+  
+  // Check if payment already exists for this session (idempotency)
+  const { data: existingPayment } = await supabase
+    .from('payments')
+    .select('id')
+    .eq('stripe_checkout_session_id', data.sessionId)
+    .maybeSingle()
+  
+  if (existingPayment) {
+    console.log('⚠️ Payment already exists for session:', data.sessionId)
+    return
+  }
+  
+  // Create subscription record if subscriptionPlanId is provided
+  let subscriptionId: string | null = null
+  if (data.subscriptionPlanId) {
+    subscriptionId = await paymentService.createSubscriptionRecord(
+      data.userId,
+      data.subscriptionPlanId
+    )
+  }
+  
+  // Create payment record with presentment data (Requirements: 4.4)
+  const paymentData = {
+    user_id: data.userId,
+    gateway: 'stripe',
+    stripe_checkout_session_id: data.sessionId,
+    stripe_payment_intent_id: data.paymentIntentId,
+    stripe_customer_id: data.customerId,
+    
+    // Presentment fields (Adaptive Pricing)
+    amount_charged_local: data.presentmentAmount,
+    currency_charged_local: data.presentmentCurrency,
+    amount_charged_gbp: data.gbpAmount,
+    fx_rate_applied: data.fxRate,
+    country_detected: data.countryDetected,
+    
+    // Standard payment fields
+    amount: data.gbpAmount || data.presentmentAmount,
+    currency: 'GBP',
+    original_amount: data.gbpAmount || data.presentmentAmount,
+    discount_amount: data.totalDiscount,
+    final_amount: data.gbpAmount || data.presentmentAmount,
+    
+    // Subscription linkage
+    subscription_id: subscriptionId,
+    subscription_plan_id: data.subscriptionPlanId,
+    
+    // Status
+    status: 'succeeded',
+    
+    // Metadata
+    metadata: data.metadata,
+  }
+  
+  const { data: payment, error: paymentError } = await supabase
+    .from('payments')
+    .insert(paymentData)
+    .select('id')
+    .single()
+  
+  if (paymentError) {
+    console.error('❌ Failed to create payment record:', paymentError)
+    throw new Error(`Failed to create payment: ${paymentError.message}`)
+  }
+  
+  console.log('✅ Payment record created:', payment.id)
+  
+  // Activate subscription if created (Requirements: 2.4)
+  if (subscriptionId) {
+    await paymentService.activateSubscription(subscriptionId)
+    console.log('✅ Subscription activated:', subscriptionId)
+  }
+}
 
 router.post('/webhooks/razorpay', async (req, res) => {
   const signature = req.headers['x-razorpay-signature'] as string

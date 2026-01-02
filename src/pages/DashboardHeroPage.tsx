@@ -432,3 +432,5 @@ export const DashboardHeroPage: React.FC = () => {
     </Box>
   )
 }
+
+export default DashboardHeroPage

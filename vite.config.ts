@@ -5,7 +5,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     host: '0.0.0.0',
-    port: 5000,
+    port: 5001,
     allowedHosts: true,
     proxy: {
       '/api': {
@@ -19,4 +19,18 @@ export default defineConfig({
       '@': '/src',
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Vendor chunks
+          'react-vendor': ['react', 'react-dom'],
+          'mui-vendor': ['@mui/material', '@mui/icons-material'],
+          'chart-vendor': ['recharts'],
+          'utils-vendor': ['date-fns', 'html2canvas'],
+        }
+      }
+    },
+    chunkSizeWarningLimit: 1000
+  }
 })

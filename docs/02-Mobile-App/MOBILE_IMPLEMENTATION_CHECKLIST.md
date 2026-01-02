@@ -672,7 +672,7 @@
 | AI Recommendations | ✅ Ready | `/api/ai/recommendations` | Personalized content ready |
 | Hero Sections | ✅ Ready | `/api/hero-sections` | Marketing banners ready |
 | User Profile | ✅ Ready | `/api/users/*` | Profile management ready |
-| Email Templates | ✅ Ready | Resend configured | For transactional emails |
+| Email Templates | ✅ Ready | Brevo configured | For transactional emails |
 | Real-time Voice Tutoring | 🚧 TBD | `/api/tutoring/*` | Requires backend implementation |
 
 ---

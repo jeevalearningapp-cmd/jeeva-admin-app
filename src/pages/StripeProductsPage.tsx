@@ -25,9 +25,14 @@ import {
   Stack,
   Card,
   CardContent,
+  Tooltip,
 } from '@mui/material'
-import { AddOutlined as AddIcon, DeleteOutlined as DeleteIcon } from '@mui/icons-material'
-import { supabase } from '@/lib/supabase'
+import { 
+  AddOutlined as AddIcon, 
+  DeleteOutlined as DeleteIcon,
+  PreviewOutlined as PreviewIcon,
+  WarningAmberOutlined as WarningIcon,
+} from '@mui/icons-material'
 import { useSnackbar } from 'notistack'
 import { getApiUrl } from '@/config/api'
 
@@ -43,12 +48,6 @@ interface Price {
   is_active: boolean
 }
 
-interface Country {
-  country_code: string
-  country_name: string
-  currency: string
-}
-
 interface StripeProduct {
   id: string
   name: string
@@ -57,15 +56,14 @@ interface StripeProduct {
 
 export const StripeProductsPage: React.FC = () => {
   const [prices, setPrices] = useState<Price[]>([])
-  const [countries, setCountries] = useState<Country[]>([])
   const [stripeProducts, setStripeProducts] = useState<StripeProduct[]>([])
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
+  const [previewLoading, setPreviewLoading] = useState(false)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [createProductDialogOpen, setCreateProductDialogOpen] = useState(false)
   const [formData, setFormData] = useState({
     stripe_product_id: '',
-    country_code: '',
     amount: '',
     plan_name: '',
     plan_duration_days: '30',
@@ -84,7 +82,7 @@ export const StripeProductsPage: React.FC = () => {
   const fetchInitialData = async () => {
     setLoading(true)
     try {
-      await Promise.all([fetchPrices(), fetchCountries(), fetchStripeProducts()])
+      await Promise.all([fetchPrices(), fetchStripeProducts()])
     } finally {
       setLoading(false)
     }
@@ -109,19 +107,6 @@ export const StripeProductsPage: React.FC = () => {
       setStripeProducts(data || [])
     } catch (err: any) {
       console.error('Failed to load Stripe products:', err)
-    }
-  }
-
-  const fetchCountries = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('country_currency_map')
-        .select('country_code, country_name, currency')
-
-      if (error) throw error
-      setCountries(data || [])
-    } catch (err: any) {
-      console.error('Failed to load countries:', err)
     }
   }
 
@@ -163,7 +148,6 @@ export const StripeProductsPage: React.FC = () => {
     try {
       if (
         !formData.stripe_product_id ||
-        !formData.country_code ||
         !formData.amount ||
         !formData.plan_name
       ) {
@@ -177,7 +161,7 @@ export const StripeProductsPage: React.FC = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           stripe_product_id: formData.stripe_product_id,
-          country_code: formData.country_code,
+          currency: 'gbp', // GBP-only for Adaptive Pricing
           amount: parseFloat(formData.amount),
           plan_name: formData.plan_name,
           plan_duration_days: parseInt(formData.plan_duration_days),
@@ -194,7 +178,6 @@ export const StripeProductsPage: React.FC = () => {
       setDialogOpen(false)
       setFormData({
         stripe_product_id: '',
-        country_code: '',
         amount: '',
         plan_name: '',
         plan_duration_days: '30',
@@ -204,6 +187,46 @@ export const StripeProductsPage: React.FC = () => {
       enqueueSnackbar(`Error: ${err.message}`, { variant: 'error' })
     } finally {
       setSubmitting(false)
+    }
+  }
+
+  const handlePreviewAdaptivePricing = async () => {
+    // Find the first active GBP price to use for preview
+    const gbpPrice = prices.find(p => p.currency.toUpperCase() === 'GBP' && p.is_active)
+    
+    if (!gbpPrice) {
+      enqueueSnackbar('No active GBP price found. Create a GBP price first to preview Adaptive Pricing.', { variant: 'warning' })
+      return
+    }
+
+    try {
+      setPreviewLoading(true)
+      const response = await fetch(`${apiUrl}/checkout/create-session`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          planPriceIdGbp: gbpPrice.stripe_price_id,
+          userId: 'preview-test-user',
+          customerEmail: 'test+adaptive_preview@jeeva-app.com',
+          successUrl: `${window.location.origin}/stripe-products?preview=success`,
+          cancelUrl: `${window.location.origin}/stripe-products?preview=cancelled`,
+        }),
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Failed to create preview session')
+      }
+
+      const { sessionUrl } = await response.json()
+      
+      // Open checkout in new tab for preview
+      window.open(sessionUrl, '_blank')
+      enqueueSnackbar('Preview checkout opened in new tab. Stripe will show local currency based on your location.', { variant: 'info' })
+    } catch (err: any) {
+      enqueueSnackbar(`Error: ${err.message}`, { variant: 'error' })
+    } finally {
+      setPreviewLoading(false)
     }
   }
 
@@ -229,9 +252,20 @@ export const StripeProductsPage: React.FC = () => {
   return (
     <Box sx={{ p: 3 }}>
       {/* Header */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Typography variant="h5">Stripe Products & Prices</Typography>
         <Stack direction="row" spacing={2}>
+          <Tooltip title="Preview how Adaptive Pricing displays to customers">
+            <Button
+              variant="outlined"
+              color="info"
+              startIcon={previewLoading ? <CircularProgress size={18} /> : <PreviewIcon />}
+              onClick={handlePreviewAdaptivePricing}
+              disabled={previewLoading}
+            >
+              Preview Adaptive Pricing
+            </Button>
+          </Tooltip>
           <Button
             variant="outlined"
             startIcon={<AddIcon />}
@@ -244,10 +278,24 @@ export const StripeProductsPage: React.FC = () => {
             startIcon={<AddIcon />}
             onClick={() => setDialogOpen(true)}
           >
-            Add Price
+            Add GBP Price
           </Button>
         </Stack>
       </Box>
+
+      {/* Adaptive Pricing Warning Banner */}
+      <Alert 
+        severity="warning" 
+        icon={<WarningIcon />}
+        sx={{ mb: 3 }}
+      >
+        <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+          Adaptive Pricing Enabled
+        </Typography>
+        <Typography variant="body2">
+          Do not create INR/USD Prices manually. Stripe Adaptive Pricing automatically converts GBP prices to local currencies (INR, USD, etc.) at checkout based on customer location.
+        </Typography>
+      </Alert>
 
       {/* Prices Table */}
       <Typography variant="h6" sx={{ mb: 2 }}>
@@ -339,8 +387,11 @@ export const StripeProductsPage: React.FC = () => {
 
       {/* Add Price Dialog */}
       <Dialog open={dialogOpen} onClose={() => !submitting && setDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Add New Price</DialogTitle>
+        <DialogTitle>Add New GBP Price</DialogTitle>
         <DialogContent sx={{ pt: 2 }}>
+          <Alert severity="info" sx={{ mb: 2 }}>
+            Prices are created in GBP only. Stripe Adaptive Pricing will automatically convert to local currencies at checkout.
+          </Alert>
           <FormControl fullWidth margin="normal">
             <InputLabel>Stripe Product</InputLabel>
             <Select
@@ -363,29 +414,24 @@ export const StripeProductsPage: React.FC = () => {
             onChange={(e) => setFormData({ ...formData, plan_name: e.target.value })}
             placeholder="Premium Monthly"
           />
-          <FormControl fullWidth margin="normal">
-            <InputLabel>Country</InputLabel>
-            <Select
-              value={formData.country_code}
-              onChange={(e) => setFormData({ ...formData, country_code: e.target.value })}
-              label="Country"
-            >
-              {countries.map((c) => (
-                <MenuItem key={c.country_code} value={c.country_code}>
-                  {c.country_name} ({c.currency})
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
           <TextField
             fullWidth
-            label="Amount"
+            label="Currency"
+            margin="normal"
+            value="GBP"
+            disabled
+            helperText="Only GBP prices are supported. Adaptive Pricing handles currency conversion."
+          />
+          <TextField
+            fullWidth
+            label="Amount (GBP)"
             margin="normal"
             type="number"
             inputProps={{ step: '0.01', min: '0' }}
             value={formData.amount}
             onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
             placeholder="25.00"
+            helperText="Enter amount in GBP (e.g., 25.00 for £25)"
           />
           <FormControl fullWidth margin="normal">
             <InputLabel>Duration</InputLabel>
@@ -405,7 +451,7 @@ export const StripeProductsPage: React.FC = () => {
             Cancel
           </Button>
           <Button onClick={handleSubmit} variant="contained" disabled={submitting} sx={{ minWidth: '100px' }}>
-            {submitting ? <CircularProgress size={24} /> : 'Add Price'}
+            {submitting ? <CircularProgress size={24} /> : 'Add GBP Price'}
           </Button>
         </DialogActions>
       </Dialog>

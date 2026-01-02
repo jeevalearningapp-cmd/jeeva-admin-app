@@ -169,7 +169,7 @@ export default function TrialLearningManager({ onStatusChange }: LearningManager
         {(
           ['video', 'audio', 'text', 'flashcard', 'assessment'] as const
         ).map((type) => (
-          <Grid xs={12} sm={6} md={4} lg={2.4} key={type}>
+          <Grid size={{ xs: 12, sm: 6, md: 4, lg: 2.4 }} key={type}>
             <Card>
               <CardContent sx={{ textAlign: 'center' }}>
                 <Typography color="text.secondary" variant="caption">

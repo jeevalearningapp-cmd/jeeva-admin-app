@@ -12,6 +12,7 @@ export const usePayments = (filters?: PaymentFilters) => {
     data: payments = [],
     isLoading,
     error,
+    refetch,
   } = useQuery({
     queryKey: ['payments', filters],
     queryFn: () => paymentsAPI.getPayments(filters),
@@ -52,5 +53,6 @@ export const usePayments = (filters?: PaymentFilters) => {
     error,
     refund: refundMutation.mutate,
     isRefunding: refundMutation.isPending,
+    refetch,
   }
 }

@@ -489,3 +489,5 @@ export const AdminUsersPage: React.FC = () => {
     </Box>
   )
 }
+
+export default AdminUsersPage

@@ -46,43 +46,44 @@ router.post('/products', async (req: Request, res: Response) => {
 /**
  * POST /api/stripe-admin/prices
  * Create a Stripe price (recurring or one-time)
+ * 
+ * IMPORTANT: Only GBP prices are allowed. Stripe Adaptive Pricing
+ * automatically handles currency conversion for international customers.
  */
 router.post('/prices', async (req: Request, res: Response) => {
   try {
     const {
       stripe_product_id,
-      country_code,
+      currency,
       amount,
       plan_name,
       plan_duration_days = 30,
-      recurring = true, // NEW: Support one-time purchases
+      recurring = true,
     } = req.body
 
-    if (!stripe_product_id || !country_code || !amount || !plan_name) {
+    if (!stripe_product_id || !amount || !plan_name) {
       return res.status(400).json({
-        error: 'Missing required fields: stripe_product_id, country_code, amount, plan_name',
+        error: 'Missing required fields: stripe_product_id, amount, plan_name',
       })
     }
 
-    // Get country details
-    const { data: country, error: countryError } = await supabase
-      .from('country_currency_map')
-      .select('currency')
-      .eq('country_code', country_code)
-      .single()
-
-    if (countryError || !country) {
-      return res.status(400).json({ error: 'Invalid country code' })
+    // Enforce GBP-only currency for Adaptive Pricing
+    // Currency is optional - defaults to GBP if not provided
+    const requestedCurrency = currency?.toUpperCase() || 'GBP'
+    
+    if (requestedCurrency !== 'GBP') {
+      return res.status(400).json({
+        error: 'Only GBP prices are allowed. Adaptive Pricing handles currency conversion automatically.',
+      })
     }
 
-    // Create price in Stripe
+    // Create price in Stripe with GBP currency
     const priceData: Stripe.PriceCreateParams = {
       product: stripe_product_id,
-      unit_amount: Math.round(amount * 100), // Convert to cents
-      currency: country.currency.toLowerCase(),
+      unit_amount: Math.round(amount * 100), // Convert to pence
+      currency: 'gbp',
       metadata: {
         plan_name,
-        country_code,
         plan_duration_days: plan_duration_days.toString(),
         recurring: recurring.toString(),
       },
@@ -98,15 +99,14 @@ router.post('/prices', async (req: Request, res: Response) => {
 
     const price = await stripe.prices.create(priceData)
 
-    console.log('✅ Price created in Stripe:', price.id)
+    console.log('✅ GBP Price created in Stripe:', price.id)
 
     res.json({
       success: true,
       price: {
         id: price.id,
         amount,
-        currency: country.currency,
-        country_code,
+        currency: 'GBP',
         plan_name,
         recurring,
       },
@@ -180,6 +180,81 @@ router.delete('/prices/:priceId', async (req: Request, res: Response) => {
     })
   } catch (error: any) {
     console.error('❌ Error deactivating price:', error)
+    res.status(500).json({ error: error.message })
+  }
+})
+
+/**
+ * GET /api/stripe-admin/catalog
+ * Get subscription catalog with GBP prices for Adaptive Pricing.
+ * Returns plans grouped by tier (Starter/Growth/Ultimate) with only canonical GBP prices.
+ * No country-based grouping - Stripe Adaptive Pricing handles currency conversion.
+ * 
+ * Requirements: 1.2, 1.4, 7.3
+ */
+router.get('/catalog', async (req: Request, res: Response) => {
+  try {
+    // Fetch all active prices from Stripe
+    const prices = await stripe.prices.list({
+      limit: 100,
+      active: true,
+      expand: ['data.product'],
+    })
+
+    // Filter to only GBP prices and transform to CatalogPlan format
+    const catalogPlans = prices.data
+      .filter((price) => {
+        // Only include GBP prices
+        if (price.currency.toLowerCase() !== 'gbp') {
+          return false
+        }
+        // Only include prices with active products
+        const product = price.product as Stripe.Product
+        return product && !product.deleted && product.active
+      })
+      .map((price) => {
+        const product = price.product as Stripe.Product
+        const metadata = price.metadata || {}
+        const productMetadata = product.metadata || {}
+
+        // Parse features from product metadata if available
+        let features: string[] = []
+        try {
+          if (productMetadata.features) {
+            features = JSON.parse(productMetadata.features)
+          }
+        } catch {
+          features = []
+        }
+
+        return {
+          planId: product.id,
+          name: metadata.plan_name || product.name || 'Plan',
+          description: product.description || '',
+          durationDays: parseInt(metadata.plan_duration_days || '30', 10),
+          stripePriceIdGbp: price.id,
+          unitAmountGbp: price.unit_amount || 0, // Amount in pence
+          active: price.active && product.active,
+          features,
+        }
+      })
+      // Sort by plan tier order: Starter, Growth, Ultimate
+      .sort((a, b) => {
+        const tierOrder: Record<string, number> = {
+          starter: 1,
+          growth: 2,
+          ultimate: 3,
+        }
+        const aOrder = tierOrder[a.name.toLowerCase()] || 999
+        const bOrder = tierOrder[b.name.toLowerCase()] || 999
+        return aOrder - bOrder
+      })
+
+    res.json({
+      plans: catalogPlans,
+    })
+  } catch (error: any) {
+    console.error('❌ Error fetching catalog:', error)
     res.status(500).json({ error: error.message })
   }
 })

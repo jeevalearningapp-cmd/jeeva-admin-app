@@ -30,7 +30,7 @@ export interface RecentActivity {
   type: 'user' | 'subscription' | 'content'
   message: string
   timestamp: string
-  metadata?: Record<string, any>
+  metadata?: Record<string, string | number | boolean | null>
 }
 
 export interface DashboardData {

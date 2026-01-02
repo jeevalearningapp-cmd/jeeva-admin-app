@@ -71,3 +71,5 @@ export const NotificationsPage: React.FC = () => {
     </Box>
   )
 }
+
+export default NotificationsPage

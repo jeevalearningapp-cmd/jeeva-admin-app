@@ -54,7 +54,7 @@ export default function TrialAnalyticsDashboard() {
     <Box>
       {/* KPI Cards */}
       <Grid container spacing={2} sx={{ mb: 3 }}>
-        <Grid xs={12} sm={6} md={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Card>
             <CardContent>
               <Typography color="text.secondary" gutterBottom>
@@ -68,7 +68,7 @@ export default function TrialAnalyticsDashboard() {
           </Card>
         </Grid>
 
-        <Grid xs={12} sm={6} md={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Card>
             <CardContent>
               <Typography color="text.secondary" gutterBottom>
@@ -82,7 +82,7 @@ export default function TrialAnalyticsDashboard() {
           </Card>
         </Grid>
 
-        <Grid xs={12} sm={6} md={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Card>
             <CardContent>
               <Typography color="text.secondary" gutterBottom>
@@ -96,7 +96,7 @@ export default function TrialAnalyticsDashboard() {
           </Card>
         </Grid>
 
-        <Grid xs={12} sm={6} md={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Card>
             <CardContent>
               <Typography color="text.secondary" gutterBottom>
@@ -113,7 +113,7 @@ export default function TrialAnalyticsDashboard() {
 
       {/* Charts */}
       <Grid container spacing={3} sx={{ mb: 3 }}>
-        <Grid xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <Paper sx={{ p: 2 }}>
             <Typography variant="h6" gutterBottom>
               Trial Starts & Completions (Last 7 Days)
@@ -142,7 +142,7 @@ export default function TrialAnalyticsDashboard() {
           </Paper>
         </Grid>
 
-        <Grid xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <Paper sx={{ p: 2 }}>
             <Typography variant="h6" gutterBottom>
               Section Performance

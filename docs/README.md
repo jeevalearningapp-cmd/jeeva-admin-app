@@ -30,7 +30,7 @@ Database schema, content organization, and data models for the entire platform.
 ### **04-Backend** 🔧
 Express.js backend API, services, and integrations.
 - REST API endpoint documentation
-- Email service (Resend)
+- Email service (Brevo)
 - Payment processing (Stripe)
 - AI integration (Google Gemini)
 - Webhook handlers
@@ -148,7 +148,7 @@ Complete payment gateway and subscription implementation guide using Stripe.
 - Supabase PostgreSQL
 - Google Gemini for AI
 - Stripe for payments
-- Resend for email
+- Brevo for email
 - Expo for push notifications
 
 ### **Subscription Model**

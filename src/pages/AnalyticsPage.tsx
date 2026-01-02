@@ -260,3 +260,5 @@ export const AnalyticsPage: React.FC = () => {
     </Box>
   )
 }
+
+export default AnalyticsPage

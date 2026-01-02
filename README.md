@@ -44,7 +44,7 @@ The Jeeva Admin Portal is a full-featured web application designed to manage all
 - System status monitoring
 
 ### 📧 Email System
-- Resend integration for transactional emails
+- Brevo integration for transactional emails
 - Welcome emails with confirmation links
 - Subscription confirmations
 - Payment receipts
@@ -73,7 +73,7 @@ The Jeeva Admin Portal is a full-featured web application designed to manage all
 
 ### Backend
 - **BaaS**: Supabase (PostgreSQL, Auth, Storage)
-- **Email API**: Express.js server with Resend
+- **Email API**: Express.js server with Brevo
 - **Authentication**: Supabase Auth with RLS policies
 
 ### Development Tools
@@ -86,7 +86,7 @@ The Jeeva Admin Portal is a full-featured web application designed to manage all
 ### Prerequisites
 - Node.js 18+ and npm
 - Supabase account and project
-- Resend API key (for email functionality)
+- Brevo API key & SMTP credentials (for email functionality)
 
 ### Installation
 
@@ -107,7 +107,8 @@ The Jeeva Admin Portal is a full-featured web application designed to manage all
    ```env
    VITE_SUPABASE_URL=your_supabase_project_url
    VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
-   RESEND_API_KEY=your_resend_api_key
+   BREVO_API_KEY=your_brevo_api_key
+   BREVO_SMTP_KEY=your_brevo_smtp_key
    ```
 
 4. **Set up Supabase database**
@@ -177,7 +178,8 @@ jeeva-admin-portal/
 |----------|-------------|----------|
 | `VITE_SUPABASE_URL` | Your Supabase project URL | Yes |
 | `VITE_SUPABASE_ANON_KEY` | Your Supabase anonymous key | Yes |
-| `RESEND_API_KEY` | Your Resend API key for emails | Yes |
+| `BREVO_API_KEY` | Your Brevo API key for emails | Yes |
+| `BREVO_SMTP_KEY` | Your Brevo SMTP key for emails | Yes |
 
 ## 🎨 Features in Detail
 

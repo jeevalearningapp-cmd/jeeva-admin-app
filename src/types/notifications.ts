@@ -41,7 +41,7 @@ export interface NotificationData {
   moduleId?: string
   topicId?: string
   subscriptionId?: string
-  [key: string]: any
+  [key: string]: string | number | boolean | undefined
 }
 
 export interface Notification {

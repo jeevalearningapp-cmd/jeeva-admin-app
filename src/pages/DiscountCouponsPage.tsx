@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useMemo } from 'react'
 import {
   Box,
   Typography,
@@ -14,8 +14,6 @@ import {
   InputAdornment,
   IconButton,
   Chip,
-  CircularProgress,
-  Alert,
   Button,
   Dialog,
   DialogTitle,
@@ -29,41 +27,38 @@ import {
   FormControlLabel,
   Stack,
   FormHelperText,
+  Tooltip,
+  Alert,
+  Card,
+  CardContent,
+  Grid,
 } from '@mui/material'
 import {
   SearchOutlined as SearchIcon,
   AddOutlined as AddIcon,
   EditOutlined as EditIcon,
   DeleteOutlined as DeleteIcon,
+  RefreshOutlined as RefreshIcon,
   LocalOfferOutlined as CouponIcon,
+  ContentCopyOutlined as CopyIcon,
+  CheckCircleOutlined as CheckIcon,
+  CancelOutlined as CancelIcon,
+  SyncOutlined as SyncIcon,
 } from '@mui/icons-material'
-import { supabase } from '@/lib/supabase'
 import { useSnackbar } from 'notistack'
 import { PageLoader } from '@/components/common'
 import { format } from 'date-fns'
-import { getApiUrl } from '@/config/api'
-
-interface DiscountCoupon {
-  id: string
-  code: string
-  description: string | null
-  discount_type: 'percentage' | 'fixed_amount'
-  discount_value: number
-  applicable_plans: string[] | null
-  usage_limit: number | null
-  times_used: number
-  valid_from: string
-  valid_until: string | null
-  is_active: boolean
-  created_at: string
-}
+import { useCoupons, useCreateCoupon, useUpdateCoupon, useDeleteCoupon } from '@/hooks/useCoupons'
+import { CreateCouponInput, UpdateCouponInput, DiscountCoupon } from '@/types/coupon'
 
 interface CouponFormData {
   code: string
   description: string
   discount_type: 'percentage' | 'fixed_amount'
   discount_value: string
-  applicable_plans: string[]
+  currency: string
+  duration: 'once' | 'repeating' | 'forever'
+  duration_in_months: string
   usage_limit: string
   valid_from: string
   valid_until: string
@@ -75,118 +70,107 @@ const initialFormData: CouponFormData = {
   description: '',
   discount_type: 'percentage',
   discount_value: '',
-  applicable_plans: [],
+  currency: 'USD',
+  duration: 'once',
+  duration_in_months: '',
   usage_limit: '',
   valid_from: new Date().toISOString().split('T')[0],
   valid_until: '',
   is_active: true,
 }
 
-interface Price {
-  id: string
-  plan_name: string
-  currency: string
-  country_code: string
-}
-
 export const DiscountCouponsPage: React.FC = () => {
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(10)
   const [search, setSearch] = useState('')
-  const [coupons, setCoupons] = useState<DiscountCoupon[]>([])
-  const [filteredCoupons, setFilteredCoupons] = useState<DiscountCoupon[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingCoupon, setEditingCoupon] = useState<DiscountCoupon | null>(null)
   const [formData, setFormData] = useState<CouponFormData>(initialFormData)
-  const [submitting, setSubmitting] = useState(false)
-  const [prices, setPrices] = useState<Price[]>([])
-  const [pricesLoading, setPricesLoading] = useState(true)
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({})
+
   const { enqueueSnackbar } = useSnackbar()
-  const apiUrl = getApiUrl()
+  
+  // Fetch coupons with search filter
+  const { data: coupons = [], isLoading, error, refetch } = useCoupons({ search })
+  const createCoupon = useCreateCoupon()
+  const updateCoupon = useUpdateCoupon()
+  const deleteCoupon = useDeleteCoupon()
 
-  const fetchPrices = async () => {
-    try {
-      setPricesLoading(true)
-      const response = await fetch(`${apiUrl}/api/stripe-admin/prices`)
-      if (!response.ok) throw new Error('Failed to fetch prices')
+  // Filter and paginate coupons
+  const filteredCoupons = useMemo(() => {
+    return coupons.filter(coupon => 
+      coupon.code.toLowerCase().includes(search.toLowerCase()) ||
+      (coupon.description && coupon.description.toLowerCase().includes(search.toLowerCase()))
+    )
+  }, [coupons, search])
 
-      const priceData = await response.json()
-      setPrices(priceData || [])
-    } catch (err: any) {
-      console.error('Failed to load prices:', err)
-      enqueueSnackbar('Failed to load available plans', { variant: 'warning' })
-    } finally {
-      setPricesLoading(false)
+  const paginatedCoupons = useMemo(() => {
+    const start = page * rowsPerPage
+    return filteredCoupons.slice(start, start + rowsPerPage)
+  }, [filteredCoupons, page, rowsPerPage])
+
+  // Handle form submission
+  const handleSubmit = async () => {
+    // Validate form
+    const errors: Record<string, string> = {}
+    
+    if (!formData.code.trim()) errors.code = 'Code is required'
+    if (!formData.discount_value || parseFloat(formData.discount_value) <= 0) {
+      errors.discount_value = 'Discount value must be greater than 0'
     }
-  }
-
-  const fetchCoupons = async () => {
-    try {
-      setLoading(true)
-      setError(null)
-
-      const response = await fetch(`${apiUrl}/api/stripe-coupons`)
-      if (!response.ok) throw new Error('Failed to fetch coupons')
-
-      const data = await response.json()
-      
-      const transformedCoupons = data.map((coupon: any) => ({
-        id: coupon.id,
-        code: coupon.code,
-        description: coupon.description,
-        discount_type: coupon.discountType,
-        discount_value: coupon.discountValue,
-        applicable_plans: null,
-        usage_limit: coupon.maxRedemptions,
-        times_used: coupon.timesRedeemed || 0,
-        valid_from: coupon.createdAt,
-        valid_until: null,
-        is_active: coupon.isActive,
-        created_at: coupon.createdAt,
-      })) as DiscountCoupon[]
-
-      setCoupons(transformedCoupons)
-      filterCoupons(transformedCoupons, search)
-    } catch (err: any) {
-      setError(err.message)
-      enqueueSnackbar(`Error loading coupons: ${err.message}`, { variant: 'error' })
-    } finally {
-      setLoading(false)
+    if (formData.discount_type === 'percentage' && parseFloat(formData.discount_value) > 100) {
+      errors.discount_value = 'Percentage cannot exceed 100'
     }
-  }
+    if (formData.discount_type === 'fixed_amount' && !formData.currency) {
+      errors.currency = 'Currency is required for fixed amount discounts'
+    }
+    if (formData.duration === 'repeating' && !formData.duration_in_months) {
+      errors.duration_in_months = 'Duration in months is required for repeating coupons'
+    }
 
-  const filterCoupons = (allCoupons: DiscountCoupon[], searchTerm: string) => {
-    if (!searchTerm.trim()) {
-      setFilteredCoupons(allCoupons)
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors)
       return
     }
 
-    const term = searchTerm.toLowerCase()
-    const filtered = allCoupons.filter(
-      (coupon) =>
-        coupon.code.toLowerCase().includes(term) ||
-        coupon.description?.toLowerCase().includes(term)
-    )
-    setFilteredCoupons(filtered)
-  }
-
-  useEffect(() => {
-    fetchPrices()
-    fetchCoupons()
-  }, [])
-
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newSearch = e.target.value
-    setSearch(newSearch)
-    filterCoupons(coupons, newSearch)
-    setPage(0)
+    try {
+      if (editingCoupon) {
+        // Update existing coupon
+        const updateInput: UpdateCouponInput = {
+          description: formData.description || undefined,
+          is_active: formData.is_active,
+          usage_limit: formData.usage_limit ? parseInt(formData.usage_limit) : undefined,
+          valid_until: formData.valid_until || undefined,
+        }
+        await updateCoupon.mutateAsync({ id: editingCoupon.id, input: updateInput })
+      } else {
+        // Create new coupon
+        const createInput: CreateCouponInput = {
+          code: formData.code.toUpperCase(),
+          description: formData.description || undefined,
+          discount_type: formData.discount_type,
+          discount_value: parseFloat(formData.discount_value),
+          currency: formData.discount_type === 'fixed_amount' ? formData.currency : undefined,
+          duration: formData.duration,
+          duration_in_months: formData.duration === 'repeating' ? parseInt(formData.duration_in_months) : undefined,
+          usage_limit: formData.usage_limit ? parseInt(formData.usage_limit) : undefined,
+          valid_from: formData.valid_from,
+          valid_until: formData.valid_until || undefined,
+          is_active: formData.is_active,
+        }
+        await createCoupon.mutateAsync(createInput)
+      }
+      
+      handleCloseDialog()
+    } catch (error) {
+      console.error('Error saving coupon:', error)
+    }
   }
 
   const handleAddClick = () => {
     setEditingCoupon(null)
     setFormData(initialFormData)
+    setFormErrors({})
     setDialogOpen(true)
   }
 
@@ -197,111 +181,181 @@ export const DiscountCouponsPage: React.FC = () => {
       description: coupon.description || '',
       discount_type: coupon.discount_type,
       discount_value: coupon.discount_value.toString(),
-      applicable_plans: coupon.applicable_plans || [],
+      currency: coupon.currency || 'USD',
+      duration: coupon.duration || 'once',
+      duration_in_months: coupon.duration_in_months?.toString() || '',
       usage_limit: coupon.usage_limit?.toString() || '',
       valid_from: coupon.valid_from.split('T')[0],
       valid_until: coupon.valid_until ? coupon.valid_until.split('T')[0] : '',
       is_active: coupon.is_active,
     })
+    setFormErrors({})
     setDialogOpen(true)
+  }
+
+  const handleDeleteClick = async (coupon: DiscountCoupon) => {
+    if (!window.confirm(`Are you sure you want to delete coupon "${coupon.code}"?`)) return
+    
+    try {
+      await deleteCoupon.mutateAsync(coupon.id)
+    } catch (error) {
+      console.error('Error deleting coupon:', error)
+    }
   }
 
   const handleCloseDialog = () => {
     setDialogOpen(false)
     setEditingCoupon(null)
     setFormData(initialFormData)
+    setFormErrors({})
   }
 
-  const handleSubmit = async () => {
-    try {
-      if (!formData.code.trim()) {
-        enqueueSnackbar('Coupon code is required', { variant: 'warning' })
-        return
-      }
-
-      if (!formData.discount_value) {
-        enqueueSnackbar('Discount value is required', { variant: 'warning' })
-        return
-      }
-
-      setSubmitting(true)
-
-      const couponPayload = {
-        code: formData.code.toUpperCase().trim(),
-        description: formData.description || '',
-        discountType: formData.discount_type,
-        discountValue: parseFloat(formData.discount_value),
-        maxRedemptions: formData.usage_limit ? parseInt(formData.usage_limit) : null,
-        durationMonths: 1,
-      }
-
-      if (editingCoupon) {
-        const response = await fetch(`${apiUrl}/api/stripe-coupons/${editingCoupon.code}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(couponPayload),
-        })
-
-        if (!response.ok) throw new Error('Failed to update coupon')
-        enqueueSnackbar('Coupon updated successfully', { variant: 'success' })
-      } else {
-        const response = await fetch(`${apiUrl}/api/stripe-coupons`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(couponPayload),
-        })
-
-        if (!response.ok) throw new Error('Failed to create coupon')
-        enqueueSnackbar('Coupon created successfully', { variant: 'success' })
-      }
-
-      handleCloseDialog()
-      await fetchCoupons()
-    } catch (err: any) {
-      enqueueSnackbar(`Error saving coupon: ${err.message}`, { variant: 'error' })
-    } finally {
-      setSubmitting(false)
-    }
+  const handleCopyCode = (code: string) => {
+    navigator.clipboard.writeText(code)
+    enqueueSnackbar('Coupon code copied to clipboard', { variant: 'success' })
   }
 
-  const handleDeleteClick = async (coupon: DiscountCoupon) => {
-    if (!window.confirm(`Delete coupon "${coupon.code}"?`)) return
-
+  const handleSyncStripe = async () => {
     try {
-      const response = await fetch(`${apiUrl}/api/stripe-coupons/${coupon.code}`, {
-        method: 'DELETE',
+      const response = await fetch('/api/sync-stripe-coupons', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
       })
-
-      if (!response.ok) throw new Error('Failed to delete coupon')
-      enqueueSnackbar('Coupon deleted successfully', { variant: 'success' })
-      await fetchCoupons()
-    } catch (err: any) {
-      enqueueSnackbar(`Error deleting coupon: ${err.message}`, { variant: 'error' })
+      
+      if (!response.ok) throw new Error('Sync failed')
+      
+      const result = await response.json()
+      enqueueSnackbar(
+        `Synced ${result.results.total} coupons (${result.results.created} created, ${result.results.updated} updated)`,
+        { variant: 'success' }
+      )
+      refetch()
+    } catch (error) {
+      console.error('Error syncing Stripe coupons:', error)
+      enqueueSnackbar('Failed to sync Stripe coupons', { variant: 'error' })
     }
   }
 
-  if (loading) return <PageLoader />
+  const formatDiscountValue = (coupon: DiscountCoupon) => {
+    if (coupon.discount_type === 'percentage') {
+      return `${coupon.discount_value}%`
+    }
+    return `${coupon.currency} ${coupon.discount_value.toFixed(2)}`
+  }
 
-  const displayCoupons = filteredCoupons.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+  const getStatusColor = (coupon: DiscountCoupon): 'success' | 'error' | 'warning' | 'default' => {
+    if (!coupon.is_active) return 'default'
+    if (coupon.valid_until && new Date(coupon.valid_until) < new Date()) return 'error'
+    if (coupon.usage_limit && coupon.times_redeemed >= coupon.usage_limit) return 'warning'
+    return 'success'
+  }
+
+  const getStatusLabel = (coupon: DiscountCoupon): string => {
+    if (!coupon.is_active) return 'Inactive'
+    if (coupon.valid_until && new Date(coupon.valid_until) < new Date()) return 'Expired'
+    if (coupon.usage_limit && coupon.times_redeemed >= coupon.usage_limit) return 'Limit Reached'
+    return 'Active'
+  }
+
+  if (isLoading) return <PageLoader />
 
   return (
     <Box sx={{ p: 3 }}>
+      {/* Header */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h5">Discount Coupons</Typography>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={handleAddClick}>
-          Create Coupon
-        </Button>
+        <Box>
+          <Typography variant="h5" sx={{ mb: 0.5 }}>
+            Discount Coupons
+          </Typography>
+          <Typography variant="body2" color="textSecondary">
+            Manage discount codes and promotional offers
+          </Typography>
+        </Box>
+        <Box sx={{ display: 'flex', gap: 2 }}>
+          <Tooltip title="Sync from Stripe">
+            <Button
+              variant="outlined"
+              startIcon={<SyncIcon />}
+              onClick={handleSyncStripe}
+              color="secondary"
+            >
+              Sync Stripe
+            </Button>
+          </Tooltip>
+          <Tooltip title="Refresh">
+            <IconButton onClick={() => refetch()} color="primary">
+              <RefreshIcon />
+            </IconButton>
+          </Tooltip>
+          <Button variant="contained" startIcon={<AddIcon />} onClick={handleAddClick}>
+            Create Coupon
+          </Button>
+        </Box>
       </Box>
 
-      {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+      {error && (
+        <Alert severity="error" sx={{ mb: 3 }}>
+          {error.message || 'Failed to load coupons'}
+        </Alert>
+      )}
 
-      <Paper sx={{ mb: 3, p: 2 }}>
+      {/* Stats Cards */}
+      <Grid container spacing={3} sx={{ mb: 3 }}>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card>
+            <CardContent>
+              <Typography color="textSecondary" gutterBottom variant="body2">
+                Total Coupons
+              </Typography>
+              <Typography variant="h4">{coupons.length}</Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card>
+            <CardContent>
+              <Typography color="textSecondary" gutterBottom variant="body2">
+                Active Coupons
+              </Typography>
+              <Typography variant="h4">
+                {coupons.filter(c => c.is_active).length}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card>
+            <CardContent>
+              <Typography color="textSecondary" gutterBottom variant="body2">
+                Total Redemptions
+              </Typography>
+              <Typography variant="h4">
+                {coupons.reduce((sum, c) => sum + c.times_redeemed, 0)}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card>
+            <CardContent>
+              <Typography color="textSecondary" gutterBottom variant="body2">
+                Expired Coupons
+              </Typography>
+              <Typography variant="h4">
+                {coupons.filter(c => c.valid_until && new Date(c.valid_until) < new Date()).length}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+
+      {/* Search and Table */}
+      <Paper sx={{ p: 3 }}>
         <TextField
           fullWidth
-          size="small"
           placeholder="Search by code or description..."
           value={search}
-          onChange={handleSearch}
+          onChange={(e) => setSearch(e.target.value)}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -309,211 +363,278 @@ export const DiscountCouponsPage: React.FC = () => {
               </InputAdornment>
             ),
           }}
+          sx={{ mb: 3 }}
+        />
+
+        <TableContainer>
+          <Table>
+            <TableHead>
+              <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
+                <TableCell>Code</TableCell>
+                <TableCell>Description</TableCell>
+                <TableCell>Discount</TableCell>
+                <TableCell>Duration</TableCell>
+                <TableCell align="center">Usage</TableCell>
+                <TableCell>Valid Until</TableCell>
+                <TableCell>Status</TableCell>
+                <TableCell align="center">Actions</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {paginatedCoupons.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={8} align="center" sx={{ py: 6 }}>
+                    <Typography color="textSecondary">
+                      {search ? 'No coupons found matching your search' : 'No coupons created yet'}
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+              ) : (
+                paginatedCoupons.map((coupon) => (
+                  <TableRow key={coupon.id} hover>
+                    <TableCell>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Typography variant="body2" sx={{ fontFamily: 'monospace', fontWeight: 600 }}>
+                          {coupon.code}
+                        </Typography>
+                        <Tooltip title="Copy code">
+                          <IconButton size="small" onClick={() => handleCopyCode(coupon.code)}>
+                            <CopyIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      </Box>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2" sx={{ maxWidth: 200 }}>
+                        {coupon.description || '-'}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Chip
+                        label={formatDiscountValue(coupon)}
+                        size="small"
+                        color="primary"
+                        variant="outlined"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2" sx={{ textTransform: 'capitalize' }}>
+                        {coupon.duration || 'Once'}
+                        {coupon.duration === 'repeating' && coupon.duration_in_months && 
+                          ` (${coupon.duration_in_months}mo)`
+                        }
+                      </Typography>
+                    </TableCell>
+                    <TableCell align="center">
+                      <Typography variant="body2">
+                        {coupon.times_redeemed}
+                        {coupon.usage_limit ? ` / ${coupon.usage_limit}` : ' / ∞'}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2">
+                        {coupon.valid_until 
+                          ? format(new Date(coupon.valid_until), 'MMM dd, yyyy')
+                          : 'No expiry'
+                        }
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Chip
+                        label={getStatusLabel(coupon)}
+                        color={getStatusColor(coupon)}
+                        size="small"
+                        icon={coupon.is_active && getStatusColor(coupon) === 'success' ? <CheckIcon /> : <CancelIcon />}
+                      />
+                    </TableCell>
+                    <TableCell align="center">
+                      <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
+                        <Tooltip title="Edit">
+                          <IconButton size="small" onClick={() => handleEditClick(coupon)}>
+                            <EditIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Delete">
+                          <IconButton
+                            size="small"
+                            color="error"
+                            onClick={() => handleDeleteClick(coupon)}
+                          >
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+
+        <TablePagination
+          component="div"
+          count={filteredCoupons.length}
+          page={page}
+          onPageChange={(_, newPage) => setPage(newPage)}
+          rowsPerPage={rowsPerPage}
+          onRowsPerPageChange={(e) => {
+            setRowsPerPage(parseInt(e.target.value, 10))
+            setPage(0)
+          }}
+          rowsPerPageOptions={[5, 10, 25, 50]}
         />
       </Paper>
 
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
-              <TableCell>Code</TableCell>
-              <TableCell>Discount</TableCell>
-              <TableCell>Valid Until</TableCell>
-              <TableCell align="center">Used / Limit</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell align="center">Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {displayCoupons.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={6} align="center" sx={{ py: 3 }}>
-                  <Typography color="textSecondary">No coupons found</Typography>
-                </TableCell>
-              </TableRow>
-            ) : (
-              displayCoupons.map((coupon) => (
-                <TableRow key={coupon.id}>
-                  <TableCell>
-                    <Stack>
-                      <Typography variant="body2" sx={{ fontFamily: 'monospace', fontWeight: 600 }}>
-                        {coupon.code}
-                      </Typography>
-                      {coupon.description && (
-                        <Typography variant="caption" color="textSecondary">
-                          {coupon.description}
-                        </Typography>
-                      )}
-                    </Stack>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                      {coupon.discount_type === 'percentage'
-                        ? `${coupon.discount_value}%`
-                        : `₹${coupon.discount_value}`}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    {coupon.valid_until ? (
-                      <Typography variant="body2">
-                        {format(new Date(coupon.valid_until), 'MMM dd, yyyy')}
-                      </Typography>
-                    ) : (
-                      <Typography variant="caption" color="textSecondary">
-                        No expiry
-                      </Typography>
-                    )}
-                  </TableCell>
-                  <TableCell align="center">
-                    <Typography variant="body2">
-                      {coupon.times_used}
-                      {coupon.usage_limit ? ` / ${coupon.usage_limit}` : ''}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Chip
-                      label={coupon.is_active ? 'Active' : 'Inactive'}
-                      color={coupon.is_active ? 'success' : 'default'}
-                      size="small"
-                    />
-                  </TableCell>
-                  <TableCell align="center">
-                    <IconButton
-                      size="small"
-                      onClick={() => handleEditClick(coupon)}
-                      title="Edit"
-                    >
-                      <EditIcon fontSize="small" />
-                    </IconButton>
-                    <IconButton
-                      size="small"
-                      color="error"
-                      onClick={() => handleDeleteClick(coupon)}
-                      title="Delete"
-                    >
-                      <DeleteIcon fontSize="small" />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
-          component="div"
-          count={filteredCoupons.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={(_, newPage) => setPage(newPage)}
-          onRowsPerPageChange={(e) => setRowsPerPage(parseInt(e.target.value, 10))}
-        />
-      </TableContainer>
-
       {/* Create/Edit Dialog */}
-      <Dialog open={dialogOpen} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
-        <DialogTitle>{editingCoupon ? 'Edit Coupon' : 'Create New Coupon'}</DialogTitle>
-        <DialogContent sx={{ pt: 2 }}>
-          <Stack spacing={2}>
+      <Dialog open={dialogOpen} onClose={handleCloseDialog} maxWidth="md" fullWidth>
+        <DialogTitle>
+          {editingCoupon ? 'Edit Coupon' : 'Create New Coupon'}
+        </DialogTitle>
+        <DialogContent>
+          <Stack spacing={3} sx={{ mt: 2 }}>
             <TextField
-              fullWidth
               label="Coupon Code"
               value={formData.code}
-              onChange={(e) =>
-                setFormData({ ...formData, code: e.target.value.toUpperCase() })
-              }
-              placeholder="SAVE20"
+              onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
+              error={!!formErrors.code}
+              helperText={formErrors.code || 'Unique code for the coupon (e.g., SAVE20)'}
               disabled={!!editingCoupon}
+              required
+              fullWidth
             />
 
             <TextField
-              fullWidth
               label="Description"
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              placeholder="e.g., Summer sale discount"
+              helperText="Optional description for internal reference"
               multiline
               rows={2}
+              fullWidth
             />
 
-            <FormControl fullWidth>
-              <InputLabel>Discount Type</InputLabel>
-              <Select
-                value={formData.discount_type}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    discount_type: e.target.value as 'percentage' | 'fixed_amount',
-                  })
-                }
-                label="Discount Type"
-              >
-                <MenuItem value="percentage">Percentage (%)</MenuItem>
-                <MenuItem value="fixed_amount">Fixed Amount (₹)</MenuItem>
-              </Select>
-            </FormControl>
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
+                <FormControl fullWidth required>
+                  <InputLabel>Discount Type</InputLabel>
+                  <Select
+                    value={formData.discount_type}
+                    onChange={(e) => setFormData({ ...formData, discount_type: e.target.value as any })}
+                    label="Discount Type"
+                    disabled={!!editingCoupon}
+                  >
+                    <MenuItem value="percentage">Percentage</MenuItem>
+                    <MenuItem value="fixed_amount">Fixed Amount</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="Discount Value"
+                  type="number"
+                  value={formData.discount_value}
+                  onChange={(e) => setFormData({ ...formData, discount_value: e.target.value })}
+                  error={!!formErrors.discount_value}
+                  helperText={formErrors.discount_value || (formData.discount_type === 'percentage' ? 'Enter percentage (1-100)' : 'Enter amount')}
+                  disabled={!!editingCoupon}
+                  required
+                  fullWidth
+                  InputProps={{
+                    endAdornment: formData.discount_type === 'percentage' ? '%' : formData.currency,
+                  }}
+                />
+              </Grid>
+            </Grid>
+
+            {formData.discount_type === 'fixed_amount' && (
+              <FormControl fullWidth required>
+                <InputLabel>Currency</InputLabel>
+                <Select
+                  value={formData.currency}
+                  onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
+                  label="Currency"
+                  disabled={!!editingCoupon}
+                >
+                  <MenuItem value="USD">USD - US Dollar</MenuItem>
+                  <MenuItem value="GBP">GBP - British Pound</MenuItem>
+                  <MenuItem value="INR">INR - Indian Rupee</MenuItem>
+                  <MenuItem value="EUR">EUR - Euro</MenuItem>
+                </Select>
+              </FormControl>
+            )}
+
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
+                <FormControl fullWidth required>
+                  <InputLabel>Duration</InputLabel>
+                  <Select
+                    value={formData.duration}
+                    onChange={(e) => setFormData({ ...formData, duration: e.target.value as any })}
+                    label="Duration"
+                    disabled={!!editingCoupon}
+                  >
+                    <MenuItem value="once">Once</MenuItem>
+                    <MenuItem value="repeating">Repeating</MenuItem>
+                    <MenuItem value="forever">Forever</MenuItem>
+                  </Select>
+                  <FormHelperText>How long the discount applies</FormHelperText>
+                </FormControl>
+              </Grid>
+
+              {formData.duration === 'repeating' && (
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    label="Duration in Months"
+                    type="number"
+                    value={formData.duration_in_months}
+                    onChange={(e) => setFormData({ ...formData, duration_in_months: e.target.value })}
+                    error={!!formErrors.duration_in_months}
+                    helperText={formErrors.duration_in_months || 'Number of months to repeat'}
+                    disabled={!!editingCoupon}
+                    required
+                    fullWidth
+                  />
+                </Grid>
+              )}
+            </Grid>
 
             <TextField
-              fullWidth
-              label="Discount Value"
-              type="number"
-              value={formData.discount_value}
-              onChange={(e) => setFormData({ ...formData, discount_value: e.target.value })}
-              inputProps={{ step: '0.01', min: '0' }}
-            />
-
-            <FormControl fullWidth>
-              <InputLabel>Applicable to Plans</InputLabel>
-              <Select
-                multiple
-                value={formData.applicable_plans}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    applicable_plans: typeof e.target.value === 'string'
-                      ? e.target.value.split(',')
-                      : e.target.value,
-                  })
-                }
-                label="Applicable to Plans"
-              >
-                {prices.map((price) => (
-                  <MenuItem key={price.id} value={price.id}>
-                    {price.plan_name} ({price.currency})
-                  </MenuItem>
-                ))}
-              </Select>
-              <FormHelperText>Leave empty to apply to all plans</FormHelperText>
-            </FormControl>
-
-            <TextField
-              fullWidth
               label="Usage Limit"
               type="number"
               value={formData.usage_limit}
               onChange={(e) => setFormData({ ...formData, usage_limit: e.target.value })}
-              placeholder="Leave empty for unlimited"
-              inputProps={{ min: '1' }}
+              helperText="Maximum number of times this coupon can be used (leave empty for unlimited)"
+              fullWidth
             />
 
-            <TextField
-              fullWidth
-              label="Valid From"
-              type="date"
-              value={formData.valid_from}
-              onChange={(e) => setFormData({ ...formData, valid_from: e.target.value })}
-              InputLabelProps={{ shrink: true }}
-            />
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="Valid From"
+                  type="date"
+                  value={formData.valid_from}
+                  onChange={(e) => setFormData({ ...formData, valid_from: e.target.value })}
+                  disabled={!!editingCoupon}
+                  required
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                />
+              </Grid>
 
-            <TextField
-              fullWidth
-              label="Valid Until"
-              type="date"
-              value={formData.valid_until}
-              onChange={(e) => setFormData({ ...formData, valid_until: e.target.value })}
-              InputLabelProps={{ shrink: true }}
-              helperText="Leave empty for no expiry"
-            />
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="Valid Until"
+                  type="date"
+                  value={formData.valid_until}
+                  onChange={(e) => setFormData({ ...formData, valid_until: e.target.value })}
+                  helperText="Leave empty for no expiry"
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                />
+              </Grid>
+            </Grid>
 
             <FormControlLabel
               control={
@@ -527,14 +648,18 @@ export const DiscountCouponsPage: React.FC = () => {
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDialog} disabled={submitting}>
-            Cancel
-          </Button>
-          <Button onClick={handleSubmit} variant="contained" disabled={submitting}>
-            {submitting ? <CircularProgress size={24} /> : editingCoupon ? 'Update' : 'Create'}
+          <Button onClick={handleCloseDialog}>Cancel</Button>
+          <Button
+            variant="contained"
+            onClick={handleSubmit}
+            disabled={createCoupon.isPending || updateCoupon.isPending}
+          >
+            {editingCoupon ? 'Update' : 'Create'}
           </Button>
         </DialogActions>
       </Dialog>
     </Box>
   )
 }
+
+export default DiscountCouponsPage

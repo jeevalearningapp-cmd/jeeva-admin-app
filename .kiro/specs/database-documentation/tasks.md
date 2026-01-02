@@ -1,0 +1,228 @@
+# Implementation Plan
+
+## Documentation Creation Tasks
+
+- [x] 1. Create documentation index and structure
+  - [x] 1.1 Create INDEX.md with navigation links to all documentation files
+    - Include overview of database architecture
+    - Add quick reference table of all 53 tables
+    - Add links to each documentation section
+    - _Requirements: 1.1, 6.1_
+  - [x] 1.2 Archive outdated SCHEMA.md and create SCHEMA_COMPLETE.md
+    - Rename existing SCHEMA.md to SCHEMA_LEGACY.md
+    - Create new SCHEMA_COMPLETE.md with updated structure
+    - _Requirements: 1.1_
+
+- [x] 2. Document all database tables (Authentication & Users domain)
+  - [x] 2.1 Document users, user_profiles, user_sessions tables
+    - Include all columns with types, nullability, defaults
+    - Document foreign keys and constraints
+    - Add RLS policy status
+    - _Requirements: 1.1, 1.2, 1.3, 1.4_
+  - [x] 2.2 Document admin_users, notification_preferences tables
+    - Include role enum values
+    - Document notification setting columns
+    - _Requirements: 1.1, 1.2, 7.1_
+  - [x] 2.3 Write property test for table documentation completeness
+    - **Property 1: Documentation Completeness**
+    - **Validates: Requirements 1.1**
+
+- [x] 3. Document all database tables (Learning Content domain)
+  - [x] 3.1 Document modules, topics, subtopics tables
+    - Include is_trial, display_order columns
+    - Document parent-child relationships
+    - _Requirements: 1.1, 1.2, 1.3_
+  - [x] 3.2 Document lessons, lesson_content, lesson_quizzes tables
+    - Include content type enums
+    - Document unlock threshold fields
+    - _Requirements: 1.1, 1.2, 7.1_
+  - [x] 3.3 Document questions, question_options, question_media tables
+    - Include question_type, difficulty enums
+    - Document trial content fields
+    - _Requirements: 1.1, 1.2, 7.1_
+  - [x] 3.4 Document flashcards, module_access_rules tables
+    - Include access_type enum values
+    - _Requirements: 1.1, 1.2, 7.1_
+  - [x] 3.5 Write property test for column detail accuracy
+    - **Property 2: Column Detail Accuracy**
+    - **Validates: Requirements 1.2**
+
+- [x] 4. Document all database tables (Progress & Practice domain)
+  - [x] 4.1 Document learning_completions, learning_progress, learning_paths tables
+    - Include status enums
+    - Document user progress tracking
+    - _Requirements: 1.1, 1.2, 7.1_
+  - [x] 4.2 Document practice_sessions, practice_results, lesson_quiz_results tables
+    - Include JSONB structure for answer_log
+    - _Requirements: 1.1, 1.2, 7.2_
+  - [x] 4.3 Document mock_exam_config, mock_exams, mock_results, mock_sessions tables
+    - Include exam configuration fields
+    - Document status enums
+    - _Requirements: 1.1, 1.2, 7.1_
+  - [x] 4.4 Document ai_recommendations, user_analytics tables
+    - Include JSONB structures for recommendation_data, analytics_data
+    - _Requirements: 1.1, 1.2, 7.2_
+
+- [x] 5. Document all database tables (Trial Module domain)
+  - [x] 5.1 Document trial_mock_exams, trial_exam_attempts tables
+    - Include question_ids array structure
+    - Document status enum values
+    - _Requirements: 1.1, 1.2, 7.1, 7.3_
+  - [x] 5.2 Document trial_learning_progress, trial_attempt_records tables
+    - Include content_type enum values
+    - Document JSONB structures for answers_data
+    - _Requirements: 1.1, 1.2, 7.1, 7.2_
+
+- [x] 6. Document all database tables (Subscriptions & Payments domain)
+  - [x] 6.1 Document subscription_plans, subscriptions tables
+    - Include status enum (trial, active, expired, cancelled)
+    - Document payment_gateway enum
+    - _Requirements: 1.1, 1.2, 7.1_
+  - [x] 6.2 Document subscription_usage, discount_coupons tables
+    - Include discount_type enum
+    - Document usage tracking fields
+    - _Requirements: 1.1, 1.2, 7.1_
+  - [x] 6.3 Write property test for foreign key documentation
+    - **Property 3: Foreign Key Documentation**
+    - **Validates: Requirements 1.3**
+
+- [x] 7. Document all database tables (System, AI, Notifications domains)
+  - [x] 7.1 Document app_settings, dashboard_hero, content_approvals, email_templates tables
+    - Include approval status enum
+    - Document JSONB structures
+    - _Requirements: 1.1, 1.2, 7.1, 7.2_
+  - [x] 7.2 Document chat_conversations, chat_messages, ai_usage_stats tables
+    - Include role enum (user, assistant)
+    - Document metadata JSONB structure
+    - _Requirements: 1.1, 1.2, 7.1, 7.2_
+  - [x] 7.3 Document notifications, notification_queue, notification_targets, push_tokens, user_notification_reads tables
+    - Include notification_type enum
+    - Document delivery status enum
+    - _Requirements: 1.1, 1.2, 7.1_
+  - [x] 7.4 Document analytics_sessions, daily_stats, backup tables
+    - Include aggregation fields
+    - _Requirements: 1.1, 1.2_
+
+- [x] 8. Checkpoint - Verify table documentation
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [x] 9. Create TRIGGERS_AND_FUNCTIONS.md
+  - [x] 9.1 Document all 18 triggers with schema, timing, events, and functions
+    - Group by schema (auth, public, realtime, storage)
+    - Include trigger level (ROW/STATEMENT)
+    - _Requirements: 2.1, 2.2, 2.3_
+  - [x] 9.2 Document all timestamp update functions
+    - Include update_ai_usage_timestamp, update_chat_conversation_timestamp, etc.
+    - Document SECURITY DEFINER context
+    - _Requirements: 3.1, 3.2_
+  - [x] 9.3 Document notification functions
+    - Include notify_content_approved, notify_new_user_welcome, etc.
+    - Provide usage examples
+    - _Requirements: 3.1, 3.2, 3.3_
+  - [x] 9.4 Document business logic functions
+    - Include handle_auth_user_created, increment_coupon_usage
+    - Include check_module_access, get_trial_progress
+    - _Requirements: 3.1, 3.2, 3.3_
+  - [x] 9.5 Write property test for trigger-function cross-reference
+    - **Property 4: Trigger-Function Cross-Reference**
+    - **Validates: Requirements 2.2, 3.4**
+
+- [-] 10. Create RLS_POLICIES.md
+  - [ ] 10.1 Document RLS policies for all 28 tables with RLS enabled
+    - Include policy name, operation, USING expression, WITH CHECK expression
+    - Group by domain
+    - _Requirements: 4.1, 4.2_
+  - [x] 10.2 Create policy matrix showing role-based access
+    - Show SELECT/INSERT/UPDATE/DELETE permissions per role
+    - Include superadmin, editor, moderator, user roles
+    - _Requirements: 4.3_
+  - [x] 10.3 Document 26 tables needing RLS policies
+    - List each table with recommended policy
+    - Prioritize by security risk
+    - _Requirements: 4.4_
+  - [x] 10.4 Write property test for RLS gap identification
+    - **Property 5: RLS Gap Identification**
+    - **Validates: Requirements 4.4**
+
+- [x] 11. Create INDEXES.md
+  - [x] 11.1 Document all existing indexes
+    - Include table, columns, type (unique, partial, composite)
+    - Group by table
+    - _Requirements: 5.1, 5.2_
+  - [x] 11.2 Identify missing indexes for foreign keys
+    - List foreign key columns without indexes
+    - Recommend index creation statements
+    - _Requirements: 5.3, 5.4_
+  - [x] 11.3 Write property test for index coverage
+    - **Property 6: Index Coverage for Foreign Keys**
+    - **Validates: Requirements 5.4**
+
+- [x] 12. Checkpoint - Verify triggers, RLS, and indexes documentation
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [x] 13. Create ER_DIAGRAMS.md
+  - [x] 13.1 Create high-level ER diagram showing all table relationships
+    - Use Mermaid erDiagram syntax
+    - Show all 53 tables with relationships
+    - _Requirements: 6.1, 6.3_
+  - [x] 13.2 Create domain-specific ER diagrams
+    - Auth & Users diagram
+    - Learning Content diagram
+    - Progress & Practice diagram
+    - Subscriptions & Payments diagram
+    - Notifications diagram
+    - AI & Chat diagram
+    - _Requirements: 6.2_
+  - [x] 13.3 Add cardinality notation to all relationships
+    - Use ||--o{ for one-to-many
+    - Use ||--|| for one-to-one
+    - Use }o--o{ for many-to-many
+    - _Requirements: 6.4_
+  - [x] 13.4 Write property test for relationship cardinality
+    - **Property 7: Relationship Cardinality**
+    - **Validates: Requirements 6.4**
+
+- [x] 14. Create DATA_TYPES.md
+  - [x] 14.1 Document all enum values from CHECK constraints
+    - question_type, difficulty, status enums
+    - role, discount_type, payment_gateway enums
+    - _Requirements: 7.1_
+  - [x] 14.2 Document all JSONB column structures with examples
+    - answer_log, exam_data, recommendation_data structures
+    - metadata, context_data, topic_scores structures
+    - _Requirements: 7.2_
+  - [x] 14.3 Document all array columns
+    - features[], variables[], question_ids[] columns
+    - Include element types and usage
+    - _Requirements: 7.3_
+  - [x] 14.4 Write property test for enum value completeness
+    - **Property 8: Enum Value Completeness**
+    - **Validates: Requirements 7.1**
+
+- [x] 15. Create MIGRATIONS.md
+  - [x] 15.1 List all migration files in chronological order
+    - Include file name, date, and summary
+    - Group by feature area
+    - _Requirements: 8.1, 8.2_
+  - [x] 15.2 Document migration dependencies and rollback info
+    - Indicate which migrations are reversible
+    - Document any data migrations
+    - _Requirements: 8.3_
+  - [x] 15.3 Document schema conflict resolution strategies
+    - Include common conflict scenarios
+    - Provide resolution steps
+    - _Requirements: 8.4_
+
+- [x] 16. Final Checkpoint - Complete documentation validation
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [x] 17. Update existing documentation references
+  - [x] 17.1 Update design.md to reference new documentation
+    - Add links to SCHEMA_COMPLETE.md
+    - Update table counts and references
+    - _Requirements: 1.1_
+  - [x] 17.2 Update INDEX.md in docs/03-Database
+    - Add navigation to all new files
+    - Mark SCHEMA.md as legacy
+    - _Requirements: 1.1_
+

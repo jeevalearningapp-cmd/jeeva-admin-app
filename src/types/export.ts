@@ -10,9 +10,26 @@ export interface ExportOptions {
   includeFooter: boolean
 }
 
+import type { Payment, PaymentRefund } from './payments'
+
+export interface SubscriptionExport {
+  id: string
+  userId: string
+  planType: string
+  planId?: string
+  startDate: string
+  endDate: string
+  isActive: boolean
+  status: string
+  amountPaidUsd?: number
+  couponCode?: string
+  discountAmount?: number
+  createdAt: string
+}
+
 export interface StatementData {
-  payments: any[]
-  subscriptions: any[]
+  payments: Payment[]
+  subscriptions: SubscriptionExport[]
   summary: {
     totalPayments: number
     totalAmount: number
@@ -20,7 +37,7 @@ export interface StatementData {
     failedPayments: number
     refundedAmount: number
   }
-  refunds: any[]
+  refunds: PaymentRefund[]
   generatedAt: string
   dateRange: {
     from: string

@@ -67,3 +67,31 @@ export interface AnalyticsData {
   engagementTrends: EngagementTrend[]
   conversionMetrics: ConversionMetric[]
 }
+
+/**
+ * Currency breakdown for presentment analytics
+ * Used in Stripe Adaptive Pricing analytics
+ * 
+ * Requirements: 3.1, 3.2
+ */
+export interface CurrencyBreakdown {
+  currency: string          // Currency code (INR, GBP, USD)
+  count: number             // Number of payments in this currency
+  percentage: number        // Percentage of total payments
+  averageLocalAmount: number // Average amount in local currency
+  averageGbpAmount: number  // Average amount in GBP
+  totalLocalAmount: number  // Total amount in local currency
+  totalGbpAmount: number    // Total amount in GBP
+}
+
+/**
+ * Presentment summary for Stripe Adaptive Pricing
+ * Shows distribution of payments across presentment currencies
+ * 
+ * Requirements: 3.1, 3.2
+ */
+export interface PresentmentSummary {
+  range: string             // Time range (e.g., "30d")
+  totalPayments: number     // Total number of payments in range
+  byCurrency: CurrencyBreakdown[]
+}

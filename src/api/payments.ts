@@ -19,8 +19,7 @@ export const paymentsAPI = {
       .insert({
         user_id: input.userId,
         gateway: input.gateway,
-        stripe_customer_id: input.gateway === 'stripe' ? input.stripeCustomerId : null,
-        razorpay_customer_id: input.gateway === 'razorpay' ? input.razorpayCustomerId : null,
+        stripe_customer_id: input.stripeCustomerId,
         email: input.email,
         full_name: input.fullName,
         phone: input.phone,
@@ -362,6 +361,13 @@ function transformPaymentFromDB(data: any): Payment {
     createdAt: data.created_at,
     updatedAt: data.updated_at,
     completedAt: data.completed_at,
+    // Stripe Adaptive Pricing presentment fields
+    stripeCheckoutSessionId: data.stripe_checkout_session_id,
+    amountChargedLocal: data.amount_charged_local ? parseFloat(data.amount_charged_local) : undefined,
+    currencyChargedLocal: data.currency_charged_local,
+    amountChargedGbp: data.amount_charged_gbp ? parseFloat(data.amount_charged_gbp) : undefined,
+    fxRateApplied: data.fx_rate_applied ? parseFloat(data.fx_rate_applied) : undefined,
+    countryDetected: data.country_detected,
   }
 }
 

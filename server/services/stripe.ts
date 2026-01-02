@@ -5,6 +5,21 @@ import type {
   Payment,
 } from '../../src/types/payments'
 
+// Checkout Session types for Adaptive Pricing
+export interface CreateCheckoutSessionInput {
+  priceIdGbp: string          // Stripe Price ID (GBP)
+  userId: string              // Internal user ID
+  customerEmail: string       // Customer email for Stripe
+  successUrl: string          // Redirect on success
+  cancelUrl: string           // Redirect on cancel
+  subscriptionPlanId?: string // Optional subscription plan ID for metadata
+}
+
+export interface CheckoutSessionResult {
+  sessionId: string           // cs_xxx
+  sessionUrl: string          // Checkout page URL
+}
+
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('STRIPE_SECRET_KEY is not set')
 }
@@ -144,6 +159,9 @@ export const stripeService = {
     console.log(`Processing Stripe webhook: ${event.type}`)
 
     switch (event.type) {
+      case 'checkout.session.completed':
+        return this.handleCheckoutSessionCompleted(event.data.object as Stripe.Checkout.Session)
+
       case 'payment_intent.succeeded':
         return {
           type: 'payment_succeeded',
@@ -181,7 +199,148 @@ export const stripeService = {
     }
   },
 
+  /**
+   * Handles checkout.session.completed webhook event for Adaptive Pricing.
+   * Extracts presentment data including local currency, GBP amount, and FX rate.
+   * 
+   * Requirements: 2.3 - Extract and store presentment currency, local amount, GBP amount, and FX rate
+   */
+  handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) {
+    // Extract session identifiers
+    const sessionId = session.id
+    const paymentIntentId = typeof session.payment_intent === 'string' 
+      ? session.payment_intent 
+      : session.payment_intent?.id || null
+    
+    // Extract customer info
+    const customerId = typeof session.customer === 'string'
+      ? session.customer
+      : session.customer?.id || null
+    const customerEmail = session.customer_email || session.customer_details?.email || null
+    
+    // Extract presentment currency and amount (what customer paid)
+    const presentmentCurrency = session.currency?.toUpperCase() || 'GBP'
+    const presentmentAmountCents = session.amount_total || 0
+    const presentmentAmount = presentmentAmountCents / 100
+    
+    // Extract metadata
+    const metadata = session.metadata || {}
+    const userId = metadata.userId || null
+    const subscriptionPlanId = metadata.subscriptionPlanId || null
+    
+    // Extract GBP amount and FX rate from currency_conversion if present
+    // Stripe Adaptive Pricing provides this when converting from GBP to local currency
+    let gbpAmount: number | null = null
+    let fxRate: number | null = null
+    let chargeId: string | null = null
+    
+    // Access currency_conversion data if available (Adaptive Pricing)
+    // Note: currency_conversion is available on the session when Adaptive Pricing is used
+    const currencyConversion = (session as any).currency_conversion
+    
+    if (currencyConversion) {
+      // source_currency is the original price currency (GBP)
+      // amount_total is in the destination currency (presentment)
+      const sourceAmountCents = currencyConversion.amount_subtotal || currencyConversion.amount_total
+      if (sourceAmountCents && currencyConversion.source_currency?.toLowerCase() === 'gbp') {
+        gbpAmount = sourceAmountCents / 100
+        
+        // Compute FX rate: local_amount / gbp_amount
+        if (gbpAmount > 0 && presentmentAmount > 0) {
+          fxRate = presentmentAmount / gbpAmount
+        }
+      }
+    }
+    
+    // If no currency conversion (payment was in GBP), GBP amount equals presentment amount
+    if (gbpAmount === null && presentmentCurrency === 'GBP') {
+      gbpAmount = presentmentAmount
+      fxRate = 1.0
+    }
+    
+    // Extract country from customer details
+    const countryDetected = session.customer_details?.address?.country || null
+    
+    // Extract coupon/discount info if present
+    const totalDiscount = session.total_details?.amount_discount 
+      ? session.total_details.amount_discount / 100 
+      : 0
+    
+    console.log('📦 Checkout session completed:', {
+      sessionId,
+      paymentIntentId,
+      presentmentCurrency,
+      presentmentAmount,
+      gbpAmount,
+      fxRate,
+      userId,
+      subscriptionPlanId,
+      countryDetected,
+    })
+    
+    return {
+      type: 'checkout_session_completed',
+      data: {
+        sessionId,
+        paymentIntentId,
+        chargeId,
+        customerId,
+        customerEmail,
+        presentmentCurrency,
+        presentmentAmount,
+        gbpAmount,
+        fxRate,
+        countryDetected,
+        userId,
+        subscriptionPlanId,
+        totalDiscount,
+        metadata,
+      },
+    }
+  },
+
   getPublishableKey() {
     return process.env.STRIPE_PUBLISHABLE_KEY || ''
+  },
+
+  /**
+   * Creates a Stripe Checkout Session for Adaptive Pricing.
+   * Uses GBP price ID and lets Stripe handle currency conversion automatically.
+   * 
+   * @param input - Checkout session configuration
+   * @returns Session ID and URL for redirect
+   */
+  async createCheckoutSession(input: CreateCheckoutSessionInput): Promise<CheckoutSessionResult> {
+    try {
+      const session = await stripe.checkout.sessions.create({
+        mode: 'payment',
+        line_items: [
+          {
+            price: input.priceIdGbp,
+            quantity: 1,
+          },
+        ],
+        customer_email: input.customerEmail,
+        success_url: input.successUrl,
+        cancel_url: input.cancelUrl,
+        allow_promotion_codes: true,
+        metadata: {
+          userId: input.userId,
+          subscriptionPlanId: input.subscriptionPlanId || '',
+        },
+      })
+
+      if (!session.url) {
+        throw new Error('Checkout session URL not returned by Stripe')
+      }
+
+      return {
+        sessionId: session.id,
+        sessionUrl: session.url,
+      }
+    } catch (error: any) {
+      console.error('Stripe checkout session creation failed:', error)
+      throw new Error(`Failed to create checkout session: ${error.message}`)
+    }
   },
 }
