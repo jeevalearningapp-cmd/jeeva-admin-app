@@ -7,6 +7,7 @@ This guide explains how to integrate the JeevaBot AI chatbot into your React Nat
 JeevaBot is an AI-powered study assistant that helps nursing students prepare for the UK NMC CBT exam. It provides context-aware responses based on the student's current progress, lessons, and weak topics.
 
 **Key Features:**
+
 - Context-aware AI responses using Google Gemini 2.5-flash
 - Rate limiting based on subscription plans (10-100 messages/day)
 - Conversation history persistence
@@ -24,6 +25,7 @@ Send a message to JeevaBot and get an AI response.
 **Endpoint:** `POST /api/chat/send`
 
 **Request Body:**
+
 ```json
 {
   "userId": "uuid-string",
@@ -33,6 +35,7 @@ Send a message to JeevaBot and get an AI response.
 ```
 
 **Response:**
+
 ```json
 {
   "conversationId": "uuid-string",
@@ -44,6 +47,7 @@ Send a message to JeevaBot and get an AI response.
 ```
 
 **Error Response (Rate Limit):**
+
 ```json
 {
   "error": "Daily AI message limit reached",
@@ -60,6 +64,7 @@ Fetch all conversations for a user.
 **Endpoint:** `GET /api/chat/conversations/:userId`
 
 **Response:**
+
 ```json
 [
   {
@@ -80,6 +85,7 @@ Fetch all messages in a conversation.
 **Endpoint:** `GET /api/chat/messages/:conversationId`
 
 **Response:**
+
 ```json
 [
   {
@@ -107,6 +113,7 @@ Check remaining AI messages for the day.
 **Endpoint:** `GET /api/chat/rate-limit/:userId`
 
 **Response:**
+
 ```json
 {
   "allowed": true,
@@ -124,14 +131,14 @@ Create a chat service to handle API calls:
 
 ```typescript
 // services/chatService.ts
-import axios from 'axios';
+import axios from "axios";
 
-const API_BASE_URL = 'https://your-replit-app.replit.dev/api/chat';
+const API_BASE_URL = "https://your-replit-app.replit.dev/api/chat";
 
 export interface ChatMessage {
   id: string;
   conversationId: string;
-  role: 'user' | 'assistant';
+  role: "user" | "assistant";
   content: string;
   createdAt: string;
   tokensUsed?: number;
@@ -165,7 +172,7 @@ class ChatService {
   async sendMessage(
     userId: string,
     content: string,
-    conversationId?: string
+    conversationId?: string,
   ): Promise<SendMessageResponse> {
     const response = await axios.post(`${API_BASE_URL}/send`, {
       userId,
@@ -181,7 +188,9 @@ class ChatService {
   }
 
   async getMessages(conversationId: string): Promise<ChatMessage[]> {
-    const response = await axios.get(`${API_BASE_URL}/messages/${conversationId}`);
+    const response = await axios.get(
+      `${API_BASE_URL}/messages/${conversationId}`,
+    );
     return response.data;
   }
 
@@ -200,8 +209,11 @@ Use React Context or Zustand for state management:
 
 ```typescript
 // store/chatStore.ts (using Zustand)
-import { create } from 'zustand';
-import chatService, { ChatMessage, Conversation } from '../services/chatService';
+import { create } from "zustand";
+import chatService, {
+  ChatMessage,
+  Conversation,
+} from "../services/chatService";
 
 interface ChatState {
   conversations: Conversation[];
@@ -209,7 +221,7 @@ interface ChatState {
   messages: ChatMessage[];
   isLoading: boolean;
   rateLimitStatus: RateLimitStatus | null;
-  
+
   loadConversations: (userId: string) => Promise<void>;
   loadMessages: (conversationId: string) => Promise<void>;
   sendMessage: (userId: string, content: string) => Promise<void>;
@@ -230,7 +242,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
       const conversations = await chatService.getConversations(userId);
       set({ conversations, isLoading: false });
     } catch (error) {
-      console.error('Failed to load conversations:', error);
+      console.error("Failed to load conversations:", error);
       set({ isLoading: false });
     }
   },
@@ -241,7 +253,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
       const messages = await chatService.getMessages(conversationId);
       set({ messages, isLoading: false });
     } catch (error) {
-      console.error('Failed to load messages:', error);
+      console.error("Failed to load messages:", error);
       set({ isLoading: false });
     }
   },
@@ -249,51 +261,54 @@ export const useChatStore = create<ChatState>((set, get) => ({
   sendMessage: async (userId: string, content: string) => {
     const { currentConversation } = get();
     set({ isLoading: true });
-    
+
     try {
       const result = await chatService.sendMessage(
         userId,
         content,
-        currentConversation?.id
+        currentConversation?.id,
       );
-      
+
       // Add user message
       const userMessage: ChatMessage = {
         id: `temp-${Date.now()}`,
         conversationId: result.conversationId,
-        role: 'user',
+        role: "user",
         content,
         createdAt: new Date().toISOString(),
       };
-      
+
       // Add AI response
       const aiMessage: ChatMessage = {
         id: result.messageId,
         conversationId: result.conversationId,
-        role: 'assistant',
+        role: "assistant",
         content: result.response,
         tokensUsed: result.tokensUsed,
         createdAt: new Date().toISOString(),
       };
-      
-      set(state => ({
+
+      set((state) => ({
         messages: [...state.messages, userMessage, aiMessage],
         isLoading: false,
         rateLimitStatus: {
           allowed: result.remainingMessages > 0,
-          limit: result.remainingMessages + (state.rateLimitStatus?.current || 0),
+          limit:
+            result.remainingMessages + (state.rateLimitStatus?.current || 0),
           current: (state.rateLimitStatus?.current || 0) + 1,
           remaining: result.remainingMessages,
         },
       }));
-      
+
       // Reload conversations to update message count
       await get().loadConversations(userId);
     } catch (error: any) {
-      console.error('Failed to send message:', error);
-      if (error.response?.data?.error?.includes('limit')) {
+      console.error("Failed to send message:", error);
+      if (error.response?.data?.error?.includes("limit")) {
         // Handle rate limit error
-        alert('Daily AI message limit reached. Upgrade your plan for more messages!');
+        alert(
+          "Daily AI message limit reached. Upgrade your plan for more messages!",
+        );
       }
       set({ isLoading: false });
     }
@@ -304,7 +319,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
       const status = await chatService.checkRateLimit(userId);
       set({ rateLimitStatus: status });
     } catch (error) {
-      console.error('Failed to check rate limit:', error);
+      console.error("Failed to check rate limit:", error);
     }
   },
 
@@ -344,7 +359,7 @@ export default function ChatScreen() {
     sendMessage,
     checkRateLimit,
   } = useChatStore();
-  
+
   const [inputText, setInputText] = useState('');
 
   useEffect(() => {
@@ -355,7 +370,7 @@ export default function ChatScreen() {
 
   const handleSend = async () => {
     if (!inputText.trim() || !user?.id) return;
-    
+
     const message = inputText.trim();
     setInputText('');
     await sendMessage(user.id, message);
@@ -565,6 +580,7 @@ const styles = StyleSheet.create({
 The chat API expects a `userId` (UUID) from your Supabase authentication. Make sure to:
 
 1. Get the user ID from your auth context:
+
 ```typescript
 const { user } = useAuth();
 const userId = user?.id;
@@ -578,14 +594,15 @@ const userId = user?.id;
 
 Rate limits are based on subscription plans:
 
-| Plan | Messages/Day |
-|------|--------------|
-| Free Trial | 10 |
-| 30/60 Day Plans | 50 |
-| 90 Day Plan | 75 |
-| 120 Day Plan | 100 |
+| Plan            | Messages/Day |
+| --------------- | ------------ |
+| Free Trial      | 10           |
+| 30/60 Day Plans | 50           |
+| 90 Day Plan     | 75           |
+| 120 Day Plan    | 100          |
 
 **Best Practices:**
+
 - Check rate limit status on app launch and before sending
 - Show remaining messages in the UI
 - Display upgrade prompts when limit is reached
@@ -600,19 +617,22 @@ try {
   if (error.response?.status === 429) {
     // Rate limit exceeded
     Alert.alert(
-      'Daily Limit Reached',
-      'You\'ve used all your AI messages for today. Upgrade your plan for more!',
+      "Daily Limit Reached",
+      "You've used all your AI messages for today. Upgrade your plan for more!",
       [
-        { text: 'Later', style: 'cancel' },
-        { text: 'Upgrade', onPress: () => navigation.navigate('Subscriptions') },
-      ]
+        { text: "Later", style: "cancel" },
+        {
+          text: "Upgrade",
+          onPress: () => navigation.navigate("Subscriptions"),
+        },
+      ],
     );
   } else if (error.response?.status === 401) {
     // Authentication error
-    Alert.alert('Session Expired', 'Please log in again.');
+    Alert.alert("Session Expired", "Please log in again.");
   } else {
     // Generic error
-    Alert.alert('Error', 'Failed to send message. Please try again.');
+    Alert.alert("Error", "Failed to send message. Please try again.");
   }
 }
 ```
@@ -620,6 +640,7 @@ try {
 ## Context-Aware Responses
 
 JeevaBot automatically includes context about:
+
 - Student's current lesson topic
 - Recent practice session performance
 - Identified weak topics
@@ -681,6 +702,7 @@ Potential improvements for Phase 2+:
 ## Support
 
 For issues or questions:
+
 - Check API logs in Replit console
 - Review error messages in mobile app
 - Test endpoints with cURL/Postman

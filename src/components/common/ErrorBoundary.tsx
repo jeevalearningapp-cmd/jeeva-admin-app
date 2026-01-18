@@ -1,26 +1,26 @@
-import React, { Component, ErrorInfo, ReactNode } from 'react'
-import { Box, Typography, Button, Paper, Alert } from '@mui/material'
-import { ErrorOutlined, RefreshOutlined } from '@mui/icons-material'
+import React, { Component, ErrorInfo, ReactNode } from "react";
+import { Box, Typography, Button, Paper, Alert } from "@mui/material";
+import { ErrorOutlined, RefreshOutlined } from "@mui/icons-material";
 
 interface Props {
-  children: ReactNode
-  fallback?: ReactNode
+  children: ReactNode;
+  fallback?: ReactNode;
 }
 
 interface State {
-  hasError: boolean
-  error: Error | null
-  errorInfo: ErrorInfo | null
+  hasError: boolean;
+  error: Error | null;
+  errorInfo: ErrorInfo | null;
 }
 
 export class ErrorBoundary extends Component<Props, State> {
   constructor(props: Props) {
-    super(props)
+    super(props);
     this.state = {
       hasError: false,
       error: null,
       errorInfo: null,
-    }
+    };
   }
 
   static getDerivedStateFromError(error: Error): State {
@@ -28,19 +28,19 @@ export class ErrorBoundary extends Component<Props, State> {
       hasError: true,
       error,
       errorInfo: null,
-    }
+    };
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('ErrorBoundary caught an error:', error, errorInfo)
-    
+    console.error("ErrorBoundary caught an error:", error, errorInfo);
+
     // Log to error reporting service (Sentry, LogRocket, etc.)
     // Example: logErrorToService(error, errorInfo)
-    
+
     this.setState({
       error,
       errorInfo,
-    })
+    });
   }
 
   handleReset = () => {
@@ -48,24 +48,24 @@ export class ErrorBoundary extends Component<Props, State> {
       hasError: false,
       error: null,
       errorInfo: null,
-    })
-    window.location.reload()
-  }
+    });
+    window.location.reload();
+  };
 
   render() {
     if (this.state.hasError) {
       if (this.props.fallback) {
-        return this.props.fallback
+        return this.props.fallback;
       }
 
       return (
         <Box
           sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            minHeight: '100vh',
-            bgcolor: 'background.default',
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            minHeight: "100vh",
+            bgcolor: "background.default",
             p: 3,
           }}
         >
@@ -73,13 +73,11 @@ export class ErrorBoundary extends Component<Props, State> {
             sx={{
               p: 4,
               maxWidth: 600,
-              borderRadius: '16px',
-              textAlign: 'center',
+              borderRadius: "16px",
+              textAlign: "center",
             }}
           >
-            <ErrorOutlined
-              sx={{ fontSize: 64, color: 'error.main', mb: 2 }}
-            />
+            <ErrorOutlined sx={{ fontSize: 64, color: "error.main", mb: 2 }} />
             <Typography variant="h4" gutterBottom fontWeight="bold">
               Something went wrong
             </Typography>
@@ -87,8 +85,8 @@ export class ErrorBoundary extends Component<Props, State> {
               We're sorry for the inconvenience. An unexpected error occurred.
             </Typography>
 
-            {process.env.NODE_ENV === 'development' && this.state.error && (
-              <Alert severity="error" sx={{ mt: 2, mb: 2, textAlign: 'left' }}>
+            {process.env.NODE_ENV === "development" && this.state.error && (
+              <Alert severity="error" sx={{ mt: 2, mb: 2, textAlign: "left" }}>
                 <Typography variant="body2" fontWeight="bold" gutterBottom>
                   Error: {this.state.error.toString()}
                 </Typography>
@@ -99,9 +97,9 @@ export class ErrorBoundary extends Component<Props, State> {
                     sx={{
                       mt: 1,
                       p: 1,
-                      bgcolor: 'rgba(0,0,0,0.1)',
+                      bgcolor: "rgba(0,0,0,0.1)",
                       borderRadius: 1,
-                      overflow: 'auto',
+                      overflow: "auto",
                       maxHeight: 200,
                     }}
                   >
@@ -115,15 +113,15 @@ export class ErrorBoundary extends Component<Props, State> {
               variant="contained"
               startIcon={<RefreshOutlined />}
               onClick={this.handleReset}
-              sx={{ borderRadius: '12px', mt: 2 }}
+              sx={{ borderRadius: "12px", mt: 2 }}
             >
               Reload Page
             </Button>
           </Paper>
         </Box>
-      )
+      );
     }
 
-    return this.props.children
+    return this.props.children;
   }
 }

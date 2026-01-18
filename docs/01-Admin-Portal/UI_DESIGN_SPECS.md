@@ -18,24 +18,28 @@ This document provides comprehensive UI/UX design specifications for the Jeeva L
 ### Design Principles
 
 **1. Clarity**
+
 - Clean, minimal interfaces with focus on content
 - Clear visual hierarchy
 - Consistent spacing and alignment
 - Readable typography at all sizes
 
 **2. Efficiency**
+
 - Quick access to key features
 - Minimal steps to complete tasks
 - Smart defaults and suggestions
 - Progressive disclosure of complexity
 
 **3. Delight**
+
 - Smooth animations and transitions
 - Micro-interactions for feedback
 - Gamification elements (achievements, streaks)
 - Celebratory moments for milestones
 
 **4. Accessibility**
+
 - High contrast for readability
 - Touch targets minimum 44x44pt
 - Screen reader support
@@ -48,6 +52,7 @@ This document provides comprehensive UI/UX design specifications for the Jeeva L
 ### Primary Colors
 
 **Primary Blue** (Jeeva Brand Color)
+
 ```
 Primary/500 (Main):     #3B82F6
 Primary/400 (Light):    #60A5FA
@@ -56,6 +61,7 @@ Primary/700 (Darker):   #1D4ED8
 ```
 
 **Usage:**
+
 - Primary CTAs (Sign in, Register, Continue buttons)
 - Active navigation states
 - Progress indicators
@@ -67,6 +73,7 @@ Primary/700 (Darker):   #1D4ED8
 ### Module/Category Colors
 
 **Green (Practice/Numeracy)**
+
 ```
 Green/500:              #4ADE80
 Green/400:              #6EE7B7
@@ -75,6 +82,7 @@ Green/50 (Background):  #ECFDF5
 ```
 
 **Coral/Salmon (Retake/Clinical)**
+
 ```
 Coral/500:              #FF8A80
 Coral/400:              #FFAB91
@@ -82,6 +90,7 @@ Coral/100:              #FFCCBC
 ```
 
 **Orange/Peach (Badges/Highlights)**
+
 ```
 Orange/500:             #FFB74D
 Orange/400:             #FFCC80
@@ -89,6 +98,7 @@ Orange/100:             #FFE0B2
 ```
 
 **Blue Gradient (Hero Cards)**
+
 ```
 Gradient Start:         #2F80ED
 Gradient End:           #5B9FED
@@ -100,6 +110,7 @@ Angle:                  135deg
 ### Neutral Colors
 
 **Grays**
+
 ```
 Gray/900 (Text):        #1A1A1A
 Gray/800:               #2D2D2D
@@ -114,6 +125,7 @@ Gray/50:                #FAFAFA
 ```
 
 **Usage:**
+
 - Text Primary: Gray/900 (#1A1A1A)
 - Text Secondary: Gray/500 (#9E9E9E)
 - Borders: Gray/300 (#E0E0E0)
@@ -126,30 +138,35 @@ Gray/50:                #FAFAFA
 ### Semantic Colors
 
 **Success (Green)**
+
 ```
 Success/500:            #4ADE80
 Success/100:            #D1FAE5
 ```
 
 **Error (Red/Coral)**
+
 ```
 Error/500:              #FF8A80
 Error/100:              #FFCCBC
 ```
 
 **Warning (Orange)**
+
 ```
 Warning/500:            #FFB74D
 Warning/100:            #FFE0B2
 ```
 
 **Info (Blue)**
+
 ```
 Info/500:               #3B82F6
 Info/100:               #DBEAFE
 ```
 
 **Score Display:**
+
 ```
 Correct (Blue):         #3B82F6
 Incorrect (Red):        #FF8A80
@@ -157,6 +174,7 @@ Skipped (Gray):         #9E9E9E
 ```
 
 **Usage:**
+
 - Success: Correct answers (7), completions, achievements
 - Error: Wrong answers (3), retake actions
 - Warning: Discount badges, subscription alerts
@@ -167,6 +185,7 @@ Skipped (Gray):         #9E9E9E
 ### Gradient Colors
 
 **Primary Gradient**
+
 ```
 Linear Gradient:
   Start: #007AFF
@@ -175,6 +194,7 @@ Linear Gradient:
 ```
 
 **Usage:**
+
 - Premium badges
 - Achievement cards
 - Special buttons
@@ -189,12 +209,14 @@ Linear Gradient:
 **Primary Font:** SF Pro Display / SF Pro Text (iOS) | Roboto (Android) | Inter (Web fallback)
 
 **Font Weights:**
+
 - Regular: 400
 - Medium: 500
 - Semibold: 600
 - Bold: 700
 
 **System Fonts** (Recommended for native feel):
+
 - iOS: -apple-system, SF Pro Display
 - Android: Roboto
 - Web: Inter, system-ui, sans-serif
@@ -204,6 +226,7 @@ Linear Gradient:
 ### Text Styles (From Figma)
 
 **Hero/Display Text** (Onboarding, Welcome)
+
 ```
 Font Size: 28pt
 Line Height: 1.2 (34pt)
@@ -213,6 +236,7 @@ Example: "welcome to Jeeva learning app"
 ```
 
 **Page Titles**
+
 ```
 Font Size: 24pt
 Line Height: 1.3 (32pt)
@@ -222,6 +246,7 @@ Example: "Hi, welcome back", "Choose Your Practice Module"
 ```
 
 **Section Headers**
+
 ```
 Font Size: 20pt
 Line Height: 1.4 (28pt)
@@ -231,6 +256,7 @@ Example: "Topics", "Practice topics"
 ```
 
 **Card Titles**
+
 ```
 Font Size: 18pt
 Line Height: 1.4 (25pt)
@@ -240,6 +266,7 @@ Example: "NMC CBT", "The NMC Code", "Numeracy"
 ```
 
 **Body Text / Descriptions**
+
 ```
 Font Size: 16pt
 Line Height: 1.5 (24pt)
@@ -249,6 +276,7 @@ Example: "Exam preparatory course", "Patient dignity, consent, advocacy."
 ```
 
 **Small Text / Captions**
+
 ```
 Font Size: 14pt
 Line Height: 1.5 (21pt)
@@ -258,6 +286,7 @@ Example: "interactive learning", "mix password with uppercase..."
 ```
 
 **Label Text (Buttons, Tabs)**
+
 ```
 Font Size: 16pt
 Line Height: 1.2 (19pt)
@@ -267,6 +296,7 @@ Example: "Sign in", "Register", "Continue"
 ```
 
 **Badge/Chip Text**
+
 ```
 Font Size: 12pt
 Line Height: 1.3 (16pt)
@@ -276,6 +306,7 @@ Example: "Lessons: 4", "Get 5% off", "Topics: 4"
 ```
 
 **Version/Small Labels**
+
 ```
 Font Size: 11pt
 Line Height: 1.4 (15pt)
@@ -289,12 +320,14 @@ Example: "Jeeva Learning app V: 1.01"
 ### Text Colors
 
 **Light Mode:**
+
 - Primary Text: Gray/900 (#1A1A1A)
 - Secondary Text: Gray/600 (#525252)
 - Tertiary Text: Gray/500 (#737373)
 - Disabled Text: Gray/400 (#A3A3A3)
 
 **Dark Mode:**
+
 - Primary Text: Gray/50 (#FAFAFA)
 - Secondary Text: Gray/300 (#D4D4D4)
 - Tertiary Text: Gray/400 (#A3A3A3)
@@ -321,6 +354,7 @@ XL:   32pt  (8 units)
 ```
 
 **Usage Guide:**
+
 - XS (8pt): Icon padding, badge padding
 - SM (12pt): Button padding, chip padding
 - MD (16pt): Card padding, screen padding
@@ -335,13 +369,16 @@ XL:   32pt  (8 units)
 ### Grid System
 
 **Screen Margins:**
+
 - Mobile: 16pt (MD)
 - Tablet: 24pt (LG)
 
 **Column Gap:**
+
 - Default: 16pt (MD)
 
 **Card Spacing:**
+
 - Between Cards: 12pt (SM)
 - Card Internal Padding: 16pt (MD)
 
@@ -365,6 +402,7 @@ Round:      999pt (Avatar, icon buttons)
 ### Buttons (From Figma)
 
 #### Primary Button (Main CTAs)
+
 ```
 Background: #3B82F6 (Primary Blue)
 Text: White (#FFFFFF)
@@ -383,6 +421,7 @@ States:
 ```
 
 #### Secondary Button (Destructive/Alternative)
+
 ```
 Background: #FF8A80 (Coral)
 Text: White (#FFFFFF)
@@ -399,6 +438,7 @@ States:
 ```
 
 #### Tertiary Button (Small Actions)
+
 ```
 Background: #FFFFFF (White)
 Border: 1px solid #E0E0E0
@@ -412,6 +452,7 @@ Examples: "Edit profile", "view notes"
 ```
 
 #### Text Link Button
+
 ```
 Background: Transparent
 Text: #3B82F6 (Primary Blue)
@@ -426,6 +467,7 @@ States:
 ```
 
 #### Icon Button (Navigation)
+
 ```
 Size: 40x40px
 Background: Transparent
@@ -443,6 +485,7 @@ States:
 ### Input Fields (From Figma)
 
 #### Text Input (Email, Password, Name)
+
 ```
 Height: 48-52px
 Padding: 14px 16px
@@ -467,6 +510,7 @@ States:
 ```
 
 #### Password Input (with Helper Text)
+
 ```
 Same as Text Input with:
 - Show/Hide toggle icon (eye icon, right aligned)
@@ -476,6 +520,7 @@ Same as Text Input with:
 ```
 
 #### Form Container (Card)
+
 ```
 Background: White (#FFFFFF)
 Border: None
@@ -492,6 +537,7 @@ Examples: Login card, Registration card
 ### Cards (From Figma)
 
 #### Hero Card (Featured Content)
+
 ```
 Background: Linear Gradient (#2F80ED → #5B9FED, 135deg)
 Border Radius: 16px
@@ -513,6 +559,7 @@ Dimensions:
 ```
 
 #### Course/Module Card (White)
+
 ```
 Background: White (#FFFFFF)
 Border: 1px solid #E0E0E0
@@ -531,6 +578,7 @@ Example: "NMC CBT" card
 ```
 
 #### Topic/Lesson Card (List Item)
+
 ```
 Background: White (#FFFFFF)
 Border: 1px solid #E0E0E0
@@ -552,6 +600,7 @@ States:
 ```
 
 #### Module Card (Colored Background)
+
 ```
 Background: Module color (#ECFDF5 green, #FFF4E6 orange, etc.)
 Border Radius: 12px
@@ -568,6 +617,7 @@ Examples: "Numeracy", "Clinical" practice modules
 ```
 
 #### Score/Result Card
+
 ```
 Background: White (#FFFFFF) or Light Blue (#EFF6FF)
 Border Radius: 16px
@@ -587,6 +637,7 @@ Example: Quiz result "7/11"
 ```
 
 #### Subscription Plan Card
+
 ```
 Background: White (#FFFFFF)
 Border: 1px solid #E0E0E0
@@ -621,7 +672,7 @@ Tab Item:
 
 Tabs (From Figma):
 1. Home - House icon
-2. AI assistant - Chat bubble icon  
+2. AI assistant - Chat bubble icon
 3. Courses - Play circle icon
 4. Profile - Person icon
 
@@ -636,6 +687,7 @@ States:
 ### Progress Indicators
 
 #### Progress Bar
+
 ```
 Height: 6pt
 Background: Gray/200
@@ -648,6 +700,7 @@ Animated:
 ```
 
 #### Circular Progress
+
 ```
 Size: 40x40pt
 Stroke Width: 4pt
@@ -659,6 +712,7 @@ With Percentage:
 ```
 
 #### Streak Counter
+
 ```
 Icon: 🔥 Fire emoji or custom icon
 Count: Heading 2 (24pt/600)
@@ -673,6 +727,7 @@ Padding: 12pt 16pt
 ### Badges & Chips (From Figma)
 
 #### Info Badge (Lessons Count)
+
 ```
 Background: #3B82F6 (Primary Blue)
 Text: White (#FFFFFF)
@@ -685,6 +740,7 @@ Example: "Lessons: 4"
 ```
 
 #### Discount Badge (Subscription)
+
 ```
 Background: #FFB74D (Orange)
 Text: White (#FFFFFF)
@@ -697,6 +753,7 @@ Example: "Get 5% off", "Get 15% off", "Get 25% off"
 ```
 
 #### Category Label
+
 ```
 Background: Transparent
 Text: #3B82F6 (Primary Blue)
@@ -707,6 +764,7 @@ Example: "course"
 ```
 
 #### Topics Badge (with Icon)
+
 ```
 Background: #DBEAFE (Light Blue)
 Icon: Info circle, 14px, #3B82F6
@@ -723,6 +781,7 @@ Example: "Topics: 4"
 ### Social Login Buttons (From Figma)
 
 #### Social Sign-in Container
+
 ```
 Divider with Text:
 - Line: 1px solid #E0E0E0
@@ -752,6 +811,7 @@ States:
 ### Video/Audio Player (From Figma)
 
 #### Video Player (Lesson Content)
+
 ```
 Container:
 - Width: Full width (minus 16px padding)
@@ -773,6 +833,7 @@ States:
 ```
 
 #### View Notes Button (Below Video)
+
 ```
 Background: #F5F5F5 (Light Gray)
 Border: None
@@ -793,6 +854,7 @@ States:
 ### Profile Components (From Figma)
 
 #### Profile Header
+
 ```
 Avatar:
 - Size: 80px circle
@@ -814,6 +876,7 @@ Edit Button:
 ```
 
 #### Profile Menu List
+
 ```
 Menu Item:
 - Height: 56px
@@ -851,6 +914,7 @@ Logout Item:
 ### Modals & Dialogs (From Figma)
 
 #### Subscription Modal (Full Screen Overlay)
+
 ```
 Background: White (#FFFFFF)
 Close Button: Top left, X icon, 24px, #1A1A1A
@@ -873,6 +937,7 @@ Content:
 ### Lists
 
 #### List Item
+
 ```
 Height: 64pt (min)
 Padding: 12pt 16pt
@@ -890,6 +955,7 @@ States:
 ```
 
 #### Section Header
+
 ```
 Height: 40pt
 Padding: 8pt 16pt
@@ -920,6 +986,7 @@ Components:
 ### Loading States
 
 #### Skeleton Loader
+
 ```
 Background: Gray/200
 Shimmer: Linear gradient moving left to right
@@ -931,6 +998,7 @@ Animation: 1.5s infinite
 ```
 
 #### Spinner
+
 ```
 Size: 24x24pt (small), 40x40pt (medium), 64x64pt (large)
 Color: Primary/500
@@ -945,6 +1013,7 @@ Animation: Rotate 1s infinite linear
 ### Duration & Easing
 
 **Duration:**
+
 ```
 Fast:     150ms   (Micro-interactions)
 Normal:   250ms   (Default transitions)
@@ -953,9 +1022,10 @@ XSlow:    600ms   (Page transitions)
 ```
 
 **Easing Functions:**
+
 ```
 Ease Out:     cubic-bezier(0.0, 0.0, 0.2, 1)    // Decelerating
-Ease In:      cubic-bezier(0.4, 0.0, 1, 1)      // Accelerating  
+Ease In:      cubic-bezier(0.4, 0.0, 1, 1)      // Accelerating
 Ease In Out:  cubic-bezier(0.4, 0.0, 0.2, 1)    // Standard
 Spring:       cubic-bezier(0.68, -0.55, 0.27, 1.55)  // Bouncy
 ```
@@ -965,6 +1035,7 @@ Spring:       cubic-bezier(0.68, -0.55, 0.27, 1.55)  // Bouncy
 ### Common Animations
 
 **1. Button Press**
+
 ```
 Scale: 0.95
 Duration: 150ms
@@ -972,6 +1043,7 @@ Easing: Ease In Out
 ```
 
 **2. Card Tap**
+
 ```
 Scale: 0.98
 Shadow: Reduce by 50%
@@ -980,6 +1052,7 @@ Easing: Ease Out
 ```
 
 **3. Page Transition**
+
 ```
 Slide In: translateX(100%)
 Fade In: opacity 0 → 1
@@ -988,6 +1061,7 @@ Easing: Ease Out
 ```
 
 **4. Modal/Bottom Sheet**
+
 ```
 Slide Up: translateY(100%)
 Backdrop Fade: opacity 0 → 0.5
@@ -996,6 +1070,7 @@ Easing: Ease Out
 ```
 
 **5. Success Animation**
+
 ```
 Scale: 0 → 1 → 1.1 → 1
 Rotate: 0 → 360deg
@@ -1004,6 +1079,7 @@ Easing: Spring
 ```
 
 **6. Loading Skeleton**
+
 ```
 Shimmer: translateX(-100%) → translateX(100%)
 Duration: 1500ms
@@ -1016,6 +1092,7 @@ Infinite: true
 ### Micro-interactions
 
 **1. Checkbox Check**
+
 ```
 Scale: 0 → 1.2 → 1
 Duration: 250ms
@@ -1023,6 +1100,7 @@ Easing: Spring
 ```
 
 **2. Toggle Switch**
+
 ```
 Slide: translateX(0) → translateX(24pt)
 Background: Gray/300 → Primary/500
@@ -1031,6 +1109,7 @@ Easing: Ease In Out
 ```
 
 **3. Progress Fill**
+
 ```
 Width: Current → Target
 Duration: 300ms
@@ -1038,6 +1117,7 @@ Easing: Ease Out
 ```
 
 **4. Achievement Unlock**
+
 ```
 - Bounce in: Scale 0 → 1.2 → 0.9 → 1
 - Confetti: Particle system
@@ -1052,6 +1132,7 @@ Easing: Ease Out
 ### Onboarding/Welcome Screen
 
 **Layout:**
+
 ```
 Full Screen:
 - Logo: Top center, 64px, ~80px from top
@@ -1073,6 +1154,7 @@ Spacing:
 ### Login/Register Screen
 
 **Layout:**
+
 ```
 Header:
 - Logo + "JEEVA LEARNING APP" text, top center
@@ -1100,6 +1182,7 @@ Spacing:
 ### Home/Dashboard Screen
 
 **Layout:**
+
 ```
 Header (Fixed):
 - Logo: Top left, 32px height
@@ -1136,6 +1219,7 @@ Bottom Navigation:
 ### Courses/Module List Screen
 
 **Layout:**
+
 ```
 Header:
 - Back arrow: Top left
@@ -1167,6 +1251,7 @@ Spacing:
 ### Practice/Topic List Screen
 
 **Layout:**
+
 ```
 Header:
 - Back arrow: Top left
@@ -1198,6 +1283,7 @@ Bottom Navigation:
 ### Video Lesson Screen
 
 **Layout:**
+
 ```
 Header:
 - Back arrow: Top left
@@ -1234,6 +1320,7 @@ CTA Button:
 ### Result/Score Screen
 
 **Layout:**
+
 ```
 Header:
 - Back arrow: Top left
@@ -1271,6 +1358,7 @@ Action Buttons:
 ### Profile Screen
 
 **Layout:**
+
 ```
 Header:
 - Back arrow: Top left
@@ -1308,6 +1396,7 @@ Bottom Navigation:
 ### Lesson Viewer
 
 **Layout:**
+
 ```
 Header (Sticky):
   - Back Button: Left
@@ -1330,6 +1419,7 @@ Footer (Sticky Bottom):
 ### Practice Session
 
 **Layout:**
+
 ```
 Header:
   - Question Number: "3 of 10"
@@ -1351,6 +1441,7 @@ Footer:
 ### Profile
 
 **Layout:**
+
 ```
 Header:
   - Cover Image (optional)
@@ -1377,23 +1468,28 @@ Menu List:
 ### Color Adjustments
 
 **Backgrounds:**
+
 - Surface: #1A1A1A
 - Card: #2D2D2D
 - Modal: #404040
 
 **Text:**
+
 - Primary: #FAFAFA
 - Secondary: #D4D4D4
 - Tertiary: #A3A3A3
 
 **Borders:**
+
 - Gray/700 (#404040)
 
 **Shadows:**
+
 - Use highlights instead:
   - 0px 1px 0px rgba(255, 255, 255, 0.1)
 
 **Primary Colors:**
+
 - Slightly lighter for better contrast
 - Primary/400 (#3395FF) instead of Primary/500
 
@@ -1412,11 +1508,13 @@ Desktop:    > 1024pt (web only)
 ### Adaptations
 
 **Tablet (Landscape):**
+
 - 2-column layout for content lists
 - Side panel for details
 - Larger touch targets (48pt min)
 
 **Large Screens:**
+
 - Max width: 1200pt
 - Center content
 - Increase side margins
@@ -1426,22 +1524,26 @@ Desktop:    > 1024pt (web only)
 ## ♿ Accessibility
 
 ### Touch Targets
+
 - Minimum: 44x44pt
 - Recommended: 48x48pt
 - Spacing: 8pt minimum between targets
 
 ### Color Contrast
+
 - WCAG AA Standard: 4.5:1 (normal text)
 - WCAG AA Standard: 3:1 (large text)
 - All text meets minimum contrast
 
 ### Focus States
+
 ```
 Outline: 3pt solid Primary/500
 Outline Offset: 2pt
 ```
 
 ### Text Scaling
+
 - Support Dynamic Type (iOS)
 - Support Font Scaling (Android)
 - Maximum scale: 200%
@@ -1452,21 +1554,25 @@ Outline Offset: 2pt
 ## 🎯 Interactive States
 
 ### Hover (Tablets/Web)
+
 - Background opacity: +10%
 - Shadow elevation: +2pt
 - Transition: 150ms ease out
 
 ### Active/Pressed
+
 - Scale: 0.95-0.98
 - Background opacity: +20%
 - Transition: 100ms ease in
 
 ### Focus (Keyboard)
+
 - Outline: 3pt Primary/500
 - Outline offset: 2pt
 - Background: +5% opacity
 
 ### Disabled
+
 - Opacity: 0.4
 - Cursor: not-allowed (web)
 - Remove all interactions
@@ -1476,9 +1582,11 @@ Outline Offset: 2pt
 ## 🖼️ Iconography
 
 ### Icon Set
+
 **Library:** Material Icons / SF Symbols / Custom
 
 **Sizes:**
+
 - Small: 16x16pt
 - Medium: 20x20pt (default)
 - Large: 24x24pt
@@ -1487,6 +1595,7 @@ Outline Offset: 2pt
 **Stroke Width:** 1.5pt (outline icons)
 
 **Common Icons:**
+
 - Home: house
 - Learn: book
 - Practice: pencil
@@ -1502,12 +1611,14 @@ Outline Offset: 2pt
 ## 📸 Imagery
 
 ### Aspect Ratios
+
 - Module Thumbnail: 16:9
 - Lesson Cover: 3:2
 - Avatar: 1:1 (square)
 - Banner: 21:9
 
 ### Image Specs
+
 - Format: WebP (fallback: JPEG/PNG)
 - Quality: 85%
 - Max Width: 1200pt
@@ -1518,6 +1629,7 @@ Outline Offset: 2pt
 ## 🎨 Illustration Style
 
 ### Guidelines
+
 - Flat design, minimal gradients
 - Primary color palette
 - Rounded, friendly shapes
@@ -1526,6 +1638,7 @@ Outline Offset: 2pt
 - Purposeful use of white space
 
 ### Usage
+
 - Empty states
 - Onboarding screens
 - Error pages
@@ -1537,6 +1650,7 @@ Outline Offset: 2pt
 ## 📋 Design Checklist
 
 ### Before Development
+
 - [ ] All screens designed in Figma
 - [ ] Components documented
 - [ ] Spacing verified (4pt grid)
@@ -1548,6 +1662,7 @@ Outline Offset: 2pt
 - [ ] Accessibility checked
 
 ### During Development
+
 - [ ] Match Figma designs pixel-perfect
 - [ ] Use design system components
 - [ ] Implement animations
@@ -1562,11 +1677,13 @@ Outline Offset: 2pt
 ## 🔗 Design Resources
 
 ### Figma File
+
 - **Main Design:** [Jeeva App Prototype](https://www.figma.com/proto/dOT7f0j582Wo6hdqNn4x8D/Jeeva-app)
 - **Component Library:** [Export from Figma]
 - **Icon Library:** Material Icons / SF Symbols
 
 ### Assets Export
+
 - Export 1x, 2x, 3x for mobile
 - SVG for icons
 - WebP for images
@@ -1684,6 +1801,7 @@ Outline Offset: 2pt
 ### React Native / Expo
 
 **1. Use StyleSheet:**
+
 ```typescript
 const styles = StyleSheet.create({
   primaryButton: {
@@ -1691,11 +1809,12 @@ const styles = StyleSheet.create({
     height: 48,
     borderRadius: 8,
     paddingHorizontal: 24,
-  }
-})
+  },
+});
 ```
 
 **2. Theme Provider:**
+
 ```typescript
 const theme = {
   colors,
@@ -1710,15 +1829,16 @@ const theme = {
 ```
 
 **3. Responsive Units:**
-```typescript
-import { Dimensions, PixelRatio } from 'react-native'
 
-const { width, height } = Dimensions.get('window')
-const scale = width / 375 // Base on iPhone X width
+```typescript
+import { Dimensions, PixelRatio } from "react-native";
+
+const { width, height } = Dimensions.get("window");
+const scale = width / 375; // Base on iPhone X width
 
 const normalize = (size: number) => {
-  return Math.round(PixelRatio.roundToNearestPixel(size * scale))
-}
+  return Math.round(PixelRatio.roundToNearestPixel(size * scale));
+};
 ```
 
 ---
@@ -1738,6 +1858,7 @@ const normalize = (size: number) => {
 **For Developers:**
 
 Before implementing each screen:
+
 - [ ] Review the specific screen layout section
 - [ ] Use the design tokens JSON for consistent styling
 - [ ] Match exact colors, spacing, and typography
@@ -1748,6 +1869,7 @@ Before implementing each screen:
 - [ ] Ensure accessibility compliance
 
 **Key Implementation Points:**
+
 1. **Colors:** Use the exact hex values from the color palette section
 2. **Typography:** Match font sizes, weights, and line heights exactly
 3. **Spacing:** Follow the 4px/8px/12px/16px/24px spacing scale
@@ -1759,21 +1881,25 @@ Before implementing each screen:
 ## 🎨 Design System Summary
 
 **Colors:**
+
 - Primary Blue: #3B82F6 (buttons, links, active states)
 - Green: #4ADE80 (practice modules, success)
 - Coral: #FF8A80 (destructive actions, errors)
 - Orange: #FFB74D (badges, highlights)
 
 **Typography:**
+
 - Font: SF Pro (iOS) / Roboto (Android)
 - Sizes: 11pt → 28pt
 - Weights: Regular (400), Medium (500), Semibold (600), Bold (700)
 
 **Spacing:**
+
 - Base: 4px grid system
 - Common: 8px, 12px, 16px, 24px, 32px
 
 **Border Radius:**
+
 - Small: 6-8px
 - Medium: 12px
 - Large: 16px

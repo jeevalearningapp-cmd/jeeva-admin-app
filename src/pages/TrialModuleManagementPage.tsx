@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState } from "react";
 import {
   Box,
   Button,
@@ -10,21 +10,21 @@ import {
   Paper,
   LinearProgress,
   Alert,
-} from '@mui/material'
-import { AddOutlined } from '@mui/icons-material'
-import TrialPracticeManager from '@/components/TrialModuleManagement/TrialPracticeManager'
-import TrialLearningManager from '@/components/TrialModuleManagement/TrialLearningManager'
-import TrialMockExamManager from '@/components/TrialModuleManagement/TrialMockExamManager'
-import TrialAnalyticsDashboard from '@/components/TrialModuleManagement/TrialAnalyticsDashboard'
+} from "@mui/material";
+import { AddOutlined } from "@mui/icons-material";
+import TrialPracticeManager from "@/components/TrialModuleManagement/TrialPracticeManager";
+import TrialLearningManager from "@/components/TrialModuleManagement/TrialLearningManager";
+import TrialMockExamManager from "@/components/TrialModuleManagement/TrialMockExamManager";
+import TrialAnalyticsDashboard from "@/components/TrialModuleManagement/TrialAnalyticsDashboard";
 
 interface TabPanelProps {
-  children?: React.ReactNode
-  index: number
-  value: number
+  children?: React.ReactNode;
+  index: number;
+  value: number;
 }
 
 function TabPanel(props: TabPanelProps) {
-  const { children, value, index, ...other } = props
+  const { children, value, index, ...other } = props;
   return (
     <div
       role="tabpanel"
@@ -35,16 +35,18 @@ function TabPanel(props: TabPanelProps) {
     >
       {value === index && <Box sx={{ pt: 3 }}>{children}</Box>}
     </div>
-  )
+  );
 }
 
 export default function TrialModuleManagementPage() {
-  const [tabValue, setTabValue] = useState(0)
-  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+  const [tabValue, setTabValue] = useState(0);
+  const [status, setStatus] = useState<
+    "idle" | "loading" | "success" | "error"
+  >("idle");
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
-    setTabValue(newValue)
-  }
+    setTabValue(newValue);
+  };
 
   return (
     <Box>
@@ -54,18 +56,27 @@ export default function TrialModuleManagementPage() {
           Trial Module Management
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          Manage practice questions, learning content, mock exams, and analytics for the trial module
+          Manage practice questions, learning content, mock exams, and analytics
+          for the trial module
         </Typography>
       </Box>
 
       {/* Status Alert */}
-      {status === 'success' && (
-        <Alert severity="success" sx={{ mb: 2 }} onClose={() => setStatus('idle')}>
+      {status === "success" && (
+        <Alert
+          severity="success"
+          sx={{ mb: 2 }}
+          onClose={() => setStatus("idle")}
+        >
           Trial content saved successfully!
         </Alert>
       )}
-      {status === 'error' && (
-        <Alert severity="error" sx={{ mb: 2 }} onClose={() => setStatus('idle')}>
+      {status === "error" && (
+        <Alert
+          severity="error"
+          sx={{ mb: 2 }}
+          onClose={() => setStatus("idle")}
+        >
           Error saving trial content. Please try again.
         </Alert>
       )}
@@ -76,12 +87,28 @@ export default function TrialModuleManagementPage() {
           value={tabValue}
           onChange={handleTabChange}
           aria-label="Trial module management tabs"
-          sx={{ borderBottom: 1, borderColor: 'divider' }}
+          sx={{ borderBottom: 1, borderColor: "divider" }}
         >
-          <Tab label="Practice Section" id="trial-tab-0" aria-controls="trial-tabpanel-0" />
-          <Tab label="Learning Section" id="trial-tab-1" aria-controls="trial-tabpanel-1" />
-          <Tab label="Mock Exam" id="trial-tab-2" aria-controls="trial-tabpanel-2" />
-          <Tab label="Analytics" id="trial-tab-3" aria-controls="trial-tabpanel-3" />
+          <Tab
+            label="Practice Section"
+            id="trial-tab-0"
+            aria-controls="trial-tabpanel-0"
+          />
+          <Tab
+            label="Learning Section"
+            id="trial-tab-1"
+            aria-controls="trial-tabpanel-1"
+          />
+          <Tab
+            label="Mock Exam"
+            id="trial-tab-2"
+            aria-controls="trial-tabpanel-2"
+          />
+          <Tab
+            label="Analytics"
+            id="trial-tab-3"
+            aria-controls="trial-tabpanel-3"
+          />
         </Tabs>
 
         {/* Tab Panels */}
@@ -104,5 +131,5 @@ export default function TrialModuleManagementPage() {
         </Box>
       </Paper>
     </Box>
-  )
+  );
 }

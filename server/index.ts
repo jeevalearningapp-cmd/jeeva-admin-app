@@ -1,4 +1,4 @@
-import 'dotenv/config';
+import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import emailRoutes from "./routes/email.js";
@@ -26,11 +26,14 @@ import contentValidationRoutes from "./routes/content-validation.js";
 import { notificationService } from "./services/notifications.js";
 
 const app = express();
-const PORT = parseInt(process.env.PORT || '3001', 10);
+const PORT = parseInt(process.env.PORT || "3001", 10);
 
 app.use(cors());
 
-app.use("/api/payments/webhooks/stripe", express.raw({ type: "application/json" }));
+app.use(
+  "/api/payments/webhooks/stripe",
+  express.raw({ type: "application/json" }),
+);
 app.use("/api/payments/webhooks/razorpay", express.json());
 
 app.use(express.json());
@@ -59,26 +62,36 @@ app.use("/api/users", progressTrackingRoutes);
 app.use("/api", contentValidationRoutes);
 
 app.get("/api/health", (req, res) => {
-  res.json({ status: "ok", message: "API server running (Email + AI Chat + Payments + Notifications + Country Detection + Learning Module Restructure)" });
+  res.json({
+    status: "ok",
+    message:
+      "API server running (Email + AI Chat + Payments + Notifications + Country Detection + Learning Module Restructure)",
+  });
 });
 
 // Start notification queue processor (runs every 2 minutes)
-setInterval(async () => {
-  try {
-    await notificationService.processNotificationQueue();
-  } catch (error) {
-    console.error("Error in notification queue processor:", error);
-  }
-}, 2 * 60 * 1000); // 2 minutes
+setInterval(
+  async () => {
+    try {
+      await notificationService.processNotificationQueue();
+    } catch (error) {
+      console.error("Error in notification queue processor:", error);
+    }
+  },
+  2 * 60 * 1000,
+); // 2 minutes
 
 // Check receipt status every 5 minutes
-setInterval(async () => {
-  try {
-    await notificationService.checkReceiptStatus();
-  } catch (error) {
-    console.error("Error checking receipt status:", error);
-  }
-}, 5 * 60 * 1000); // 5 minutes
+setInterval(
+  async () => {
+    try {
+      await notificationService.checkReceiptStatus();
+    } catch (error) {
+      console.error("Error checking receipt status:", error);
+    }
+  },
+  5 * 60 * 1000,
+); // 5 minutes
 
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`✅ API server running on port ${PORT}`);
@@ -96,9 +109,13 @@ app.listen(PORT, "0.0.0.0", () => {
   console.log(`   - Learning Questions API: /api/learning`);
   console.log(`   - Mock Exam Questions API: /api/mock-exam`);
   console.log(`   - Topic Core Notes API: /api/topics/:topicId/core-notes`);
-  console.log(`   - Topic Flash Content API: /api/topics/:topicId/flash-content`);
+  console.log(
+    `   - Topic Flash Content API: /api/topics/:topicId/flash-content`,
+  );
   console.log(`   - Progress Tracking API: /api/users/:userId/topic-progress`);
-  console.log(`   - Content Validation API: /api/topics/:topicId/validation-status`);
+  console.log(
+    `   - Content Validation API: /api/topics/:topicId/validation-status`,
+  );
   console.log(`\n🔔 Push notification service started`);
   console.log(`   - Queue processor: every 2 minutes`);
   console.log(`   - Receipt checker: every 5 minutes`);

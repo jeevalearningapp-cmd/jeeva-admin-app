@@ -10,17 +10,18 @@
 
 Three distinct modules with different question display and interaction logic:
 
-| Module | Purpose | Question Count | User Flow | Passing Criteria |
-|--------|---------|-----------------|-----------|------------------|
-| **Practice** | Familiarize with exam scenarios | Any | Free navigation | No requirement |
-| **Learning** | Structured learning with assessment | 10-15 per subtopic | Sequential | 80% minimum |
-| **Mock Exam** | Real exam simulation | Full exam length | Timed | Pass/fail |
+| Module        | Purpose                             | Question Count     | User Flow       | Passing Criteria |
+| ------------- | ----------------------------------- | ------------------ | --------------- | ---------------- |
+| **Practice**  | Familiarize with exam scenarios     | Any                | Free navigation | No requirement   |
+| **Learning**  | Structured learning with assessment | 10-15 per subtopic | Sequential      | 80% minimum      |
+| **Mock Exam** | Real exam simulation                | Full exam length   | Timed           | Pass/fail        |
 
 ---
 
 ## Module 1: PRACTICE MODULE
 
 ### Purpose
+
 Users familiarize themselves with NMC CBT exam question types and scenarios. Can practice freely with no progression requirements.
 
 ### Structure
@@ -47,6 +48,7 @@ Users familiarize themselves with NMC CBT exam question types and scenarios. Can
 ### Question Logic - Practice Module
 
 **Database Fields:**
+
 ```typescript
 {
   moduleType: 'practice',
@@ -60,6 +62,7 @@ Users familiarize themselves with NMC CBT exam question types and scenarios. Can
 ```
 
 **User Flow:**
+
 ```
 1. Select Topic (Numeracy OR Clinical Knowledge)
    ↓
@@ -80,6 +83,7 @@ Users familiarize themselves with NMC CBT exam question types and scenarios. Can
 ```
 
 **Display Rules:**
+
 - ✅ No question order restriction (can be randomized or sequential)
 - ✅ User can skip questions
 - ✅ User can mark for review
@@ -88,6 +92,7 @@ Users familiarize themselves with NMC CBT exam question types and scenarios. Can
 - ✅ Results shown immediately after each answer
 
 **Results Summary:**
+
 ```
 - Total questions attempted: X
 - Correct answers: Y
@@ -98,6 +103,7 @@ Users familiarize themselves with NMC CBT exam question types and scenarios. Can
 ```
 
 **Admin Panel Control:**
+
 - Add/Edit/Delete questions for each subtopic
 - Set difficulty level
 - Add explanations for each answer
@@ -109,6 +115,7 @@ Users familiarize themselves with NMC CBT exam question types and scenarios. Can
 ## Module 2: LEARNING MODULE
 
 ### Purpose
+
 Structured learning where users progressively learn through content (video, audio, text) and then assess their understanding with 10-15 questions per subtopic. Must achieve 80% to progress.
 
 ### Structure
@@ -121,7 +128,7 @@ Topic 1: Numeracy (1.1 - 1.4)
   ├── 1.2 Unit Conversions ← Unlock after 1.1 (80% pass)
   ├── 1.3 IV Flow Rate Calculations ← Unlock after 1.2 (80% pass)
   └── 1.4 Fluid Balance ← Unlock after 1.3 (80% pass)
-  
+
 Topic 2: The NMC Code (2.1 - 2.4)
   ├── 2.1 Prioritise People
   ├── 2.2 Practice Effectively
@@ -161,6 +168,7 @@ Topic 8: Cultural Adaptation (8.1 - 8.2)
 ### Content Per Subtopic
 
 **Each subtopic contains:**
+
 1. **Video** (e.g., "Dosage Calculations - Expert Explanation")
    - Duration: 10-15 minutes
    - Embedded or linked from storage
@@ -186,6 +194,7 @@ Topic 8: Cultural Adaptation (8.1 - 8.2)
 ### Question Logic - Learning Module
 
 **Database Fields:**
+
 ```typescript
 {
   moduleType: 'learning',
@@ -201,6 +210,7 @@ Topic 8: Cultural Adaptation (8.1 - 8.2)
 ```
 
 **User Flow:**
+
 ```
 1. User selects a subtopic (e.g., "1.1 Dosage Calculations")
    ↓
@@ -244,12 +254,14 @@ Topic 8: Cultural Adaptation (8.1 - 8.2)
 ```
 
 **Progression Status:**
+
 - `not_started` - Content available, assessment locked
 - `in_progress` - User has started assessment
 - `completed` - User scored ≥80%
 - `locked` - User hasn't completed prerequisite subtopic
 
 **Display Rules for Learning Module:**
+
 - ✅ **Sequential Unlock:** Next subtopic only available after 80% pass
 - ✅ **Content First:** Questions only show after viewing content
 - ✅ **Mark Tracking:** Track which content user viewed
@@ -261,12 +273,14 @@ Topic 8: Cultural Adaptation (8.1 - 8.2)
 - ✅ **No Time Limit:** Unlimited time per question
 
 **User Cannot:**
+
 - ❌ Skip content viewing
 - ❌ Jump to next subtopic without 80% pass
 - ❌ Access locked subtopics
 - ❌ Move backward (once completed, subtopic stays completed)
 
 **Admin Panel Control:**
+
 - Add/Edit video, audio, lesson content per subtopic
 - Add/Edit 10-15 questions per subtopic
 - Set passing score (default 80%)
@@ -280,11 +294,13 @@ Topic 8: Cultural Adaptation (8.1 - 8.2)
 ## Module 3: MOCK EXAM MODULE
 
 ### Purpose
+
 Real exam simulation matching the actual NMC CBT exam format. Full exam experience with all topics combined.
 
 ### Structure
 
 **One exam with:**
+
 - Full question bank (all topics combined)
 - Timed format (matches real exam: 3 hours 45 minutes)
 - All question types included
@@ -295,6 +311,7 @@ Real exam simulation matching the actual NMC CBT exam format. Full exam experien
 ### Question Logic - Mock Exam Module
 
 **Database Fields:**
+
 ```typescript
 {
   moduleType: 'mock_exam',
@@ -309,6 +326,7 @@ Real exam simulation matching the actual NMC CBT exam format. Full exam experien
 ```
 
 **User Flow:**
+
 ```
 1. User clicks "Start Mock Exam"
    ↓
@@ -352,6 +370,7 @@ Real exam simulation matching the actual NMC CBT exam format. Full exam experien
 ```
 
 **Display Rules for Mock Exam:**
+
 - ✅ **Timed Exam:** 3 hours 45 minutes (like real NMC CBT)
 - ✅ **All Questions:** Mix from all topics
 - ✅ **Question Navigation:** Can jump to any question
@@ -362,12 +381,14 @@ Real exam simulation matching the actual NMC CBT exam format. Full exam experien
 - ✅ **Immediate Results:** After submission
 
 **User Cannot:**
+
 - ❌ Pause exam (timer keeps running)
 - ❌ Extend time
 - ❌ Review answers during exam
 - ❌ Exit and restart (auto-submits if closed)
 
 **Results Include:**
+
 - Total score (e.g., 76/100)
 - Pass/Fail (if 80% required)
 - Time taken
@@ -381,6 +402,7 @@ Real exam simulation matching the actual NMC CBT exam format. Full exam experien
 - Option to retry
 
 **Admin Panel Control:**
+
 - Select which questions go into mock exam
 - Set exam duration (default 3:45)
 - Set passing score (default 80%)
@@ -397,13 +419,13 @@ Real exam simulation matching the actual NMC CBT exam format. Full exam experien
 ```typescript
 CREATE TABLE questions (
   id UUID PRIMARY KEY,
-  
+
   // Identification
   question_text TEXT NOT NULL,
   module_type VARCHAR(50), // 'practice' | 'learning' | 'mock_exam'
   category VARCHAR(100), // Topic: 'Numeracy', 'The NMC Code', etc
   subdivision VARCHAR(100), // Subtopic: '1.1', '2.1', etc
-  
+
   // Content
   lesson_id UUID, // Links to lessons table (for learning module)
   question_type VARCHAR(50), // 'multiple_choice' | 'true_false'
@@ -411,11 +433,11 @@ CREATE TABLE questions (
   points INT DEFAULT 1,
   explanation TEXT,
   image_url TEXT,
-  
+
   // Status
   is_active BOOLEAN DEFAULT true,
   exam_part VARCHAR(50), // For mock exam: 'full' | 'part1'
-  
+
   // Audit
   created_at TIMESTAMP,
   updated_at TIMESTAMP
@@ -514,26 +536,27 @@ Response: [{ attemptId, score, date, duration }, ...]
 
 ## Summary Table
 
-| Aspect | Practice | Learning | Mock Exam |
-|--------|----------|----------|-----------|
-| **Topics** | 2 (Numeracy, Clinical Knowledge) | 8 (All topics) | All combined |
-| **Subtopics** | 9 total | 21 total | N/A - full exam |
-| **Questions per Subtopic** | Multiple | 10-15 | 100+ |
-| **Content Required** | None | Video, Audio, Lesson | None |
-| **Question Type** | Multiple choice | Multiple choice | Multiple choice |
-| **User Can Select** | Yes, any subtopic | No, sequential only | No, only one exam |
-| **Time Limit** | None | None | 3 hours 45 minutes |
-| **Passing Requirement** | None | 80% | Varies (default 80%) |
-| **Can Retry** | Unlimited | Until 80% | Unlimited |
-| **Progress Tracking** | None | By subtopic | By attempt |
-| **Results** | Immediate | Immediate | Detailed breakdown |
-| **Purpose** | Familiarize | Learn & assess | Simulate real exam |
+| Aspect                     | Practice                         | Learning             | Mock Exam            |
+| -------------------------- | -------------------------------- | -------------------- | -------------------- |
+| **Topics**                 | 2 (Numeracy, Clinical Knowledge) | 8 (All topics)       | All combined         |
+| **Subtopics**              | 9 total                          | 21 total             | N/A - full exam      |
+| **Questions per Subtopic** | Multiple                         | 10-15                | 100+                 |
+| **Content Required**       | None                             | Video, Audio, Lesson | None                 |
+| **Question Type**          | Multiple choice                  | Multiple choice      | Multiple choice      |
+| **User Can Select**        | Yes, any subtopic                | No, sequential only  | No, only one exam    |
+| **Time Limit**             | None                             | None                 | 3 hours 45 minutes   |
+| **Passing Requirement**    | None                             | 80%                  | Varies (default 80%) |
+| **Can Retry**              | Unlimited                        | Until 80%            | Unlimited            |
+| **Progress Tracking**      | None                             | By subtopic          | By attempt           |
+| **Results**                | Immediate                        | Immediate            | Detailed breakdown   |
+| **Purpose**                | Familiarize                      | Learn & assess       | Simulate real exam   |
 
 ---
 
 ## Implementation Checklist for Mobile App
 
 ### Practice Module
+
 - [ ] Create topic selector UI
 - [ ] Create subtopic selector UI
 - [ ] Fetch questions from `/api/content/practice/.../questions`
@@ -545,6 +568,7 @@ Response: [{ attemptId, score, date, duration }, ...]
 - [ ] Option to retry same subtopic
 
 ### Learning Module
+
 - [ ] Create topic/subtopic list (showing locked/unlocked status)
 - [ ] Fetch content (video, audio, lesson)
 - [ ] Display video player
@@ -562,6 +586,7 @@ Response: [{ attemptId, score, date, duration }, ...]
 - [ ] Show progress bar for all topics
 
 ### Mock Exam Module
+
 - [ ] Display exam info and confirm start
 - [ ] Start timer (3:45:00)
 - [ ] Fetch all exam questions

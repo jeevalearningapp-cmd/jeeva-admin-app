@@ -1,5 +1,5 @@
-import express, { Request, Response } from 'express';
-import { supabase } from '../lib/supabase.js';
+import express, { Request, Response } from "express";
+import { supabase } from "../lib/supabase.js";
 
 const router = express.Router();
 
@@ -7,18 +7,20 @@ const router = express.Router();
  * GET /api/learning/topics
  * List all learning topics
  */
-router.get('/topics', async (req: Request, res: Response) => {
+router.get("/topics", async (req: Request, res: Response) => {
   try {
     const { data, error } = await supabase
-      .from('topics')
-      .select(`
+      .from("topics")
+      .select(
+        `
         *,
         subtopics:subtopics(count)
-      `)
-      .order('display_order', { ascending: true });
+      `,
+      )
+      .order("display_order", { ascending: true });
 
     if (error) {
-      console.error('Error fetching learning topics:', error);
+      console.error("Error fetching learning topics:", error);
       res.status(500).json({
         success: false,
         error: error.message,
@@ -31,10 +33,13 @@ router.get('/topics', async (req: Request, res: Response) => {
       data,
     });
   } catch (error) {
-    console.error('Error in GET /topics:', error);
+    console.error("Error in GET /topics:", error);
     res.status(500).json({
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to fetch learning topics',
+      error:
+        error instanceof Error
+          ? error.message
+          : "Failed to fetch learning topics",
     });
   }
 });
@@ -43,7 +48,7 @@ router.get('/topics', async (req: Request, res: Response) => {
  * POST /api/learning/topics (admin only)
  * Create a new learning topic
  */
-router.post('/topics', async (req: Request, res: Response) => {
+router.post("/topics", async (req: Request, res: Response) => {
   try {
     const { title, description, displayOrder, moduleId } = req.body;
 
@@ -51,7 +56,7 @@ router.post('/topics', async (req: Request, res: Response) => {
     if (!title) {
       res.status(400).json({
         success: false,
-        error: 'Title is required',
+        error: "Title is required",
       });
       return;
     }
@@ -60,9 +65,9 @@ router.post('/topics', async (req: Request, res: Response) => {
     let order = displayOrder;
     if (order === undefined) {
       const { data: maxOrderTopic } = await supabase
-        .from('topics')
-        .select('display_order')
-        .order('display_order', { ascending: false })
+        .from("topics")
+        .select("display_order")
+        .order("display_order", { ascending: false })
         .limit(1)
         .single();
 
@@ -71,7 +76,7 @@ router.post('/topics', async (req: Request, res: Response) => {
 
     // Insert topic
     const { data: topic, error: topicError } = await supabase
-      .from('topics')
+      .from("topics")
       .insert({
         title,
         description,
@@ -82,7 +87,7 @@ router.post('/topics', async (req: Request, res: Response) => {
       .single();
 
     if (topicError) {
-      console.error('Error creating learning topic:', topicError);
+      console.error("Error creating learning topic:", topicError);
       res.status(500).json({
         success: false,
         error: topicError.message,
@@ -91,13 +96,11 @@ router.post('/topics', async (req: Request, res: Response) => {
     }
 
     // Create placeholder for Core Notes
-    await supabase
-      .from('topic_core_notes')
-      .insert({
-        topic_id: topic.id,
-        content: '',
-        is_active: false,
-      });
+    await supabase.from("topic_core_notes").insert({
+      topic_id: topic.id,
+      content: "",
+      is_active: false,
+    });
 
     // Create placeholders for Flash Content (5 screens)
     const flashContentScreens = [];
@@ -106,24 +109,25 @@ router.post('/topics', async (req: Request, res: Response) => {
         topic_id: topic.id,
         screen_number: i,
         title: `Screen ${i}`,
-        content: '',
+        content: "",
         is_active: false,
       });
     }
 
-    await supabase
-      .from('topic_flash_content')
-      .insert(flashContentScreens);
+    await supabase.from("topic_flash_content").insert(flashContentScreens);
 
     res.status(201).json({
       success: true,
       data: topic,
     });
   } catch (error) {
-    console.error('Error in POST /topics:', error);
+    console.error("Error in POST /topics:", error);
     res.status(500).json({
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to create learning topic',
+      error:
+        error instanceof Error
+          ? error.message
+          : "Failed to create learning topic",
     });
   }
 });
@@ -132,22 +136,22 @@ router.post('/topics', async (req: Request, res: Response) => {
  * PUT /api/learning/topics/:id (admin only)
  * Edit an existing learning topic
  */
-router.put('/topics/:id', async (req: Request, res: Response) => {
+router.put("/topics/:id", async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { title, description, displayOrder, moduleId } = req.body;
 
     // Check if topic exists
     const { data: existing, error: fetchError } = await supabase
-      .from('topics')
-      .select('id')
-      .eq('id', id)
+      .from("topics")
+      .select("id")
+      .eq("id", id)
       .single();
 
     if (fetchError || !existing) {
       res.status(404).json({
         success: false,
-        error: 'Topic not found',
+        error: "Topic not found",
       });
       return;
     }
@@ -161,14 +165,14 @@ router.put('/topics/:id', async (req: Request, res: Response) => {
     updateData.updated_at = new Date().toISOString();
 
     const { data, error } = await supabase
-      .from('topics')
+      .from("topics")
       .update(updateData)
-      .eq('id', id)
+      .eq("id", id)
       .select()
       .single();
 
     if (error) {
-      console.error('Error updating learning topic:', error);
+      console.error("Error updating learning topic:", error);
       res.status(500).json({
         success: false,
         error: error.message,
@@ -181,10 +185,13 @@ router.put('/topics/:id', async (req: Request, res: Response) => {
       data,
     });
   } catch (error) {
-    console.error('Error in PUT /topics/:id:', error);
+    console.error("Error in PUT /topics/:id:", error);
     res.status(500).json({
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to update learning topic',
+      error:
+        error instanceof Error
+          ? error.message
+          : "Failed to update learning topic",
     });
   }
 });
@@ -193,53 +200,59 @@ router.put('/topics/:id', async (req: Request, res: Response) => {
  * DELETE /api/learning/topics/:id (admin only)
  * Delete a learning topic with cascade warning
  */
-router.delete('/topics/:id', async (req: Request, res: Response) => {
+router.delete("/topics/:id", async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
     // Check if topic exists
     const { data: existing, error: fetchError } = await supabase
-      .from('topics')
-      .select('id, title')
-      .eq('id', id)
+      .from("topics")
+      .select("id, title")
+      .eq("id", id)
       .single();
 
     if (fetchError || !existing) {
       res.status(404).json({
         success: false,
-        error: 'Topic not found',
+        error: "Topic not found",
       });
       return;
     }
 
     // Get counts of related content
     const { count: subtopicsCount } = await supabase
-      .from('subtopics')
-      .select('*', { count: 'exact', head: true })
-      .eq('topic_id', id);
+      .from("subtopics")
+      .select("*", { count: "exact", head: true })
+      .eq("topic_id", id);
 
     const { count: coreNotesCount } = await supabase
-      .from('topic_core_notes')
-      .select('*', { count: 'exact', head: true })
-      .eq('topic_id', id);
+      .from("topic_core_notes")
+      .select("*", { count: "exact", head: true })
+      .eq("topic_id", id);
 
     const { count: flashContentCount } = await supabase
-      .from('topic_flash_content')
-      .select('*', { count: 'exact', head: true })
-      .eq('topic_id', id);
+      .from("topic_flash_content")
+      .select("*", { count: "exact", head: true })
+      .eq("topic_id", id);
 
     const { count: learningQuestionsCount } = await supabase
-      .from('learning_questions')
-      .select('*', { count: 'exact', head: true })
-      .eq('topic_id', id);
+      .from("learning_questions")
+      .select("*", { count: "exact", head: true })
+      .eq("topic_id", id);
 
     // Check if force delete is requested
     const { force } = req.query;
 
-    if (!force && (subtopicsCount || coreNotesCount || flashContentCount || learningQuestionsCount)) {
+    if (
+      !force &&
+      (subtopicsCount ||
+        coreNotesCount ||
+        flashContentCount ||
+        learningQuestionsCount)
+    ) {
       res.status(409).json({
         success: false,
-        error: 'Topic has related content',
+        error: "Topic has related content",
         warning: {
           message: `Deleting topic "${existing.title}" will also delete:`,
           counts: {
@@ -248,7 +261,7 @@ router.delete('/topics/:id', async (req: Request, res: Response) => {
             flashContent: flashContentCount || 0,
             learningQuestions: learningQuestionsCount || 0,
           },
-          hint: 'Add ?force=true to confirm deletion',
+          hint: "Add ?force=true to confirm deletion",
         },
       });
       return;
@@ -256,12 +269,12 @@ router.delete('/topics/:id', async (req: Request, res: Response) => {
 
     // Delete topic (cascade will handle related content)
     const { error: deleteError } = await supabase
-      .from('topics')
+      .from("topics")
       .delete()
-      .eq('id', id);
+      .eq("id", id);
 
     if (deleteError) {
-      console.error('Error deleting learning topic:', deleteError);
+      console.error("Error deleting learning topic:", deleteError);
       res.status(500).json({
         success: false,
         error: deleteError.message,
@@ -271,13 +284,16 @@ router.delete('/topics/:id', async (req: Request, res: Response) => {
 
     res.json({
       success: true,
-      message: 'Topic deleted successfully',
+      message: "Topic deleted successfully",
     });
   } catch (error) {
-    console.error('Error in DELETE /topics/:id:', error);
+    console.error("Error in DELETE /topics/:id:", error);
     res.status(500).json({
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to delete learning topic',
+      error:
+        error instanceof Error
+          ? error.message
+          : "Failed to delete learning topic",
     });
   }
 });
@@ -286,7 +302,7 @@ router.delete('/topics/:id', async (req: Request, res: Response) => {
  * PUT /api/learning/topics/reorder (admin only)
  * Reorder topics
  */
-router.put('/topics/reorder', async (req: Request, res: Response) => {
+router.put("/topics/reorder", async (req: Request, res: Response) => {
   try {
     const { topicOrders } = req.body;
 
@@ -294,32 +310,34 @@ router.put('/topics/reorder', async (req: Request, res: Response) => {
     if (!topicOrders || !Array.isArray(topicOrders)) {
       res.status(400).json({
         success: false,
-        error: 'topicOrders array is required',
+        error: "topicOrders array is required",
       });
       return;
     }
 
     // Update each topic's display order
-    const updates = topicOrders.map(async (item: { id: string; displayOrder: number }) => {
-      return supabase
-        .from('topics')
-        .update({
-          display_order: item.displayOrder,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', item.id);
-    });
+    const updates = topicOrders.map(
+      async (item: { id: string; displayOrder: number }) => {
+        return supabase
+          .from("topics")
+          .update({
+            display_order: item.displayOrder,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", item.id);
+      },
+    );
 
     await Promise.all(updates);
 
     // Fetch updated topics
     const { data, error } = await supabase
-      .from('topics')
-      .select('*')
-      .order('display_order', { ascending: true });
+      .from("topics")
+      .select("*")
+      .order("display_order", { ascending: true });
 
     if (error) {
-      console.error('Error fetching reordered topics:', error);
+      console.error("Error fetching reordered topics:", error);
       res.status(500).json({
         success: false,
         error: error.message,
@@ -332,10 +350,11 @@ router.put('/topics/reorder', async (req: Request, res: Response) => {
       data,
     });
   } catch (error) {
-    console.error('Error in PUT /topics/reorder:', error);
+    console.error("Error in PUT /topics/reorder:", error);
     res.status(500).json({
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to reorder topics',
+      error:
+        error instanceof Error ? error.message : "Failed to reorder topics",
     });
   }
 });

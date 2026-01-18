@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Paper,
@@ -11,124 +11,140 @@ import {
   Tabs,
   Tab,
   Divider,
-} from '@mui/material'
+} from "@mui/material";
 import {
   SaveOutlined,
   NavigateBeforeOutlined,
   NavigateNextOutlined,
   ImageOutlined,
-} from '@mui/icons-material'
-import { useEditor, EditorContent } from '@tiptap/react'
-import StarterKit from '@tiptap/starter-kit'
-import Link from '@tiptap/extension-link'
-import Placeholder from '@tiptap/extension-placeholder'
-import { flashContentAPI, TopicFlashContent } from '@/api/flashContent'
-import { useSnackbar } from 'notistack'
+} from "@mui/icons-material";
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Link from "@tiptap/extension-link";
+import Placeholder from "@tiptap/extension-placeholder";
+import { flashContentAPI, TopicFlashContent } from "@/api/flashContent";
+import { useSnackbar } from "notistack";
 
 interface FlashContentEditorProps {
-  topicId: string
+  topicId: string;
 }
 
-export const FlashContentEditor: React.FC<FlashContentEditorProps> = ({ topicId }) => {
-  const [flashScreens, setFlashScreens] = useState<TopicFlashContent[]>([])
-  const [currentScreen, setCurrentScreen] = useState(0)
-  const [isLoading, setIsLoading] = useState(true)
-  const [isSaving, setIsSaving] = useState(false)
-  const [error, setError] = useState<string>('')
-  const { enqueueSnackbar } = useSnackbar()
+export const FlashContentEditor: React.FC<FlashContentEditorProps> = ({
+  topicId,
+}) => {
+  const [flashScreens, setFlashScreens] = useState<TopicFlashContent[]>([]);
+  const [currentScreen, setCurrentScreen] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState<string>("");
+  const { enqueueSnackbar } = useSnackbar();
 
   // Load flash content
   useEffect(() => {
-    loadFlashContent()
-  }, [topicId])
+    loadFlashContent();
+  }, [topicId]);
 
   const loadFlashContent = async () => {
     try {
-      setIsLoading(true)
-      setError('')
-      const data = await flashContentAPI.getByTopicId(topicId)
-      
+      setIsLoading(true);
+      setError("");
+      const data = await flashContentAPI.getByTopicId(topicId);
+
       // Ensure we have exactly 5 screens
       if (data.length === 0) {
         // Create placeholders if none exist
-        const placeholders = await flashContentAPI.createPlaceholders(topicId)
-        setFlashScreens(placeholders)
+        const placeholders = await flashContentAPI.createPlaceholders(topicId);
+        setFlashScreens(placeholders);
       } else if (data.length < 5) {
         // Create missing screens
-        const existingNumbers = data.map(s => s.screenNumber)
-        const missingNumbers = [1, 2, 3, 4, 5].filter(n => !existingNumbers.includes(n))
-        
+        const existingNumbers = data.map((s) => s.screenNumber);
+        const missingNumbers = [1, 2, 3, 4, 5].filter(
+          (n) => !existingNumbers.includes(n),
+        );
+
         for (const screenNumber of missingNumbers) {
           await flashContentAPI.create({
             topicId,
             screenNumber,
             title: `Screen ${screenNumber}`,
-            content: '',
-          })
+            content: "",
+          });
         }
-        
+
         // Reload
-        const reloadedData = await flashContentAPI.getByTopicId(topicId)
-        setFlashScreens(reloadedData)
+        const reloadedData = await flashContentAPI.getByTopicId(topicId);
+        setFlashScreens(reloadedData);
       } else {
-        setFlashScreens(data)
+        setFlashScreens(data);
       }
     } catch (err: any) {
-      setError(err.message || 'Failed to load flash content')
+      setError(err.message || "Failed to load flash content");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleSave = async () => {
     try {
-      setIsSaving(true)
-      setError('')
+      setIsSaving(true);
+      setError("");
 
-      const screen = flashScreens[currentScreen]
+      const screen = flashScreens[currentScreen];
       await flashContentAPI.update(topicId, screen.screenNumber, {
         title: screen.title,
         content: screen.content,
         imageUrl: screen.imageUrl,
-      })
+      });
 
-      enqueueSnackbar('Flash content saved successfully', { variant: 'success' })
+      enqueueSnackbar("Flash content saved successfully", {
+        variant: "success",
+      });
     } catch (err: any) {
-      setError(err.message || 'Failed to save flash content')
-      enqueueSnackbar('Failed to save flash content', { variant: 'error' })
+      setError(err.message || "Failed to save flash content");
+      enqueueSnackbar("Failed to save flash content", { variant: "error" });
     } finally {
-      setIsSaving(false)
+      setIsSaving(false);
     }
-  }
+  };
 
   const handleUpdateScreen = (updates: Partial<TopicFlashContent>) => {
-    const updatedScreens = [...flashScreens]
-    updatedScreens[currentScreen] = { ...updatedScreens[currentScreen], ...updates }
-    setFlashScreens(updatedScreens)
-  }
+    const updatedScreens = [...flashScreens];
+    updatedScreens[currentScreen] = {
+      ...updatedScreens[currentScreen],
+      ...updates,
+    };
+    setFlashScreens(updatedScreens);
+  };
 
-  const handleNavigate = (direction: 'prev' | 'next') => {
-    if (direction === 'prev' && currentScreen > 0) {
-      setCurrentScreen(currentScreen - 1)
-    } else if (direction === 'next' && currentScreen < 4) {
-      setCurrentScreen(currentScreen + 1)
+  const handleNavigate = (direction: "prev" | "next") => {
+    if (direction === "prev" && currentScreen > 0) {
+      setCurrentScreen(currentScreen - 1);
+    } else if (direction === "next" && currentScreen < 4) {
+      setCurrentScreen(currentScreen + 1);
     }
-  }
+  };
 
   if (isLoading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+      <Box sx={{ display: "flex", justifyContent: "center", p: 4 }}>
         <CircularProgress />
       </Box>
-    )
+    );
   }
 
-  const screen = flashScreens[currentScreen]
+  const screen = flashScreens[currentScreen];
 
   return (
     <Box>
       {/* Header */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 3,
+        }}
+      >
         <Box>
           <Typography variant="h5" gutterBottom>
             Flash Content Editor
@@ -142,25 +158,25 @@ export const FlashContentEditor: React.FC<FlashContentEditorProps> = ({ topicId 
           startIcon={<SaveOutlined />}
           onClick={handleSave}
           disabled={isSaving}
-          sx={{ borderRadius: '12px' }}
+          sx={{ borderRadius: "12px" }}
         >
-          {isSaving ? 'Saving...' : 'Save'}
+          {isSaving ? "Saving..." : "Save"}
         </Button>
       </Box>
 
       {error && (
-        <Alert severity="error" onClose={() => setError('')} sx={{ mb: 2 }}>
+        <Alert severity="error" onClose={() => setError("")} sx={{ mb: 2 }}>
           {error}
         </Alert>
       )}
 
       {/* Screen Navigation Tabs */}
-      <Paper sx={{ mb: 2, border: '1px solid #E5E7EB', borderRadius: '16px' }}>
+      <Paper sx={{ mb: 2, border: "1px solid #E5E7EB", borderRadius: "16px" }}>
         <Tabs
           value={currentScreen}
           onChange={(_, newValue) => setCurrentScreen(newValue)}
           variant="fullWidth"
-          sx={{ borderBottom: '1px solid #E5E7EB' }}
+          sx={{ borderBottom: "1px solid #E5E7EB" }}
         >
           {flashScreens.map((screen, index) => (
             <Tab
@@ -174,22 +190,29 @@ export const FlashContentEditor: React.FC<FlashContentEditorProps> = ({ topicId 
 
       {/* Screen Editor */}
       {screen && (
-        <Paper sx={{ p: 3, border: '1px solid #E5E7EB', borderRadius: '16px' }}>
+        <Paper sx={{ p: 3, border: "1px solid #E5E7EB", borderRadius: "16px" }}>
           {/* Screen Number Indicator */}
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              mb: 3,
+            }}
+          >
             <Typography variant="h6" color="primary">
               Screen {currentScreen + 1} of 5
             </Typography>
-            <Box sx={{ display: 'flex', gap: 1 }}>
+            <Box sx={{ display: "flex", gap: 1 }}>
               <IconButton
-                onClick={() => handleNavigate('prev')}
+                onClick={() => handleNavigate("prev")}
                 disabled={currentScreen === 0}
                 size="small"
               >
                 <NavigateBeforeOutlined />
               </IconButton>
               <IconButton
-                onClick={() => handleNavigate('next')}
+                onClick={() => handleNavigate("next")}
                 disabled={currentScreen === 4}
                 size="small"
               >
@@ -225,12 +248,14 @@ export const FlashContentEditor: React.FC<FlashContentEditorProps> = ({ topicId 
           {/* Image URL Field */}
           <TextField
             label="Image URL (Optional)"
-            value={screen.imageUrl || ''}
+            value={screen.imageUrl || ""}
             onChange={(e) => handleUpdateScreen({ imageUrl: e.target.value })}
             fullWidth
             placeholder="https://example.com/image.jpg"
             InputProps={{
-              startAdornment: <ImageOutlined sx={{ mr: 1, color: 'action.active' }} />,
+              startAdornment: (
+                <ImageOutlined sx={{ mr: 1, color: "action.active" }} />
+              ),
             }}
           />
 
@@ -245,13 +270,13 @@ export const FlashContentEditor: React.FC<FlashContentEditorProps> = ({ topicId 
                 src={screen.imageUrl}
                 alt="Flash content preview"
                 sx={{
-                  maxWidth: '100%',
+                  maxWidth: "100%",
                   maxHeight: 300,
-                  borderRadius: '8px',
-                  border: '1px solid #E5E7EB',
+                  borderRadius: "8px",
+                  border: "1px solid #E5E7EB",
                 }}
                 onError={(e) => {
-                  ;(e.target as HTMLImageElement).style.display = 'none'
+                  (e.target as HTMLImageElement).style.display = "none";
                 }}
               />
             </Box>
@@ -260,33 +285,33 @@ export const FlashContentEditor: React.FC<FlashContentEditorProps> = ({ topicId 
       )}
 
       {/* Navigation Buttons */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
+      <Box sx={{ display: "flex", justifyContent: "space-between", mt: 3 }}>
         <Button
           variant="outlined"
           startIcon={<NavigateBeforeOutlined />}
-          onClick={() => handleNavigate('prev')}
+          onClick={() => handleNavigate("prev")}
           disabled={currentScreen === 0}
-          sx={{ borderRadius: '12px' }}
+          sx={{ borderRadius: "12px" }}
         >
           Previous Screen
         </Button>
         <Button
           variant="outlined"
           endIcon={<NavigateNextOutlined />}
-          onClick={() => handleNavigate('next')}
+          onClick={() => handleNavigate("next")}
           disabled={currentScreen === 4}
-          sx={{ borderRadius: '12px' }}
+          sx={{ borderRadius: "12px" }}
         >
           Next Screen
         </Button>
       </Box>
     </Box>
-  )
-}
+  );
+};
 
 interface FlashContentRichEditorProps {
-  content: string
-  onChange: (content: string) => void
+  content: string;
+  onChange: (content: string) => void;
 }
 
 const FlashContentRichEditor: React.FC<FlashContentRichEditorProps> = ({
@@ -295,41 +320,43 @@ const FlashContentRichEditor: React.FC<FlashContentRichEditorProps> = ({
 }) => {
   const editor = useEditor({
     extensions: [
-      StarterKit,
+      StarterKit.configure({
+        link: false,
+      }),
       Link.configure({
         openOnClick: false,
       }),
       Placeholder.configure({
-        placeholder: 'Write concise, memorable content for quick revision...',
+        placeholder: "Write concise, memorable content for quick revision...",
       }),
     ],
     content,
     onUpdate: ({ editor }) => {
-      onChange(editor.getHTML())
+      onChange(editor.getHTML());
     },
-  })
+  });
 
   return (
     <Box
       sx={{
-        border: '1px solid #E5E7EB',
-        borderRadius: '8px',
+        border: "1px solid #E5E7EB",
+        borderRadius: "8px",
         minHeight: 200,
-        '& .ProseMirror': {
+        "& .ProseMirror": {
           padding: 2,
           minHeight: 200,
-          outline: 'none',
-          '& p.is-editor-empty:first-child::before': {
-            color: '#adb5bd',
-            content: 'attr(data-placeholder)',
-            float: 'left',
+          outline: "none",
+          "& p.is-editor-empty:first-of-type::before": {
+            color: "#adb5bd",
+            content: "attr(data-placeholder)",
+            float: "left",
             height: 0,
-            pointerEvents: 'none',
+            pointerEvents: "none",
           },
         },
       }}
     >
       <EditorContent editor={editor} />
     </Box>
-  )
-}
+  );
+};

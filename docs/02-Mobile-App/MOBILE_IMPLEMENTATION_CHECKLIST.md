@@ -9,6 +9,7 @@
 ## Phase 1: Project Setup & Authentication ⏳
 
 ### 1.1 Environment & Tools
+
 - [ ] Create React Native project with Expo
 - [ ] Configure TypeScript & ESLint
 - [ ] Set up environment variables (.env file)
@@ -16,6 +17,7 @@
 - [ ] Set up Expo modules (auth, notifications, storage)
 
 ### 1.2 Authentication - BACKEND READY ✅
+
 **Admin portal support:** ✅ Complete  
 **Status:** Backend ready, mobile integration needed
 
@@ -35,6 +37,7 @@
 - [ ] Auto-login on app restart
 
 ### 1.3 Navigation & Routing
+
 - [ ] Set up React Navigation (Native Stack & Bottom Tab)
 - [ ] Create public routes (Login, Signup)
 - [ ] Create protected routes (Dashboard, Learning, etc.)
@@ -48,6 +51,7 @@
 ## Phase 2: Core Learning Features 🎓
 
 ### 2.1 Dashboard Screen
+
 **Admin portal support:** ✅ Analytics/metrics ready  
 **Status:** Mobile UI needed
 
@@ -61,6 +65,7 @@
 - [ ] Quick access buttons (Practice, Mock, Learning)
 
 ### 2.2 Practice Module - MCQs
+
 **Admin portal support:** ✅ Content management ready  
 **Status:** Mobile UI needed
 
@@ -83,6 +88,7 @@
   - [ ] Weak areas identified
 
 ### 2.3 Learning Module - Content
+
 **Admin portal support:** ✅ Content management ready  
 **Status:** Mobile UI needed
 
@@ -100,6 +106,7 @@
 - [ ] Track lesson progress
 
 ### 2.4 Mock Exams
+
 **Admin portal support:** ✅ Mock exam management ready  
 **Status:** Mobile UI needed
 
@@ -121,9 +128,11 @@
 - [ ] Store exam attempts for analytics
 
 ### 2.5 Real-time Voice Tutoring with Instructors 🎤
+
 **Status:** NEW FEATURE - Requires Backend Implementation
 
 #### Prerequisites
+
 - [ ] Set up WebRTC infrastructure (Twilio, Jitsi, or Agora)
 - [ ] Create instructor availability management system
 - [ ] Build scheduling database tables
@@ -131,6 +140,7 @@
 - [ ] Set up video call authentication tokens
 
 #### Mobile Implementation
+
 - [ ] Build "Request Live Tutoring" button on learning screens
 - [ ] Create tutoring scheduling screen
   - [ ] Display available instructors
@@ -160,6 +170,7 @@
   - [ ] Download call transcript (if available)
 
 #### Backend Requirements (TBD)
+
 - [ ] Create `/api/tutoring/instructors` endpoint (list available instructors)
 - [ ] Create `/api/tutoring/availability` endpoint (get instructor schedules)
 - [ ] Create `/api/tutoring/book` endpoint (book a session)
@@ -170,6 +181,7 @@
 - [ ] Database tables: `tutoring_instructors`, `tutoring_sessions`, `tutoring_feedback`, `tutoring_schedule`
 
 #### Instructor Features (Admin Portal)
+
 - [ ] Instructor dashboard
 - [ ] Availability calendar
 - [ ] Upcoming sessions list
@@ -179,23 +191,24 @@
 - [ ] Performance analytics
 
 #### Video Call Provider Integration
+
 **Choose one:**
+
 - [ ] **Twilio Video** (Most reliable, paid)
   - Scalable, SDKs for all platforms
   - Screen sharing, recording built-in
   - Integration: Twilio SDK for React Native
-  
 - [ ] **Agora** (Good balance, cheaper)
   - Lower latency, good for India
   - Screen sharing, recording available
   - Integration: Agora SDK for React Native
-  
 - [ ] **Jitsi** (Open source, free)
   - Self-hosted or cloud
   - Screen sharing built-in
   - Integration: WebRTC with Jitsi API
 
 #### Session Features
+
 - [ ] Duration limit (15-60 minutes)
 - [ ] Pricing per minute or fixed price
 - [ ] Payment before/after session
@@ -204,6 +217,7 @@
 - [ ] Cancellation policies
 
 #### Analytics & Tracking
+
 - [ ] Track call duration
 - [ ] Track failed connection attempts
 - [ ] Track no-shows
@@ -216,15 +230,18 @@
 ## Phase 3: Payment Integration 💳
 
 ### 3.1 Payment Gateway - BACKEND READY ✅
+
 **Admin portal support:** ✅ Dual gateway (Stripe + Razorpay)  
 **Status:** Mobile implementation needed
 
 #### Country Detection
+
 - [ ] Implement country detection via IP geolocation
 - [ ] Store user's country preference in profile
 - [ ] Add country selector in settings (override if needed)
 
 #### Subscription Plans Display
+
 - [ ] Fetch subscription plans from `/api/subscriptions/plans`
 - [ ] Display plans with features list
 - [ ] Display pricing (USD converted if needed)
@@ -232,6 +249,7 @@
 - [ ] Show "Try Free" or upgrade button
 
 #### For India Users (Razorpay)
+
 - [ ] Integrate Razorpay React Native SDK
 - [ ] Implement payment method selection
   - [ ] Credit/Debit Card
@@ -245,6 +263,7 @@
 - [ ] Store payment method for future (optional)
 
 #### For International Users (Stripe)
+
 - [ ] Integrate Stripe React Native SDK
 - [ ] Build card input form
 - [ ] Create payment intent with `/api/payments/create`
@@ -254,6 +273,7 @@
 - [ ] Handle payment success/failure
 
 #### Subscription Management
+
 - [ ] Build subscription plans UI
 - [ ] Implement upgrade flow
 - [ ] Implement downgrade confirmation
@@ -263,6 +283,7 @@
 - [ ] Implement auto-renewal settings
 
 ### 3.2 Discount Codes
+
 - [ ] Build promo code input field
 - [ ] Validate coupon with `/api/subscriptions/validate-coupon`
 - [ ] Apply discount to total
@@ -274,6 +295,7 @@
 ## Phase 4: AI Features 🤖
 
 ### 4.1 JeevaBot (AI Chatbot)
+
 **Admin portal support:** ✅ Backend ready  
 **Status:** Mobile UI needed
 
@@ -291,6 +313,7 @@
 - [ ] Handle API errors gracefully
 
 ### 4.2 Personalized Recommendations
+
 **Admin portal support:** ✅ Backend ready  
 **Status:** Mobile UI needed
 
@@ -306,10 +329,12 @@
 ## Phase 5: Notifications 🔔
 
 ### 5.1 Push Notifications - BACKEND READY ✅
+
 **Admin portal support:** ✅ Expo integration complete  
 **Status:** Mobile implementation needed
 
 #### Expo Setup
+
 - [ ] Register for Expo account
 - [ ] Configure Expo project settings
 - [ ] Install Expo Notifications module
@@ -317,6 +342,7 @@
 - [ ] Handle permission denial gracefully
 
 #### Token Registration
+
 - [ ] Get device Expo push token
 - [ ] Send token to `/api/push-tokens/register`
 - [ ] Update token on app start
@@ -324,6 +350,7 @@
 - [ ] Store token locally as backup
 
 #### Notification Handling
+
 - [ ] Implement foreground notification handler
 - [ ] Implement background notification handler
 - [ ] Parse notification data payload
@@ -333,6 +360,7 @@
 - [ ] Vibrate on notification (optional)
 
 #### Push Notification Types
+
 - [ ] Subscription expiring soon
 - [ ] New content available
 - [ ] Content approved/rejected (admin only)
@@ -342,6 +370,7 @@
 - [ ] Campaign notifications
 
 ### 5.2 In-App Notification Inbox - BACKEND READY ✅
+
 **Admin portal support:** ✅ Complete  
 **Status:** Mobile UI needed
 
@@ -358,6 +387,7 @@
 - [ ] Navigate to notification settings on tap
 
 ### 5.3 Notification Preferences - BACKEND READY ✅
+
 **Admin portal support:** ✅ Complete  
 **Status:** Mobile UI needed
 
@@ -378,6 +408,7 @@
 ## Phase 6: Performance & Analytics 📊
 
 ### 6.1 Performance Dashboard
+
 **Admin portal support:** ✅ Analytics ready  
 **Status:** Mobile UI needed
 
@@ -392,6 +423,7 @@
 - [ ] Fetch analytics from `/api/analytics/user`
 
 ### 6.2 Analytics Tracking
+
 - [ ] Track question attempts
 - [ ] Track time spent on content
 - [ ] Track exam attempts and scores
@@ -404,6 +436,7 @@
 ## Phase 7: Content Gating & Trial 🔒
 
 ### 7.1 Free Trial Mode
+
 **Admin portal support:** ✅ Configuration ready  
 **Status:** Mobile implementation needed
 
@@ -416,6 +449,7 @@
 - [ ] Notify when trial expiring (7 days before)
 
 ### 7.2 Subscription Validation
+
 - [ ] Check subscription status on app start
 - [ ] Refresh subscription status periodically
 - [ ] Show "Upgrade" screen if subscription expired
@@ -427,6 +461,7 @@
 ## Phase 8: Hero Sections & Marketing 📱
 
 ### 8.1 Promotional Banners
+
 **Admin portal support:** ✅ Hero section management ready  
 **Status:** Mobile UI needed
 
@@ -443,6 +478,7 @@
 ## Phase 9: User Profile & Settings ⚙️
 
 ### 9.1 User Profile Screen
+
 - [ ] Display user profile information
 - [ ] Show profile picture
 - [ ] Display name, email
@@ -452,6 +488,7 @@
 - [ ] Upload profile picture
 
 ### 9.2 Edit Profile
+
 - [ ] Build edit profile form
 - [ ] Update name
 - [ ] Update email
@@ -461,6 +498,7 @@
 - [ ] Handle validation errors
 
 ### 9.3 App Settings
+
 - [ ] Theme selection (Light/Dark mode)
 - [ ] Language preference (if multilingual)
 - [ ] Clear app cache
@@ -476,6 +514,7 @@
 ## Phase 10: Content Download & Offline Mode 📲
 
 ### 10.1 Offline Content
+
 - [ ] Implement local storage for lessons
 - [ ] Implement local storage for questions
 - [ ] Implement local storage for flashcards
@@ -485,6 +524,7 @@
 - [ ] Clear downloaded content option
 
 ### 10.2 Offline Mode
+
 - [ ] Continue practicing offline
 - [ ] Sync answers when online
 - [ ] Continue learning offline
@@ -497,6 +537,7 @@
 ## Phase 11: UI/UX Polish 🎨
 
 ### 11.1 Design System
+
 - [ ] Create component library
   - [ ] Button component
   - [ ] Input component
@@ -511,6 +552,7 @@
 - [ ] Define color palette
 
 ### 11.2 Animations
+
 - [ ] Add screen transitions
 - [ ] Add button interactions
 - [ ] Add loading animations
@@ -519,6 +561,7 @@
 - [ ] Add chart animations
 
 ### 11.3 Responsive Design
+
 - [ ] Test on various screen sizes
 - [ ] Optimize for tablets
 - [ ] Test landscape orientation
@@ -530,6 +573,7 @@
 ## Phase 12: Testing & Quality Assurance ✅
 
 ### 12.1 Unit Testing
+
 - [ ] Test API service functions
 - [ ] Test hooks (usePayments, useNotifications, etc.)
 - [ ] Test utility functions
@@ -537,6 +581,7 @@
 - [ ] Achieve 80%+ coverage
 
 ### 12.2 Integration Testing
+
 - [ ] Test authentication flow
 - [ ] Test payment flow
 - [ ] Test notification delivery
@@ -544,12 +589,14 @@
 - [ ] Test offline mode
 
 ### 12.3 E2E Testing
+
 - [ ] Test complete user journey (signup → practice)
 - [ ] Test payment journey
 - [ ] Test notification flow
 - [ ] Test learning path
 
 ### 12.4 Manual Testing
+
 - [ ] Test on iOS device
 - [ ] Test on Android device
 - [ ] Test on different screen sizes
@@ -563,6 +610,7 @@
 ## Phase 13: Performance Optimization 🚀
 
 ### 13.1 App Performance
+
 - [ ] Implement code splitting
 - [ ] Optimize bundle size
 - [ ] Lazy load screens
@@ -573,6 +621,7 @@
 - [ ] Optimize re-renders
 
 ### 13.2 Network Performance
+
 - [ ] Implement request batching
 - [ ] Add request caching
 - [ ] Implement pagination for lists
@@ -584,6 +633,7 @@
 ## Phase 14: Security 🔐
 
 ### 14.1 Data Security
+
 - [ ] Implement secure token storage
 - [ ] Use encryption for sensitive data
 - [ ] Implement certificate pinning
@@ -593,6 +643,7 @@
 - [ ] Refresh tokens before expiry
 
 ### 14.2 App Security
+
 - [ ] Implement app code obfuscation
 - [ ] Jailbreak/Root detection
 - [ ] Implement app signing
@@ -600,6 +651,7 @@
 - [ ] Implement OWASP security best practices
 
 ### 14.3 Payment Security
+
 - [ ] Never store card details locally
 - [ ] Use tokenized payments only
 - [ ] Implement webhook verification
@@ -611,6 +663,7 @@
 ## Phase 15: Build & Deployment 🚢
 
 ### 15.1 iOS Build
+
 - [ ] Create Apple Developer account
 - [ ] Create certificates & provisioning profiles
 - [ ] Build iOS app (development)
@@ -620,6 +673,7 @@
 - [ ] Publish to App Store
 
 ### 15.2 Android Build
+
 - [ ] Create Google Play account
 - [ ] Create keystore file
 - [ ] Build Android app (development)
@@ -630,6 +684,7 @@
 - [ ] Publish to Play Store
 
 ### 15.3 Release Management
+
 - [ ] Create release notes
 - [ ] Version management
 - [ ] Track user feedback
@@ -641,6 +696,7 @@
 ## Phase 16: Post-Launch Support 🛠️
 
 ### 16.1 Monitoring
+
 - [ ] Set up crash analytics (Firebase Crashlytics)
 - [ ] Monitor API performance
 - [ ] Track user engagement
@@ -649,6 +705,7 @@
 - [ ] Monitor app ratings & reviews
 
 ### 16.2 User Support
+
 - [ ] In-app help/FAQ section
 - [ ] Support contact form
 - [ ] Email support system
@@ -659,37 +716,37 @@
 
 ## Backend Support Status Summary
 
-| Feature | Backend | Status | Notes |
-|---------|---------|--------|-------|
-| Authentication | ✅ Ready | `/auth/*` endpoints | Supabase Auth integrated |
-| Content (MCQs, Lessons, Flashcards) | ✅ Ready | `/api/content/*` | Full CRUD in admin portal |
-| Payments (Stripe + Razorpay) | ✅ Ready | `/api/payments/*` | Smart country-based routing |
-| Subscriptions | ✅ Ready | `/api/subscriptions/*` | Plans, coupons, management |
-| Analytics | ✅ Ready | `/api/analytics/*` | Performance tracking ready |
-| Push Notifications | ✅ Ready | `/api/notifications/*` | Expo integration complete |
-| In-App Notifications | ✅ Ready | `/api/notifications/*` | Inbox, preferences ready |
-| AI Chat (JeevaBot) | ✅ Ready | `/api/chat` | Gemini integration done |
-| AI Recommendations | ✅ Ready | `/api/ai/recommendations` | Personalized content ready |
-| Hero Sections | ✅ Ready | `/api/hero-sections` | Marketing banners ready |
-| User Profile | ✅ Ready | `/api/users/*` | Profile management ready |
-| Email Templates | ✅ Ready | Brevo configured | For transactional emails |
-| Real-time Voice Tutoring | 🚧 TBD | `/api/tutoring/*` | Requires backend implementation |
+| Feature                             | Backend  | Status                    | Notes                           |
+| ----------------------------------- | -------- | ------------------------- | ------------------------------- |
+| Authentication                      | ✅ Ready | `/auth/*` endpoints       | Supabase Auth integrated        |
+| Content (MCQs, Lessons, Flashcards) | ✅ Ready | `/api/content/*`          | Full CRUD in admin portal       |
+| Payments (Stripe + Razorpay)        | ✅ Ready | `/api/payments/*`         | Smart country-based routing     |
+| Subscriptions                       | ✅ Ready | `/api/subscriptions/*`    | Plans, coupons, management      |
+| Analytics                           | ✅ Ready | `/api/analytics/*`        | Performance tracking ready      |
+| Push Notifications                  | ✅ Ready | `/api/notifications/*`    | Expo integration complete       |
+| In-App Notifications                | ✅ Ready | `/api/notifications/*`    | Inbox, preferences ready        |
+| AI Chat (JeevaBot)                  | ✅ Ready | `/api/chat`               | Gemini integration done         |
+| AI Recommendations                  | ✅ Ready | `/api/ai/recommendations` | Personalized content ready      |
+| Hero Sections                       | ✅ Ready | `/api/hero-sections`      | Marketing banners ready         |
+| User Profile                        | ✅ Ready | `/api/users/*`            | Profile management ready        |
+| Email Templates                     | ✅ Ready | Brevo configured          | For transactional emails        |
+| Real-time Voice Tutoring            | 🚧 TBD   | `/api/tutoring/*`         | Requires backend implementation |
 
 ---
 
 ## Timeline Estimate
 
-| Phase | Effort | Timeline |
-|-------|--------|----------|
-| 1. Setup | 1-2 weeks | Week 1-2 |
-| 2. Learning Features (incl. Voice Tutoring) | 4-5 weeks | Week 3-7 |
-| 3. Payments | 2-3 weeks | Week 8-10 |
-| 4. AI Features | 1-2 weeks | Week 11-12 |
-| 5. Notifications | 1-2 weeks | Week 13-14 |
-| 6-8. Dashboard, Content, Settings | 2-3 weeks | Week 15-17 |
-| 9. Polish & Testing | 2-3 weeks | Week 18-20 |
-| 10. Performance & Security | 1-2 weeks | Week 21-22 |
-| 11. Build & Deploy | 1-2 weeks | Week 23-24 |
+| Phase                                       | Effort    | Timeline   |
+| ------------------------------------------- | --------- | ---------- |
+| 1. Setup                                    | 1-2 weeks | Week 1-2   |
+| 2. Learning Features (incl. Voice Tutoring) | 4-5 weeks | Week 3-7   |
+| 3. Payments                                 | 2-3 weeks | Week 8-10  |
+| 4. AI Features                              | 1-2 weeks | Week 11-12 |
+| 5. Notifications                            | 1-2 weeks | Week 13-14 |
+| 6-8. Dashboard, Content, Settings           | 2-3 weeks | Week 15-17 |
+| 9. Polish & Testing                         | 2-3 weeks | Week 18-20 |
+| 10. Performance & Security                  | 1-2 weeks | Week 21-22 |
+| 11. Build & Deploy                          | 1-2 weeks | Week 23-24 |
 
 **Total Estimate:** 18-26 weeks (4.5-6.5 months) for full feature parity including Voice Tutoring
 
@@ -698,6 +755,7 @@
 ## Priority Ranking
 
 ### Must Have (MVP)
+
 1. ✅ Authentication (OAuth + email)
 2. ✅ Practice MCQs module
 3. ✅ Payment integration
@@ -706,6 +764,7 @@
 6. ✅ Push notifications
 
 ### Should Have
+
 7. Learning content module
 8. Mock exams
 9. AI chatbot (JeevaBot)
@@ -714,6 +773,7 @@
 12. Offline mode
 
 ### Nice to Have
+
 13. Content download
 14. Dark mode
 15. Advanced analytics
@@ -726,12 +786,14 @@
 ## Key Integration Points
 
 ### Admin Portal → Mobile
+
 - Content created in admin → fetched via API
 - Notifications sent from admin → delivered to mobile
 - Subscriptions managed in admin → enforced on mobile
 - Analytics tracked on mobile → displayed in admin dashboard
 
 ### Mobile → Backend APIs
+
 ```
 Authentication:       POST /auth/login, /auth/signup, /auth/refresh
 Content:             GET /api/content/questions, /api/content/lessons

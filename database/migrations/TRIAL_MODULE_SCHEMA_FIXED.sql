@@ -11,11 +11,13 @@ ALTER TABLE modules ADD COLUMN IF NOT EXISTS is_trial BOOLEAN DEFAULT false;
 ALTER TABLE modules ADD COLUMN IF NOT EXISTS icon VARCHAR(255);
 ALTER TABLE modules ADD COLUMN IF NOT EXISTS color VARCHAR(7);
 ALTER TABLE modules ADD COLUMN IF NOT EXISTS estimated_duration_hours DECIMAL(5,2);
+ALTER TABLE modules ADD COLUMN IF NOT EXISTS slug VARCHAR(100);
 
 CREATE INDEX IF NOT EXISTS idx_modules_is_trial ON modules(is_trial);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_modules_slug ON modules(slug);
 
 -- Insert Trial Module
-INSERT INTO modules (name, slug, description, is_trial, "order", is_active)
+INSERT INTO modules (title, slug, description, is_trial, display_order, is_active)
 VALUES (
   'Trial',
   'trial',
@@ -84,7 +86,7 @@ CREATE TABLE IF NOT EXISTS lesson_content (
   content_type VARCHAR(50) NOT NULL,
   title VARCHAR(255) NOT NULL,
   description TEXT,
-  "order" INTEGER NOT NULL DEFAULT 0,
+  display_order INTEGER NOT NULL DEFAULT 0,
   content_url VARCHAR(500),
   content_text TEXT,
   content_data JSONB,
@@ -103,12 +105,12 @@ CREATE INDEX IF NOT EXISTS idx_lesson_content_type ON lesson_content(content_typ
 -- 6. ENHANCED: questions table (add trial fields)
 -- ============================================================================
 
-ALTER TABLE questions ADD COLUMN IF NOT EXISTS is_trial_content BOOLEAN DEFAULT false;
-ALTER TABLE questions ADD COLUMN IF NOT EXISTS trial_order INTEGER;
-ALTER TABLE questions ADD COLUMN IF NOT EXISTS acceptable_range DECIMAL(10,2);
-ALTER TABLE questions ADD COLUMN IF NOT EXISTS unit VARCHAR(50);
+ALTER TABLE mock_exam_questions ADD COLUMN IF NOT EXISTS is_trial_content BOOLEAN DEFAULT false;
+ALTER TABLE mock_exam_questions ADD COLUMN IF NOT EXISTS trial_order INTEGER;
+ALTER TABLE mock_exam_questions ADD COLUMN IF NOT EXISTS acceptable_range DECIMAL(10,2);
+ALTER TABLE mock_exam_questions ADD COLUMN IF NOT EXISTS unit VARCHAR(50);
 
-CREATE INDEX IF NOT EXISTS idx_questions_is_trial ON questions(is_trial_content);
+CREATE INDEX IF NOT EXISTS idx_questions_is_trial ON mock_exam_questions(is_trial_content);
 
 -- ============================================================================
 -- 7. NEW: trial_attempt_records table
@@ -181,7 +183,7 @@ CREATE INDEX IF NOT EXISTS idx_trial_learning_lesson ON trial_learning_progress(
 CREATE TABLE IF NOT EXISTS trial_mock_exams (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   module_id UUID NOT NULL REFERENCES modules(id) ON DELETE CASCADE,
-  name VARCHAR(255) NOT NULL,
+  title VARCHAR(255) NOT NULL,
   description TEXT,
   question_count INTEGER NOT NULL,
   time_limit_minutes INTEGER NOT NULL,
@@ -248,15 +250,18 @@ ALTER TABLE trial_exam_attempts ENABLE ROW LEVEL SECURITY;
 -- ============================================================================
 
 -- module_access_rules policies
-CREATE POLICY IF NOT EXISTS "access_rules_read_public" ON module_access_rules
+DROP POLICY IF EXISTS "access_rules_read_public" ON module_access_rules;
+CREATE POLICY "access_rules_read_public" ON module_access_rules
 FOR SELECT USING (is_active = true);
 
-CREATE POLICY IF NOT EXISTS "access_rules_admin_all" ON module_access_rules
+DROP POLICY IF EXISTS "access_rules_admin_all" ON module_access_rules;
+CREATE POLICY "access_rules_admin_all" ON module_access_rules
 FOR ALL USING (auth.jwt() ->> 'role' IN ('admin', 'superadmin'))
 WITH CHECK (auth.jwt() ->> 'role' IN ('admin', 'superadmin'));
 
 -- lesson_content policies
-CREATE POLICY IF NOT EXISTS "lesson_content_read_trial" ON lesson_content
+DROP POLICY IF EXISTS "lesson_content_read_trial" ON lesson_content;
+CREATE POLICY "lesson_content_read_trial" ON lesson_content
 FOR SELECT USING (
   EXISTS (
     SELECT 1 FROM lessons l
@@ -265,7 +270,8 @@ FOR SELECT USING (
   )
 );
 
-CREATE POLICY IF NOT EXISTS "lesson_content_read_subscribed" ON lesson_content
+DROP POLICY IF EXISTS "lesson_content_read_subscribed" ON lesson_content;
+CREATE POLICY "lesson_content_read_subscribed" ON lesson_content
 FOR SELECT USING (
   EXISTS (
     SELECT 1 FROM lessons l
@@ -278,56 +284,71 @@ FOR SELECT USING (
   )
 );
 
-CREATE POLICY IF NOT EXISTS "lesson_content_admin_all" ON lesson_content
+DROP POLICY IF EXISTS "lesson_content_admin_all" ON lesson_content;
+CREATE POLICY "lesson_content_admin_all" ON lesson_content
 FOR ALL USING (auth.jwt() ->> 'role' IN ('admin', 'superadmin'))
 WITH CHECK (auth.jwt() ->> 'role' IN ('admin', 'superadmin'));
 
 -- trial_attempt_records policies
-CREATE POLICY IF NOT EXISTS "trial_attempts_user_own" ON trial_attempt_records
+DROP POLICY IF EXISTS "trial_attempts_user_own" ON trial_attempt_records;
+CREATE POLICY "trial_attempts_user_own" ON trial_attempt_records
 FOR SELECT USING (user_id = auth.uid());
 
-CREATE POLICY IF NOT EXISTS "trial_attempts_user_insert" ON trial_attempt_records
+DROP POLICY IF EXISTS "trial_attempts_user_insert" ON trial_attempt_records;
+CREATE POLICY "trial_attempts_user_insert" ON trial_attempt_records
 FOR INSERT WITH CHECK (user_id = auth.uid());
 
-CREATE POLICY IF NOT EXISTS "trial_attempts_user_update" ON trial_attempt_records
+DROP POLICY IF EXISTS "trial_attempts_user_update" ON trial_attempt_records;
+CREATE POLICY "trial_attempts_user_update" ON trial_attempt_records
 FOR UPDATE USING (user_id = auth.uid())
 WITH CHECK (user_id = auth.uid());
 
-CREATE POLICY IF NOT EXISTS "trial_attempts_admin_read" ON trial_attempt_records
+DROP POLICY IF EXISTS "trial_attempts_admin_read" ON trial_attempt_records;
+CREATE POLICY "trial_attempts_admin_read" ON trial_attempt_records
 FOR SELECT USING (auth.jwt() ->> 'role' IN ('admin', 'superadmin'));
 
 -- trial_learning_progress policies
-CREATE POLICY IF NOT EXISTS "trial_learning_user_own" ON trial_learning_progress
+DROP POLICY IF EXISTS "trial_learning_user_own" ON trial_learning_progress;
+CREATE POLICY "trial_learning_user_own" ON trial_learning_progress
 FOR SELECT USING (user_id = auth.uid());
 
-CREATE POLICY IF NOT EXISTS "trial_learning_user_insert" ON trial_learning_progress
+DROP POLICY IF EXISTS "trial_learning_user_insert" ON trial_learning_progress;
+CREATE POLICY "trial_learning_user_insert" ON trial_learning_progress
 FOR INSERT WITH CHECK (user_id = auth.uid());
 
-CREATE POLICY IF NOT EXISTS "trial_learning_user_update" ON trial_learning_progress
+DROP POLICY IF EXISTS "trial_learning_user_update" ON trial_learning_progress;
+CREATE POLICY "trial_learning_user_update" ON trial_learning_progress
 FOR UPDATE USING (user_id = auth.uid())
 WITH CHECK (user_id = auth.uid());
 
-CREATE POLICY IF NOT EXISTS "trial_learning_admin_read" ON trial_learning_progress
+DROP POLICY IF EXISTS "trial_learning_admin_read" ON trial_learning_progress;
+CREATE POLICY "trial_learning_admin_read" ON trial_learning_progress
 FOR SELECT USING (auth.jwt() ->> 'role' IN ('admin', 'superadmin'));
 
 -- trial_mock_exams policies
-CREATE POLICY IF NOT EXISTS "trial_exams_read_public" ON trial_mock_exams
+DROP POLICY IF EXISTS "trial_exams_read_public" ON trial_mock_exams;
+CREATE POLICY "trial_exams_read_public" ON trial_mock_exams
 FOR SELECT USING (is_active = true);
 
-CREATE POLICY IF NOT EXISTS "trial_exams_admin_all" ON trial_mock_exams
+DROP POLICY IF EXISTS "trial_exams_admin_all" ON trial_mock_exams;
+CREATE POLICY "trial_exams_admin_all" ON trial_mock_exams
 FOR ALL USING (auth.jwt() ->> 'role' IN ('admin', 'superadmin'))
 WITH CHECK (auth.jwt() ->> 'role' IN ('admin', 'superadmin'));
 
 -- trial_exam_attempts policies
-CREATE POLICY IF NOT EXISTS "trial_exam_attempts_user_read" ON trial_exam_attempts
+DROP POLICY IF EXISTS "trial_exam_attempts_user_read" ON trial_exam_attempts;
+CREATE POLICY "trial_exam_attempts_user_read" ON trial_exam_attempts
 FOR SELECT USING (user_id = auth.uid());
 
-CREATE POLICY IF NOT EXISTS "trial_exam_attempts_user_insert" ON trial_exam_attempts
+DROP POLICY IF EXISTS "trial_exam_attempts_user_insert" ON trial_exam_attempts;
+CREATE POLICY "trial_exam_attempts_user_insert" ON trial_exam_attempts
 FOR INSERT WITH CHECK (user_id = auth.uid());
 
-CREATE POLICY IF NOT EXISTS "trial_exam_attempts_user_update" ON trial_exam_attempts
+DROP POLICY IF EXISTS "trial_exam_attempts_user_update" ON trial_exam_attempts;
+CREATE POLICY "trial_exam_attempts_user_update" ON trial_exam_attempts
 FOR UPDATE USING (user_id = auth.uid() AND status = 'in_progress')
 WITH CHECK (user_id = auth.uid());
 
-CREATE POLICY IF NOT EXISTS "trial_exam_attempts_admin_read" ON trial_exam_attempts
+DROP POLICY IF EXISTS "trial_exam_attempts_admin_read" ON trial_exam_attempts;
+CREATE POLICY "trial_exam_attempts_admin_read" ON trial_exam_attempts
 FOR SELECT USING (auth.jwt() ->> 'role' IN ('admin', 'superadmin'));

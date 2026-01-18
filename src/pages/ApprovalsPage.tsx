@@ -1,4 +1,4 @@
-import React from 'react'
+import React from "react";
 import {
   Box,
   Typography,
@@ -25,7 +25,7 @@ import {
   Alert,
   Card,
   CardContent,
-} from '@mui/material'
+} from "@mui/material";
 import {
   SearchOutlined,
   CheckCircleOutlined,
@@ -35,53 +35,67 @@ import {
   PendingActionsOutlined,
   ThumbUpOutlined,
   ThumbDownOutlined,
-} from '@mui/icons-material'
-import { PageLoader } from '@/components/common'
-import { useApprovals, useApprovalStats, useReviewApproval, useDeleteApproval } from '@/hooks'
-import { ContentApproval, ApprovalStatus, ResourceType } from '@/types'
-import { useAuth } from '@/context'
-import { format } from 'date-fns'
+} from "@mui/icons-material";
+import { PageLoader } from "@/components/common";
+import {
+  useApprovals,
+  useApprovalStats,
+  useReviewApproval,
+  useDeleteApproval,
+} from "@/hooks";
+import { ContentApproval, ApprovalStatus, ResourceType } from "@/types";
+import { useAuth } from "@/context";
+import { format } from "date-fns";
 
 export const ApprovalsPage: React.FC = () => {
-  const { adminUser } = useAuth()
-  const [searchQuery, setSearchQuery] = React.useState('')
-  const [statusFilter, setStatusFilter] = React.useState<ApprovalStatus | 'all'>('all')
-  const [typeFilter, setTypeFilter] = React.useState<ResourceType | 'all'>('all')
-  const [selectedApproval, setSelectedApproval] = React.useState<ContentApproval | null>(null)
-  const [dialogOpen, setDialogOpen] = React.useState(false)
-  const [reviewComments, setReviewComments] = React.useState('')
-  const [initialLoad, setInitialLoad] = React.useState(true)
+  const { adminUser } = useAuth();
+  const [searchQuery, setSearchQuery] = React.useState("");
+  const [statusFilter, setStatusFilter] = React.useState<
+    ApprovalStatus | "all"
+  >("all");
+  const [typeFilter, setTypeFilter] = React.useState<ResourceType | "all">(
+    "all",
+  );
+  const [selectedApproval, setSelectedApproval] =
+    React.useState<ContentApproval | null>(null);
+  const [dialogOpen, setDialogOpen] = React.useState(false);
+  const [reviewComments, setReviewComments] = React.useState("");
+  const [initialLoad, setInitialLoad] = React.useState(true);
 
-  const { data: approvals, isLoading, error } = useApprovals({
+  const {
+    data: approvals,
+    isLoading,
+    error,
+  } = useApprovals({
     status: statusFilter,
     resourceType: typeFilter,
     search: searchQuery,
-  })
+  });
 
-  const { data: stats } = useApprovalStats()
-  const reviewMutation = useReviewApproval()
-  const deleteMutation = useDeleteApproval()
+  const { data: stats } = useApprovalStats();
+  const reviewMutation = useReviewApproval();
+  const deleteMutation = useDeleteApproval();
 
   React.useEffect(() => {
     if (!isLoading && initialLoad) {
-      setInitialLoad(false)
+      setInitialLoad(false);
     }
-  }, [isLoading, initialLoad])
+  }, [isLoading, initialLoad]);
 
   const handleOpenDialog = (approval: ContentApproval) => {
-    setSelectedApproval(approval)
-    setReviewComments(approval.reviewComments || '')
-    setDialogOpen(true)
-  }
+    setSelectedApproval(approval);
+    setReviewComments(approval.reviewComments || "");
+    setDialogOpen(true);
+  };
 
   const handleCloseDialog = () => {
-    setDialogOpen(false)
-    setSelectedApproval(null)
-    setReviewComments('')
-  }
+    setDialogOpen(false);
+    setSelectedApproval(null);
+    setReviewComments("");
+  };
 
-  const handleReview = async (status: 'approved' | 'rejected') => {
-    if (!selectedApproval || !adminUser) return
+  const handleReview = async (status: "approved" | "rejected") => {
+    if (!selectedApproval || !adminUser) return;
 
     try {
       await reviewMutation.mutateAsync({
@@ -89,38 +103,42 @@ export const ApprovalsPage: React.FC = () => {
         status,
         reviewComments: reviewComments.trim() || undefined,
         reviewedBy: adminUser.id,
-      })
-      handleCloseDialog()
+      });
+      handleCloseDialog();
     } catch (error) {
-      console.error('Review error:', error)
+      console.error("Review error:", error);
     }
-  }
+  };
 
   const handleDelete = async (id: string) => {
-    if (window.confirm('Are you sure you want to delete this approval request?')) {
-      await deleteMutation.mutateAsync(id)
+    if (
+      window.confirm("Are you sure you want to delete this approval request?")
+    ) {
+      await deleteMutation.mutateAsync(id);
     }
-  }
+  };
 
-  const getStatusColor = (status: ApprovalStatus): 'warning' | 'success' | 'error' => {
+  const getStatusColor = (
+    status: ApprovalStatus,
+  ): "warning" | "success" | "error" => {
     switch (status) {
-      case 'pending':
-        return 'warning'
-      case 'approved':
-        return 'success'
-      case 'rejected':
-        return 'error'
+      case "pending":
+        return "warning";
+      case "approved":
+        return "success";
+      case "rejected":
+        return "error";
       default:
-        return 'warning'
+        return "warning";
     }
-  }
+  };
 
   const getTypeLabel = (type: ResourceType): string => {
-    return type.charAt(0).toUpperCase() + type.slice(1)
-  }
+    return type.charAt(0).toUpperCase() + type.slice(1);
+  };
 
   if (isLoading && initialLoad) {
-    return <PageLoader />
+    return <PageLoader />;
   }
 
   if (error) {
@@ -133,7 +151,7 @@ export const ApprovalsPage: React.FC = () => {
           Failed to load approvals. Please try again later.
         </Alert>
       </Box>
-    )
+    );
   }
 
   return (
@@ -146,21 +164,21 @@ export const ApprovalsPage: React.FC = () => {
       {stats && (
         <Box
           sx={{
-            display: 'grid',
+            display: "grid",
             gridTemplateColumns: {
-              xs: 'repeat(1, 1fr)',
-              sm: 'repeat(2, 1fr)',
-              md: 'repeat(4, 1fr)',
+              xs: "repeat(1, 1fr)",
+              sm: "repeat(2, 1fr)",
+              md: "repeat(4, 1fr)",
             },
             gap: 2,
             mb: 3,
             mt: 1,
           }}
         >
-          <Card sx={{ bgcolor: '#FFF7ED', borderRadius: '16px' }}>
+          <Card sx={{ bgcolor: "#FFF7ED", borderRadius: "16px" }}>
             <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <PendingActionsOutlined sx={{ color: '#F59E0B' }} />
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <PendingActionsOutlined sx={{ color: "#F59E0B" }} />
                 <Box>
                   <Typography variant="body2" color="text.secondary">
                     Pending
@@ -172,10 +190,10 @@ export const ApprovalsPage: React.FC = () => {
               </Box>
             </CardContent>
           </Card>
-          <Card sx={{ bgcolor: '#ECFDF5', borderRadius: '16px' }}>
+          <Card sx={{ bgcolor: "#ECFDF5", borderRadius: "16px" }}>
             <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <CheckCircleOutlined sx={{ color: '#10B981' }} />
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <CheckCircleOutlined sx={{ color: "#10B981" }} />
                 <Box>
                   <Typography variant="body2" color="text.secondary">
                     Approved
@@ -187,10 +205,10 @@ export const ApprovalsPage: React.FC = () => {
               </Box>
             </CardContent>
           </Card>
-          <Card sx={{ bgcolor: '#FEF2F2', borderRadius: '16px' }}>
+          <Card sx={{ bgcolor: "#FEF2F2", borderRadius: "16px" }}>
             <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <CancelOutlined sx={{ color: '#EF4444' }} />
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <CancelOutlined sx={{ color: "#EF4444" }} />
                 <Box>
                   <Typography variant="body2" color="text.secondary">
                     Rejected
@@ -202,10 +220,10 @@ export const ApprovalsPage: React.FC = () => {
               </Box>
             </CardContent>
           </Card>
-          <Card sx={{ bgcolor: '#F3F4F6', borderRadius: '16px' }}>
+          <Card sx={{ bgcolor: "#F3F4F6", borderRadius: "16px" }}>
             <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <VisibilityOutlined sx={{ color: '#6B7280' }} />
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <VisibilityOutlined sx={{ color: "#6B7280" }} />
                 <Box>
                   <Typography variant="body2" color="text.secondary">
                     Total
@@ -221,14 +239,14 @@ export const ApprovalsPage: React.FC = () => {
       )}
 
       {/* Filters */}
-      <Paper sx={{ p: 2, mb: 2, borderRadius: '16px' }}>
-        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+      <Paper sx={{ p: 2, mb: 2, borderRadius: "16px" }}>
+        <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
           <TextField
             placeholder="Search by title..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             size="small"
-            sx={{ flexGrow: 1, minWidth: 200, borderRadius: '12px' }}
+            sx={{ flexGrow: 1, minWidth: 200, borderRadius: "12px" }}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -241,9 +259,11 @@ export const ApprovalsPage: React.FC = () => {
             <InputLabel>Status</InputLabel>
             <Select
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value as ApprovalStatus | 'all')}
+              onChange={(e) =>
+                setStatusFilter(e.target.value as ApprovalStatus | "all")
+              }
               label="Status"
-              sx={{ borderRadius: '12px' }}
+              sx={{ borderRadius: "12px" }}
             >
               <MenuItem value="all">All Status</MenuItem>
               <MenuItem value="pending">Pending</MenuItem>
@@ -255,9 +275,11 @@ export const ApprovalsPage: React.FC = () => {
             <InputLabel>Type</InputLabel>
             <Select
               value={typeFilter}
-              onChange={(e) => setTypeFilter(e.target.value as ResourceType | 'all')}
+              onChange={(e) =>
+                setTypeFilter(e.target.value as ResourceType | "all")
+              }
               label="Type"
-              sx={{ borderRadius: '12px' }}
+              sx={{ borderRadius: "12px" }}
             >
               <MenuItem value="all">All Types</MenuItem>
               <MenuItem value="module">Module</MenuItem>
@@ -271,7 +293,7 @@ export const ApprovalsPage: React.FC = () => {
       </Paper>
 
       {/* Approvals Table */}
-      <TableContainer component={Paper} sx={{ borderRadius: '16px' }}>
+      <TableContainer component={Paper} sx={{ borderRadius: "16px" }}>
         <Table>
           <TableHead>
             <TableRow>
@@ -293,7 +315,10 @@ export const ApprovalsPage: React.FC = () => {
                   </Typography>
                 </TableCell>
                 <TableCell>
-                  <Chip label={getTypeLabel(approval.resourceType)} size="small" />
+                  <Chip
+                    label={getTypeLabel(approval.resourceType)}
+                    size="small"
+                  />
                 </TableCell>
                 <TableCell>
                   <Chip
@@ -302,11 +327,11 @@ export const ApprovalsPage: React.FC = () => {
                     size="small"
                   />
                 </TableCell>
-                <TableCell>{approval.submittedByName || 'Unknown'}</TableCell>
+                <TableCell>{approval.submittedByName || "Unknown"}</TableCell>
                 <TableCell>
-                  {format(new Date(approval.createdAt), 'MMM dd, yyyy HH:mm')}
+                  {format(new Date(approval.createdAt), "MMM dd, yyyy HH:mm")}
                 </TableCell>
-                <TableCell>{approval.reviewedByName || '-'}</TableCell>
+                <TableCell>{approval.reviewedByName || "-"}</TableCell>
                 <TableCell align="right">
                   <IconButton
                     size="small"
@@ -315,15 +340,16 @@ export const ApprovalsPage: React.FC = () => {
                   >
                     <VisibilityOutlined fontSize="small" />
                   </IconButton>
-                  {approval.status === 'pending' && adminUser?.role === 'superadmin' && (
-                    <IconButton
-                      size="small"
-                      onClick={() => handleDelete(approval.id)}
-                      color="error"
-                    >
-                      <DeleteOutlined fontSize="small" />
-                    </IconButton>
-                  )}
+                  {approval.status === "pending" &&
+                    adminUser?.role === "superadmin" && (
+                      <IconButton
+                        size="small"
+                        onClick={() => handleDelete(approval.id)}
+                        color="error"
+                      >
+                        <DeleteOutlined fontSize="small" />
+                      </IconButton>
+                    )}
                 </TableCell>
               </TableRow>
             ))}
@@ -331,9 +357,11 @@ export const ApprovalsPage: React.FC = () => {
               <TableRow>
                 <TableCell colSpan={7} align="center" sx={{ py: 4 }}>
                   <Typography variant="body2" color="text.secondary">
-                    {searchQuery || statusFilter !== 'all' || typeFilter !== 'all'
-                      ? 'No approval requests found matching your filters.'
-                      : 'No approval requests yet.'}
+                    {searchQuery ||
+                    statusFilter !== "all" ||
+                    typeFilter !== "all"
+                      ? "No approval requests found matching your filters."
+                      : "No approval requests yet."}
                   </Typography>
                 </TableCell>
               </TableRow>
@@ -343,13 +371,20 @@ export const ApprovalsPage: React.FC = () => {
       </TableContainer>
 
       {/* Review Dialog */}
-      <Dialog open={dialogOpen} onClose={handleCloseDialog} maxWidth="md" fullWidth>
+      <Dialog
+        open={dialogOpen}
+        onClose={handleCloseDialog}
+        maxWidth="md"
+        fullWidth
+      >
         <DialogTitle>
           Review Content - {selectedApproval?.resourceTitle}
         </DialogTitle>
         <DialogContent>
           {selectedApproval && (
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
+            <Box
+              sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 2 }}
+            >
               <Box>
                 <Typography variant="body2" color="text.secondary">
                   Content Type
@@ -374,7 +409,7 @@ export const ApprovalsPage: React.FC = () => {
                   Submitted By
                 </Typography>
                 <Typography variant="body1">
-                  {selectedApproval.submittedByName || 'Unknown'}
+                  {selectedApproval.submittedByName || "Unknown"}
                 </Typography>
               </Box>
               {selectedApproval.reviewedByName && (
@@ -395,48 +430,49 @@ export const ApprovalsPage: React.FC = () => {
                 rows={4}
                 fullWidth
                 placeholder="Add your review comments here..."
-                disabled={selectedApproval.status !== 'pending'}
+                disabled={selectedApproval.status !== "pending"}
               />
-              {selectedApproval.reviewComments && selectedApproval.status !== 'pending' && (
-                <Alert severity="info">
-                  Previous Review: {selectedApproval.reviewComments}
-                </Alert>
-              )}
+              {selectedApproval.reviewComments &&
+                selectedApproval.status !== "pending" && (
+                  <Alert severity="info">
+                    Previous Review: {selectedApproval.reviewComments}
+                  </Alert>
+                )}
             </Box>
           )}
         </DialogContent>
         <DialogActions sx={{ p: 2, gap: 1 }}>
-          <Button onClick={handleCloseDialog} sx={{ borderRadius: '12px' }}>
+          <Button onClick={handleCloseDialog} sx={{ borderRadius: "12px" }}>
             Close
           </Button>
-          {selectedApproval?.status === 'pending' && (
+          {selectedApproval?.status === "pending" && (
             <>
               <Button
-                onClick={() => handleReview('rejected')}
+                onClick={() => handleReview("rejected")}
                 variant="outlined"
                 color="error"
                 startIcon={<ThumbDownOutlined />}
                 disabled={reviewMutation.isPending}
-                sx={{ borderRadius: '12px' }}
+                sx={{ borderRadius: "12px" }}
               >
-                {reviewMutation.isPending ? 'Rejecting...' : 'Reject'}
+                {reviewMutation.isPending ? "Rejecting..." : "Reject"}
               </Button>
               <Button
-                onClick={() => handleReview('approved')}
+                onClick={() => handleReview("approved")}
                 variant="contained"
                 color="success"
                 startIcon={<ThumbUpOutlined />}
                 disabled={reviewMutation.isPending}
-                sx={{ borderRadius: '12px' }}
+                sx={{ borderRadius: "12px" }}
               >
-                {reviewMutation.isPending ? 'Approving...' : 'Approve'}
+                {reviewMutation.isPending ? "Approving..." : "Approve"}
               </Button>
             </>
           )}
         </DialogActions>
       </Dialog>
     </Box>
-  )
-}
+  );
+};
 
-export default ApprovalsPage
+export default ApprovalsPage;

@@ -265,7 +265,7 @@ export async function getFlashcardsByLesson(lessonId: string): Promise<Flashcard
   return data || [];
 }
 
-Now flashcards can be organized by topic (e.g., all flashcards for "The NMC Code") 
+Now flashcards can be organized by topic (e.g., all flashcards for "The NMC Code")
 OR by specific lesson (traditional approach).
 ```
 
@@ -342,8 +342,8 @@ export default function LearningTopicsScreen() {
         <Text style={styles.title}>{item.title}</Text>
         <Text style={styles.description}>{item.description}</Text>
         <Text style={styles.subtopicCount}>
-          {item.subtopics.length > 0 
-            ? `${item.subtopics.length} subtopics` 
+          {item.subtopics.length > 0
+            ? `${item.subtopics.length} subtopics`
             : 'Direct lessons'}
         </Text>
       </View>
@@ -428,15 +428,15 @@ export default function TopicDetailScreen() {
       <View style={styles.container}>
         <Text style={styles.header}>{topic.title}</Text>
         <Text style={styles.description}>{topic.description}</Text>
-        
+
         <FlatList
           data={topic.subtopics}
           renderItem={({ item: subtopic }) => (
             <TouchableOpacity
               style={styles.subtopicCard}
-              onPress={() => navigation.navigate('SubtopicLessons', { 
-                topic, 
-                subtopic 
+              onPress={() => navigation.navigate('SubtopicLessons', {
+                topic,
+                subtopic
               })}
             >
               <View style={styles.subtopicNumber}>
@@ -452,15 +452,15 @@ export default function TopicDetailScreen() {
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.list}
         />
-        
+
         {/* Topic-level flashcards */}
         {flashcards && flashcards.length > 0 && (
           <View style={styles.flashcardsSection}>
             <TouchableOpacity
               style={styles.flashcardsButton}
-              onPress={() => navigation.navigate('Flashcards', { 
+              onPress={() => navigation.navigate('Flashcards', {
                 topicTitle: topic.title,
-                flashcards 
+                flashcards
               })}
             >
               <Icon name="style" size={24} color="white" />
@@ -487,7 +487,7 @@ export default function TopicDetailScreen() {
     <View style={styles.container}>
       <Text style={styles.header}>{topic.title}</Text>
       <Text style={styles.description}>{topic.description}</Text>
-      
+
       <FlatList
         data={lessons}
         renderItem={({ item: lesson }) => (
@@ -495,11 +495,11 @@ export default function TopicDetailScreen() {
             style={styles.lessonCard}
             onPress={() => navigation.navigate('LessonContent', { lesson })}
           >
-            <Icon 
-              name={lesson.lesson_type === 'video' ? 'play-circle' : 
-                    lesson.lesson_type === 'audio' ? 'headphones' : 'description'} 
-              size={24} 
-              color="#007aff" 
+            <Icon
+              name={lesson.lesson_type === 'video' ? 'play-circle' :
+                    lesson.lesson_type === 'audio' ? 'headphones' : 'description'}
+              size={24}
+              color="#007aff"
             />
             <Text style={styles.lessonTitle}>{lesson.title}</Text>
             <Icon name="chevron-right" size={24} color="#999" />
@@ -508,15 +508,15 @@ export default function TopicDetailScreen() {
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.list}
       />
-      
+
       {/* Topic-level flashcards for topics without subtopics */}
       {flashcards && flashcards.length > 0 && (
         <View style={styles.flashcardsSection}>
           <TouchableOpacity
             style={styles.flashcardsButton}
-            onPress={() => navigation.navigate('Flashcards', { 
+            onPress={() => navigation.navigate('Flashcards', {
               topicTitle: topic.title,
-              flashcards 
+              flashcards
             })}
           >
             <Icon name="style" size={24} color="white" />
@@ -611,10 +611,10 @@ export default function SubtopicLessonsScreen() {
   const { topic, subtopic } = route.params;
 
   const { data: lessons, isLoading: lessonsLoading } = useLessonsBySubtopic(
-    topic.id, 
+    topic.id,
     subtopic.id
   );
-  
+
   const { data: flashcards } = useFlashcardsByTopic(topic.title);
 
   if (lessonsLoading) {
@@ -644,14 +644,14 @@ export default function SubtopicLessonsScreen() {
                 style={styles.card}
                 onPress={() => navigation.navigate('LessonContent', { lesson })}
               >
-                <Icon 
+                <Icon
                   name={
-                    lesson.lesson_type === 'video' ? 'play-circle' : 
-                    lesson.lesson_type === 'audio' ? 'headphones' : 
+                    lesson.lesson_type === 'video' ? 'play-circle' :
+                    lesson.lesson_type === 'audio' ? 'headphones' :
                     lesson.lesson_type === 'quiz' ? 'quiz' : 'description'
-                  } 
-                  size={24} 
-                  color="#007aff" 
+                  }
+                  size={24}
+                  color="#007aff"
                 />
                 <View style={styles.cardContent}>
                   <Text style={styles.cardTitle}>{lesson.title}</Text>
@@ -675,9 +675,9 @@ export default function SubtopicLessonsScreen() {
         <View style={styles.section}>
           <TouchableOpacity
             style={styles.flashcardsButton}
-            onPress={() => navigation.navigate('Flashcards', { 
+            onPress={() => navigation.navigate('Flashcards', {
               topicTitle: topic.title,
-              flashcards 
+              flashcards
             })}
           >
             <Icon name="style" size={24} color="white" />
@@ -754,28 +754,28 @@ import LessonContentScreen from '../screens/learning/LessonContentScreen';
 import FlashcardsScreen from '../screens/learning/FlashcardsScreen';
 
 // Inside your Stack.Navigator:
-<Stack.Screen 
-  name="LearningTopics" 
+<Stack.Screen
+  name="LearningTopics"
   component={LearningTopicsScreen}
   options={{ title: 'Learning Module' }}
 />
-<Stack.Screen 
-  name="TopicDetail" 
+<Stack.Screen
+  name="TopicDetail"
   component={TopicDetailScreen}
   options={{ title: 'Topic' }}
 />
-<Stack.Screen 
-  name="SubtopicLessons" 
+<Stack.Screen
+  name="SubtopicLessons"
   component={SubtopicLessonsScreen}
   options={{ title: 'Lessons' }}
 />
-<Stack.Screen 
-  name="LessonContent" 
+<Stack.Screen
+  name="LessonContent"
   component={LessonContentScreen}
   options={{ title: 'Lesson' }}
 />
-<Stack.Screen 
-  name="Flashcards" 
+<Stack.Screen
+  name="Flashcards"
   component={FlashcardsScreen}
   options={{ title: 'Flashcards' }}
 />
@@ -808,7 +808,7 @@ export default function LessonContentScreen() {
   const handleComplete = () => {
     // If lesson_type is 'quiz', navigate to quiz screen
     if (lesson.lesson_type === 'quiz') {
-      navigation.navigate('LessonQuiz', { 
+      navigation.navigate('LessonQuiz', {
         lesson,
         passingScore: lesson.passing_score_percentage || 80
       });
@@ -855,19 +855,19 @@ export default function LessonContentScreen() {
       </View>
 
       {/* Complete Button */}
-      <TouchableOpacity 
+      <TouchableOpacity
         style={[styles.completeButton, completed && styles.completedButton]}
         onPress={handleComplete}
         disabled={completed}
       >
-        <Icon 
-          name={completed ? 'check-circle' : 'check'} 
-          size={24} 
-          color="white" 
+        <Icon
+          name={completed ? 'check-circle' : 'check'}
+          size={24}
+          color="white"
         />
         <Text style={styles.completeButtonText}>
-          {lesson.lesson_type === 'quiz' 
-            ? 'Take Quiz (80% to pass)' 
+          {lesson.lesson_type === 'quiz'
+            ? 'Take Quiz (80% to pass)'
             : completed ? 'Completed' : 'Mark as Complete'}
         </Text>
       </TouchableOpacity>
@@ -928,12 +928,14 @@ These 11 prompts will:
 ## Admin Portal Integration
 
 The admin portal has been updated to support:
+
 - Creating lessons with subtopic categories (dropdown shows all 25 subtopics)
 - Creating flashcards for either specific lessons OR entire topics
 - Filtering content by topic and subtopic
 - Visual indicators showing which lessons/flashcards belong to which categories
 
 **Next Steps After Implementation:**
+
 - Test the complete flow: Topics → Subtopics → Lessons → Flashcards
 - Implement the quiz screen with 80% passing logic
 - Add progress tracking for completed lessons

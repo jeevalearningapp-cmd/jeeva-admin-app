@@ -11,6 +11,7 @@
 ### When Creating New Component Tests
 
 If your component uses:
+
 - ✅ `useQuery`, `useMutation`, `useQueryClient` → Use `renderWithProviders()`
 - ✅ `useNavigate`, `useLocation`, `useParams` → Use `renderWithProviders()`
 - ✅ Any hooks that need context providers → Use `renderWithProviders()`
@@ -40,6 +41,7 @@ describe('MyComponent', () => {
 Located at: `src/__tests__/utils/test-wrapper.tsx`
 
 ### Provides:
+
 - ✅ QueryClientProvider (TanStack React Query)
 - ✅ BrowserRouter (React Router)
 - ✅ Fresh QueryClient for each test (no retries)
@@ -47,6 +49,7 @@ Located at: `src/__tests__/utils/test-wrapper.tsx`
 ### Functions:
 
 **1. `renderWithProviders(component, options?)`**
+
 - Custom render function that wraps component with all providers
 - Use this for 95% of your component tests
 - Replaces React Testing Library's `render()`
@@ -58,24 +61,26 @@ renderWithProviders(<MyComponent />)
 ```
 
 **2. `createTestQueryClient()`**
+
 - Creates a fresh QueryClient with optimized settings
 - Use if you need direct access to QueryClient (e.g., for renderHook)
 
 ```typescript
-import { createTestQueryClient } from '@/__tests__/utils/test-wrapper'
+import { createTestQueryClient } from "@/__tests__/utils/test-wrapper";
 
-const queryClient = createTestQueryClient()
+const queryClient = createTestQueryClient();
 ```
 
 **3. `TestWrapper` component**
+
 - React component that wraps children with all providers
 - Use with renderHook when testing custom hooks
 
 ```typescript
-import { TestWrapper } from '@/__tests__/utils/test-wrapper'
-import { renderHook } from '@testing-library/react'
+import { TestWrapper } from "@/__tests__/utils/test-wrapper";
+import { renderHook } from "@testing-library/react";
 
-const { result } = renderHook(() => useMyHook(), { wrapper: TestWrapper })
+const { result } = renderHook(() => useMyHook(), { wrapper: TestWrapper });
 ```
 
 ---
@@ -83,6 +88,7 @@ const { result } = renderHook(() => useMyHook(), { wrapper: TestWrapper })
 ## Common Test Patterns
 
 ### Component Test
+
 ```typescript
 import { renderWithProviders } from '@/__tests__/utils/test-wrapper'
 
@@ -93,27 +99,29 @@ it('should render component', () => {
 ```
 
 ### Hook Test
-```typescript
-import { renderHook, waitFor } from '@testing-library/react'
-import { TestWrapper } from '@/__tests__/utils/test-wrapper'
 
-it('should use hook', async () => {
-  const { result } = renderHook(() => useMyHook(), { wrapper: TestWrapper })
-  
+```typescript
+import { renderHook, waitFor } from "@testing-library/react";
+import { TestWrapper } from "@/__tests__/utils/test-wrapper";
+
+it("should use hook", async () => {
+  const { result } = renderHook(() => useMyHook(), { wrapper: TestWrapper });
+
   await waitFor(() => {
-    expect(result.current.data).toBeDefined()
-  })
-})
+    expect(result.current.data).toBeDefined();
+  });
+});
 ```
 
 ### Utility/Service Test (No Wrapper Needed)
-```typescript
-import { validateSettings } from '@/utils/settingsValidation'
 
-it('should validate correctly', () => {
-  const result = validateSettings({ siteName: 'Test' })
-  expect(result.isValid).toBe(true)
-})
+```typescript
+import { validateSettings } from "@/utils/settingsValidation";
+
+it("should validate correctly", () => {
+  const result = validateSettings({ siteName: "Test" });
+  expect(result.isValid).toBe(true);
+});
 ```
 
 ---
@@ -121,6 +129,7 @@ it('should validate correctly', () => {
 ## Best Practices
 
 ### ✅ DO:
+
 - Use `renderWithProviders()` for all component tests
 - Use `TestWrapper` for custom hook tests
 - Mock API calls and external services
@@ -129,6 +138,7 @@ it('should validate correctly', () => {
 - Keep tests focused and isolated
 
 ### ❌ DON'T:
+
 - Use standard `render()` for components with hooks
 - Skip the provider wrapper to "speed up" tests
 - Mock everything - test real logic where possible
@@ -189,18 +199,22 @@ export function TestWrapper({ children }: { children: ReactNode }) {
 ## Troubleshooting
 
 ### Error: "No QueryClient set"
+
 - **Cause:** Using `render()` instead of `renderWithProviders()`
 - **Fix:** Change `render(<Component />)` to `renderWithProviders(<Component />)`
 
 ### Error: "useNavigate() must be used within <BrowserRouter>"
+
 - **Cause:** Component uses routing but not wrapped with router
 - **Fix:** Use `renderWithProviders()` which includes BrowserRouter
 
 ### Error: "Cannot act on an unmounted component"
+
 - **Cause:** Async operations not properly awaited
 - **Fix:** Use `await waitFor(() => { ... })` for async assertions
 
 ### Tests running slowly
+
 - **Cause:** QueryClient retries enabled
 - **Fix:** Uses `createTestQueryClient()` which disables retries
 
@@ -209,12 +223,14 @@ export function TestWrapper({ children }: { children: ReactNode }) {
 ## Test Statistics
 
 **Current State (Nov 23, 2025):**
+
 - Test Files: 8
 - Total Tests: 67
 - Pass Rate: 100%
 - Average Duration: 47.15s
 
 **Coverage Areas:**
+
 - Settings management
 - Payment handling
 - Hook testing
@@ -226,6 +242,7 @@ export function TestWrapper({ children }: { children: ReactNode }) {
 ## Continuous Improvement
 
 When adding new features:
+
 1. ✅ Write tests first (TDD approach recommended)
 2. ✅ Use `renderWithProviders()` for component tests
 3. ✅ Run full test suite: `npm test -- --run`
@@ -237,6 +254,7 @@ When adding new features:
 ## Support
 
 For test-related questions:
+
 1. Check this guide first
 2. Review existing test examples in `src/__tests__/`
 3. Refer to Testing Library docs: https://testing-library.com/

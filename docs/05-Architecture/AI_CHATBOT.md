@@ -15,18 +15,20 @@ This guide covers **Phase 1** of Jeeva's AI integration: implementing JeevaBot, 
 ## 🎯 Phase 1 Goals
 
 ### What We're Building:
+
 ✅ AI-powered chatbot (JeevaBot) for instant help  
 ✅ Context-aware responses based on user progress  
 ✅ Chat interface in mobile app  
 ✅ Message history storage  
 ✅ Cost controls and rate limiting  
-✅ Error handling with fallbacks  
+✅ Error handling with fallbacks
 
 ### What's NOT in Phase 1:
+
 ❌ Vertex AI custom ML models (Phase 2)  
 ❌ Adaptive learning paths (Phase 2)  
 ❌ Auto-generated practice content (Phase 2)  
-❌ Predictive analytics (Phase 2)  
+❌ Predictive analytics (Phase 2)
 
 ---
 
@@ -35,15 +37,16 @@ This guide covers **Phase 1** of Jeeva's AI integration: implementing JeevaBot, 
 ### System Flow:
 
 ```
-User asks question → Frontend sends to backend → 
-Backend builds context (user progress + lesson content) → 
-Calls Gemini API → Streams response → 
+User asks question → Frontend sends to backend →
+Backend builds context (user progress + lesson content) →
+Calls Gemini API → Streams response →
 Saves to Supabase → Displays to user
 ```
 
 ### Components:
 
 **Frontend (React Native/Expo):**
+
 - `ChatScreen.tsx` - Main chat interface
 - `ChatBubble.tsx` - Message display component
 - `ChatInput.tsx` - User input field
@@ -51,12 +54,14 @@ Saves to Supabase → Displays to user
 - `AskAIButton.tsx` - Floating action button on lessons
 
 **Backend API:**
+
 - Gemini API client (`lib/gemini.ts`)
 - Context builder (user data + content)
 - Rate limiter middleware
 - Response streaming handler
 
 **Database (Supabase):**
+
 - `chat_conversations` - Conversation threads
 - `chat_messages` - Individual messages
 - `ai_usage_stats` - Usage tracking for cost control
@@ -89,6 +94,7 @@ The Gemini API key must **NEVER** be exposed to the mobile app. Store it only in
    - Value: `50`
 
 **For Mobile App (.env file):**
+
 ```env
 # NO Gemini API key here!
 # Mobile app calls backend endpoints instead
@@ -98,11 +104,13 @@ EXPO_PUBLIC_BACKEND_URL=https://your-backend.replit.app
 ### Step 3: Install SDK (Backend Only)
 
 **Backend (Admin Portal):**
+
 ```bash
 npm install @google/generative-ai
 ```
 
 **Mobile App:**
+
 ```bash
 # NO Gemini SDK in mobile app
 # Just use fetch/axios to call backend
@@ -131,6 +139,7 @@ CREATE INDEX idx_chat_conversations_created ON chat_conversations(created_at DES
 ```
 
 **JSONB Structure (`context_data`):**
+
 ```json
 {
   "currentLesson": {
@@ -165,6 +174,7 @@ CREATE INDEX idx_chat_messages_created ON chat_messages(created_at DESC);
 ```
 
 **JSONB Structure (`metadata`):**
+
 ```json
 {
   "model": "gemini-1.5-flash",
@@ -204,19 +214,19 @@ CREATE INDEX idx_ai_usage_user_date ON ai_usage_stats(user_id, date);
 **⚠️ This code runs ONLY on the backend server, NOT in the mobile app!**
 
 ```typescript
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 // Backend secret - NEVER exposed to clients
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "";
 
 if (!GEMINI_API_KEY) {
-  throw new Error('GEMINI_API_KEY is not configured in backend secrets');
+  throw new Error("GEMINI_API_KEY is not configured in backend secrets");
 }
 
 export const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 
-export const chatModel = genAI.getGenerativeModel({ 
-  model: 'gemini-1.5-flash',
+export const chatModel = genAI.getGenerativeModel({
+  model: "gemini-1.5-flash",
   generationConfig: {
     temperature: 0.7,
     topK: 40,
@@ -227,12 +237,12 @@ export const chatModel = genAI.getGenerativeModel({
 
 export const getModelResponse = async (
   prompt: string,
-  conversationHistory: { role: string; content: string }[] = []
+  conversationHistory: { role: string; content: string }[] = [],
 ): Promise<string> => {
   try {
     const chat = chatModel.startChat({
-      history: conversationHistory.map(msg => ({
-        role: msg.role === 'user' ? 'user' : 'model',
+      history: conversationHistory.map((msg) => ({
+        role: msg.role === "user" ? "user" : "model",
         parts: [{ text: msg.content }],
       })),
     });
@@ -241,8 +251,8 @@ export const getModelResponse = async (
     const response = result.response;
     return response.text();
   } catch (error) {
-    console.error('Gemini API Error:', error);
-    throw new Error('Failed to get AI response');
+    console.error("Gemini API Error:", error);
+    throw new Error("Failed to get AI response");
   }
 };
 ```
@@ -250,74 +260,79 @@ export const getModelResponse = async (
 ### Create Backend Chat Endpoint (`server/routes/chat.ts`)
 
 ```typescript
-import express from 'express';
-import { getModelResponse } from '../lib/gemini';
-import { buildChatContext } from '../utils/chatContext';
-import { supabase } from '../lib/supabase';
+import express from "express";
+import { getModelResponse } from "../lib/gemini";
+import { buildChatContext } from "../utils/chatContext";
+import { supabase } from "../lib/supabase";
 
 const router = express.Router();
 
 // POST /api/chat/send
-router.post('/send', async (req, res) => {
+router.post("/send", async (req, res) => {
   try {
     const { userId, conversationId, content } = req.body;
-    
+
     // Verify user authentication
-    const { data: { user }, error: authError } = await supabase.auth.getUser(
-      req.headers.authorization?.replace('Bearer ', '')
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser(
+      req.headers.authorization?.replace("Bearer ", ""),
     );
-    
+
     if (authError || !user || user.id !== userId) {
-      return res.status(401).json({ error: 'Unauthorized' });
+      return res.status(401).json({ error: "Unauthorized" });
     }
-    
+
     // Check rate limit
     const canSend = await checkMessageLimit(userId);
     if (!canSend) {
-      return res.status(429).json({ 
-        error: 'Daily message limit reached (50 messages/day)' 
+      return res.status(429).json({
+        error: "Daily message limit reached (50 messages/day)",
       });
     }
-    
+
     // Save user message
     const { data: userMsg } = await supabase
-      .from('chat_messages')
+      .from("chat_messages")
       .insert({
         conversation_id: conversationId,
-        role: 'user',
-        content
+        role: "user",
+        content,
       })
       .select()
       .single();
-    
+
     // Build context and get AI response
     const context = await buildChatContext(userId);
     const history = await getConversationHistory(conversationId);
-    const aiResponse = await getModelResponse(`${context}\n\n${content}`, history);
-    
+    const aiResponse = await getModelResponse(
+      `${context}\n\n${content}`,
+      history,
+    );
+
     // Save AI response
     const { data: aiMsg } = await supabase
-      .from('chat_messages')
+      .from("chat_messages")
       .insert({
         conversation_id: conversationId,
-        role: 'assistant',
+        role: "assistant",
         content: aiResponse,
         metadata: {
-          model: 'gemini-1.5-flash',
-          tokensUsed: Math.ceil(aiResponse.length / 4)
-        }
+          model: "gemini-1.5-flash",
+          tokensUsed: Math.ceil(aiResponse.length / 4),
+        },
       })
       .select()
       .single();
-    
+
     // Update usage stats
     await updateUsageStats(userId, Math.ceil(aiResponse.length / 4));
-    
+
     res.json({ userMsg, aiMsg });
-    
   } catch (error) {
-    console.error('Chat API error:', error);
-    res.status(500).json({ error: 'Failed to send message' });
+    console.error("Chat API error:", error);
+    res.status(500).json({ error: "Failed to send message" });
   }
 });
 
@@ -329,7 +344,7 @@ export default router;
 ### Context Builder (`src/utils/chatContext.ts`)
 
 ```typescript
-import { supabase } from '@/lib/supabase';
+import { supabase } from "@/lib/supabase";
 
 interface UserContext {
   userId: string;
@@ -341,19 +356,19 @@ interface UserContext {
 export const buildChatContext = async (userId: string): Promise<string> => {
   // Get user's current lesson
   const { data: currentLesson } = await supabase
-    .from('learning_completions')
-    .select('lesson:lessons(*), module:modules(*)')
-    .eq('user_id', userId)
-    .order('updated_at', { ascending: false })
+    .from("learning_completions")
+    .select("lesson:lessons(*), module:modules(*)")
+    .eq("user_id", userId)
+    .order("updated_at", { ascending: false })
     .limit(1)
     .single();
 
   // Get recent practice performance
   const { data: recentPractice } = await supabase
-    .from('practice_sessions')
-    .select('score, topic:topics(title)')
-    .eq('user_id', userId)
-    .order('created_at', { ascending: false })
+    .from("practice_sessions")
+    .select("score, topic:topics(title)")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false })
     .limit(5);
 
   // Build context string for AI
@@ -368,7 +383,7 @@ Student Context:
 
   if (recentPractice && recentPractice.length > 0) {
     context += `- Recent practice scores:\n`;
-    recentPractice.forEach(p => {
+    recentPractice.forEach((p) => {
       context += `  * ${p.topic?.title}: ${p.score}%\n`;
     });
   }
@@ -404,15 +419,16 @@ Remember: You're a supportive nursing tutor helping students transition from Ind
 **Mobile app calls backend API endpoints (NO direct Gemini access!)**
 
 ```typescript
-import { useState, useCallback } from 'react';
-import { supabase } from '@/lib/supabase';
-import { useAuth } from '@/context/AuthContext';
+import { useState, useCallback } from "react";
+import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/context/AuthContext";
 
-const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL || 'https://your-backend.replit.app';
+const BACKEND_URL =
+  process.env.EXPO_PUBLIC_BACKEND_URL || "https://your-backend.replit.app";
 
 interface Message {
   id: string;
-  role: 'user' | 'assistant';
+  role: "user" | "assistant";
   content: string;
   createdAt: string;
 }
@@ -422,106 +438,113 @@ export const useChatbot = (conversationId?: string) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [currentConversationId, setCurrentConversationId] = useState(conversationId);
+  const [currentConversationId, setCurrentConversationId] =
+    useState(conversationId);
 
   // Send message to backend
-  const sendMessage = useCallback(async (content: string) => {
-    if (!user || !content.trim()) return;
+  const sendMessage = useCallback(
+    async (content: string) => {
+      if (!user || !content.trim()) return;
 
-    setLoading(true);
-    setError(null);
+      setLoading(true);
+      setError(null);
 
-    try {
-      // Create or get conversation
-      let convId = currentConversationId;
-      if (!convId) {
-        const { data: newConv, error: convError } = await supabase
-          .from('chat_conversations')
-          .insert({
-            user_id: user.id,
-            title: content.substring(0, 50) + '...',
-          })
-          .select()
-          .single();
+      try {
+        // Create or get conversation
+        let convId = currentConversationId;
+        if (!convId) {
+          const { data: newConv, error: convError } = await supabase
+            .from("chat_conversations")
+            .insert({
+              user_id: user.id,
+              title: content.substring(0, 50) + "...",
+            })
+            .select()
+            .single();
 
-        if (convError) throw convError;
-        convId = newConv.id;
-        setCurrentConversationId(convId);
-      }
-
-      // Call backend API (authenticated)
-      const response = await fetch(`${BACKEND_URL}/api/chat/send`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session?.access_token}`,
-        },
-        body: JSON.stringify({
-          userId: user.id,
-          conversationId: convId,
-          content,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to send message');
-      }
-
-      const { userMsg, aiMsg } = await response.json();
-
-      // Add both messages to UI
-      setMessages(prev => [...prev, 
-        {
-          id: userMsg.id,
-          role: 'user',
-          content: userMsg.content,
-          createdAt: userMsg.created_at,
-        },
-        {
-          id: aiMsg.id,
-          role: 'assistant',
-          content: aiMsg.content,
-          createdAt: aiMsg.created_at,
+          if (convError) throw convError;
+          convId = newConv.id;
+          setCurrentConversationId(convId);
         }
-      ]);
 
-    } catch (err: any) {
-      console.error('Chat error:', err);
-      setError(err.message || 'Failed to send message');
-      
-      // Fallback response
-      const fallbackMsg = {
-        id: 'fallback-' + Date.now(),
-        role: 'assistant' as const,
-        content: "I'm having trouble connecting right now. Please try again in a moment, or contact support if the issue persists.",
-        createdAt: new Date().toISOString(),
-      };
-      setMessages(prev => [...prev, fallbackMsg]);
-    } finally {
-      setLoading(false);
-    }
-  }, [user, session, currentConversationId]);
+        // Call backend API (authenticated)
+        const response = await fetch(`${BACKEND_URL}/api/chat/send`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session?.access_token}`,
+          },
+          body: JSON.stringify({
+            userId: user.id,
+            conversationId: convId,
+            content,
+          }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || "Failed to send message");
+        }
+
+        const { userMsg, aiMsg } = await response.json();
+
+        // Add both messages to UI
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: userMsg.id,
+            role: "user",
+            content: userMsg.content,
+            createdAt: userMsg.created_at,
+          },
+          {
+            id: aiMsg.id,
+            role: "assistant",
+            content: aiMsg.content,
+            createdAt: aiMsg.created_at,
+          },
+        ]);
+      } catch (err: any) {
+        console.error("Chat error:", err);
+        setError(err.message || "Failed to send message");
+
+        // Fallback response
+        const fallbackMsg = {
+          id: "fallback-" + Date.now(),
+          role: "assistant" as const,
+          content:
+            "I'm having trouble connecting right now. Please try again in a moment, or contact support if the issue persists.",
+          createdAt: new Date().toISOString(),
+        };
+        setMessages((prev) => [...prev, fallbackMsg]);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [user, session, currentConversationId],
+  );
 
   // Load conversation history
   const loadConversation = useCallback(async (convId: string) => {
     const { data, error } = await supabase
-      .from('chat_messages')
-      .select('*')
-      .eq('conversation_id', convId)
-      .order('created_at', { ascending: true });
+      .from("chat_messages")
+      .select("*")
+      .eq("conversation_id", convId)
+      .order("created_at", { ascending: true });
 
     if (error) {
-      console.error('Error loading conversation:', error);
+      console.error("Error loading conversation:", error);
       return;
     }
 
-    setMessages(data.map(msg => ({
-      id: msg.id,
-      role: msg.role,
-      content: msg.content,
-      createdAt: msg.created_at,
-    })));
+    setMessages(
+      data.map((msg) => ({
+        id: msg.id,
+        role: msg.role,
+        content: msg.content,
+        createdAt: msg.created_at,
+      })),
+    );
     setCurrentConversationId(convId);
   }, []);
 
@@ -905,16 +928,19 @@ $$ LANGUAGE plpgsql;
 ### Error Handling Strategy
 
 **1. API Failures:**
+
 - Show fallback message to user
 - Log error for admin review
 - Don't expose technical details
 
 **2. Rate Limit Exceeded:**
+
 - Clear message: "Daily limit reached"
 - Suggest alternative help (contact support)
 - Reset at midnight
 
 **3. Network Issues:**
+
 - Retry logic (max 3 attempts)
 - Offline indicator
 - Queue messages for later
@@ -926,6 +952,7 @@ $$ LANGUAGE plpgsql;
 ### AI Usage Monitoring
 
 Create admin view to track:
+
 - Daily message volume
 - Cost estimates (tokens × price)
 - Popular questions
@@ -933,8 +960,9 @@ Create admin view to track:
 - User engagement
 
 **Query for Admin Dashboard:**
+
 ```sql
-SELECT 
+SELECT
   DATE(created_at) as date,
   COUNT(*) as total_messages,
   COUNT(DISTINCT conversation_id) as conversations,
@@ -953,14 +981,17 @@ ORDER BY date DESC;
 ### Gemini API Pricing (as of Oct 2025)
 
 **Free Tier:**
+
 - 60 requests per minute
 - Good for testing and low traffic
 
 **Paid Tier:**
+
 - Input: $0.00025 per 1K tokens
 - Output: $0.00075 per 1K tokens
 
 **Cost Estimates:**
+
 - Average message: ~500 tokens (input + output)
 - Cost per message: ~$0.0005 (half a cent)
 - 1000 students × 20 messages/day = 20,000 messages
@@ -1007,18 +1038,21 @@ ORDER BY date DESC;
 ### Phase 1 Rollout:
 
 **Week 1:**
+
 1. Set up Gemini API key
 2. Create database tables
 3. Deploy backend changes
 4. Test with internal team (5-10 users)
 
 **Week 2:**
+
 1. Deploy mobile app update
 2. Beta test with 50 users
 3. Monitor usage and costs
 4. Gather feedback
 
 **Week 3:**
+
 1. Fix any issues
 2. Adjust rate limits if needed
 3. Full rollout to all users
@@ -1031,22 +1065,26 @@ ORDER BY date DESC;
 Track these KPIs:
 
 **Engagement:**
+
 - Daily active chatbot users
 - Messages per user per day
 - Conversation length (avg messages)
 - Repeat usage rate
 
 **Quality:**
+
 - Thumbs up/down ratings
 - Follow-up question rate (indicates unclear answers)
 - Support ticket reduction
 
 **Cost:**
+
 - Daily/monthly API costs
 - Cost per user
 - Token efficiency
 
 **Business Impact:**
+
 - Student retention (do chatbot users stay longer?)
 - Study time increase
 - Exam score improvement
@@ -1060,6 +1098,7 @@ Track these KPIs:
 Beyond reactive chat support, JeevaBot proactively analyzes student performance and generates **personalized weekly study plans** based on their learning patterns, practice results, and mock exam scores.
 
 **Purpose:**
+
 - Identify weak areas automatically
 - Generate actionable study recommendations
 - Create personalized weekly schedules
@@ -1085,6 +1124,7 @@ CREATE INDEX idx_ai_recommendations_created ON ai_recommendations(created_at DES
 ```
 
 **JSONB Structure:**
+
 ```json
 {
   "generated_at": "2025-10-18T10:00:00Z",
@@ -1099,9 +1139,7 @@ CREATE INDEX idx_ai_recommendations_created ON ai_recommendations(created_at DES
       "practice_target": 20
     }
   ],
-  "strong_areas": [
-    { "topic": "Infection Control", "accuracy": 92 }
-  ],
+  "strong_areas": [{ "topic": "Infection Control", "accuracy": 92 }],
   "weekly_schedule": {
     "monday": "Pharmacology review + 20 practice MCQs",
     "tuesday": "Pharmacology continued",
@@ -1122,9 +1160,9 @@ CREATE INDEX idx_ai_recommendations_created ON ai_recommendations(created_at DES
 
 **Recommendation Generator (`server/utils/generateRecommendations.ts`):**
 
-```typescript
-import { supabase } from '../lib/supabase';
-import { getModelResponse } from '../lib/gemini';
+````typescript
+import { supabase } from "../lib/supabase";
+import { getModelResponse } from "../lib/gemini";
 
 interface PerformanceData {
   userId: string;
@@ -1137,66 +1175,73 @@ interface PerformanceData {
 export async function generateRecommendations(userId: string) {
   // Fetch performance data
   const data = await fetchPerformanceData(userId);
-  
+
   // Build AI prompt
   const prompt = buildRecommendationPrompt(data);
-  
+
   // Call Gemini API
   const aiResponse = await getModelResponse(prompt);
-  
+
   // Parse and structure response
   const recommendation = parseAIRecommendation(aiResponse, data);
-  
+
   // Save to database
-  await supabase.from('ai_recommendations').insert({
+  await supabase.from("ai_recommendations").insert({
     user_id: userId,
     recommendation_data: recommendation,
   });
-  
+
   return recommendation;
 }
 
 async function fetchPerformanceData(userId: string): Promise<PerformanceData> {
   // Get practice stats
   const { data: practiceStats } = await supabase
-    .from('practice_sessions')
-    .select(`
+    .from("practice_sessions")
+    .select(
+      `
       *,
       practice_results (*)
-    `)
-    .eq('user_id', userId)
-    .gte('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
-    .order('created_at', { ascending: false });
-  
+    `,
+    )
+    .eq("user_id", userId)
+    .gte(
+      "created_at",
+      new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+    )
+    .order("created_at", { ascending: false });
+
   // Get mock exam results
   const { data: mockExams } = await supabase
-    .from('mock_exams')
-    .select(`
+    .from("mock_exams")
+    .select(
+      `
       *,
       mock_exam_results (*)
-    `)
-    .eq('user_id', userId)
-    .order('created_at', { ascending: false })
+    `,
+    )
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false })
     .limit(5);
-  
+
   // Get learning progress
   const { data: learningProgress } = await supabase
-    .from('learning_completions')
-    .select('*, lessons (*)')
-    .eq('user_id', userId);
-  
+    .from("learning_completions")
+    .select("*, lessons (*)")
+    .eq("user_id", userId);
+
   // Get subscription info
   const { data: subscription } = await supabase
-    .from('subscriptions')
-    .select('*')
-    .eq('user_id', userId)
-    .order('created_at', { ascending: false })
+    .from("subscriptions")
+    .select("*")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false })
     .limit(1)
     .single();
-  
+
   // Calculate topic-wise accuracy
   const topicAccuracy = calculateTopicAccuracy(practiceStats);
-  
+
   return {
     userId,
     practiceStats: topicAccuracy,
@@ -1207,11 +1252,12 @@ async function fetchPerformanceData(userId: string): Promise<PerformanceData> {
 }
 
 function buildRecommendationPrompt(data: PerformanceData): string {
-  const weakTopics = data.practiceStats.filter(t => t.accuracy < 0.70);
+  const weakTopics = data.practiceStats.filter((t) => t.accuracy < 0.7);
   const daysRemaining = Math.ceil(
-    (new Date(data.subscription.end_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+    (new Date(data.subscription.end_date).getTime() - Date.now()) /
+      (1000 * 60 * 60 * 24),
   );
-  
+
   return `You are an NMC CBT exam preparation expert for nursing students.
 Analyze this student's performance and generate a personalized study plan.
 
@@ -1219,10 +1265,10 @@ STUDENT PERFORMANCE DATA:
 ${JSON.stringify(data, null, 2)}
 
 WEAK TOPICS (< 70% accuracy):
-${weakTopics.map(t => `- ${t.topic_name}: ${t.accuracy}%`).join('\n')}
+${weakTopics.map((t) => `- ${t.topic_name}: ${t.accuracy}%`).join("\n")}
 
 MOCK EXAM SCORES:
-${data.mockExams.map(m => `- Part ${m.part}: ${m.score}/${m.total_questions}`).join('\n')}
+${data.mockExams.map((m) => `- Part ${m.part}: ${m.score}/${m.total_questions}`).join("\n")}
 
 SUBSCRIPTION:
 - Days remaining: ${daysRemaining}
@@ -1251,55 +1297,59 @@ Return only valid JSON, no markdown formatting.`;
 function parseAIRecommendation(aiResponse: string, data: PerformanceData): any {
   try {
     // Remove markdown code blocks if present
-    const cleanResponse = aiResponse.replace(/```json\n?/g, '').replace(/```\n?/g, '');
+    const cleanResponse = aiResponse
+      .replace(/```json\n?/g, "")
+      .replace(/```\n?/g, "");
     const parsed = JSON.parse(cleanResponse);
-    
+
     // Add metadata
     return {
       ...parsed,
       generated_at: new Date().toISOString(),
-      analysis_period: 'last_7_days',
+      analysis_period: "last_7_days",
       days_until_subscription_ends: Math.ceil(
-        (new Date(data.subscription.end_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+        (new Date(data.subscription.end_date).getTime() - Date.now()) /
+          (1000 * 60 * 60 * 24),
       ),
     };
   } catch (error) {
-    console.error('Failed to parse AI recommendation:', error);
+    console.error("Failed to parse AI recommendation:", error);
     // Return fallback recommendation
     return generateFallbackRecommendation(data);
   }
 }
 
 function generateFallbackRecommendation(data: PerformanceData): any {
-  const weakTopics = data.practiceStats.filter(t => t.accuracy < 0.70);
-  
+  const weakTopics = data.practiceStats.filter((t) => t.accuracy < 0.7);
+
   return {
     generated_at: new Date().toISOString(),
-    analysis_period: 'last_7_days',
+    analysis_period: "last_7_days",
     exam_readiness: 60,
-    urgent_topics: weakTopics.slice(0, 3).map(t => ({
+    urgent_topics: weakTopics.slice(0, 3).map((t) => ({
       topic: t.topic_name,
       accuracy: t.accuracy,
-      priority: 'high',
+      priority: "high",
       recommended_lessons: [],
       practice_target: 20,
     })),
     strong_areas: data.practiceStats
-      .filter(t => t.accuracy > 0.85)
-      .map(t => ({ topic: t.topic_name, accuracy: t.accuracy })),
+      .filter((t) => t.accuracy > 0.85)
+      .map((t) => ({ topic: t.topic_name, accuracy: t.accuracy })),
     weekly_schedule: {
-      monday: 'Review weak topics',
-      tuesday: 'Practice sessions',
-      wednesday: 'Continue practice',
-      thursday: 'Mock exam preparation',
-      friday: 'Practice sessions',
-      saturday: 'Mock exam attempt',
-      sunday: 'Review and rest',
+      monday: "Review weak topics",
+      tuesday: "Practice sessions",
+      wednesday: "Continue practice",
+      thursday: "Mock exam preparation",
+      friday: "Practice sessions",
+      saturday: "Mock exam attempt",
+      sunday: "Review and rest",
     },
-    motivational_message: 'Keep practicing! Focus on your weak areas and you\'ll improve.',
+    motivational_message:
+      "Keep practicing! Focus on your weak areas and you'll improve.",
   };
 }
-```
+````
 
 ---
 
@@ -1309,32 +1359,34 @@ function generateFallbackRecommendation(data: PerformanceData): any {
 
 ```typescript
 // server/routes/ai.ts
-import express from 'express';
-import { generateRecommendations } from '../utils/generateRecommendations';
+import express from "express";
+import { generateRecommendations } from "../utils/generateRecommendations";
 
 const router = express.Router();
 
-router.post('/generate-recommendations', async (req, res) => {
+router.post("/generate-recommendations", async (req, res) => {
   try {
     const { userId } = req.body;
-    
+
     // Verify authentication
-    const { data: { user }, error: authError } = await supabase.auth.getUser(
-      req.headers.authorization?.replace('Bearer ', '')
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser(
+      req.headers.authorization?.replace("Bearer ", ""),
     );
-    
+
     if (authError || !user || user.id !== userId) {
-      return res.status(401).json({ error: 'Unauthorized' });
+      return res.status(401).json({ error: "Unauthorized" });
     }
-    
+
     // Generate recommendations
     const recommendation = await generateRecommendations(userId);
-    
+
     res.json({ success: true, recommendation });
-    
   } catch (error) {
-    console.error('Error generating recommendations:', error);
-    res.status(500).json({ error: 'Failed to generate recommendations' });
+    console.error("Error generating recommendations:", error);
+    res.status(500).json({ error: "Failed to generate recommendations" });
   }
 });
 
@@ -1348,9 +1400,9 @@ export default router;
 **Hook: `useAIRecommendations.ts`**
 
 ```typescript
-import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
-import { useAuth } from '@/context/AuthContext';
+import { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/context/AuthContext";
 
 const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
@@ -1358,51 +1410,53 @@ export function useAIRecommendations() {
   const { user, session } = useAuth();
   const [recommendation, setRecommendation] = useState(null);
   const [loading, setLoading] = useState(false);
-  
+
   // Fetch latest recommendation
   useEffect(() => {
     if (user) {
       fetchLatestRecommendation();
     }
   }, [user]);
-  
+
   const fetchLatestRecommendation = async () => {
     const { data } = await supabase
-      .from('ai_recommendations')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false })
+      .from("ai_recommendations")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false })
       .limit(1)
       .single();
-    
+
     if (data) {
       setRecommendation(data.recommendation_data);
     }
   };
-  
+
   const generateNewRecommendation = async () => {
     setLoading(true);
-    
+
     try {
-      const response = await fetch(`${BACKEND_URL}/api/ai/generate-recommendations`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session?.access_token}`,
+      const response = await fetch(
+        `${BACKEND_URL}/api/ai/generate-recommendations`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session?.access_token}`,
+          },
+          body: JSON.stringify({ userId: user.id }),
         },
-        body: JSON.stringify({ userId: user.id }),
-      });
-      
+      );
+
       const { recommendation: newRec } = await response.json();
       setRecommendation(newRec);
-      
     } catch (error) {
-      console.error('Error generating recommendation:', error);
+      console.error("Error generating recommendation:", error);
     } finally {
       setLoading(false);
     }
   };
-  
+
   return {
     recommendation,
     loading,
@@ -1420,33 +1474,33 @@ import { useAIRecommendations } from '@/hooks/useAIRecommendations';
 
 export function AIRecommendationsCard() {
   const { recommendation, loading, generateNewRecommendation } = useAIRecommendations();
-  
+
   if (!recommendation) {
     return (
       <View>
         <Text>Get Your Personalized Study Plan</Text>
-        <Button 
-          title="Generate Plan" 
+        <Button
+          title="Generate Plan"
           onPress={generateNewRecommendation}
           disabled={loading}
         />
       </View>
     );
   }
-  
+
   return (
     <View style={{ padding: 16, backgroundColor: '#f5f5f5', borderRadius: 8 }}>
       <Text style={{ fontSize: 20, fontWeight: 'bold' }}>
         🤖 Your Study Plan
       </Text>
-      
+
       <View style={{ marginTop: 12 }}>
         <Text style={{ fontSize: 16 }}>
           🎯 Exam Readiness: {recommendation.exam_readiness}%
         </Text>
         <ProgressBar value={recommendation.exam_readiness} />
       </View>
-      
+
       <View style={{ marginTop: 16 }}>
         <Text style={{ fontSize: 16, fontWeight: 'bold' }}>
           🚨 Urgent - Fix These First:
@@ -1462,7 +1516,7 @@ export function AIRecommendationsCard() {
           </View>
         ))}
       </View>
-      
+
       <View style={{ marginTop: 16 }}>
         <Text style={{ fontSize: 16, fontWeight: 'bold' }}>
           💪 Strong Areas:
@@ -1471,7 +1525,7 @@ export function AIRecommendationsCard() {
           <Text key={idx}>✓ {area.topic} ({area.accuracy}%)</Text>
         ))}
       </View>
-      
+
       <View style={{ marginTop: 16 }}>
         <Text style={{ fontSize: 16, fontWeight: 'bold' }}>
           📅 This Week:
@@ -1482,13 +1536,13 @@ export function AIRecommendationsCard() {
           </Text>
         ))}
       </View>
-      
+
       <Text style={{ marginTop: 16, fontStyle: 'italic', color: '#007aff' }}>
         {recommendation.motivational_message}
       </Text>
-      
-      <Button 
-        title="Generate New Plan" 
+
+      <Button
+        title="Generate New Plan"
         onPress={generateNewRecommendation}
         disabled={loading}
       />
@@ -1505,24 +1559,24 @@ export function AIRecommendationsCard() {
 
 ```typescript
 // server/jobs/weeklyRecommendations.ts
-import { supabase } from '../lib/supabase';
-import { generateRecommendations } from '../utils/generateRecommendations';
+import { supabase } from "../lib/supabase";
+import { generateRecommendations } from "../utils/generateRecommendations";
 
 export async function generateWeeklyRecommendations() {
-  console.log('[Cron] Starting weekly recommendations generation...');
-  
+  console.log("[Cron] Starting weekly recommendations generation...");
+
   // Get all active users
   const { data: activeUsers } = await supabase
-    .from('subscriptions')
-    .select('user_id')
-    .in('status', ['active', 'trial'])
-    .gte('end_date', new Date().toISOString());
-  
+    .from("subscriptions")
+    .select("user_id")
+    .in("status", ["active", "trial"])
+    .gte("end_date", new Date().toISOString());
+
   if (!activeUsers) return;
-  
+
   let successCount = 0;
   let errorCount = 0;
-  
+
   for (const { user_id } of activeUsers) {
     try {
       await generateRecommendations(user_id);
@@ -1531,12 +1585,14 @@ export async function generateWeeklyRecommendations() {
       console.error(`Error generating for user ${user_id}:`, error);
       errorCount++;
     }
-    
+
     // Rate limit: 1 request per second to avoid API throttling
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
   }
-  
-  console.log(`[Cron] Completed: ${successCount} success, ${errorCount} errors`);
+
+  console.log(
+    `[Cron] Completed: ${successCount} success, ${errorCount} errors`,
+  );
 }
 
 // Run every Sunday at 6 AM
@@ -1548,12 +1604,14 @@ export async function generateWeeklyRecommendations() {
 ### Cost Estimation
 
 **Per Recommendation:**
+
 - Input tokens: ~1000 (performance data)
 - Output tokens: ~500 (structured recommendation)
 - Total: ~1500 tokens
 - Cost: ~$0.001 (0.1 cents per recommendation)
 
 **Monthly for 1000 users:**
+
 - 1000 users × 4 weeks = 4000 recommendations
 - Cost: ~$4/month
 
@@ -1587,18 +1645,23 @@ After Phase 1 is stable, plan for:
 ### Common Issues:
 
 **Issue:** "API key invalid"
+
 - Solution: Check `.env` file, ensure key starts with `AIza`
 
 **Issue:** "Messages not saving"
+
 - Solution: Verify Supabase connection, check table permissions
 
 **Issue:** "Rate limit not working"
+
 - Solution: Check `increment_ai_usage` function, verify date format
 
 **Issue:** "Context not personalized"
+
 - Solution: Ensure `buildChatContext` fetches user data correctly
 
 **Issue:** "High costs"
+
 - Solution: Reduce max tokens, increase caching, limit message length
 
 ---
@@ -1606,10 +1669,12 @@ After Phase 1 is stable, plan for:
 ## 📞 Support
 
 **For Implementation Help:**
+
 - Email: vollstek@gmail.com
 - Reference: Phase 1 AI Integration
 
 **For API Issues:**
+
 - [Google AI Studio Docs](https://ai.google.dev/docs)
 - [Gemini API Reference](https://ai.google.dev/api)
 
@@ -1622,6 +1687,7 @@ After Phase 1 is stable, plan for:
 **Next Review:** After Phase 1 launch, before Phase 2 planning
 
 **Recent Updates (v2.0):**
+
 - Added AI-powered performance analysis & recommendations feature
 - Added weekly personalized study plan generation
 - Added exam readiness scoring algorithm

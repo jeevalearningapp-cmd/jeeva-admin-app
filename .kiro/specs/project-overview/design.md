@@ -85,16 +85,16 @@ server/
 ```typescript
 // AuthContext provides user state and auth methods
 interface AuthContextType {
-  user: AdminUser | null
-  loading: boolean
-  signIn: (email: string, password: string) => Promise<void>
-  signOut: () => Promise<void>
+  user: AdminUser | null;
+  loading: boolean;
+  signIn: (email: string, password: string) => Promise<void>;
+  signOut: () => Promise<void>;
 }
 
 // ProtectedRoute guards routes by role
 interface ProtectedRouteProps {
-  children: React.ReactNode
-  allowedRoles?: ('superadmin' | 'editor' | 'moderator')[]
+  children: React.ReactNode;
+  allowedRoles?: ("superadmin" | "editor" | "moderator")[];
 }
 ```
 
@@ -102,96 +102,96 @@ interface ProtectedRouteProps {
 
 ```typescript
 interface Module {
-  id: string
-  title: string
-  description?: string
-  thumbnail_url?: string
-  is_active: boolean
-  display_order: number
-  is_trial: boolean
-  icon?: string
-  color?: string
-  estimated_duration_hours?: number
-  created_at: string
-  updated_at: string
+  id: string;
+  title: string;
+  description?: string;
+  thumbnail_url?: string;
+  is_active: boolean;
+  display_order: number;
+  is_trial: boolean;
+  icon?: string;
+  color?: string;
+  estimated_duration_hours?: number;
+  created_at: string;
+  updated_at: string;
 }
 
 interface Topic {
-  id: string
-  module_id: string
-  title: string
-  description?: string
-  is_active: boolean
-  display_order: number
-  is_trial_content: boolean
-  created_at: string
-  updated_at: string
+  id: string;
+  module_id: string;
+  title: string;
+  description?: string;
+  is_active: boolean;
+  display_order: number;
+  is_trial_content: boolean;
+  created_at: string;
+  updated_at: string;
 }
 
 interface Lesson {
-  id: string
-  topic_id: string
-  title: string
-  content: string
-  video_url?: string
-  audio_url?: string
-  lesson_type: 'text' | 'video' | 'audio'
-  passing_score_percentage: number
-  category?: string
-  duration: number
-  is_active: boolean
-  display_order: number
-  notes?: string
-  is_trial_content: boolean
-  unlock_threshold_percentage: number
-  requires_unlocking: boolean
-  created_at: string
-  updated_at: string
+  id: string;
+  topic_id: string;
+  title: string;
+  content: string;
+  video_url?: string;
+  audio_url?: string;
+  lesson_type: "text" | "video" | "audio";
+  passing_score_percentage: number;
+  category?: string;
+  duration: number;
+  is_active: boolean;
+  display_order: number;
+  notes?: string;
+  is_trial_content: boolean;
+  unlock_threshold_percentage: number;
+  requires_unlocking: boolean;
+  created_at: string;
+  updated_at: string;
 }
 
 interface Question {
-  id: string
-  lesson_id?: string
-  question_text: string
-  question_type: 'multiple_choice' | 'true_false' | 'short_answer'
-  difficulty?: 'easy' | 'medium' | 'hard'
-  points: number
-  explanation?: string
-  image_url?: string
-  is_active: boolean
-  module_type?: string
-  category?: string
-  subdivision?: string
-  exam_part?: string
-  is_trial_content: boolean
-  trial_order?: number
-  acceptable_range?: number
-  unit?: string
-  options?: QuestionOption[]
-  created_at: string
-  updated_at: string
+  id: string;
+  lesson_id?: string;
+  question_text: string;
+  question_type: "multiple_choice" | "true_false" | "short_answer";
+  difficulty?: "easy" | "medium" | "hard";
+  points: number;
+  explanation?: string;
+  image_url?: string;
+  is_active: boolean;
+  module_type?: string;
+  category?: string;
+  subdivision?: string;
+  exam_part?: string;
+  is_trial_content: boolean;
+  trial_order?: number;
+  acceptable_range?: number;
+  unit?: string;
+  options?: QuestionOption[];
+  created_at: string;
+  updated_at: string;
 }
 
 interface QuestionOption {
-  id: string
-  question_id: string
-  option_text: string
-  is_correct: boolean
-  display_order: number
-  created_at: string
+  id: string;
+  question_id: string;
+  option_text: string;
+  is_correct: boolean;
+  display_order: number;
+  created_at: string;
 }
 
 interface Flashcard {
-  id: string
-  lesson_id?: string
-  front: string
-  back: string
-  category?: string
-  image_url?: string
-  is_active: boolean
-  display_order: number
-  created_at: string
-  updated_at: string
+  id: string;
+  lesson_id?: string;
+  front: string;
+  back: string;
+  category?: string;
+  image_url?: string;
+  is_active: boolean;
+  display_order: number;
+  created_at: string;
+  updated_at: string;
 }
 ```
 
@@ -199,64 +199,64 @@ interface Flashcard {
 
 ```typescript
 interface SubscriptionPlan {
-  id: string
-  name: string
-  description?: string
-  price_usd: number
-  duration_days: number
-  features?: string[]
-  is_active: boolean
-  display_order: number
-  config?: Record<string, any>
-  created_at: string
-  updated_at: string
+  id: string;
+  name: string;
+  description?: string;
+  price_usd: number;
+  duration_days: number;
+  features?: string[];
+  is_active: boolean;
+  display_order: number;
+  config?: Record<string, any>;
+  created_at: string;
+  updated_at: string;
 }
 
 interface Subscription {
-  id: string
-  user_id: string
-  plan_type: string
-  plan_id?: string
-  start_date: string
-  end_date: string
-  is_active: boolean
-  auto_renew: boolean
-  status: 'active' | 'expired' | 'cancelled'
-  payment_gateway?: string
-  payment_method?: string
-  amount_paid_usd?: number
-  coupon_code?: string
-  discount_amount?: number
-  transaction_id?: string
-  created_at: string
-  updated_at: string
+  id: string;
+  user_id: string;
+  plan_type: string;
+  plan_id?: string;
+  start_date: string;
+  end_date: string;
+  is_active: boolean;
+  auto_renew: boolean;
+  status: "active" | "expired" | "cancelled";
+  payment_gateway?: string;
+  payment_method?: string;
+  amount_paid_usd?: number;
+  coupon_code?: string;
+  discount_amount?: number;
+  transaction_id?: string;
+  created_at: string;
+  updated_at: string;
 }
 
 interface DiscountCoupon {
-  id: string
-  code: string
-  description?: string
-  discount_type: 'percentage' | 'fixed'
-  discount_value: number
-  applicable_plans?: string[]
-  usage_limit?: number
-  usage_count: number
-  valid_from: string
-  valid_until: string
-  is_active: boolean
-  created_at: string
-  updated_at: string
+  id: string;
+  code: string;
+  description?: string;
+  discount_type: "percentage" | "fixed";
+  discount_value: number;
+  applicable_plans?: string[];
+  usage_limit?: number;
+  usage_count: number;
+  valid_from: string;
+  valid_until: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
 }
 
 interface SubscriptionUsage {
-  id: string
-  user_id: string
-  feature: string
-  used_this_month: number
-  limit_this_month?: number
-  reset_date: string
-  created_at: string
-  updated_at: string
+  id: string;
+  user_id: string;
+  feature: string;
+  used_this_month: number;
+  limit_this_month?: number;
+  reset_date: string;
+  created_at: string;
+  updated_at: string;
 }
 ```
 
@@ -264,80 +264,80 @@ interface SubscriptionUsage {
 
 ```typescript
 interface TrialMockExam {
-  id: string
-  module_id: string
-  title: string
-  description?: string
-  question_count: number
-  time_limit_minutes: number
-  passing_score: number
-  question_ids: string[]
-  allow_mark_for_review: boolean
-  allow_answer_changes: boolean
-  show_question_navigator: boolean
-  auto_submit_at_time_limit: boolean
-  show_results_immediately: boolean
-  is_active: boolean
-  created_at: string
-  updated_at: string
+  id: string;
+  module_id: string;
+  title: string;
+  description?: string;
+  question_count: number;
+  time_limit_minutes: number;
+  passing_score: number;
+  question_ids: string[];
+  allow_mark_for_review: boolean;
+  allow_answer_changes: boolean;
+  show_question_navigator: boolean;
+  auto_submit_at_time_limit: boolean;
+  show_results_immediately: boolean;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
 }
 
 interface TrialExamAttempt {
-  id: string
-  user_id: string
-  exam_id: string
-  total_questions: number
-  correct_answers?: number
-  incorrect_answers?: number
-  score?: number
-  percentage_score?: number
-  is_passed?: boolean
-  user_answers?: Record<string, any>
-  marked_for_review?: Record<string, any>
-  started_at: string
-  completed_at: string
-  duration_seconds?: number
-  topic_scores?: Record<string, any>
-  status: 'in_progress' | 'completed' | 'abandoned'
-  device_type?: string
-  created_at: string
-  updated_at: string
+  id: string;
+  user_id: string;
+  exam_id: string;
+  total_questions: number;
+  correct_answers?: number;
+  incorrect_answers?: number;
+  score?: number;
+  percentage_score?: number;
+  is_passed?: boolean;
+  user_answers?: Record<string, any>;
+  marked_for_review?: Record<string, any>;
+  started_at: string;
+  completed_at: string;
+  duration_seconds?: number;
+  topic_scores?: Record<string, any>;
+  status: "in_progress" | "completed" | "abandoned";
+  device_type?: string;
+  created_at: string;
+  updated_at: string;
 }
 
 interface TrialLearningProgress {
-  id: string
-  user_id: string
-  topic_id: string
-  lesson_id: string
-  is_started: boolean
-  is_completed: boolean
-  is_unlocked: boolean
-  assessment_score?: number
-  assessment_percentage?: number
-  assessment_passed?: boolean
-  assessment_attempts: number
-  content_viewed?: Record<string, any>
-  estimated_time_spent_minutes?: number
-  started_at?: string
-  completed_at?: string
-  last_accessed_at?: string
-  created_at: string
-  updated_at: string
+  id: string;
+  user_id: string;
+  topic_id: string;
+  lesson_id: string;
+  is_started: boolean;
+  is_completed: boolean;
+  is_unlocked: boolean;
+  assessment_score?: number;
+  assessment_percentage?: number;
+  assessment_passed?: boolean;
+  assessment_attempts: number;
+  content_viewed?: Record<string, any>;
+  estimated_time_spent_minutes?: number;
+  started_at?: string;
+  completed_at?: string;
+  last_accessed_at?: string;
+  created_at: string;
+  updated_at: string;
 }
 ```
 
 ### API Route Structure
 
-| Route | Purpose |
-|-------|---------|
-| `/api/email` | Email sending via Resend |
-| `/api/chat` | AI chat via Google Gemini |
-| `/api/payments` | Stripe payment processing |
-| `/api/notifications` | Push notification management |
-| `/api/subscriptions` | Subscription CRUD operations |
-| `/api/stripe-admin` | Stripe dashboard operations |
-| `/api/stripe-coupons` | Stripe coupon management |
-| `/api/country` | Country/currency detection |
+| Route                 | Purpose                      |
+| --------------------- | ---------------------------- |
+| `/api/email`          | Email sending via Resend     |
+| `/api/chat`           | AI chat via Google Gemini    |
+| `/api/payments`       | Stripe payment processing    |
+| `/api/notifications`  | Push notification management |
+| `/api/subscriptions`  | Subscription CRUD operations |
+| `/api/stripe-admin`   | Stripe dashboard operations  |
+| `/api/stripe-coupons` | Stripe coupon management     |
+| `/api/country`        | Country/currency detection   |
 
 ## Data Models
 
@@ -470,11 +470,11 @@ notifications (1) ──→ (*) notification_targets
 
 **Admin Role Hierarchy:**
 
-| Role | Permissions |
-|------|-------------|
-| `superadmin` | Full CRUD on all tables, can manage admin users |
-| `editor` | Create/update content (modules, lessons, questions, flashcards), create notifications |
-| `moderator` | Read-only access to content and analytics |
+| Role         | Permissions                                                                           |
+| ------------ | ------------------------------------------------------------------------------------- |
+| `superadmin` | Full CRUD on all tables, can manage admin users                                       |
+| `editor`     | Create/update content (modules, lessons, questions, flashcards), create notifications |
+| `moderator`  | Read-only access to content and analytics                                             |
 
 **RLS Policy Patterns:**
 
@@ -495,32 +495,32 @@ notifications (1) ──→ (*) notification_targets
 
 **Tables with RLS Enabled (28 tables):**
 
-| Table | SELECT | INSERT | UPDATE | DELETE |
-|-------|--------|--------|--------|--------|
-| admin_users | Own record only | Superadmin only | Superadmin only | Superadmin only |
-| ai_recommendations | Own only | Own only | Own only | Own only |
-| ai_usage_stats | Own + Admin view | Own only | Own only | - |
-| analytics_sessions | Own only | Own only | Own only | Own only |
-| chat_conversations | Own + Admin view | Own only | Own only | - |
-| chat_messages | Own (via conversation) + Admin | Own only | - | - |
-| content_approvals | Editor/Moderator/Superadmin | Editor/Superadmin | Own pending + Superadmin | Superadmin |
-| flashcards | Editor/Moderator/Superadmin | Editor/Superadmin | Editor/Superadmin | Superadmin |
-| learning_completions | Own + Admin view | Own only | Own only | - |
-| learning_paths | Own only | Own only | Own only | Own only |
-| learning_progress | Own only | Service role | Service role | - |
-| lesson_content | Admin + Trial content | Admin only | Admin only | Admin only |
-| lesson_quiz_results | Own + Admin view | Own only | - | - |
-| lessons | Public active + Admin | Editor/Superadmin | Editor/Superadmin | Superadmin |
-| mock_exam_config | Public view | Admin only | Admin only | Admin only |
-| mock_exams | Own only | Own only | - | - |
-| mock_results | Own (via exam) | Own (via exam) | - | - |
-| mock_sessions | Own only | Own only | Own only | - |
-| module_access_rules | Public active | Admin only | Admin only | Admin only |
-| modules | Public active + Admin | Editor/Superadmin | Editor/Superadmin | Superadmin |
-| notification_preferences | Own only | Own only | Own only | - |
-| notification_queue | Admin view | Service role | Service role | Service role |
-| notification_targets | Own + Admin view | Service role | Service role | Service role |
-| notifications | Public view | Editor/Superadmin | Editor/Superadmin | Superadmin |
+| Table                    | SELECT                         | INSERT            | UPDATE                   | DELETE          |
+| ------------------------ | ------------------------------ | ----------------- | ------------------------ | --------------- |
+| admin_users              | Own record only                | Superadmin only   | Superadmin only          | Superadmin only |
+| ai_recommendations       | Own only                       | Own only          | Own only                 | Own only        |
+| ai_usage_stats           | Own + Admin view               | Own only          | Own only                 | -               |
+| analytics_sessions       | Own only                       | Own only          | Own only                 | Own only        |
+| chat_conversations       | Own + Admin view               | Own only          | Own only                 | -               |
+| chat_messages            | Own (via conversation) + Admin | Own only          | -                        | -               |
+| content_approvals        | Editor/Moderator/Superadmin    | Editor/Superadmin | Own pending + Superadmin | Superadmin      |
+| flashcards               | Editor/Moderator/Superadmin    | Editor/Superadmin | Editor/Superadmin        | Superadmin      |
+| learning_completions     | Own + Admin view               | Own only          | Own only                 | -               |
+| learning_paths           | Own only                       | Own only          | Own only                 | Own only        |
+| learning_progress        | Own only                       | Service role      | Service role             | -               |
+| lesson_content           | Admin + Trial content          | Admin only        | Admin only               | Admin only      |
+| lesson_quiz_results      | Own + Admin view               | Own only          | -                        | -               |
+| lessons                  | Public active + Admin          | Editor/Superadmin | Editor/Superadmin        | Superadmin      |
+| mock_exam_config         | Public view                    | Admin only        | Admin only               | Admin only      |
+| mock_exams               | Own only                       | Own only          | -                        | -               |
+| mock_results             | Own (via exam)                 | Own (via exam)    | -                        | -               |
+| mock_sessions            | Own only                       | Own only          | Own only                 | -               |
+| module_access_rules      | Public active                  | Admin only        | Admin only               | Admin only      |
+| modules                  | Public active + Admin          | Editor/Superadmin | Editor/Superadmin        | Superadmin      |
+| notification_preferences | Own only                       | Own only          | Own only                 | -               |
+| notification_queue       | Admin view                     | Service role      | Service role             | Service role    |
+| notification_targets     | Own + Admin view               | Service role      | Service role             | Service role    |
+| notifications            | Public view                    | Editor/Superadmin | Editor/Superadmin        | Superadmin      |
 
 **Tables Needing RLS Policies (26 tables):**
 
@@ -534,38 +534,46 @@ notifications (1) ──→ (*) notification_targets
 
 ## Correctness Properties
 
-*A property is a characteristic or behavior that should hold true across all valid executions of a system-essentially, a formal statement about what the system should do. Properties serve as the bridge between human-readable specifications and machine-verifiable correctness guarantees.*
+_A property is a characteristic or behavior that should hold true across all valid executions of a system-essentially, a formal statement about what the system should do. Properties serve as the bridge between human-readable specifications and machine-verifiable correctness guarantees._
 
 ### Property 1: Role-Based Access Control Consistency
-*For any* admin user with a specific role, accessing any protected route SHALL either grant access (if role is in allowedRoles) or redirect to dashboard (if role is not permitted)
+
+_For any_ admin user with a specific role, accessing any protected route SHALL either grant access (if role is in allowedRoles) or redirect to dashboard (if role is not permitted)
 **Validates: Requirements 1.2, 1.3, 1.4**
 
 ### Property 2: Content Hierarchy Integrity
-*For any* content item (topic, lesson, question, flashcard), the parent reference SHALL always point to an existing, active parent entity
+
+_For any_ content item (topic, lesson, question, flashcard), the parent reference SHALL always point to an existing, active parent entity
 **Validates: Requirements 2.1, 2.2, 2.3**
 
 ### Property 3: Question Option Correctness
-*For any* multiple choice question, exactly one option SHALL be marked as is_correct = true
+
+_For any_ multiple choice question, exactly one option SHALL be marked as is_correct = true
 **Validates: Requirements 2.5**
 
 ### Property 4: Subscription Status Consistency
-*For any* subscription record, the status SHALL be 'active' only when current_date is between start_date and end_date
+
+_For any_ subscription record, the status SHALL be 'active' only when current_date is between start_date and end_date
 **Validates: Requirements 4.5**
 
 ### Property 5: Payment Amount Calculation
-*For any* payment with a discount coupon, finalAmount SHALL equal originalAmount minus discountAmount, and discountAmount SHALL not exceed originalAmount
+
+_For any_ payment with a discount coupon, finalAmount SHALL equal originalAmount minus discountAmount, and discountAmount SHALL not exceed originalAmount
 **Validates: Requirements 4.3**
 
 ### Property 6: Trial Module Configuration Bounds
-*For any* trial mock exam configuration, question_count SHALL be exactly 20, time_limit_minutes SHALL be exactly 30, and passing_score SHALL be between 0 and 100
+
+_For any_ trial mock exam configuration, question_count SHALL be exactly 20, time_limit_minutes SHALL be exactly 30, and passing_score SHALL be between 0 and 100
 **Validates: Requirements 5.3**
 
 ### Property 7: AI Usage Rate Limiting
-*For any* user on any given day, the message_count in ai_usage_stats SHALL not exceed the configured daily limit (default: 50)
+
+_For any_ user on any given day, the message_count in ai_usage_stats SHALL not exceed the configured daily limit (default: 50)
 **Validates: Requirements 8.2**
 
 ### Property 8: Notification Delivery Tracking
-*For any* notification in the queue with status 'sent', there SHALL exist corresponding delivery records with timestamps
+
+_For any_ notification in the queue with status 'sent', there SHALL exist corresponding delivery records with timestamps
 **Validates: Requirements 7.4**
 
 ## Error Handling
@@ -588,12 +596,12 @@ notifications (1) ──→ (*) notification_targets
 
 ```typescript
 interface ErrorResponse {
-  success: false
+  success: false;
   error: {
-    code: string
-    message: string
-    details?: Record<string, any>
-  }
+    code: string;
+    message: string;
+    details?: Record<string, any>;
+  };
 }
 ```
 
@@ -611,6 +619,7 @@ interface ErrorResponse {
 Property-based tests SHALL be written using the `fast-check` library to verify correctness properties across randomly generated inputs.
 
 Each property-based test MUST:
+
 1. Be annotated with the property number from the design document
 2. Run a minimum of 100 iterations
 3. Use smart generators that constrain to valid input spaces

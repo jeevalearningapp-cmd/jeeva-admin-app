@@ -1,4 +1,4 @@
-import React from 'react'
+import React from "react";
 import {
   TextField,
   TextFieldProps,
@@ -9,14 +9,14 @@ import {
   FormHelperText,
   Box,
   Typography,
-  alpha
-} from '@mui/material'
-import { CheckCircleOutlined, ErrorOutlineOutlined } from '@mui/icons-material'
+  alpha,
+} from "@mui/material";
+import { CheckCircleOutlined, ErrorOutlineOutlined } from "@mui/icons-material";
 
-interface FormFieldProps extends Omit<TextFieldProps, 'error'> {
-  error?: string
-  touched?: boolean
-  showSuccess?: boolean
+interface FormFieldProps extends Omit<TextFieldProps, "error"> {
+  error?: string;
+  touched?: boolean;
+  showSuccess?: boolean;
 }
 
 export const FormField: React.FC<FormFieldProps> = ({
@@ -26,31 +26,31 @@ export const FormField: React.FC<FormFieldProps> = ({
   sx,
   ...props
 }) => {
-  const hasError = touched && !!error
-  const showSuccessIndicator = touched && !error && showSuccess && props.value
+  const hasError = touched && !!error;
+  const showSuccessIndicator = touched && !error && showSuccess && props.value;
 
   return (
-    <Box sx={{ position: 'relative' }}>
+    <Box sx={{ position: "relative" }}>
       <TextField
         {...props}
         error={hasError}
         helperText={hasError ? error : props.helperText}
         sx={[
           {
-            '& .MuiOutlinedInput-root': {
+            "& .MuiOutlinedInput-root": {
               borderRadius: 0,
-              transition: 'all 0.2s ease',
+              transition: "all 0.2s ease",
             },
-            '& .MuiFormHelperText-root': {
+            "& .MuiFormHelperText-root": {
               mx: 0,
               mt: 0.5,
-              display: 'flex',
-              alignItems: 'center',
+              display: "flex",
+              alignItems: "center",
               gap: 0.5,
-              fontSize: '0.75rem'
-            }
+              fontSize: "0.75rem",
+            },
           },
-          ...(Array.isArray(sx) ? sx : sx ? [sx] : [])
+          ...(Array.isArray(sx) ? sx : sx ? [sx] : []),
         ]}
         InputProps={{
           ...props.InputProps,
@@ -60,8 +60,8 @@ export const FormField: React.FC<FormFieldProps> = ({
                 <CheckCircleOutlined
                   sx={{
                     fontSize: 20,
-                    color: 'success.main',
-                    mr: 1
+                    color: "success.main",
+                    mr: 1,
                   }}
                 />
               )}
@@ -69,26 +69,26 @@ export const FormField: React.FC<FormFieldProps> = ({
                 <ErrorOutlineOutlined
                   sx={{
                     fontSize: 20,
-                    color: 'error.main',
-                    mr: 1
+                    color: "error.main",
+                    mr: 1,
                   }}
                 />
               )}
               {props.InputProps?.endAdornment}
             </>
-          )
+          ),
         }}
       />
     </Box>
-  )
-}
+  );
+};
 
-interface FormSelectProps extends Omit<SelectProps, 'error'> {
-  label: string
-  error?: string
-  touched?: boolean
-  helperText?: string
-  required?: boolean
+interface FormSelectProps extends Omit<SelectProps, "error"> {
+  label: string;
+  error?: string;
+  touched?: boolean;
+  helperText?: string;
+  required?: boolean;
 }
 
 export const FormSelect: React.FC<FormSelectProps> = ({
@@ -100,11 +100,15 @@ export const FormSelect: React.FC<FormSelectProps> = ({
   children,
   ...props
 }) => {
-  const hasError = touched && !!error
+  const hasError = touched && !!error;
 
   return (
     <FormControl fullWidth error={hasError} required={required}>
-      <InputLabel sx={{ '&.Mui-focused': { color: hasError ? 'error.main' : 'primary.main' } }}>
+      <InputLabel
+        sx={{
+          "&.Mui-focused": { color: hasError ? "error.main" : "primary.main" },
+        }}
+      >
         {label}
       </InputLabel>
       <Select
@@ -112,16 +116,16 @@ export const FormSelect: React.FC<FormSelectProps> = ({
         label={label}
         sx={{
           borderRadius: 0,
-          ...props.sx
+          ...props.sx,
         }}
       >
         {children}
       </Select>
       {(hasError || helperText) && (
-        <FormHelperText sx={{ mx: 0, mt: 0.5, fontSize: '0.75rem' }}>
+        <FormHelperText sx={{ mx: 0, mt: 0.5, fontSize: "0.75rem" }}>
           {hasError ? error : helperText}
         </FormHelperText>
       )}
     </FormControl>
-  )
-}
+  );
+};

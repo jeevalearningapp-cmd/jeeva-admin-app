@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Typography,
@@ -24,7 +24,7 @@ import {
   TableRow,
   IconButton,
   Tooltip,
-} from '@mui/material'
+} from "@mui/material";
 import {
   SaveOutlined,
   SettingsOutlined,
@@ -34,16 +34,20 @@ import {
   DeleteOutlined,
   AddOutlined,
   EditOutlined,
-} from '@mui/icons-material'
-import { useSettings } from '@/hooks/useSettings'
-import { useEmailTemplates } from '@/hooks/useEmailTemplates'
-import type { UpdateSettingsInput, EmailTemplate } from '@/types'
-import { validateSettings, getValidationErrorMessage, type SettingsValidationResult } from '@/utils/settingsValidation'
+} from "@mui/icons-material";
+import { useSettings } from "@/hooks/useSettings";
+import { useEmailTemplates } from "@/hooks/useEmailTemplates";
+import type { UpdateSettingsInput, EmailTemplate } from "@/types";
+import {
+  validateSettings,
+  getValidationErrorMessage,
+  type SettingsValidationResult,
+} from "@/utils/settingsValidation";
 
 interface TabPanelProps {
-  children?: React.ReactNode
-  index: number
-  value: number
+  children?: React.ReactNode;
+  index: number;
+  value: number;
 }
 
 const TabPanel: React.FC<TabPanelProps> = ({ children, value, index }) => {
@@ -51,52 +55,68 @@ const TabPanel: React.FC<TabPanelProps> = ({ children, value, index }) => {
     <div hidden={value !== index} role="tabpanel">
       {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
     </div>
-  )
-}
+  );
+};
 
 export const SettingsPage: React.FC = () => {
-  const [tabValue, setTabValue] = React.useState(0)
-  const { settings: backendSettings, isLoading, updateSettings, isUpdating } = useSettings()
-  const { templates, create: createTemplate, update: updateTemplate, delete: deleteTemplate, isCreating } = useEmailTemplates()
-  const [validationResult, setValidationResult] = useState<SettingsValidationResult>({ isValid: true, errors: [] })
-  const [templateDialogOpen, setTemplateDialogOpen] = useState(false)
-  const [editingTemplate, setEditingTemplate] = useState<EmailTemplate | null>(null)
+  const [tabValue, setTabValue] = React.useState(0);
+  const {
+    settings: backendSettings,
+    isLoading,
+    updateSettings,
+    isUpdating,
+  } = useSettings();
+  const {
+    templates,
+    create: createTemplate,
+    update: updateTemplate,
+    delete: deleteTemplate,
+    isCreating,
+  } = useEmailTemplates();
+  const [validationResult, setValidationResult] =
+    useState<SettingsValidationResult>({ isValid: true, errors: [] });
+  const [templateDialogOpen, setTemplateDialogOpen] = useState(false);
+  const [editingTemplate, setEditingTemplate] = useState<EmailTemplate | null>(
+    null,
+  );
   const [templateForm, setTemplateForm] = useState({
-    name: '',
-    subject: '',
-    body: '',
+    name: "",
+    subject: "",
+    body: "",
     variables: [] as string[],
     isActive: true,
-  })
-  
-  const [localSettings, setLocalSettings] = React.useState<UpdateSettingsInput>({
-    siteName: '',
-    siteDescription: '',
-    contactEmail: '',
-    supportEmail: '',
-    logoUrl: '',
-    faviconUrl: '',
-    defaultNotificationImageUrl: '',
-    maintenanceMode: false,
-    registrationEnabled: true,
-    emailVerificationRequired: true,
-    maxFileUploadSize: 5,
-    allowedFileTypes: ['image/jpeg', 'image/png', 'image/gif', 'video/mp4'],
-    sessionTimeout: 60,
-    passwordMinLength: 8,
-    passwordRequireUppercase: true,
-    passwordRequireLowercase: true,
-    passwordRequireNumbers: true,
-    passwordRequireSpecialChars: true,
-    emailNotifications: true,
-    pushNotifications: false,
-    newUserSignup: true,
-    contentSubmitted: true,
-    contentApproved: true,
-    contentRejected: true,
-    subscriptionExpiring: true,
-    subscriptionRenewed: true,
-  })
+  });
+
+  const [localSettings, setLocalSettings] = React.useState<UpdateSettingsInput>(
+    {
+      siteName: "",
+      siteDescription: "",
+      contactEmail: "",
+      supportEmail: "",
+      logoUrl: "",
+      faviconUrl: "",
+      defaultNotificationImageUrl: "",
+      maintenanceMode: false,
+      registrationEnabled: true,
+      emailVerificationRequired: true,
+      maxFileUploadSize: 5,
+      allowedFileTypes: ["image/jpeg", "image/png", "image/gif", "video/mp4"],
+      sessionTimeout: 60,
+      passwordMinLength: 8,
+      passwordRequireUppercase: true,
+      passwordRequireLowercase: true,
+      passwordRequireNumbers: true,
+      passwordRequireSpecialChars: true,
+      emailNotifications: true,
+      pushNotifications: false,
+      newUserSignup: true,
+      contentSubmitted: true,
+      contentApproved: true,
+      contentRejected: true,
+      subscriptionExpiring: true,
+      subscriptionRenewed: true,
+    },
+  );
 
   // Sync backend settings to local state when loaded
   useEffect(() => {
@@ -108,7 +128,8 @@ export const SettingsPage: React.FC = () => {
         supportEmail: backendSettings.supportEmail,
         logoUrl: backendSettings.logoUrl,
         faviconUrl: backendSettings.faviconUrl,
-        defaultNotificationImageUrl: backendSettings.defaultNotificationImageUrl,
+        defaultNotificationImageUrl:
+          backendSettings.defaultNotificationImageUrl,
         maintenanceMode: backendSettings.maintenanceMode,
         registrationEnabled: backendSettings.registrationEnabled,
         emailVerificationRequired: backendSettings.emailVerificationRequired,
@@ -119,7 +140,8 @@ export const SettingsPage: React.FC = () => {
         passwordRequireUppercase: backendSettings.passwordRequireUppercase,
         passwordRequireLowercase: backendSettings.passwordRequireLowercase,
         passwordRequireNumbers: backendSettings.passwordRequireNumbers,
-        passwordRequireSpecialChars: backendSettings.passwordRequireSpecialChars,
+        passwordRequireSpecialChars:
+          backendSettings.passwordRequireSpecialChars,
         emailNotifications: backendSettings.emailNotifications,
         pushNotifications: backendSettings.pushNotifications,
         newUserSignup: backendSettings.newUserSignup,
@@ -128,64 +150,77 @@ export const SettingsPage: React.FC = () => {
         contentRejected: backendSettings.contentRejected,
         subscriptionExpiring: backendSettings.subscriptionExpiring,
         subscriptionRenewed: backendSettings.subscriptionRenewed,
-      })
+      });
     }
-  }, [backendSettings])
+  }, [backendSettings]);
 
-  const handleChange = (field: keyof UpdateSettingsInput) => (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    let value: string | boolean | number | string[]
-    
-    if (event.target.type === 'checkbox') {
-      value = event.target.checked
-    } else if (event.target.type === 'number') {
-      value = parseFloat(event.target.value) || 0
-    } else {
-      value = event.target.value
-    }
-    
-    setLocalSettings({ ...localSettings, [field]: value })
-  }
+  const handleChange =
+    (field: keyof UpdateSettingsInput) =>
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      let value: string | boolean | number | string[];
+
+      if (event.target.type === "checkbox") {
+        value = event.target.checked;
+      } else if (event.target.type === "number") {
+        value = parseFloat(event.target.value) || 0;
+      } else {
+        value = event.target.value;
+      }
+
+      setLocalSettings({ ...localSettings, [field]: value });
+    };
 
   // Separate handler for Switch components (different onChange signature)
-  const handleSwitchChange = (field: keyof UpdateSettingsInput) => (
-    event: React.SyntheticEvent,
-    checked: boolean
-  ) => {
-    setLocalSettings({ ...localSettings, [field]: checked })
-  }
+  const handleSwitchChange =
+    (field: keyof UpdateSettingsInput) =>
+    (event: React.SyntheticEvent, checked: boolean) => {
+      setLocalSettings({ ...localSettings, [field]: checked });
+    };
 
   const handleSave = () => {
     // Validate settings before saving
-    const validation = validateSettings(localSettings)
-    setValidationResult(validation)
+    const validation = validateSettings(localSettings);
+    setValidationResult(validation);
 
     if (!validation.isValid) {
-      return
+      return;
     }
 
     if (backendSettings?.id) {
       updateSettings({
         id: backendSettings.id,
         input: localSettings,
-      })
+      });
       // Clear validation errors after save
-      setValidationResult({ isValid: true, errors: [] })
+      setValidationResult({ isValid: true, errors: [] });
     }
-  }
+  };
 
   if (isLoading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '400px' }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "400px",
+        }}
+      >
         <CircularProgress />
       </Box>
-    )
+    );
   }
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 3,
+        }}
+      >
         <Typography variant="h4" gutterBottom>
           Platform Settings
         </Typography>
@@ -196,7 +231,7 @@ export const SettingsPage: React.FC = () => {
           disabled={isUpdating}
           sx={{ borderRadius: 0 }}
         >
-          {isUpdating ? 'Saving...' : 'Save Changes'}
+          {isUpdating ? "Saving..." : "Save Changes"}
         </Button>
       </Box>
 
@@ -204,7 +239,7 @@ export const SettingsPage: React.FC = () => {
         <Tabs
           value={tabValue}
           onChange={(_, newValue) => setTabValue(newValue)}
-          sx={{ borderBottom: 1, borderColor: 'divider', px: 2 }}
+          sx={{ borderBottom: 1, borderColor: "divider", px: 2 }}
         >
           <Tab icon={<SettingsOutlined />} label="General" />
           <Tab icon={<SecurityOutlined />} label="Security" />
@@ -225,48 +260,69 @@ export const SettingsPage: React.FC = () => {
             </Alert>
           )}
 
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
             <TextField
               label="Site Name"
-              value={localSettings.siteName || ''}
-              onChange={handleChange('siteName')}
+              value={localSettings.siteName || ""}
+              onChange={handleChange("siteName")}
               fullWidth
               required
-              error={!!getValidationErrorMessage('siteName', validationResult.errors)}
-              helperText={getValidationErrorMessage('siteName', validationResult.errors)}
-              sx={{ '& .MuiOutlinedInput-root': { borderRadius: 0 } }}
+              error={
+                !!getValidationErrorMessage("siteName", validationResult.errors)
+              }
+              helperText={getValidationErrorMessage(
+                "siteName",
+                validationResult.errors,
+              )}
+              sx={{ "& .MuiOutlinedInput-root": { borderRadius: 0 } }}
             />
-            
+
             <TextField
               label="Site Description"
-              value={localSettings.siteDescription || ''}
-              onChange={handleChange('siteDescription')}
+              value={localSettings.siteDescription || ""}
+              onChange={handleChange("siteDescription")}
               fullWidth
               multiline
               rows={3}
-              sx={{ '& .MuiOutlinedInput-root': { borderRadius: 0 } }}
+              sx={{ "& .MuiOutlinedInput-root": { borderRadius: 0 } }}
             />
 
-            <Box sx={{ display: 'flex', gap: 2 }}>
+            <Box sx={{ display: "flex", gap: 2 }}>
               <TextField
                 label="Contact Email"
-                value={localSettings.contactEmail || ''}
-                onChange={handleChange('contactEmail')}
+                value={localSettings.contactEmail || ""}
+                onChange={handleChange("contactEmail")}
                 fullWidth
                 type="email"
-                error={!!getValidationErrorMessage('contactEmail', validationResult.errors)}
-                helperText={getValidationErrorMessage('contactEmail', validationResult.errors)}
-                sx={{ '& .MuiOutlinedInput-root': { borderRadius: 0 } }}
+                error={
+                  !!getValidationErrorMessage(
+                    "contactEmail",
+                    validationResult.errors,
+                  )
+                }
+                helperText={getValidationErrorMessage(
+                  "contactEmail",
+                  validationResult.errors,
+                )}
+                sx={{ "& .MuiOutlinedInput-root": { borderRadius: 0 } }}
               />
               <TextField
                 label="Support Email"
-                value={localSettings.supportEmail || ''}
-                onChange={handleChange('supportEmail')}
+                value={localSettings.supportEmail || ""}
+                onChange={handleChange("supportEmail")}
                 fullWidth
                 type="email"
-                error={!!getValidationErrorMessage('supportEmail', validationResult.errors)}
-                helperText={getValidationErrorMessage('supportEmail', validationResult.errors)}
-                sx={{ '& .MuiOutlinedInput-root': { borderRadius: 0 } }}
+                error={
+                  !!getValidationErrorMessage(
+                    "supportEmail",
+                    validationResult.errors,
+                  )
+                }
+                helperText={getValidationErrorMessage(
+                  "supportEmail",
+                  validationResult.errors,
+                )}
+                sx={{ "& .MuiOutlinedInput-root": { borderRadius: 0 } }}
               />
             </Box>
 
@@ -277,22 +333,22 @@ export const SettingsPage: React.FC = () => {
 
             <TextField
               label="Logo URL"
-              value={localSettings.logoUrl || ''}
-              onChange={handleChange('logoUrl')}
+              value={localSettings.logoUrl || ""}
+              onChange={handleChange("logoUrl")}
               fullWidth
               placeholder="https://example.com/logo.png"
               helperText="URL to your company logo (used in admin portal)"
-              sx={{ '& .MuiOutlinedInput-root': { borderRadius: 0 } }}
+              sx={{ "& .MuiOutlinedInput-root": { borderRadius: 0 } }}
             />
 
             <TextField
               label="Favicon URL"
-              value={localSettings.faviconUrl || ''}
-              onChange={handleChange('faviconUrl')}
+              value={localSettings.faviconUrl || ""}
+              onChange={handleChange("faviconUrl")}
               fullWidth
               placeholder="https://example.com/favicon.ico"
               helperText="URL to your favicon (small browser tab icon)"
-              sx={{ '& .MuiOutlinedInput-root': { borderRadius: 0 } }}
+              sx={{ "& .MuiOutlinedInput-root": { borderRadius: 0 } }}
             />
 
             <Typography variant="h6" sx={{ mt: 2 }}>
@@ -302,12 +358,12 @@ export const SettingsPage: React.FC = () => {
 
             <TextField
               label="Default Notification Image URL"
-              value={localSettings.defaultNotificationImageUrl || ''}
-              onChange={handleChange('defaultNotificationImageUrl')}
+              value={localSettings.defaultNotificationImageUrl || ""}
+              onChange={handleChange("defaultNotificationImageUrl")}
               fullWidth
               placeholder="https://example.com/notification-logo.png"
               helperText="Default image for push & in-app notifications (when no custom image is provided)"
-              sx={{ '& .MuiOutlinedInput-root': { borderRadius: 0 } }}
+              sx={{ "& .MuiOutlinedInput-root": { borderRadius: 0 } }}
             />
 
             <Typography variant="h6" sx={{ mt: 2 }}>
@@ -319,27 +375,27 @@ export const SettingsPage: React.FC = () => {
               control={
                 <Switch
                   checked={localSettings.maintenanceMode || false}
-                  onChange={handleChange('maintenanceMode')}
+                  onChange={handleChange("maintenanceMode")}
                 />
               }
               label="Maintenance Mode (disables user access)"
             />
-            
+
             <FormControlLabel
               control={
                 <Switch
                   checked={localSettings.registrationEnabled || false}
-                  onChange={handleChange('registrationEnabled')}
+                  onChange={handleChange("registrationEnabled")}
                 />
               }
               label="User Registration Enabled"
             />
-            
+
             <FormControlLabel
               control={
                 <Switch
                   checked={localSettings.emailVerificationRequired || false}
-                  onChange={handleChange('emailVerificationRequired')}
+                  onChange={handleChange("emailVerificationRequired")}
                 />
               }
               label="Email Verification Required"
@@ -354,53 +410,70 @@ export const SettingsPage: React.FC = () => {
               label="Max File Upload Size (MB)"
               type="number"
               value={localSettings.maxFileUploadSize || 0}
-              onChange={handleChange('maxFileUploadSize')}
+              onChange={handleChange("maxFileUploadSize")}
               fullWidth
               inputProps={{ min: 1, max: 100 }}
-              error={!!getValidationErrorMessage('maxFileUploadSize', validationResult.errors)}
-              helperText={getValidationErrorMessage('maxFileUploadSize', validationResult.errors) || 'Range: 1-100 MB'}
-              sx={{ '& .MuiOutlinedInput-root': { borderRadius: 0 } }}
+              error={
+                !!getValidationErrorMessage(
+                  "maxFileUploadSize",
+                  validationResult.errors,
+                )
+              }
+              helperText={
+                getValidationErrorMessage(
+                  "maxFileUploadSize",
+                  validationResult.errors,
+                ) || "Range: 1-100 MB"
+              }
+              sx={{ "& .MuiOutlinedInput-root": { borderRadius: 0 } }}
             />
 
             <Box>
               <Typography variant="body2" color="text.secondary" gutterBottom>
                 Allowed File Types
               </Typography>
-              <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 2 }}>
+              <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mb: 2 }}>
                 {(localSettings.allowedFileTypes || []).map((type) => (
-                  <Chip 
-                    key={type} 
-                    label={type} 
+                  <Chip
+                    key={type}
+                    label={type}
                     size="small"
                     onDelete={() => {
                       setLocalSettings({
                         ...localSettings,
-                        allowedFileTypes: (localSettings.allowedFileTypes || []).filter(t => t !== type)
-                      })
+                        allowedFileTypes: (
+                          localSettings.allowedFileTypes || []
+                        ).filter((t) => t !== type),
+                      });
                     }}
                   />
                 ))}
               </Box>
-              <Box sx={{ display: 'flex', gap: 2 }}>
+              <Box sx={{ display: "flex", gap: 2 }}>
                 <TextField
                   label="Add new file type"
                   placeholder="e.g., image/webp"
                   size="small"
                   id="fileTypeInput"
-                  sx={{ '& .MuiOutlinedInput-root': { borderRadius: 0 } }}
+                  sx={{ "& .MuiOutlinedInput-root": { borderRadius: 0 } }}
                 />
                 <Button
                   variant="outlined"
                   size="small"
                   startIcon={<AddOutlined />}
                   onClick={() => {
-                    const input = document.getElementById('fileTypeInput') as HTMLInputElement
+                    const input = document.getElementById(
+                      "fileTypeInput",
+                    ) as HTMLInputElement;
                     if (input && input.value) {
                       setLocalSettings({
                         ...localSettings,
-                        allowedFileTypes: [...(localSettings.allowedFileTypes || []), input.value]
-                      })
-                      input.value = ''
+                        allowedFileTypes: [
+                          ...(localSettings.allowedFileTypes || []),
+                          input.value,
+                        ],
+                      });
+                      input.value = "";
                     }
                   }}
                   sx={{ borderRadius: 0 }}
@@ -419,17 +492,27 @@ export const SettingsPage: React.FC = () => {
           </Typography>
           <Divider sx={{ mb: 3 }} />
 
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
             <TextField
               label="Session Timeout (minutes)"
               type="number"
               value={localSettings.sessionTimeout || 0}
-              onChange={handleChange('sessionTimeout')}
+              onChange={handleChange("sessionTimeout")}
               fullWidth
               inputProps={{ min: 5, max: 1440 }}
-              error={!!getValidationErrorMessage('sessionTimeout', validationResult.errors)}
-              helperText={getValidationErrorMessage('sessionTimeout', validationResult.errors) || 'Range: 5-1440 minutes'}
-              sx={{ '& .MuiOutlinedInput-root': { borderRadius: 0 } }}
+              error={
+                !!getValidationErrorMessage(
+                  "sessionTimeout",
+                  validationResult.errors,
+                )
+              }
+              helperText={
+                getValidationErrorMessage(
+                  "sessionTimeout",
+                  validationResult.errors,
+                ) || "Range: 5-1440 minutes"
+              }
+              sx={{ "& .MuiOutlinedInput-root": { borderRadius: 0 } }}
             />
 
             <Typography variant="h6" sx={{ mt: 2 }}>
@@ -441,49 +524,59 @@ export const SettingsPage: React.FC = () => {
               label="Minimum Password Length"
               type="number"
               value={localSettings.passwordMinLength || 0}
-              onChange={handleChange('passwordMinLength')}
+              onChange={handleChange("passwordMinLength")}
               fullWidth
               inputProps={{ min: 6, max: 128 }}
-              error={!!getValidationErrorMessage('passwordMinLength', validationResult.errors)}
-              helperText={getValidationErrorMessage('passwordMinLength', validationResult.errors) || 'Range: 6-128 characters'}
-              sx={{ '& .MuiOutlinedInput-root': { borderRadius: 0 } }}
+              error={
+                !!getValidationErrorMessage(
+                  "passwordMinLength",
+                  validationResult.errors,
+                )
+              }
+              helperText={
+                getValidationErrorMessage(
+                  "passwordMinLength",
+                  validationResult.errors,
+                ) || "Range: 6-128 characters"
+              }
+              sx={{ "& .MuiOutlinedInput-root": { borderRadius: 0 } }}
             />
 
             <FormControlLabel
               control={
                 <Switch
                   checked={localSettings.passwordRequireUppercase || false}
-                  onChange={handleSwitchChange('passwordRequireUppercase')}
+                  onChange={handleSwitchChange("passwordRequireUppercase")}
                 />
               }
               label="Require Uppercase Letters"
             />
-            
+
             <FormControlLabel
               control={
                 <Switch
                   checked={localSettings.passwordRequireLowercase || false}
-                  onChange={handleSwitchChange('passwordRequireLowercase')}
+                  onChange={handleSwitchChange("passwordRequireLowercase")}
                 />
               }
               label="Require Lowercase Letters"
             />
-            
+
             <FormControlLabel
               control={
                 <Switch
                   checked={localSettings.passwordRequireNumbers || false}
-                  onChange={handleSwitchChange('passwordRequireNumbers')}
+                  onChange={handleSwitchChange("passwordRequireNumbers")}
                 />
               }
               label="Require Numbers"
             />
-            
+
             <FormControlLabel
               control={
                 <Switch
                   checked={localSettings.passwordRequireSpecialChars || false}
-                  onChange={handleSwitchChange('passwordRequireSpecialChars')}
+                  onChange={handleSwitchChange("passwordRequireSpecialChars")}
                 />
               }
               label="Require Special Characters"
@@ -498,27 +591,25 @@ export const SettingsPage: React.FC = () => {
           </Typography>
           <Divider sx={{ mb: 3 }} />
 
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-            <Typography variant="h6">
-              Notification Channels
-            </Typography>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+            <Typography variant="h6">Notification Channels</Typography>
             <Divider />
 
             <FormControlLabel
               control={
                 <Switch
                   checked={localSettings.emailNotifications || false}
-                  onChange={handleSwitchChange('emailNotifications')}
+                  onChange={handleSwitchChange("emailNotifications")}
                 />
               }
               label="Email Notifications"
             />
-            
+
             <FormControlLabel
               control={
                 <Switch
                   checked={localSettings.pushNotifications || false}
-                  onChange={handleSwitchChange('pushNotifications')}
+                  onChange={handleSwitchChange("pushNotifications")}
                 />
               }
               label="Push Notifications"
@@ -533,57 +624,57 @@ export const SettingsPage: React.FC = () => {
               control={
                 <Switch
                   checked={localSettings.newUserSignup || false}
-                  onChange={handleSwitchChange('newUserSignup')}
+                  onChange={handleSwitchChange("newUserSignup")}
                 />
               }
               label="New User Signup"
             />
-            
+
             <FormControlLabel
               control={
                 <Switch
                   checked={localSettings.contentSubmitted || false}
-                  onChange={handleSwitchChange('contentSubmitted')}
+                  onChange={handleSwitchChange("contentSubmitted")}
                 />
               }
               label="Content Submitted for Approval"
             />
-            
+
             <FormControlLabel
               control={
                 <Switch
                   checked={localSettings.contentApproved || false}
-                  onChange={handleSwitchChange('contentApproved')}
+                  onChange={handleSwitchChange("contentApproved")}
                 />
               }
               label="Content Approved"
             />
-            
+
             <FormControlLabel
               control={
                 <Switch
                   checked={localSettings.contentRejected || false}
-                  onChange={handleSwitchChange('contentRejected')}
+                  onChange={handleSwitchChange("contentRejected")}
                 />
               }
               label="Content Rejected"
             />
-            
+
             <FormControlLabel
               control={
                 <Switch
                   checked={localSettings.subscriptionExpiring || false}
-                  onChange={handleSwitchChange('subscriptionExpiring')}
+                  onChange={handleSwitchChange("subscriptionExpiring")}
                 />
               }
               label="Subscription Expiring Soon"
             />
-            
+
             <FormControlLabel
               control={
                 <Switch
                   checked={localSettings.subscriptionRenewed || false}
-                  onChange={handleSwitchChange('subscriptionRenewed')}
+                  onChange={handleSwitchChange("subscriptionRenewed")}
                 />
               }
               label="Subscription Renewed"
@@ -593,17 +684,28 @@ export const SettingsPage: React.FC = () => {
 
         {/* Email Templates */}
         <TabPanel value={tabValue} index={3}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-            <Typography variant="h6">
-              Email Templates
-            </Typography>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              mb: 3,
+            }}
+          >
+            <Typography variant="h6">Email Templates</Typography>
             <Button
               variant="contained"
               startIcon={<AddOutlined />}
               onClick={() => {
-                setEditingTemplate(null)
-                setTemplateForm({ name: '', subject: '', body: '', variables: [], isActive: true })
-                setTemplateDialogOpen(true)
+                setEditingTemplate(null);
+                setTemplateForm({
+                  name: "",
+                  subject: "",
+                  body: "",
+                  variables: [],
+                  isActive: true,
+                });
+                setTemplateDialogOpen(true);
               }}
               sx={{ borderRadius: 0 }}
             >
@@ -614,13 +716,15 @@ export const SettingsPage: React.FC = () => {
 
           {templates.length === 0 ? (
             <Alert severity="info" sx={{ borderRadius: 0 }}>
-              No email templates created yet. Create templates for welcome emails, password resets, content approvals, and subscription notifications.
+              No email templates created yet. Create templates for welcome
+              emails, password resets, content approvals, and subscription
+              notifications.
             </Alert>
           ) : (
-            <Paper sx={{ borderRadius: 0, overflowX: 'auto' }}>
+            <Paper sx={{ borderRadius: 0, overflowX: "auto" }}>
               <Table>
                 <TableHead>
-                  <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
+                  <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
                     <TableCell>Name</TableCell>
                     <TableCell>Subject</TableCell>
                     <TableCell>Variables</TableCell>
@@ -634,21 +738,42 @@ export const SettingsPage: React.FC = () => {
                       <TableCell>{template.name}</TableCell>
                       <TableCell>{template.subject}</TableCell>
                       <TableCell>
-                        <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+                        <Box
+                          sx={{ display: "flex", gap: 0.5, flexWrap: "wrap" }}
+                        >
                           {template.variables.length > 0 ? (
                             template.variables.map((v) => (
-                              <Chip key={v} label={`{{${v}}}}`} size="small" variant="outlined" />
+                              <Chip
+                                key={v}
+                                label={`{{${v}}}}`}
+                                size="small"
+                                variant="outlined"
+                              />
                             ))
                           ) : (
-                            <Typography variant="caption" color="text.secondary">None</Typography>
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                            >
+                              None
+                            </Typography>
                           )}
                         </Box>
                       </TableCell>
                       <TableCell>
                         {template.isActive ? (
-                          <Chip label="Active" size="small" color="success" variant="filled" />
+                          <Chip
+                            label="Active"
+                            size="small"
+                            color="success"
+                            variant="filled"
+                          />
                         ) : (
-                          <Chip label="Inactive" size="small" variant="outlined" />
+                          <Chip
+                            label="Inactive"
+                            size="small"
+                            variant="outlined"
+                          />
                         )}
                       </TableCell>
                       <TableCell align="right">
@@ -656,15 +781,15 @@ export const SettingsPage: React.FC = () => {
                           <IconButton
                             size="small"
                             onClick={() => {
-                              setEditingTemplate(template)
+                              setEditingTemplate(template);
                               setTemplateForm({
                                 name: template.name,
                                 subject: template.subject,
                                 body: template.body,
                                 variables: template.variables,
                                 isActive: template.isActive,
-                              })
-                              setTemplateDialogOpen(true)
+                              });
+                              setTemplateDialogOpen(true);
                             }}
                           >
                             <EditOutlined fontSize="small" />
@@ -675,8 +800,8 @@ export const SettingsPage: React.FC = () => {
                             size="small"
                             color="error"
                             onClick={() => {
-                              if (window.confirm('Delete this template?')) {
-                                deleteTemplate(template.id)
+                              if (window.confirm("Delete this template?")) {
+                                deleteTemplate(template.id);
                               }
                             }}
                           >
@@ -692,29 +817,42 @@ export const SettingsPage: React.FC = () => {
           )}
 
           {/* Template Dialog */}
-          <Dialog open={templateDialogOpen} onClose={() => setTemplateDialogOpen(false)} maxWidth="sm" fullWidth>
+          <Dialog
+            open={templateDialogOpen}
+            onClose={() => setTemplateDialogOpen(false)}
+            maxWidth="sm"
+            fullWidth
+          >
             <DialogTitle>
-              {editingTemplate ? 'Edit Template' : 'Create New Template'}
+              {editingTemplate ? "Edit Template" : "Create New Template"}
             </DialogTitle>
-            <DialogContent sx={{ pt: 3, display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <DialogContent
+              sx={{ pt: 3, display: "flex", flexDirection: "column", gap: 2 }}
+            >
               <TextField
                 label="Template Name"
                 value={templateForm.name}
-                onChange={(e) => setTemplateForm({ ...templateForm, name: e.target.value })}
+                onChange={(e) =>
+                  setTemplateForm({ ...templateForm, name: e.target.value })
+                }
                 fullWidth
                 placeholder="e.g., Welcome Email"
               />
               <TextField
                 label="Email Subject"
                 value={templateForm.subject}
-                onChange={(e) => setTemplateForm({ ...templateForm, subject: e.target.value })}
+                onChange={(e) =>
+                  setTemplateForm({ ...templateForm, subject: e.target.value })
+                }
                 fullWidth
                 placeholder="e.g., Welcome to {{APP_NAME}}"
               />
               <TextField
                 label="Email Body (HTML)"
                 value={templateForm.body}
-                onChange={(e) => setTemplateForm({ ...templateForm, body: e.target.value })}
+                onChange={(e) =>
+                  setTemplateForm({ ...templateForm, body: e.target.value })
+                }
                 fullWidth
                 multiline
                 rows={8}
@@ -724,7 +862,7 @@ export const SettingsPage: React.FC = () => {
                 <Typography variant="body2" color="text.secondary" gutterBottom>
                   Variables
                 </Typography>
-                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 1 }}>
+                <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mb: 1 }}>
                   {templateForm.variables.map((v) => (
                     <Chip
                       key={v}
@@ -732,13 +870,15 @@ export const SettingsPage: React.FC = () => {
                       onDelete={() => {
                         setTemplateForm({
                           ...templateForm,
-                          variables: templateForm.variables.filter(x => x !== v),
-                        })
+                          variables: templateForm.variables.filter(
+                            (x) => x !== v,
+                          ),
+                        });
                       }}
                     />
                   ))}
                 </Box>
-                <Box sx={{ display: 'flex', gap: 1 }}>
+                <Box sx={{ display: "flex", gap: 1 }}>
                   <TextField
                     label="Add variable"
                     size="small"
@@ -750,13 +890,19 @@ export const SettingsPage: React.FC = () => {
                     variant="outlined"
                     size="small"
                     onClick={() => {
-                      const input = document.getElementById('varInput') as HTMLInputElement
-                      if (input && input.value && !templateForm.variables.includes(input.value)) {
+                      const input = document.getElementById(
+                        "varInput",
+                      ) as HTMLInputElement;
+                      if (
+                        input &&
+                        input.value &&
+                        !templateForm.variables.includes(input.value)
+                      ) {
                         setTemplateForm({
                           ...templateForm,
                           variables: [...templateForm.variables, input.value],
-                        })
-                        input.value = ''
+                        });
+                        input.value = "";
                       }
                     }}
                   >
@@ -768,34 +914,49 @@ export const SettingsPage: React.FC = () => {
                 control={
                   <Switch
                     checked={templateForm.isActive}
-                    onChange={(e) => setTemplateForm({ ...templateForm, isActive: e.target.checked })}
+                    onChange={(e) =>
+                      setTemplateForm({
+                        ...templateForm,
+                        isActive: e.target.checked,
+                      })
+                    }
                   />
                 }
                 label="Active"
               />
             </DialogContent>
             <DialogActions>
-              <Button onClick={() => setTemplateDialogOpen(false)}>Cancel</Button>
+              <Button onClick={() => setTemplateDialogOpen(false)}>
+                Cancel
+              </Button>
               <Button
                 variant="contained"
                 onClick={() => {
                   if (editingTemplate) {
-                    updateTemplate({ id: editingTemplate.id, template: templateForm })
+                    updateTemplate({
+                      id: editingTemplate.id,
+                      template: templateForm,
+                    });
                   } else {
-                    createTemplate(templateForm)
+                    createTemplate(templateForm);
                   }
-                  setTemplateDialogOpen(false)
+                  setTemplateDialogOpen(false);
                 }}
-                disabled={isCreating || !templateForm.name || !templateForm.subject || !templateForm.body}
+                disabled={
+                  isCreating ||
+                  !templateForm.name ||
+                  !templateForm.subject ||
+                  !templateForm.body
+                }
               >
-                {editingTemplate ? 'Update' : 'Create'}
+                {editingTemplate ? "Update" : "Create"}
               </Button>
             </DialogActions>
           </Dialog>
         </TabPanel>
       </Paper>
     </Box>
-  )
-}
+  );
+};
 
-export default SettingsPage
+export default SettingsPage;

@@ -106,6 +106,7 @@ npx supabase secrets set SUPABASE_SERVICE_ROLE_KEY=YOUR_SERVICE_ROLE_KEY_HERE \
 ```
 
 **Where to find your service role key:**
+
 1. Supabase Dashboard → Settings → API
 2. Under "Project API keys"
 3. Click "Reveal" next to `service_role` secret
@@ -123,6 +124,7 @@ curl -X POST https://qsvjvgsnbslgypykuznd.supabase.co/functions/v1/send-notifica
 ```
 
 ✅ Expected response:
+
 ```json
 {
   "success": true,
@@ -145,6 +147,7 @@ This is correct! It means the function is working but there are no notifications
 4. Copy and run in Supabase SQL Editor
 
 This creates cron jobs that:
+
 - Process notification queue every minute
 - Track delivery receipts every 5 minutes
 - Run automated notifications daily at 10 AM
@@ -164,6 +167,7 @@ For real-time automated notifications:
 3. Run in Supabase SQL Editor
 
 This creates triggers for:
+
 - Welcome notifications (new user signup)
 - Subscription activation alerts
 - Content approved/rejected notifications
@@ -215,7 +219,7 @@ The push notifications system is now fully deployed:
 
 ✅ Database tables created  
 ✅ Edge Functions deployed  
-✅ Admin portal ready to send notifications  
+✅ Admin portal ready to send notifications
 
 ---
 
@@ -234,23 +238,28 @@ For notifications to reach actual devices, the mobile app needs to:
 ## 🔧 Troubleshooting
 
 ### "Access token not provided"
+
 - Run `npx supabase login` again
 - Make sure you copied the full access token
 
 ### "relation notifications does not exist"
+
 - Run Step 1 (SQL migrations) first
 
 ### "No pending notifications" (after creating one)
+
 - This is normal if pg_cron isn't set up yet
 - Manually trigger the function with curl (see Step 9)
 
 ### Edge Function errors
+
 - Check function logs:
   ```bash
   npx supabase functions logs send-notification --project-ref qsvjvgsnbslgypykuznd
   ```
 
 ### Notifications not reaching devices
+
 - Make sure mobile app has registered push tokens
 - Check `push_tokens` table: `SELECT COUNT(*) FROM push_tokens WHERE is_active = true;`
 
@@ -261,7 +270,7 @@ For notifications to reach actual devices, the mobile app needs to:
 **Check notification delivery stats:**
 
 ```sql
-SELECT 
+SELECT
   status,
   COUNT(*) as total,
   SUM(total_delivered) as delivered,
@@ -289,6 +298,7 @@ npx supabase functions logs send-notification --project-ref qsvjvgsnbslgypykuznd
 ---
 
 **Project Details:**
+
 - Supabase URL: https://qsvjvgsnbslgypykuznd.supabase.co
 - Project Ref: qsvjvgsnbslgypykuznd
 - Admin Portal: Your Replit URL

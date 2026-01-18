@@ -1,60 +1,61 @@
 # Learning Module Structure Migration Guide
 
 ## Overview
+
 This guide documents the migration needed for the Learning Module structure update where:
+
 - **Numeracy** topic now has 4 subtopics (previously had none)
 - All subtopic IDs have been renumbered to accommodate the change
 
 ## Migration Required
 
 ### Affected Database Tables
+
 The following tables use subtopic IDs that need to be updated:
 
 1. **lessons**
    - Column: `category` (stores subtopic ID like "1.1", "2.2", etc.)
-   
 2. **questions**
    - Column: `subdivision` (stores subtopic ID)
-   
 3. **flashcards**
    - Column: `category` (stores subtopic ID)
-   
 4. **learning_progress** (if exists)
    - Column: `subtopic_id` (stores subtopic ID)
 
 ### Subtopic ID Mapping
 
-| Old ID | Old Topic | New ID | New Topic |
-|--------|-----------|--------|-----------|
-| N/A (no subtopics) | Numeracy | 1.1 | Numeracy → Dosage Calculations |
-| N/A (no subtopics) | Numeracy | 1.2 | Numeracy → Unit Conversions |
-| N/A (no subtopics) | Numeracy | 1.3 | Numeracy → IV Flow Rate Calculations |
-| N/A (no subtopics) | Numeracy | 1.4 | Numeracy → Fluid Balance |
-| 1.1 | The NMC Code → Prioritise People | 2.1 | The NMC Code → Prioritise People |
-| 1.2 | The NMC Code → Practice Effectively | 2.2 | The NMC Code → Practice Effectively |
-| 1.3 | The NMC Code → Preserve Safety | 2.3 | The NMC Code → Preserve Safety |
-| 1.4 | The NMC Code → Promote Professionalism | 2.4 | The NMC Code → Promote Professionalism |
-| 2.1 | Mental Capacity Act → Presumption of Capacity | 3.1 | Mental Capacity Act → Presumption of Capacity |
-| 2.2 | Mental Capacity Act → Assessing Capacity | 3.2 | Mental Capacity Act → Assessing Capacity |
-| 2.3 | Mental Capacity Act → Best Interests Decisions | 3.3 | Mental Capacity Act → Best Interests Decisions |
-| 2.4 | Mental Capacity Act → Advanced Care Planning | 3.4 | Mental Capacity Act → Advanced Care Planning |
-| 3.1 | Safeguarding → Recognising Abuse | 4.1 | Safeguarding → Recognising Abuse |
-| 3.2 | Safeguarding → Reporting Protocols | 4.2 | Safeguarding → Reporting Protocols |
-| 3.3 | Safeguarding → Child Protection | 4.3 | Safeguarding → Child Protection |
-| 4.1 | Consent & Confidentiality → Valid Consent | 5.1 | Consent & Confidentiality → Valid Consent |
-| 4.2 | Consent & Confidentiality → GDPR & Confidentiality | 5.2 | Consent & Confidentiality → GDPR & Confidentiality |
-| 4.3 | Consent & Confidentiality → Confidentiality vs. Safeguarding | 5.3 | Consent & Confidentiality → Confidentiality vs. Safeguarding |
-| 5.1 | Equality & Diversity → Equality Act 2010 | 6.1 | Equality & Diversity → Equality Act 2010 |
-| 5.2 | Equality & Diversity → Cultural Competence | 6.2 | Equality & Diversity → Cultural Competence |
-| 5.3 | Equality & Diversity → Reasonable Adjustments | 6.3 | Equality & Diversity → Reasonable Adjustments |
-| 6.1 | Duty of Candour → Transparency After Errors | 7.1 | Duty of Candour → Transparency After Errors |
-| 6.2 | Duty of Candour → NHS Incident Reporting | 7.2 | Duty of Candour → NHS Incident Reporting |
-| 7.1 | Cultural Adaptation → Autonomy vs. Family Decisions | 8.1 | Cultural Adaptation → Autonomy vs. Family Decisions |
-| 7.2 | Cultural Adaptation → UK Communication Styles | 8.2 | Cultural Adaptation → UK Communication Styles |
+| Old ID             | Old Topic                                                    | New ID | New Topic                                                    |
+| ------------------ | ------------------------------------------------------------ | ------ | ------------------------------------------------------------ |
+| N/A (no subtopics) | Numeracy                                                     | 1.1    | Numeracy → Dosage Calculations                               |
+| N/A (no subtopics) | Numeracy                                                     | 1.2    | Numeracy → Unit Conversions                                  |
+| N/A (no subtopics) | Numeracy                                                     | 1.3    | Numeracy → IV Flow Rate Calculations                         |
+| N/A (no subtopics) | Numeracy                                                     | 1.4    | Numeracy → Fluid Balance                                     |
+| 1.1                | The NMC Code → Prioritise People                             | 2.1    | The NMC Code → Prioritise People                             |
+| 1.2                | The NMC Code → Practice Effectively                          | 2.2    | The NMC Code → Practice Effectively                          |
+| 1.3                | The NMC Code → Preserve Safety                               | 2.3    | The NMC Code → Preserve Safety                               |
+| 1.4                | The NMC Code → Promote Professionalism                       | 2.4    | The NMC Code → Promote Professionalism                       |
+| 2.1                | Mental Capacity Act → Presumption of Capacity                | 3.1    | Mental Capacity Act → Presumption of Capacity                |
+| 2.2                | Mental Capacity Act → Assessing Capacity                     | 3.2    | Mental Capacity Act → Assessing Capacity                     |
+| 2.3                | Mental Capacity Act → Best Interests Decisions               | 3.3    | Mental Capacity Act → Best Interests Decisions               |
+| 2.4                | Mental Capacity Act → Advanced Care Planning                 | 3.4    | Mental Capacity Act → Advanced Care Planning                 |
+| 3.1                | Safeguarding → Recognising Abuse                             | 4.1    | Safeguarding → Recognising Abuse                             |
+| 3.2                | Safeguarding → Reporting Protocols                           | 4.2    | Safeguarding → Reporting Protocols                           |
+| 3.3                | Safeguarding → Child Protection                              | 4.3    | Safeguarding → Child Protection                              |
+| 4.1                | Consent & Confidentiality → Valid Consent                    | 5.1    | Consent & Confidentiality → Valid Consent                    |
+| 4.2                | Consent & Confidentiality → GDPR & Confidentiality           | 5.2    | Consent & Confidentiality → GDPR & Confidentiality           |
+| 4.3                | Consent & Confidentiality → Confidentiality vs. Safeguarding | 5.3    | Consent & Confidentiality → Confidentiality vs. Safeguarding |
+| 5.1                | Equality & Diversity → Equality Act 2010                     | 6.1    | Equality & Diversity → Equality Act 2010                     |
+| 5.2                | Equality & Diversity → Cultural Competence                   | 6.2    | Equality & Diversity → Cultural Competence                   |
+| 5.3                | Equality & Diversity → Reasonable Adjustments                | 6.3    | Equality & Diversity → Reasonable Adjustments                |
+| 6.1                | Duty of Candour → Transparency After Errors                  | 7.1    | Duty of Candour → Transparency After Errors                  |
+| 6.2                | Duty of Candour → NHS Incident Reporting                     | 7.2    | Duty of Candour → NHS Incident Reporting                     |
+| 7.1                | Cultural Adaptation → Autonomy vs. Family Decisions          | 8.1    | Cultural Adaptation → Autonomy vs. Family Decisions          |
+| 7.2                | Cultural Adaptation → UK Communication Styles                | 8.2    | Cultural Adaptation → UK Communication Styles                |
 
 ## Migration SQL Scripts
 
 ### Step 1: Backup Current Data
+
 ```sql
 -- Create backup tables before migration
 CREATE TABLE lessons_backup AS SELECT * FROM lessons;
@@ -63,6 +64,7 @@ CREATE TABLE flashcards_backup AS SELECT * FROM flashcards;
 ```
 
 ### Step 2: Update Lessons Table
+
 ```sql
 -- Update lessons.category from old IDs to new IDs
 -- Reverse order to avoid ID collisions during update
@@ -108,6 +110,7 @@ UPDATE lessons SET category = '2.1' WHERE category = '1.1';
 ```
 
 ### Step 3: Update Questions Table
+
 ```sql
 -- Update questions.subdivision from old IDs to new IDs
 -- Reverse order to avoid ID collisions
@@ -152,6 +155,7 @@ UPDATE questions SET subdivision = '2.1' WHERE subdivision = '1.1';
 ```
 
 ### Step 4: Update Flashcards Table
+
 ```sql
 -- Update flashcards.category from old IDs to new IDs
 -- Reverse order to avoid ID collisions
@@ -196,6 +200,7 @@ UPDATE flashcards SET category = '2.1' WHERE category = '1.1';
 ```
 
 ### Step 5: Update User Progress Table (if exists) Note - we dont use this table ( not in supabase )
+
 ```sql
 -- Update learning_progress.subtopic_id from old IDs to new IDs
 -- This table tracks user progress through subtopics
@@ -242,30 +247,30 @@ After running the migration, verify the changes:
 
 ```sql
 -- Check lessons by new subtopic IDs (should show all 8 topics' subtopics)
-SELECT category, COUNT(*) as count 
-FROM lessons 
+SELECT category, COUNT(*) as count
+FROM lessons
 WHERE category LIKE '%.%'
-GROUP BY category 
+GROUP BY category
 ORDER BY category;
 
 -- Check questions by new subtopic IDs (should show all 8 topics' subtopics)
-SELECT subdivision, COUNT(*) as count 
-FROM questions 
+SELECT subdivision, COUNT(*) as count
+FROM questions
 WHERE subdivision LIKE '%.%'
-GROUP BY subdivision 
+GROUP BY subdivision
 ORDER BY subdivision;
 
 -- Check flashcards by new subtopic IDs (should show all 8 topics' subtopics)
-SELECT category, COUNT(*) as count 
-FROM flashcards 
+SELECT category, COUNT(*) as count
+FROM flashcards
 WHERE category LIKE '%.%'
-GROUP BY category 
+GROUP BY category
 ORDER BY category;
 
 -- Verify all subtopic IDs are in valid ranges (should return 0 rows for invalid IDs)
-SELECT 'lessons' as table_name, category, COUNT(*) 
-FROM lessons 
-WHERE category LIKE '%.%' 
+SELECT 'lessons' as table_name, category, COUNT(*)
+FROM lessons
+WHERE category LIKE '%.%'
   AND category NOT IN (
     '1.1','1.2','1.3','1.4',  -- Numeracy
     '2.1','2.2','2.3','2.4',  -- The NMC Code
@@ -280,8 +285,8 @@ GROUP BY category
 
 UNION ALL
 
-SELECT 'questions', subdivision, COUNT(*) 
-FROM questions 
+SELECT 'questions', subdivision, COUNT(*)
+FROM questions
 WHERE subdivision LIKE '%.%'
   AND subdivision NOT IN (
     '1.1','1.2','1.3','1.4',  -- Numeracy
@@ -297,8 +302,8 @@ GROUP BY subdivision
 
 UNION ALL
 
-SELECT 'flashcards', category, COUNT(*) 
-FROM flashcards 
+SELECT 'flashcards', category, COUNT(*)
+FROM flashcards
 WHERE category LIKE '%.%'
   AND category NOT IN (
     '1.1','1.2','1.3','1.4',  -- Numeracy
@@ -313,23 +318,23 @@ WHERE category LIKE '%.%'
 GROUP BY category;
 
 -- Check for Numeracy content that still has no subtopic assignment (should return 0 rows)
-SELECT 'lessons' as table_name, topic_id, COUNT(*) 
-FROM lessons 
+SELECT 'lessons' as table_name, topic_id, COUNT(*)
+FROM lessons
 WHERE topic_id = '22222222-2222-0001-0000-000000000001'  -- Numeracy topic UUID
   AND (category IS NULL OR category = '' OR category = 'Numeracy')
 GROUP BY topic_id
 
 UNION ALL
 
-SELECT 'questions', NULL as topic_id, COUNT(*) 
-FROM questions 
-WHERE category = 'Numeracy' 
+SELECT 'questions', NULL as topic_id, COUNT(*)
+FROM questions
+WHERE category = 'Numeracy'
   AND (subdivision IS NULL OR subdivision = '' OR subdivision = 'Numeracy')
 
 UNION ALL
 
-SELECT 'flashcards', NULL as topic_id, COUNT(*) 
-FROM flashcards 
+SELECT 'flashcards', NULL as topic_id, COUNT(*)
+FROM flashcards
 WHERE category = 'Numeracy';
 ```
 
@@ -338,6 +343,7 @@ WHERE category = 'Numeracy';
 Since Numeracy previously had no subtopics, existing Numeracy content needs to be manually categorized into the new subtopics:
 
 ### Manual Categorization Required:
+
 1. Review all lessons where `topic_id` = Numeracy topic UUID
 2. Assign `category` based on lesson content:
    - **1.1** - Dosage Calculations (tablets, liquids, IV medications)
@@ -361,6 +367,7 @@ If you use CSV templates for bulk content upload, update them with the new subto
 ## Communication to Admin Users
 
 **Important:** Inform all content administrators about:
+
 1. The new subtopic IDs
 2. The requirement that Numeracy content now needs subtopic assignment
 3. Updated CSV templates (if applicable)
@@ -390,6 +397,7 @@ DROP TABLE flashcards_backup;
 ## Timeline
 
 **Recommended Migration Steps:**
+
 1. ✅ Update code structure (learningStructure.ts)
 2. ✅ Update documentation
 3. ⚠️ **BEFORE deploying to production:**

@@ -20,20 +20,20 @@ flowchart TB
         AP[Admin Pages]
         API[Express API]
     end
-    
+
     subgraph Stripe
         SC[Checkout Sessions]
         PR[Products & Prices]
         WH[Webhooks]
         AP_FX[Adaptive Pricing FX]
     end
-    
+
     subgraph Database
         DB[(Supabase)]
         PAY[payments table]
         SUB[subscriptions table]
     end
-    
+
     AP --> API
     API --> SC
     API --> PR
@@ -54,7 +54,7 @@ sequenceDiagram
     participant Stripe as Stripe Checkout
     participant WH as Webhook Handler
     participant DB as Database
-    
+
     Mobile->>API: POST /api/checkout/create-session
     API->>Stripe: Create Checkout Session (GBP price)
     Stripe-->>API: Session URL + ID
@@ -98,18 +98,18 @@ createCheckoutSession(input: CreateCheckoutSessionInput): Promise<CheckoutSessio
 
 ```typescript
 interface CatalogPlan {
-  planId: string              // Internal plan ID
-  name: string                // "Starter", "Growth", "Ultimate"
-  description: string
-  durationDays: number
-  stripePriceIdGbp: string    // price_xxx
-  unitAmountGbp: number       // Amount in pence (e.g., 2500 = £25.00)
-  active: boolean
-  features: string[]
+  planId: string; // Internal plan ID
+  name: string; // "Starter", "Growth", "Ultimate"
+  description: string;
+  durationDays: number;
+  stripePriceIdGbp: string; // price_xxx
+  unitAmountGbp: number; // Amount in pence (e.g., 2500 = £25.00)
+  active: boolean;
+  features: string[];
 }
 
 interface CatalogResponse {
-  plans: CatalogPlan[]
+  plans: CatalogPlan[];
 }
 ```
 
@@ -119,17 +119,17 @@ interface CatalogResponse {
 
 ```typescript
 interface PresentmentSummary {
-  range: string               // "30d"
-  totalPayments: number
+  range: string; // "30d"
+  totalPayments: number;
   byCurrency: {
-    currency: string          // "INR", "GBP", "USD"
-    count: number
-    percentage: number
-    averageLocalAmount: number
-    averageGbpAmount: number
-    totalLocalAmount: number
-    totalGbpAmount: number
-  }[]
+    currency: string; // "INR", "GBP", "USD"
+    count: number;
+    percentage: number;
+    averageLocalAmount: number;
+    averageGbpAmount: number;
+    totalLocalAmount: number;
+    totalGbpAmount: number;
+  }[];
 }
 ```
 
@@ -139,24 +139,24 @@ interface PresentmentSummary {
 
 ```typescript
 interface CheckoutSessionWebhookData {
-  sessionId: string           // cs_xxx
-  paymentIntentId: string     // pi_xxx
-  chargeId: string            // ch_xxx
-  customerId: string          // cus_xxx
-  amountTotal: number         // Total in presentment currency (cents)
-  currency: string            // Presentment currency (lowercase)
-  amountSubtotal: number
+  sessionId: string; // cs_xxx
+  paymentIntentId: string; // pi_xxx
+  chargeId: string; // ch_xxx
+  customerId: string; // cus_xxx
+  amountTotal: number; // Total in presentment currency (cents)
+  currency: string; // Presentment currency (lowercase)
+  amountSubtotal: number;
   metadata: {
-    userId: string
-    subscriptionPlanId: string
-  }
+    userId: string;
+    subscriptionPlanId: string;
+  };
   // Adaptive Pricing fields
   currencyConversion?: {
-    sourceCurrency: string    // "gbp"
-    destinationCurrency: string // "inr"
-    fxRate: number
-    amountOriginal: number    // GBP amount in pence
-  }
+    sourceCurrency: string; // "gbp"
+    destinationCurrency: string; // "inr"
+    fxRate: number;
+    amountOriginal: number; // GBP amount in pence
+  };
 }
 ```
 
@@ -179,31 +179,31 @@ ALTER TABLE payments ADD COLUMN IF NOT EXISTS country_detected VARCHAR(2);
 
 ```typescript
 interface Payment {
-  id: string
-  userId: string
-  gateway: 'stripe'
-  
+  id: string;
+  userId: string;
+  gateway: "stripe";
+
   // Existing fields
-  stripePaymentIntentId?: string
-  stripeCustomerId?: string
-  
+  stripePaymentIntentId?: string;
+  stripeCustomerId?: string;
+
   // New Checkout Session fields
-  stripeCheckoutSessionId?: string
-  stripeChargeId?: string
-  
+  stripeCheckoutSessionId?: string;
+  stripeChargeId?: string;
+
   // Presentment fields (new)
-  amountChargedLocal: number      // Amount in presentment currency
-  currencyChargedLocal: string    // "INR", "GBP", "USD"
-  amountChargedGbp: number        // Amount in GBP (settlement)
-  fxRateApplied?: number          // FX rate used (local/gbp)
-  countryDetected?: string        // Customer country code
-  
+  amountChargedLocal: number; // Amount in presentment currency
+  currencyChargedLocal: string; // "INR", "GBP", "USD"
+  amountChargedGbp: number; // Amount in GBP (settlement)
+  fxRateApplied?: number; // FX rate used (local/gbp)
+  countryDetected?: string; // Customer country code
+
   // Existing fields
-  subscriptionId?: string
-  subscriptionPlanId?: string
-  status: PaymentStatus
-  createdAt: string
-  updatedAt: string
+  subscriptionId?: string;
+  subscriptionPlanId?: string;
+  status: PaymentStatus;
+  createdAt: string;
+  updatedAt: string;
 }
 ```
 
@@ -211,14 +211,14 @@ interface Payment {
 
 ```typescript
 interface CatalogPlan {
-  planId: string
-  name: string
-  description: string
-  durationDays: number
-  stripePriceIdGbp: string
-  unitAmountGbp: number       // In pence
-  active: boolean
-  features: string[]
+  planId: string;
+  name: string;
+  description: string;
+  durationDays: number;
+  stripePriceIdGbp: string;
+  unitAmountGbp: number; // In pence
+  active: boolean;
+  features: string[];
 }
 ```
 
@@ -226,101 +226,113 @@ interface CatalogPlan {
 
 ```typescript
 interface CurrencyBreakdown {
-  currency: string
-  count: number
-  percentage: number
-  averageLocalAmount: number
-  averageGbpAmount: number
-  totalLocalAmount: number
-  totalGbpAmount: number
+  currency: string;
+  count: number;
+  percentage: number;
+  averageLocalAmount: number;
+  averageGbpAmount: number;
+  totalLocalAmount: number;
+  totalGbpAmount: number;
 }
 
 interface PresentmentSummary {
-  range: string
-  totalPayments: number
-  byCurrency: CurrencyBreakdown[]
+  range: string;
+  totalPayments: number;
+  byCurrency: CurrencyBreakdown[];
 }
 
 interface CouponPresentment {
-  couponId: string
-  code: string
+  couponId: string;
+  code: string;
   redemptionsByCurrency: {
-    currency: string
-    count: number
-  }[]
-  totalRedemptions: number
+    currency: string;
+    count: number;
+  }[];
+  totalRedemptions: number;
 }
 
 interface RevenueByurrency {
-  currency: string
-  totalLocal: number
-  totalGbp: number
-  transactionCount: number
+  currency: string;
+  totalLocal: number;
+  totalGbp: number;
+  transactionCount: number;
 }
 ```
 
 ## Correctness Properties
 
-*A property is a characteristic or behavior that should hold true across all valid executions of a system-essentially, a formal statement about what the system should do. Properties serve as the bridge between human-readable specifications and machine-verifiable correctness guarantees.*
+_A property is a characteristic or behavior that should hold true across all valid executions of a system-essentially, a formal statement about what the system should do. Properties serve as the bridge between human-readable specifications and machine-verifiable correctness guarantees._
 
 ### Property 1: GBP-Only Currency Validation
-*For any* price creation request with a currency value, the system should accept the request if and only if the currency is "GBP" (case-insensitive), rejecting all other currency codes with an appropriate error.
+
+_For any_ price creation request with a currency value, the system should accept the request if and only if the currency is "GBP" (case-insensitive), rejecting all other currency codes with an appropriate error.
 **Validates: Requirements 1.1, 1.3**
 
 ### Property 2: Catalog Response Structure
-*For any* catalog API response, each plan in the response should contain all required fields (planId, name, durationDays, stripePriceIdGbp, unitAmountGbp, active) and should not include country-based grouping.
+
+_For any_ catalog API response, each plan in the response should contain all required fields (planId, name, durationDays, stripePriceIdGbp, unitAmountGbp, active) and should not include country-based grouping.
 **Validates: Requirements 1.2, 1.4, 7.3**
 
 ### Property 3: Checkout Session Configuration
-*For any* checkout session creation request, the resulting Stripe session should include the GBP price ID, user metadata, success/cancel URLs, customer email, and allow_promotion_codes set to true.
+
+_For any_ checkout session creation request, the resulting Stripe session should include the GBP price ID, user metadata, success/cancel URLs, customer email, and allow_promotion_codes set to true.
 **Validates: Requirements 2.1, 2.2, 2.5, 6.1**
 
 ### Property 4: Webhook Presentment Data Extraction
-*For any* checkout.session.completed webhook payload containing currency conversion data, the system should correctly extract and store the presentment currency, local amount, GBP amount, and computed FX rate.
+
+_For any_ checkout.session.completed webhook payload containing currency conversion data, the system should correctly extract and store the presentment currency, local amount, GBP amount, and computed FX rate.
 **Validates: Requirements 2.3, 4.4**
 
 ### Property 5: Subscription Activation on Webhook
-*For any* successful checkout.session.completed webhook, the associated subscription should transition from 'pending' to 'active' status with correct start and end dates.
+
+_For any_ successful checkout.session.completed webhook, the associated subscription should transition from 'pending' to 'active' status with correct start and end dates.
 **Validates: Requirements 2.4**
 
 ### Property 6: Presentment Percentage Calculation
-*For any* set of payment records with mixed currencies, the presentment summary should calculate percentages that sum to 100% and accurately reflect the distribution of payments by currency.
+
+_For any_ set of payment records with mixed currencies, the presentment summary should calculate percentages that sum to 100% and accurately reflect the distribution of payments by currency.
 **Validates: Requirements 3.1**
 
 ### Property 7: Average Amount Calculation
-*For any* set of payment records within a date range, the average presentment amount per currency should equal the sum of amounts divided by the count for that currency.
+
+_For any_ set of payment records within a date range, the average presentment amount per currency should equal the sum of amounts divided by the count for that currency.
 **Validates: Requirements 3.2**
 
 ### Property 8: Coupon Redemption Grouping
-*For any* set of coupon redemptions with associated payment currencies, the analytics should correctly group and count redemptions by presentment currency.
+
+_For any_ set of coupon redemptions with associated payment currencies, the analytics should correctly group and count redemptions by presentment currency.
 **Validates: Requirements 3.4, 6.3**
 
 ### Property 9: Payment Record Presentment Fields
-*For any* payment record stored from a Checkout Session, the record should contain stripe_checkout_session_id, stripe_payment_intent_id, amount_charged_local, currency_charged_local, amount_charged_gbp, and fx_rate_applied (when applicable).
+
+_For any_ payment record stored from a Checkout Session, the record should contain stripe_checkout_session_id, stripe_payment_intent_id, amount_charged_local, currency_charged_local, amount_charged_gbp, and fx_rate_applied (when applicable).
 **Validates: Requirements 4.1, 4.2, 4.4**
 
 ### Property 10: Student Payment Display
-*For any* student with a completed payment, the student record should include the last payment currency and amount from the most recent successful payment.
+
+_For any_ student with a completed payment, the student record should include the last payment currency and amount from the most recent successful payment.
 **Validates: Requirements 5.1**
 
 ### Property 11: Coupon Eligibility Validation
-*For any* coupon validation request, the system should check only eligibility criteria (plan applicability, active status, max_redemptions not exceeded) without validating against specific currency amounts.
+
+_For any_ coupon validation request, the system should check only eligibility criteria (plan applicability, active status, max_redemptions not exceeded) without validating against specific currency amounts.
 **Validates: Requirements 6.2**
 
 ### Property 12: Revenue Analytics Completeness
-*For any* revenue analytics query, the response should include both local currency totals and GBP equivalents for each presentment currency, with totals matching the sum of individual payment amounts.
+
+_For any_ revenue analytics query, the response should include both local currency totals and GBP equivalents for each presentment currency, with totals matching the sum of individual payment amounts.
 **Validates: Requirements 9.1, 9.2**
 
 ## Error Handling
 
 ### API Errors
 
-| Error Code | Scenario | Response |
-|------------|----------|----------|
-| 400 | Non-GBP currency in price creation | `{ error: "Only GBP prices are allowed. Adaptive Pricing handles currency conversion automatically." }` |
-| 400 | Missing required checkout fields | `{ error: "Missing required field: {field}" }` |
-| 404 | Plan not found in catalog | `{ error: "Plan not found: {planId}" }` |
-| 500 | Stripe API failure | `{ error: "Payment service unavailable. Please try again." }` |
+| Error Code | Scenario                           | Response                                                                                                |
+| ---------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| 400        | Non-GBP currency in price creation | `{ error: "Only GBP prices are allowed. Adaptive Pricing handles currency conversion automatically." }` |
+| 400        | Missing required checkout fields   | `{ error: "Missing required field: {field}" }`                                                          |
+| 404        | Plan not found in catalog          | `{ error: "Plan not found: {planId}" }`                                                                 |
+| 500        | Stripe API failure                 | `{ error: "Payment service unavailable. Please try again." }`                                           |
 
 ### Webhook Errors
 
@@ -338,6 +350,7 @@ interface RevenueByurrency {
 ### Unit Testing
 
 Unit tests will cover:
+
 - Currency validation logic (GBP-only enforcement)
 - Presentment data extraction from webhook payloads
 - Analytics calculation functions (percentages, averages)
@@ -348,11 +361,13 @@ Unit tests will cover:
 The project will use **fast-check** as the property-based testing library for TypeScript.
 
 Each property-based test will:
+
 - Run a minimum of 100 iterations
 - Be tagged with a comment referencing the correctness property: `**Feature: stripe-adaptive-pricing, Property {number}: {property_text}**`
 - Generate random but valid inputs to verify properties hold across all cases
 
 Key property tests:
+
 1. Currency validation rejects all non-GBP currencies
 2. Catalog response always contains required fields
 3. Checkout session always includes required configuration

@@ -11,7 +11,7 @@
     - Add `fx_rate_applied` DECIMAL(10,6) column
     - Add `country_detected` VARCHAR(2) column
     - _Requirements: 4.4_
-  - [ ]* 1.2 Write property test for payment record presentment fields
+  - [ ]\* 1.2 Write property test for payment record presentment fields
     - **Property 9: Payment Record Presentment Fields**
     - **Validates: Requirements 4.1, 4.2, 4.4**
 
@@ -22,7 +22,7 @@
     - Include userId and subscriptionPlanId in metadata
     - Return sessionId and sessionUrl
     - _Requirements: 2.1, 2.2, 2.5_
-  - [ ]* 2.2 Write property test for checkout session configuration
+  - [ ]\* 2.2 Write property test for checkout session configuration
     - **Property 3: Checkout Session Configuration**
     - **Validates: Requirements 2.1, 2.2, 2.5, 6.1**
 
@@ -42,10 +42,10 @@
     - Update status to 'active', set dates
     - Update user_profiles subscription_status
     - _Requirements: 2.4_
-  - [ ]* 3.4 Write property test for webhook presentment data extraction
+  - [ ]\* 3.4 Write property test for webhook presentment data extraction
     - **Property 4: Webhook Presentment Data Extraction**
     - **Validates: Requirements 2.3, 4.4**
-  - [ ]* 3.5 Write property test for subscription activation
+  - [ ]\* 3.5 Write property test for subscription activation
     - **Property 5: Subscription Activation on Webhook**
     - **Validates: Requirements 2.4**
 
@@ -66,7 +66,7 @@
     - Validate currency === 'gbp' (case-insensitive)
     - Return 400 error with clear message for non-GBP currencies
     - _Requirements: 1.1, 1.3_
-  - [ ]* 6.2 Write property test for GBP-only currency validation
+  - [ ]\* 6.2 Write property test for GBP-only currency validation
     - **Property 1: GBP-Only Currency Validation**
     - **Validates: Requirements 1.1, 1.3**
 
@@ -76,7 +76,7 @@
     - Transform to CatalogPlan format (no country grouping)
     - Return plans array with required fields
     - _Requirements: 1.2, 1.4, 7.3_
-  - [ ]* 7.2 Write property test for catalog response structure
+  - [ ]\* 7.2 Write property test for catalog response structure
     - **Property 2: Catalog Response Structure**
     - **Validates: Requirements 1.2, 1.4, 7.3**
 
@@ -91,10 +91,10 @@
     - Query payments table for currency distribution
     - Calculate percentages, averages, totals per currency
     - _Requirements: 3.1, 3.2_
-  - [ ]* 9.2 Write property test for presentment percentage calculation
+  - [ ]\* 9.2 Write property test for presentment percentage calculation
     - **Property 6: Presentment Percentage Calculation**
     - **Validates: Requirements 3.1**
-  - [ ]* 9.3 Write property test for average amount calculation
+  - [ ]\* 9.3 Write property test for average amount calculation
     - **Property 7: Average Amount Calculation**
     - **Validates: Requirements 3.2**
 
@@ -104,7 +104,7 @@
     - Group redemptions by presentment currency
     - Return counts per currency per coupon
     - _Requirements: 3.4, 6.3_
-  - [ ]* 10.2 Write property test for coupon redemption grouping
+  - [ ]\* 10.2 Write property test for coupon redemption grouping
     - **Property 8: Coupon Redemption Grouping**
     - **Validates: Requirements 3.4, 6.3**
 
@@ -113,7 +113,7 @@
     - Query payments grouped by currency
     - Return local totals and GBP equivalents
     - _Requirements: 9.1, 9.2_
-  - [ ]* 11.2 Write property test for revenue analytics completeness
+  - [ ]\* 11.2 Write property test for revenue analytics completeness
     - **Property 12: Revenue Analytics Completeness**
     - **Validates: Requirements 9.1, 9.2**
 
@@ -127,7 +127,7 @@
     - Remove amount-based validation logic
     - Check only: plan applicability, active status, max_redemptions
     - _Requirements: 6.2_
-  - [ ]* 13.2 Write property test for coupon eligibility validation
+  - [ ]\* 13.2 Write property test for coupon eligibility validation
     - **Property 11: Coupon Eligibility Validation**
     - **Validates: Requirements 6.2**
 
@@ -190,7 +190,7 @@
   - [x] 18.2 Add payment source indicator
     - Display "Payment source: Stripe Checkout"
     - _Requirements: 5.2_
-  - [ ]* 18.3 Write property test for student payment display
+  - [ ]\* 18.3 Write property test for student payment display
     - **Property 10: Student Payment Display**
     - **Validates: Requirements 5.1**
 

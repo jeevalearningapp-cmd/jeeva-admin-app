@@ -7,6 +7,7 @@ Run **ONE** SQL script and you're done. No multiple steps, no confusion!
 **File**: `scripts/setup_and_seed_complete.sql`
 
 This script automatically:
+
 - ✅ Drops any old conflicting tables
 - ✅ Creates all tables fresh with correct columns
 - ✅ Loads 63 lessons (audio, video, text)
@@ -50,59 +51,70 @@ This script automatically:
 ### All 21 Subtopics Across 7 Topics:
 
 ✅ **The NMC Code** (4 subtopics)
+
 - 1.1 Prioritise People
 - 1.2 Practice Effectively
 - 1.3 Preserve Safety
 - 1.4 Promote Professionalism
 
 ✅ **Mental Capacity Act** (4 subtopics)
+
 - 2.1 Presumption of Capacity
 - 2.2 Assessing Capacity
 - 2.3 Best Interests Decisions
 - 2.4 Advanced Care Planning
 
 ✅ **Safeguarding** (3 subtopics)
+
 - 3.1 Recognising Abuse
 - 3.2 Reporting Protocols
 - 3.3 Child Protection
 
 ✅ **Consent & Confidentiality** (3 subtopics)
+
 - 4.1 Valid Consent
 - 4.2 GDPR & Confidentiality
 - 4.3 Confidentiality vs. Safeguarding
 
 ✅ **Equality & Diversity** (3 subtopics)
+
 - 5.1 Equality Act 2010
 - 5.2 Cultural Competence
 - 5.3 Reasonable Adjustments
 
 ✅ **Duty of Candour** (2 subtopics)
+
 - 6.1 Transparency After Errors
 - 6.2 NHS Incident Reporting
 
 ✅ **Cultural Adaptation** (2 subtopics)
+
 - 7.1 Autonomy vs. Family Decisions
 - 7.2 UK Communication Styles
 
 ### Each Subtopic Gets:
 
 **3 Lessons:**
+
 1. 🎧 Audio Podcast - NMC Code podcast
 2. 🎥 Video Tutorial - Video lesson
 3. 📄 Text Introduction - NMC Code content
 
 **2 Questions:**
+
 - Each with 4 multiple-choice options
 - Includes explanations
 
 ### Media URLs Used:
 
 **Audio (all subtopics):**
+
 ```
 https://qsvjvgsnbslgypykuznd.supabase.co/storage/v1/object/public/Podcast%20audio/NMC-code.mp3
 ```
 
 **Video (all subtopics):**
+
 ```
 https://qsvjvgsnbslgypykuznd.supabase.co/storage/v1/object/public/Video%20tutorial/1.1%20Prioritise%20people.mp4
 ```
@@ -125,19 +137,23 @@ No problem! The script drops old tables first, so you can run it again anytime:
 ## ❓ Troubleshooting
 
 ### "column does not exist" error
+
 - Make sure you copied the ENTIRE script (all 1300+ lines)
 - The DROP TABLE statements must run first
 
 ### "row-level security" error
+
 - You must run this in Supabase SQL Editor (has admin privileges)
 - Don't run it via the app or API
 
 ### No data appears in Admin Portal
+
 - Refresh your browser
 - Check you selected the correct topic/subtopic
 - Go to Supabase Table Editor → verify data exists in `lessons` and `questions` tables
 
 ### Tables already exist error
+
 - This shouldn't happen - the script drops tables first
 - If it does, manually drop tables in Supabase Table Editor, then re-run
 

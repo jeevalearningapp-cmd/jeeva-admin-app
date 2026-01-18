@@ -21,9 +21,9 @@ All migration scripts are located in `jeeva-admin-portal/database/migrations/`:
 
 ```sql
 -- 1. Verify schema migration is complete (Task 1)
-SELECT table_name 
-FROM information_schema.tables 
-WHERE table_schema = 'public' 
+SELECT table_name
+FROM information_schema.tables
+WHERE table_schema = 'public'
 AND table_name IN (
   'practice_questions',
   'learning_questions',
@@ -42,6 +42,7 @@ SELECT COUNT(*) as total_questions FROM mock_exam_questions;
 ### Execution Steps
 
 #### Step 1: Analyze Questions (5 minutes)
+
 ```bash
 # In Supabase SQL Editor or psql
 \i jeeva-admin-portal/database/migrations/classify_questions.sql
@@ -50,6 +51,7 @@ SELECT COUNT(*) as total_questions FROM mock_exam_questions;
 **Review output**: Note the counts for practice, learning, and mock_exam questions
 
 #### Step 2: Migrate Practice Questions (10 minutes)
+
 ```bash
 \i jeeva-admin-portal/database/migrations/migrate_practice_questions.sql
 ```
@@ -57,6 +59,7 @@ SELECT COUNT(*) as total_questions FROM mock_exam_questions;
 **Verify**: Check that migration summary shows expected counts and no warnings
 
 #### Step 3: Migrate Learning Questions (10 minutes)
+
 ```bash
 \i jeeva-admin-portal/database/migrations/migrate_learning_questions.sql
 ```
@@ -64,6 +67,7 @@ SELECT COUNT(*) as total_questions FROM mock_exam_questions;
 **Verify**: Check that migration summary shows expected counts and no warnings
 
 #### Step 4: Verify Mock Exam Questions (5 minutes)
+
 ```bash
 \i jeeva-admin-portal/database/migrations/verify_mock_exam_questions.sql
 ```
@@ -71,19 +75,20 @@ SELECT COUNT(*) as total_questions FROM mock_exam_questions;
 **Verify**: Check that remaining questions are correct and no errors reported
 
 #### Step 5: Final Verification (5 minutes)
+
 ```sql
 -- Check total counts
-SELECT 
+SELECT
   'practice_questions' as table_name,
   COUNT(*) as count
 FROM practice_questions
 UNION ALL
-SELECT 
+SELECT
   'learning_questions' as table_name,
   COUNT(*) as count
 FROM learning_questions
 UNION ALL
-SELECT 
+SELECT
   'mock_exam_questions' as table_name,
   COUNT(*) as count
 FROM mock_exam_questions;
@@ -110,6 +115,7 @@ FROM mock_exam_questions;
 ## If Something Goes Wrong
 
 ### Immediate Rollback
+
 ```bash
 # Stop and rollback immediately
 \i jeeva-admin-portal/database/migrations/rollback_question_migration.sql
@@ -118,15 +124,19 @@ FROM mock_exam_questions;
 ### Common Issues
 
 **Issue**: "Some questions have no options"
+
 - **Action**: Rollback and check question_options data
 
 **Issue**: "Some questions have no correct answer"
+
 - **Action**: Rollback and check is_correct flags
 
 **Issue**: "Foreign key violation"
+
 - **Action**: Rollback and verify topics/lessons exist
 
 **Issue**: "Questions still in mock_exam_questions with lesson_id"
+
 - **Action**: Check module titles match expected patterns
 
 ## Post-Migration
@@ -153,6 +163,7 @@ Migration Failed?
 ## Contact
 
 If you need help:
+
 1. Check `README_DATA_MIGRATION.md` for detailed troubleshooting
 2. Review Supabase logs for error messages
 3. Contact development team with error details
@@ -160,6 +171,7 @@ If you need help:
 ## Requirements Satisfied
 
 This migration implements:
+
 - ✅ Requirement 1.1-1.7: Separate question tables
 - ✅ Requirement 2.8: Practice questions structure
 - ✅ Requirement 7.1-7.5: Learning questions with video mapping

@@ -62,7 +62,9 @@ Learning Module
 ## User Progression Logic (Mobile App)
 
 ### Sequential Unlocking
+
 Users **CANNOT** randomly select topics. They must complete them in order:
+
 1. Complete Topic 1 → Unlock Topic 2
 2. Complete Topic 2 → Unlock Topic 3
 3. And so on...
@@ -72,29 +74,34 @@ Users **CANNOT** randomly select topics. They must complete them in order:
 For each subtopic, the user must:
 
 #### 1. **Complete Lessons** (Study Phase)
+
 - Watch videos
 - Listen to audio
 - Read text content
 - Review flashcards
 
 #### 2. **Pass Questions** (Assessment Phase)
+
 - Must score **80% or higher**
 - Questions are specific to that subtopic
 - If score < 80%, must retry
 
 #### 3. **Unlock Next Subtopic**
+
 - Only after passing with 80%+
 - Within the same topic
 
 ### Topic Completion Requirements
 
 To mark a topic as "complete" and unlock the next topic:
+
 - Complete **ALL** subtopics within that topic
 - Each subtopic must have 80%+ passing score
 
 ### All Topics Follow Same Structure
 
 All 8 topics now have subtopics:
+
 - Complete all lessons in a subtopic
 - Pass assessment with 80%+ score
 - Unlock next subtopic
@@ -103,6 +110,7 @@ All 8 topics now have subtopics:
 ## Database Structure
 
 ### Questions Table
+
 ```sql
 category: string      -- Topic title (e.g., "The NMC Code")
 subdivision: string   -- Subtopic ID (e.g., "1.1", "3.2")
@@ -110,6 +118,7 @@ module_type: 'learning'
 ```
 
 ### Lessons Table
+
 ```sql
 topic_id: UUID        -- Topic ID
 category: string      -- Subtopic ID (e.g., "1.1", "3.2")
@@ -117,6 +126,7 @@ lesson_type: 'text' | 'video' | 'audio' | 'quiz'
 ```
 
 ### Flashcards Table
+
 ```sql
 category: string      -- Subtopic ID (e.g., "1.1") or Topic title
 ```
@@ -124,11 +134,13 @@ category: string      -- Subtopic ID (e.g., "1.1") or Topic title
 ## Mobile App Implementation Guide
 
 ### 1. Fetch Topic List
+
 ```typescript
 const topics = LEARNING_TOPICS; // 8 fixed topics
 ```
 
 ### 2. Check User Progress
+
 ```typescript
 interface UserProgress {
   topicId: string;
@@ -141,10 +153,14 @@ interface UserProgress {
 ```
 
 ### 3. Determine Locked/Unlocked State
+
 ```typescript
-function isTopicUnlocked(topicIndex: number, userProgress: UserProgress[]): boolean {
+function isTopicUnlocked(
+  topicIndex: number,
+  userProgress: UserProgress[],
+): boolean {
   if (topicIndex === 0) return true; // First topic always unlocked
-  
+
   // Check if previous topic is completed
   const previousTopic = userProgress[topicIndex - 1];
   return previousTopic && previousTopic.isPassed;
@@ -152,59 +168,64 @@ function isTopicUnlocked(topicIndex: number, userProgress: UserProgress[]): bool
 ```
 
 ### 4. Fetch Subtopic Content
+
 ```typescript
 // Get questions for a specific subtopic
 const questions = await fetchQuestionsByFilters({
-  moduleType: 'learning',
-  category: topicTitle,        // e.g., "The NMC Code"
-  subdivision: subtopicId       // e.g., "1.1"
+  moduleType: "learning",
+  category: topicTitle, // e.g., "The NMC Code"
+  subdivision: subtopicId, // e.g., "1.1"
 });
 
 // Get lessons for a specific subtopic
 const lessons = await fetchLessonsByTopicAndCategory({
   topicId: topicId,
-  category: subtopicId          // e.g., "1.1"
+  category: subtopicId, // e.g., "1.1"
 });
 
 // Get flashcards for a specific subtopic
 const flashcards = await fetchFlashcardsByCategory({
-  category: subtopicId          // e.g., "1.1"
+  category: subtopicId, // e.g., "1.1"
 });
 ```
 
 ### 5. Calculate Subtopic Score
+
 ```typescript
 function calculateScore(userAnswers: Answer[], questions: Question[]): number {
-  const correctAnswers = userAnswers.filter(answer => 
-    answer.selectedOption === questions.find(q => q.id === answer.questionId)?.correctOption
+  const correctAnswers = userAnswers.filter(
+    (answer) =>
+      answer.selectedOption ===
+      questions.find((q) => q.id === answer.questionId)?.correctOption,
   );
-  
+
   return (correctAnswers.length / questions.length) * 100;
 }
 ```
 
 ### 6. Update Progress
+
 ```typescript
 async function completeSubtopic(
-  userId: string, 
-  topicId: string, 
-  subtopicId: string, 
-  score: number
+  userId: string,
+  topicId: string,
+  subtopicId: string,
+  score: number,
 ) {
   const isPassed = score >= 80;
-  
+
   await saveProgress({
     userId,
     topicId,
     subtopicId,
     score,
     isPassed,
-    completedAt: new Date()
+    completedAt: new Date(),
   });
-  
+
   // Check if all subtopics in topic are passed
   const allSubtopicsPassed = await checkAllSubtopicsPassed(userId, topicId);
-  
+
   if (allSubtopicsPassed) {
     // Unlock next topic
     await unlockNextTopic(userId, topicId);
@@ -215,17 +236,22 @@ async function completeSubtopic(
 ## Admin Panel Flow
 
 ### 1. Select Module
+
 Click "Learning Module" (green card)
 
 ### 2. Select Topic
+
 Choose from dropdown: "The NMC Code", "Safeguarding", etc.
 
 ### 3. Select Subtopic
+
 - All topics now have subtopics
 - Choose from dropdown (e.g., "1.1 Dosage Calculations", "2.1 Prioritise People")
 
 ### 4. Manage Content
+
 Tabs:
+
 - **Questions**: Add/edit questions for this subtopic
 - **Flashcards**: Add/edit flashcards for this subtopic
 - **Lessons**: Add/edit lessons (text, video, audio) for this subtopic
@@ -234,6 +260,7 @@ Tabs:
 ## Mobile App UI/UX Recommendations
 
 ### Topic List Screen
+
 ```
 ✓ Topic 1: Numeracy [COMPLETED] [100%]
   ├── ✓ 1.1 Dosage Calculations [PASSED] [92%]
@@ -249,6 +276,7 @@ Tabs:
 ```
 
 ### Subtopic Screen
+
 ```
 [Header: 2.2 Practice Effectively]
 
@@ -270,6 +298,7 @@ Flashcards (12 cards)
 ```
 
 ### Assessment Screen
+
 ```
 Question 5 of 15
 
@@ -286,6 +315,7 @@ Progress: ▓▓▓▓▓░░░░░░░░░ 33%
 ```
 
 ### Results Screen
+
 ```
 Assessment Complete!
 
@@ -301,6 +331,7 @@ Passing Score: 80%
 ## Analytics & Tracking
 
 Track these metrics per user:
+
 - `topics_completed`: Number of topics fully passed
 - `subtopics_completed`: Number of subtopics passed
 - `current_topic_id`: UUID of current topic
@@ -314,6 +345,7 @@ Track these metrics per user:
 ## Database Tables for Mobile App
 
 ### `learning_progress`
+
 ```sql
 CREATE TABLE learning_progress (
   id UUID PRIMARY KEY,
@@ -332,6 +364,7 @@ CREATE TABLE learning_progress (
 ```
 
 ### `question_attempts`
+
 ```sql
 CREATE TABLE question_attempts (
   id UUID PRIMARY KEY,
@@ -345,6 +378,7 @@ CREATE TABLE question_attempts (
 ```
 
 ### `lesson_completions`
+
 ```sql
 CREATE TABLE lesson_completions (
   id UUID PRIMARY KEY,

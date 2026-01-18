@@ -1,7 +1,7 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi } from "vitest";
 
-describe('usePayments Hook', () => {
-  it('should return payment data structure', () => {
+describe("usePayments Hook", () => {
+  it("should return payment data structure", () => {
     const mockReturn = {
       payments: [],
       summary: {
@@ -16,36 +16,36 @@ describe('usePayments Hook', () => {
       error: null,
       refund: vi.fn(),
       isRefunding: false,
-    }
+    };
 
-    expect(mockReturn).toHaveProperty('payments')
-    expect(mockReturn).toHaveProperty('summary')
-    expect(mockReturn).toHaveProperty('isLoading')
-    expect(mockReturn).toHaveProperty('refund')
-  })
+    expect(mockReturn).toHaveProperty("payments");
+    expect(mockReturn).toHaveProperty("summary");
+    expect(mockReturn).toHaveProperty("isLoading");
+    expect(mockReturn).toHaveProperty("refund");
+  });
 
-  it('should have refund mutation function', () => {
-    const refundFn = vi.fn()
-    expect(typeof refundFn).toBe('function')
-  })
+  it("should have refund mutation function", () => {
+    const refundFn = vi.fn();
+    expect(typeof refundFn).toBe("function");
+  });
 
-  it('should track loading states', () => {
+  it("should track loading states", () => {
     const states = {
       isLoading: false,
       summaryLoading: false,
-    }
-    expect(states.isLoading).toBe(false)
-    expect(states.summaryLoading).toBe(false)
-  })
+    };
+    expect(states.isLoading).toBe(false);
+    expect(states.summaryLoading).toBe(false);
+  });
 
-  it('should handle payment filters', () => {
+  it("should handle payment filters", () => {
     const filters = {
-      status: ['succeeded'],
-      gateway: ['stripe'],
-      dateFrom: '2025-01-01',
-      dateTo: '2025-01-31',
-    }
-    expect(filters.status.length).toBe(1)
-    expect(filters.gateway.length).toBe(1)
-  })
-})
+      status: ["succeeded"],
+      gateway: ["stripe"],
+      dateFrom: "2025-01-01",
+      dateTo: "2025-01-31",
+    };
+    expect(filters.status.length).toBe(1);
+    expect(filters.gateway.length).toBe(1);
+  });
+});

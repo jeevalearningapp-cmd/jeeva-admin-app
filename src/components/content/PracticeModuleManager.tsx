@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState } from "react";
 import {
   Box,
   Typography,
@@ -10,18 +10,18 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
-  Button
-} from '@mui/material'
-import { PracticeModuleTopicSelector } from './PracticeModuleTopicSelector'
-import { PracticeQuestionList } from './PracticeQuestionList'
-import { PracticeQuestionForm } from './PracticeQuestionForm'
-import { PracticeQuestionBulkImport } from './PracticeQuestionBulkImport'
-import { supabase } from '@/lib/supabase'
+  Button,
+} from "@mui/material";
+import { PracticeModuleTopicSelector } from "./PracticeModuleTopicSelector";
+import { PracticeQuestionList } from "./PracticeQuestionList";
+import { PracticeQuestionForm } from "./PracticeQuestionForm";
+import { PracticeQuestionBulkImport } from "./PracticeQuestionBulkImport";
+import { supabase } from "@/lib/supabase";
 
 interface TabPanelProps {
-  children?: React.ReactNode
-  index: number
-  value: number
+  children?: React.ReactNode;
+  index: number;
+  value: number;
 }
 
 const TabPanel: React.FC<TabPanelProps> = ({ children, value, index }) => {
@@ -29,35 +29,36 @@ const TabPanel: React.FC<TabPanelProps> = ({ children, value, index }) => {
     <div role="tabpanel" hidden={value !== index}>
       {value === index && <Box sx={{ py: 3 }}>{children}</Box>}
     </div>
-  )
-}
+  );
+};
 
 export const PracticeModuleManager: React.FC = () => {
-  const [selectedCategory, setSelectedCategory] = useState<string>('')
-  const [selectedSubdivision, setSelectedSubdivision] = useState<string>('')
-  const [tabValue, setTabValue] = useState(0)
-  const [formOpen, setFormOpen] = useState(false)
-  const [editingQuestion, setEditingQuestion] = useState<any>(null)
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  const [questionToDelete, setQuestionToDelete] = useState<string | null>(null)
-  const [refreshTrigger, setRefreshTrigger] = useState(0)
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [selectedSubdivision, setSelectedSubdivision] = useState<string>("");
+  const [tabValue, setTabValue] = useState(0);
+  const [formOpen, setFormOpen] = useState(false);
+  const [editingQuestion, setEditingQuestion] = useState<any>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [questionToDelete, setQuestionToDelete] = useState<string | null>(null);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const handleSelectionChange = (category: string, subdivision: string) => {
-    setSelectedCategory(category)
-    setSelectedSubdivision(subdivision)
-    setTabValue(0) // Reset to questions tab
-  }
+    setSelectedCategory(category);
+    setSelectedSubdivision(subdivision);
+    setTabValue(0); // Reset to questions tab
+  };
 
   const handleCreateQuestion = () => {
-    setEditingQuestion(null)
-    setFormOpen(true)
-  }
+    setEditingQuestion(null);
+    setFormOpen(true);
+  };
 
   const handleEditQuestion = async (question: any) => {
     // Fetch full question with options
     const { data, error } = await supabase
-      .from('practice_questions')
-      .select(`
+      .from("practice_questions")
+      .select(
+        `
         *,
         practice_question_options (
           id,
@@ -65,55 +66,56 @@ export const PracticeModuleManager: React.FC = () => {
           is_correct,
           display_order
         )
-      `)
-      .eq('id', question.id)
-      .single()
+      `,
+      )
+      .eq("id", question.id)
+      .single();
 
     if (error) {
-      console.error('Error fetching question:', error)
-      return
+      console.error("Error fetching question:", error);
+      return;
     }
 
     setEditingQuestion({
       ...data,
-      options: data.practice_question_options
-    })
-    setFormOpen(true)
-  }
+      options: data.practice_question_options,
+    });
+    setFormOpen(true);
+  };
 
   const handleDeleteQuestion = (questionId: string) => {
-    setQuestionToDelete(questionId)
-    setDeleteDialogOpen(true)
-  }
+    setQuestionToDelete(questionId);
+    setDeleteDialogOpen(true);
+  };
 
   const confirmDelete = async () => {
-    if (!questionToDelete) return
+    if (!questionToDelete) return;
 
     try {
       const { error } = await supabase
-        .from('practice_questions')
+        .from("practice_questions")
         .delete()
-        .eq('id', questionToDelete)
+        .eq("id", questionToDelete);
 
-      if (error) throw error
+      if (error) throw error;
 
-      setRefreshTrigger(prev => prev + 1)
-      setDeleteDialogOpen(false)
-      setQuestionToDelete(null)
+      setRefreshTrigger((prev) => prev + 1);
+      setDeleteDialogOpen(false);
+      setQuestionToDelete(null);
     } catch (err) {
-      console.error('Error deleting question:', err)
+      console.error("Error deleting question:", err);
     }
-  }
+  };
 
   const handleFormSave = () => {
-    setFormOpen(false)
-    setEditingQuestion(null)
-    setRefreshTrigger(prev => prev + 1)
-  }
+    setFormOpen(false);
+    setEditingQuestion(null);
+    setRefreshTrigger((prev) => prev + 1);
+  };
 
   const handleImportComplete = () => {
-    setRefreshTrigger(prev => prev + 1)
-  }
+    setRefreshTrigger((prev) => prev + 1);
+  };
 
   return (
     <Box>
@@ -139,7 +141,10 @@ export const PracticeModuleManager: React.FC = () => {
       {/* Content Area - Only show when subdivision is selected */}
       {selectedCategory && selectedSubdivision && (
         <Paper sx={{ p: 3 }}>
-          <Tabs value={tabValue} onChange={(_, newValue) => setTabValue(newValue)}>
+          <Tabs
+            value={tabValue}
+            onChange={(_, newValue) => setTabValue(newValue)}
+          >
             <Tab label="Questions" />
             <Tab label="Bulk Import" />
           </Tabs>
@@ -171,8 +176,8 @@ export const PracticeModuleManager: React.FC = () => {
       <PracticeQuestionForm
         open={formOpen}
         onClose={() => {
-          setFormOpen(false)
-          setEditingQuestion(null)
+          setFormOpen(false);
+          setEditingQuestion(null);
         }}
         onSave={handleFormSave}
         category={selectedCategory}
@@ -181,11 +186,15 @@ export const PracticeModuleManager: React.FC = () => {
       />
 
       {/* Delete Confirmation Dialog */}
-      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+      >
         <DialogTitle>Confirm Delete</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure you want to delete this question? This action cannot be undone.
+            Are you sure you want to delete this question? This action cannot be
+            undone.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -196,5 +205,5 @@ export const PracticeModuleManager: React.FC = () => {
         </DialogActions>
       </Dialog>
     </Box>
-  )
-}
+  );
+};

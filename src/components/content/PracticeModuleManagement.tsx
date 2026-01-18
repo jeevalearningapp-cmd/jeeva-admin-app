@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState } from "react";
 import {
   Box,
   Typography,
@@ -9,19 +9,22 @@ import {
   MenuItem,
   Tabs,
   Tab,
-  Alert
-} from '@mui/material'
+  Alert,
+} from "@mui/material";
 import {
   PRACTICE_CATEGORIES,
   NUMERACY_SUBDIVISIONS,
-  CLINICAL_SUBDIVISIONS
-} from '@/types/content'
-import { PracticeQuestionManager, PracticeCSVBulkUpload } from '@/components/content'
+  CLINICAL_SUBDIVISIONS,
+} from "@/types/content";
+import {
+  PracticeQuestionManager,
+  PracticeCSVBulkUpload,
+} from "@/components/content";
 
 interface TabPanelProps {
-  children?: React.ReactNode
-  index: number
-  value: number
+  children?: React.ReactNode;
+  index: number;
+  value: number;
 }
 
 const TabPanel: React.FC<TabPanelProps> = ({ children, value, index }) => {
@@ -29,22 +32,22 @@ const TabPanel: React.FC<TabPanelProps> = ({ children, value, index }) => {
     <div role="tabpanel" hidden={value !== index}>
       {value === index && <Box sx={{ py: 3 }}>{children}</Box>}
     </div>
-  )
-}
+  );
+};
 
 export const PracticeModuleManagement: React.FC = () => {
-  const [selectedCategory, setSelectedCategory] = useState<string>('')
-  const [selectedSubdivision, setSelectedSubdivision] = useState<string>('')
-  const [tabValue, setTabValue] = useState(0)
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [selectedSubdivision, setSelectedSubdivision] = useState<string>("");
+  const [tabValue, setTabValue] = useState(0);
 
   const getSubdivisions = () => {
     if (selectedCategory === PRACTICE_CATEGORIES.NUMERACY) {
-      return NUMERACY_SUBDIVISIONS
+      return NUMERACY_SUBDIVISIONS;
     } else if (selectedCategory === PRACTICE_CATEGORIES.CLINICAL_KNOWLEDGE) {
-      return CLINICAL_SUBDIVISIONS
+      return CLINICAL_SUBDIVISIONS;
     }
-    return []
-  }
+    return [];
+  };
 
   return (
     <Box>
@@ -57,14 +60,14 @@ export const PracticeModuleManagement: React.FC = () => {
           Choose category and subdivision to manage practice questions
         </Typography>
 
-        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+        <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
           <FormControl sx={{ minWidth: 200 }}>
             <InputLabel>Category</InputLabel>
             <Select
               value={selectedCategory}
               onChange={(e) => {
-                setSelectedCategory(e.target.value)
-                setSelectedSubdivision('')
+                setSelectedCategory(e.target.value);
+                setSelectedSubdivision("");
               }}
               label="Category"
             >
@@ -105,7 +108,10 @@ export const PracticeModuleManagement: React.FC = () => {
       {/* Content Tabs */}
       {selectedSubdivision && (
         <Paper sx={{ p: 3 }}>
-          <Tabs value={tabValue} onChange={(_, newValue) => setTabValue(newValue)}>
+          <Tabs
+            value={tabValue}
+            onChange={(_, newValue) => setTabValue(newValue)}
+          >
             <Tab label="Questions" />
             <Tab label="Bulk Upload" />
           </Tabs>
@@ -128,5 +134,5 @@ export const PracticeModuleManagement: React.FC = () => {
         </Paper>
       )}
     </Box>
-  )
-}
+  );
+};

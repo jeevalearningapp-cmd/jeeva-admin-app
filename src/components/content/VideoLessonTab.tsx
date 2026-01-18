@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState } from "react";
 import {
   Box,
   Paper,
@@ -9,83 +9,98 @@ import {
   Chip,
   FormControlLabel,
   Switch,
-} from '@mui/material'
+} from "@mui/material";
 import {
   SaveOutlined,
   VideoLibraryOutlined,
   CloudUploadOutlined,
-} from '@mui/icons-material'
-import { Subtopic } from '@/api/subtopics'
-import { subtopicsAPI } from '@/api/subtopics'
-import { lessonContentAPI } from '@/api/lessonContent'
-import { useSnackbar } from 'notistack'
+} from "@mui/icons-material";
+import { Subtopic } from "@/api/subtopics";
+import { subtopicsAPI } from "@/api/subtopics";
+import { lessonContentAPI } from "@/api/lessonContent";
+import { useSnackbar } from "notistack";
 
 interface VideoLessonTabProps {
-  subtopic: Subtopic
-  onUpdate: () => void
+  subtopic: Subtopic;
+  onUpdate: () => void;
 }
 
-export const VideoLessonTab: React.FC<VideoLessonTabProps> = ({ subtopic, onUpdate }) => {
-  const [videoUrl, setVideoUrl] = useState(subtopic.videoUrl || '')
-  const [duration, setDuration] = useState(subtopic.duration || 0)
-  const [isMandatory, setIsMandatory] = useState(subtopic.isMandatory)
-  const [isSaving, setIsSaving] = useState(false)
-  const [error, setError] = useState<string>('')
-  const { enqueueSnackbar } = useSnackbar()
+export const VideoLessonTab: React.FC<VideoLessonTabProps> = ({
+  subtopic,
+  onUpdate,
+}) => {
+  const [videoUrl, setVideoUrl] = useState(subtopic.videoUrl || "");
+  const [duration, setDuration] = useState(subtopic.duration || 0);
+  const [isMandatory, setIsMandatory] = useState(subtopic.isMandatory);
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState<string>("");
+  const { enqueueSnackbar } = useSnackbar();
 
   const handleSave = async () => {
     try {
-      setIsSaving(true)
-      setError('')
+      setIsSaving(true);
+      setError("");
 
       // Update main lesson (subtopic)
       try {
         await subtopicsAPI.update(subtopic.id, {
           isMandatory,
-          contentType: 'video',
-        })
+          contentType: "video",
+        });
       } catch (e) {
-        console.warn('Failed to update parent lesson record, but proceeding with content update', e)
+        console.warn(
+          "Failed to update parent lesson record, but proceeding with content update",
+          e,
+        );
       }
 
       // Update or create video content record
-      await lessonContentAPI.upsert(subtopic.id, 'video', {
-        title: 'Video Lesson',
+      await lessonContentAPI.upsert(subtopic.id, "video", {
+        title: "Video Lesson",
         contentUrl: videoUrl,
         durationSeconds: duration,
-        isActive: true
-      })
+        isActive: true,
+      });
 
-      enqueueSnackbar('Video lesson saved successfully', { variant: 'success' })
-      onUpdate()
+      enqueueSnackbar("Video lesson saved successfully", {
+        variant: "success",
+      });
+      onUpdate();
     } catch (err: any) {
-      setError(err.message || 'Failed to save video lesson')
-      enqueueSnackbar('Failed to save video lesson', { variant: 'error' })
+      setError(err.message || "Failed to save video lesson");
+      enqueueSnackbar("Failed to save video lesson", { variant: "error" });
     } finally {
-      setIsSaving(false)
+      setIsSaving(false);
     }
-  }
+  };
 
   const isValidUrl = (url: string) => {
-    if (!url) return false
+    if (!url) return false;
     try {
-      new URL(url)
-      return true
+      new URL(url);
+      return true;
     } catch {
-      return false
+      return false;
     }
-  }
+  };
 
   const formatDuration = (seconds: number) => {
-    const mins = Math.floor(seconds / 60)
-    const secs = seconds % 60
-    return `${mins}:${secs.toString().padStart(2, '0')}`
-  }
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  };
 
   return (
     <Box>
       {/* Header */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 3,
+        }}
+      >
         <Box>
           <Typography variant="h6" gutterBottom>
             Video Lesson (Mandatory)
@@ -99,20 +114,22 @@ export const VideoLessonTab: React.FC<VideoLessonTabProps> = ({ subtopic, onUpda
           startIcon={<SaveOutlined />}
           onClick={handleSave}
           disabled={isSaving || !isValidUrl(videoUrl)}
-          sx={{ borderRadius: '12px' }}
+          sx={{ borderRadius: "12px" }}
         >
-          {isSaving ? 'Saving...' : 'Save'}
+          {isSaving ? "Saving..." : "Save"}
         </Button>
       </Box>
 
       {error && (
-        <Alert severity="error" onClose={() => setError('')} sx={{ mb: 2 }}>
+        <Alert severity="error" onClose={() => setError("")} sx={{ mb: 2 }}>
           {error}
         </Alert>
       )}
 
       {/* Video URL Field */}
-      <Paper sx={{ p: 3, mb: 3, border: '1px solid #E5E7EB', borderRadius: '16px' }}>
+      <Paper
+        sx={{ p: 3, mb: 3, border: "1px solid #E5E7EB", borderRadius: "16px" }}
+      >
         <Typography variant="subtitle2" gutterBottom>
           Video URL
         </Typography>
@@ -123,7 +140,9 @@ export const VideoLessonTab: React.FC<VideoLessonTabProps> = ({ subtopic, onUpda
           placeholder="https://example.com/video.mp4 or YouTube URL"
           helperText="Enter a direct video URL or YouTube/Vimeo link"
           InputProps={{
-            startAdornment: <VideoLibraryOutlined sx={{ mr: 1, color: 'action.active' }} />,
+            startAdornment: (
+              <VideoLibraryOutlined sx={{ mr: 1, color: "action.active" }} />
+            ),
           }}
           sx={{ mb: 2 }}
         />
@@ -138,7 +157,11 @@ export const VideoLessonTab: React.FC<VideoLessonTabProps> = ({ subtopic, onUpda
           onChange={(e) => setDuration(parseInt(e.target.value) || 0)}
           fullWidth
           placeholder="e.g., 720 for 12 minutes"
-          helperText={duration > 0 ? `Duration: ${formatDuration(duration)}` : 'Enter duration in seconds'}
+          helperText={
+            duration > 0
+              ? `Duration: ${formatDuration(duration)}`
+              : "Enter duration in seconds"
+          }
           sx={{ mb: 2 }}
         />
 
@@ -163,30 +186,31 @@ export const VideoLessonTab: React.FC<VideoLessonTabProps> = ({ subtopic, onUpda
 
       {/* Video Preview */}
       {isValidUrl(videoUrl) && (
-        <Paper sx={{ p: 3, border: '1px solid #E5E7EB', borderRadius: '16px' }}>
+        <Paper sx={{ p: 3, border: "1px solid #E5E7EB", borderRadius: "16px" }}>
           <Typography variant="subtitle2" gutterBottom>
             Video Preview
           </Typography>
           <Box
             sx={{
-              position: 'relative',
-              paddingBottom: '56.25%', // 16:9 aspect ratio
+              position: "relative",
+              paddingBottom: "56.25%", // 16:9 aspect ratio
               height: 0,
-              overflow: 'hidden',
-              borderRadius: '8px',
-              bgcolor: '#000',
+              overflow: "hidden",
+              borderRadius: "8px",
+              bgcolor: "#000",
             }}
           >
-            {videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be') ? (
+            {videoUrl.includes("youtube.com") ||
+            videoUrl.includes("youtu.be") ? (
               <iframe
-                src={videoUrl.replace('watch?v=', 'embed/')}
+                src={videoUrl.replace("watch?v=", "embed/")}
                 style={{
-                  position: 'absolute',
+                  position: "absolute",
                   top: 0,
                   left: 0,
-                  width: '100%',
-                  height: '100%',
-                  border: 'none',
+                  width: "100%",
+                  height: "100%",
+                  border: "none",
                 }}
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
@@ -196,11 +220,11 @@ export const VideoLessonTab: React.FC<VideoLessonTabProps> = ({ subtopic, onUpda
                 src={videoUrl}
                 controls
                 style={{
-                  position: 'absolute',
+                  position: "absolute",
                   top: 0,
                   left: 0,
-                  width: '100%',
-                  height: '100%',
+                  width: "100%",
+                  height: "100%",
                 }}
               >
                 Your browser does not support the video tag.
@@ -212,19 +236,29 @@ export const VideoLessonTab: React.FC<VideoLessonTabProps> = ({ subtopic, onUpda
 
       {/* Upload Instructions */}
       {!videoUrl && (
-        <Paper sx={{ p: 3, border: '1px dashed #E5E7EB', borderRadius: '16px', textAlign: 'center' }}>
-          <CloudUploadOutlined sx={{ fontSize: 48, color: 'action.disabled', mb: 2 }} />
+        <Paper
+          sx={{
+            p: 3,
+            border: "1px dashed #E5E7EB",
+            borderRadius: "16px",
+            textAlign: "center",
+          }}
+        >
+          <CloudUploadOutlined
+            sx={{ fontSize: 48, color: "action.disabled", mb: 2 }}
+          />
           <Typography variant="body2" color="text.secondary" gutterBottom>
             No video uploaded yet
           </Typography>
           <Typography variant="caption" color="text.secondary">
-            Upload your video to a hosting service (YouTube, Vimeo, AWS S3, etc.) and paste the URL above
+            Upload your video to a hosting service (YouTube, Vimeo, AWS S3,
+            etc.) and paste the URL above
           </Typography>
         </Paper>
       )}
 
       {/* Status Indicator */}
-      <Box sx={{ mt: 3, display: 'flex', gap: 1 }}>
+      <Box sx={{ mt: 3, display: "flex", gap: 1 }}>
         {videoUrl ? (
           <Chip
             icon={<VideoLibraryOutlined />}
@@ -240,10 +274,8 @@ export const VideoLessonTab: React.FC<VideoLessonTabProps> = ({ subtopic, onUpda
             variant="outlined"
           />
         )}
-        {isMandatory && (
-          <Chip label="Mandatory" color="error" size="small" />
-        )}
+        {isMandatory && <Chip label="Mandatory" color="error" size="small" />}
       </Box>
     </Box>
-  )
-}
+  );
+};

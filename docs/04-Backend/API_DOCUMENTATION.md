@@ -11,10 +11,10 @@ The Jeeva Learning mobile app uses **Supabase** as its backend-as-a-service, sha
 ### Supabase Client Configuration
 
 ```typescript
-import { createClient } from '@supabase/supabase-js'
+import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL!
-const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!
+const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL!;
+const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!;
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
@@ -23,7 +23,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     persistSession: true,
     detectSessionInUrl: false,
   },
-})
+});
 ```
 
 ### Environment Variables
@@ -49,20 +49,20 @@ const signUp = async (email: string, password: string, fullName: string) => {
         full_name: fullName,
       },
     },
-  })
-  
-  if (error) throw error
-  
+  });
+
+  if (error) throw error;
+
   // Create user profile after signup
   if (data.user) {
-    await supabase.from('user_profiles').insert({
+    await supabase.from("user_profiles").insert({
       user_id: data.user.id,
       full_name: fullName,
-    })
+    });
   }
-  
-  return data
-}
+
+  return data;
+};
 ```
 
 ### Sign In
@@ -72,29 +72,31 @@ const signIn = async (email: string, password: string) => {
   const { data, error } = await supabase.auth.signInWithPassword({
     email,
     password,
-  })
-  
-  if (error) throw error
-  return data
-}
+  });
+
+  if (error) throw error;
+  return data;
+};
 ```
 
 ### Sign Out
 
 ```typescript
 const signOut = async () => {
-  const { error } = await supabase.auth.signOut()
-  if (error) throw error
-}
+  const { error } = await supabase.auth.signOut();
+  if (error) throw error;
+};
 ```
 
 ### Get Current User
 
 ```typescript
 const getCurrentUser = async () => {
-  const { data: { user } } = await supabase.auth.getUser()
-  return user
-}
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  return user;
+};
 ```
 
 ### Password Reset
@@ -102,12 +104,12 @@ const getCurrentUser = async () => {
 ```typescript
 const resetPassword = async (email: string) => {
   const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: 'yourapp://reset-password',
-  })
-  
-  if (error) throw error
-  return data
-}
+    redirectTo: "yourapp://reset-password",
+  });
+
+  if (error) throw error;
+  return data;
+};
 ```
 
 ### Social Authentication
@@ -116,20 +118,20 @@ const resetPassword = async (email: string) => {
 // Google Sign In
 const signInWithGoogle = async () => {
   const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: 'google',
-  })
-  if (error) throw error
-  return data
-}
+    provider: "google",
+  });
+  if (error) throw error;
+  return data;
+};
 
 // Apple Sign In
 const signInWithApple = async () => {
   const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: 'apple',
-  })
-  if (error) throw error
-  return data
-}
+    provider: "apple",
+  });
+  if (error) throw error;
+  return data;
+};
 ```
 
 ---
@@ -139,6 +141,7 @@ const signInWithApple = async () => {
 ### Table: `user_profiles`
 
 **Columns:**
+
 - `id` (UUID, PK)
 - `user_id` (UUID, FK → users.id)
 - `full_name` (TEXT)
@@ -152,34 +155,37 @@ const signInWithApple = async () => {
 ```typescript
 const getUserProfile = async (userId: string) => {
   const { data, error } = await supabase
-    .from('user_profiles')
-    .select('*')
-    .eq('user_id', userId)
-    .single()
-  
-  if (error) throw error
-  return data
-}
+    .from("user_profiles")
+    .select("*")
+    .eq("user_id", userId)
+    .single();
+
+  if (error) throw error;
+  return data;
+};
 ```
 
 ### Update User Profile
 
 ```typescript
-const updateUserProfile = async (userId: string, updates: {
-  full_name?: string
-  phone_number?: string
-  date_of_birth?: string
-}) => {
+const updateUserProfile = async (
+  userId: string,
+  updates: {
+    full_name?: string;
+    phone_number?: string;
+    date_of_birth?: string;
+  },
+) => {
   const { data, error } = await supabase
-    .from('user_profiles')
+    .from("user_profiles")
     .update(updates)
-    .eq('user_id', userId)
+    .eq("user_id", userId)
     .select()
-    .single()
-  
-  if (error) throw error
-  return data
-}
+    .single();
+
+  if (error) throw error;
+  return data;
+};
 ```
 
 ---
@@ -189,6 +195,7 @@ const updateUserProfile = async (userId: string, updates: {
 ### Table: `modules`
 
 **Columns:**
+
 - `id` (UUID, PK)
 - `title` (TEXT)
 - `description` (TEXT)
@@ -203,14 +210,14 @@ const updateUserProfile = async (userId: string, updates: {
 ```typescript
 const getModules = async () => {
   const { data, error } = await supabase
-    .from('modules')
-    .select('*')
-    .eq('is_active', true)
-    .order('display_order', { ascending: true })
-  
-  if (error) throw error
-  return data
-}
+    .from("modules")
+    .select("*")
+    .eq("is_active", true)
+    .order("display_order", { ascending: true });
+
+  if (error) throw error;
+  return data;
+};
 ```
 
 ### Get Module by ID
@@ -218,15 +225,15 @@ const getModules = async () => {
 ```typescript
 const getModuleById = async (id: string) => {
   const { data, error } = await supabase
-    .from('modules')
-    .select('*')
-    .eq('id', id)
-    .eq('is_active', true)
-    .single()
-  
-  if (error) throw error
-  return data
-}
+    .from("modules")
+    .select("*")
+    .eq("id", id)
+    .eq("is_active", true)
+    .single();
+
+  if (error) throw error;
+  return data;
+};
 ```
 
 ---
@@ -234,6 +241,7 @@ const getModuleById = async (id: string) => {
 ### Table: `topics`
 
 **Columns:**
+
 - `id` (UUID, PK)
 - `module_id` (UUID, FK → modules.id)
 - `title` (TEXT)
@@ -248,22 +256,24 @@ const getModuleById = async (id: string) => {
 ```typescript
 const getTopicsByModule = async (moduleId: string) => {
   const { data, error } = await supabase
-    .from('topics')
-    .select(`
+    .from("topics")
+    .select(
+      `
       *,
       modules (
         id,
         title,
         thumbnail_url
       )
-    `)
-    .eq('module_id', moduleId)
-    .eq('is_active', true)
-    .order('display_order', { ascending: true })
-  
-  if (error) throw error
-  return data
-}
+    `,
+    )
+    .eq("module_id", moduleId)
+    .eq("is_active", true)
+    .order("display_order", { ascending: true });
+
+  if (error) throw error;
+  return data;
+};
 ```
 
 ---
@@ -271,6 +281,7 @@ const getTopicsByModule = async (moduleId: string) => {
 ### Table: `lessons`
 
 **Columns:**
+
 - `id` (UUID, PK)
 - `topic_id` (UUID, FK → topics.id)
 - `title` (TEXT)
@@ -288,22 +299,24 @@ const getTopicsByModule = async (moduleId: string) => {
 ```typescript
 const getLessonsByTopic = async (topicId: string) => {
   const { data, error } = await supabase
-    .from('lessons')
-    .select(`
+    .from("lessons")
+    .select(
+      `
       *,
       topics (
         id,
         title,
         module_id
       )
-    `)
-    .eq('topic_id', topicId)
-    .eq('is_active', true)
-    .order('display_order', { ascending: true })
-  
-  if (error) throw error
-  return data
-}
+    `,
+    )
+    .eq("topic_id", topicId)
+    .eq("is_active", true)
+    .order("display_order", { ascending: true });
+
+  if (error) throw error;
+  return data;
+};
 ```
 
 ### Get Single Lesson with Details
@@ -311,8 +324,9 @@ const getLessonsByTopic = async (topicId: string) => {
 ```typescript
 const getLessonById = async (lessonId: string) => {
   const { data, error } = await supabase
-    .from('lessons')
-    .select(`
+    .from("lessons")
+    .select(
+      `
       *,
       topics (
         id,
@@ -323,14 +337,15 @@ const getLessonById = async (lessonId: string) => {
           title
         )
       )
-    `)
-    .eq('id', lessonId)
-    .eq('is_active', true)
-    .single()
-  
-  if (error) throw error
-  return data
-}
+    `,
+    )
+    .eq("id", lessonId)
+    .eq("is_active", true)
+    .single();
+
+  if (error) throw error;
+  return data;
+};
 ```
 
 ---
@@ -338,6 +353,7 @@ const getLessonById = async (lessonId: string) => {
 ### Table: `questions`
 
 **Columns:**
+
 - `id` (UUID, PK)
 - `lesson_id` (UUID, FK → lessons.id, nullable)
 - `question_text` (TEXT)
@@ -353,6 +369,7 @@ const getLessonById = async (lessonId: string) => {
 ### Table: `question_options`
 
 **Columns:**
+
 - `id` (UUID, PK)
 - `question_id` (UUID, FK → questions.id)
 - `option_text` (TEXT)
@@ -364,8 +381,9 @@ const getLessonById = async (lessonId: string) => {
 ```typescript
 const getQuestionsByLesson = async (lessonId: string) => {
   const { data, error } = await supabase
-    .from('questions')
-    .select(`
+    .from("questions")
+    .select(
+      `
       *,
       question_options (
         id,
@@ -373,14 +391,15 @@ const getQuestionsByLesson = async (lessonId: string) => {
         is_correct,
         display_order
       )
-    `)
-    .eq('lesson_id', lessonId)
-    .eq('is_active', true)
-    .order('created_at', { ascending: true })
-  
-  if (error) throw error
-  return data
-}
+    `,
+    )
+    .eq("lesson_id", lessonId)
+    .eq("is_active", true)
+    .order("created_at", { ascending: true });
+
+  if (error) throw error;
+  return data;
+};
 ```
 
 ### Get Questions by Topic (for Practice)
@@ -388,21 +407,23 @@ const getQuestionsByLesson = async (lessonId: string) => {
 ```typescript
 const getQuestionsByTopic = async (topicId: string, limit: number = 10) => {
   const { data, error } = await supabase
-    .from('questions')
-    .select(`
+    .from("questions")
+    .select(
+      `
       *,
       question_options (*),
       lessons!inner (
         topic_id
       )
-    `)
-    .eq('lessons.topic_id', topicId)
-    .eq('is_active', true)
-    .limit(limit)
-  
-  if (error) throw error
-  return data
-}
+    `,
+    )
+    .eq("lessons.topic_id", topicId)
+    .eq("is_active", true)
+    .limit(limit);
+
+  if (error) throw error;
+  return data;
+};
 ```
 
 ---
@@ -410,6 +431,7 @@ const getQuestionsByTopic = async (topicId: string, limit: number = 10) => {
 ### Table: `flashcards`
 
 **Columns:**
+
 - `id` (UUID, PK)
 - `lesson_id` (UUID, FK → lessons.id)
 - `front` (TEXT)
@@ -425,15 +447,15 @@ const getQuestionsByTopic = async (topicId: string, limit: number = 10) => {
 ```typescript
 const getFlashcardsByLesson = async (lessonId: string) => {
   const { data, error } = await supabase
-    .from('flashcards')
-    .select('*')
-    .eq('lesson_id', lessonId)
-    .eq('is_active', true)
-    .order('display_order', { ascending: true })
-  
-  if (error) throw error
-  return data
-}
+    .from("flashcards")
+    .select("*")
+    .eq("lesson_id", lessonId)
+    .eq("is_active", true)
+    .order("display_order", { ascending: true });
+
+  if (error) throw error;
+  return data;
+};
 ```
 
 ### Get Flashcards by Topic
@@ -441,19 +463,21 @@ const getFlashcardsByLesson = async (lessonId: string) => {
 ```typescript
 const getFlashcardsByTopic = async (topicId: string) => {
   const { data, error } = await supabase
-    .from('flashcards')
-    .select(`
+    .from("flashcards")
+    .select(
+      `
       *,
       lessons!inner (
         topic_id
       )
-    `)
-    .eq('lessons.topic_id', topicId)
-    .eq('is_active', true)
-  
-  if (error) throw error
-  return data
-}
+    `,
+    )
+    .eq("lessons.topic_id", topicId)
+    .eq("is_active", true);
+
+  if (error) throw error;
+  return data;
+};
 ```
 
 ---
@@ -463,6 +487,7 @@ const getFlashcardsByTopic = async (topicId: string) => {
 ### Table: `learning_completions`
 
 **Columns:**
+
 - `id` (UUID, PK)
 - `user_id` (UUID, FK → users.id)
 - `lesson_id` (UUID, FK → lessons.id)
@@ -473,18 +498,18 @@ const getFlashcardsByTopic = async (topicId: string) => {
 ```typescript
 const markLessonComplete = async (userId: string, lessonId: string) => {
   const { data, error } = await supabase
-    .from('learning_completions')
+    .from("learning_completions")
     .insert({
       user_id: userId,
       lesson_id: lessonId,
       completed_at: new Date().toISOString(),
     })
     .select()
-    .single()
-  
-  if (error) throw error
-  return data
-}
+    .single();
+
+  if (error) throw error;
+  return data;
+};
 ```
 
 ### Get User's Completed Lessons
@@ -492,8 +517,9 @@ const markLessonComplete = async (userId: string, lessonId: string) => {
 ```typescript
 const getCompletedLessons = async (userId: string) => {
   const { data, error } = await supabase
-    .from('learning_completions')
-    .select(`
+    .from("learning_completions")
+    .select(
+      `
       *,
       lessons (
         id,
@@ -505,13 +531,14 @@ const getCompletedLessons = async (userId: string) => {
           module_id
         )
       )
-    `)
-    .eq('user_id', userId)
-    .order('completed_at', { ascending: false })
-  
-  if (error) throw error
-  return data
-}
+    `,
+    )
+    .eq("user_id", userId)
+    .order("completed_at", { ascending: false });
+
+  if (error) throw error;
+  return data;
+};
 ```
 
 ### Check if Lesson is Completed
@@ -519,15 +546,15 @@ const getCompletedLessons = async (userId: string) => {
 ```typescript
 const isLessonCompleted = async (userId: string, lessonId: string) => {
   const { data, error } = await supabase
-    .from('learning_completions')
-    .select('id')
-    .eq('user_id', userId)
-    .eq('lesson_id', lessonId)
-    .maybeSingle()
-  
-  if (error) throw error
-  return !!data
-}
+    .from("learning_completions")
+    .select("id")
+    .eq("user_id", userId)
+    .eq("lesson_id", lessonId)
+    .maybeSingle();
+
+  if (error) throw error;
+  return !!data;
+};
 ```
 
 ### Get Topic Progress
@@ -536,33 +563,35 @@ const isLessonCompleted = async (userId: string, lessonId: string) => {
 const getTopicProgress = async (userId: string, topicId: string) => {
   // Get total lessons in topic
   const { data: totalLessons, error: lessonsError } = await supabase
-    .from('lessons')
-    .select('id')
-    .eq('topic_id', topicId)
-    .eq('is_active', true)
-  
-  if (lessonsError) throw lessonsError
-  
+    .from("lessons")
+    .select("id")
+    .eq("topic_id", topicId)
+    .eq("is_active", true);
+
+  if (lessonsError) throw lessonsError;
+
   // Get completed lessons in topic
   const { data: completedLessons, error: completedError } = await supabase
-    .from('learning_completions')
-    .select(`
+    .from("learning_completions")
+    .select(
+      `
       lesson_id,
       lessons!inner (
         topic_id
       )
-    `)
-    .eq('user_id', userId)
-    .eq('lessons.topic_id', topicId)
-  
-  if (completedError) throw completedError
-  
+    `,
+    )
+    .eq("user_id", userId)
+    .eq("lessons.topic_id", topicId);
+
+  if (completedError) throw completedError;
+
   return {
     total: totalLessons.length,
     completed: completedLessons.length,
     percentage: (completedLessons.length / totalLessons.length) * 100,
-  }
-}
+  };
+};
 ```
 
 ---
@@ -572,6 +601,7 @@ const getTopicProgress = async (userId: string, topicId: string) => {
 ### Table: `practice_sessions`
 
 **Columns:**
+
 - `id` (UUID, PK)
 - `user_id` (UUID, FK → users.id)
 - `created_at` (TIMESTAMP)
@@ -580,6 +610,7 @@ const getTopicProgress = async (userId: string, topicId: string) => {
 ### Table: `practice_results`
 
 **Columns:**
+
 - `id` (UUID, PK)
 - `session_id` (UUID, FK → practice_sessions.id)
 - `answer_log` (JSONB)
@@ -589,44 +620,44 @@ const getTopicProgress = async (userId: string, topicId: string) => {
 ```typescript
 const startPracticeSession = async (userId: string) => {
   const { data, error } = await supabase
-    .from('practice_sessions')
+    .from("practice_sessions")
     .insert({
       user_id: userId,
     })
     .select()
-    .single()
-  
-  if (error) throw error
-  return data
-}
+    .single();
+
+  if (error) throw error;
+  return data;
+};
 ```
 
 ### Save Practice Results
 
 ```typescript
 interface PracticeAnswer {
-  questionId: string
-  selectedOptionId: string
-  isCorrect: boolean
-  timeTaken: number // seconds
+  questionId: string;
+  selectedOptionId: string;
+  isCorrect: boolean;
+  timeTaken: number; // seconds
 }
 
 const savePracticeResults = async (
-  sessionId: string, 
-  answers: PracticeAnswer[]
+  sessionId: string,
+  answers: PracticeAnswer[],
 ) => {
   const { data, error } = await supabase
-    .from('practice_results')
+    .from("practice_results")
     .insert({
       session_id: sessionId,
       answer_log: answers,
     })
     .select()
-    .single()
-  
-  if (error) throw error
-  return data
-}
+    .single();
+
+  if (error) throw error;
+  return data;
+};
 ```
 
 ### Get User Practice History
@@ -634,20 +665,22 @@ const savePracticeResults = async (
 ```typescript
 const getPracticeHistory = async (userId: string, limit: number = 20) => {
   const { data, error } = await supabase
-    .from('practice_sessions')
-    .select(`
+    .from("practice_sessions")
+    .select(
+      `
       *,
       practice_results (
         answer_log
       )
-    `)
-    .eq('user_id', userId)
-    .order('created_at', { ascending: false })
-    .limit(limit)
-  
-  if (error) throw error
-  return data
-}
+    `,
+    )
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (error) throw error;
+  return data;
+};
 ```
 
 ---
@@ -655,6 +688,7 @@ const getPracticeHistory = async (userId: string, limit: number = 20) => {
 ### Table: `mock_exams`
 
 **Columns:**
+
 - `id` (UUID, PK)
 - `user_id` (UUID, FK → users.id)
 - `exam_data` (JSONB)
@@ -663,6 +697,7 @@ const getPracticeHistory = async (userId: string, limit: number = 20) => {
 ### Table: `mock_exam_results`
 
 **Columns:**
+
 - `id` (UUID, PK)
 - `exam_id` (UUID, FK → mock_exams.id)
 - `results_data` (JSONB)
@@ -671,50 +706,50 @@ const getPracticeHistory = async (userId: string, limit: number = 20) => {
 
 ```typescript
 interface MockExamData {
-  topicId: string
-  questionIds: string[]
-  duration: number // minutes
+  topicId: string;
+  questionIds: string[];
+  duration: number; // minutes
 }
 
 const startMockExam = async (userId: string, examData: MockExamData) => {
   const { data, error } = await supabase
-    .from('mock_exams')
+    .from("mock_exams")
     .insert({
       user_id: userId,
       exam_data: examData,
     })
     .select()
-    .single()
-  
-  if (error) throw error
-  return data
-}
+    .single();
+
+  if (error) throw error;
+  return data;
+};
 ```
 
 ### Submit Mock Exam
 
 ```typescript
 interface MockExamResults {
-  score: number
-  totalQuestions: number
-  correctAnswers: number
-  timeTaken: number
-  answers: PracticeAnswer[]
+  score: number;
+  totalQuestions: number;
+  correctAnswers: number;
+  timeTaken: number;
+  answers: PracticeAnswer[];
 }
 
 const submitMockExam = async (examId: string, results: MockExamResults) => {
   const { data, error } = await supabase
-    .from('mock_exam_results')
+    .from("mock_exam_results")
     .insert({
       exam_id: examId,
       results_data: results,
     })
     .select()
-    .single()
-  
-  if (error) throw error
-  return data
-}
+    .single();
+
+  if (error) throw error;
+  return data;
+};
 ```
 
 ### Get Mock Exam History
@@ -722,19 +757,21 @@ const submitMockExam = async (examId: string, results: MockExamResults) => {
 ```typescript
 const getMockExamHistory = async (userId: string) => {
   const { data, error } = await supabase
-    .from('mock_exams')
-    .select(`
+    .from("mock_exams")
+    .select(
+      `
       *,
       mock_exam_results (
         results_data
       )
-    `)
-    .eq('user_id', userId)
-    .order('created_at', { ascending: false })
-  
-  if (error) throw error
-  return data
-}
+    `,
+    )
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false });
+
+  if (error) throw error;
+  return data;
+};
 ```
 
 ---
@@ -744,6 +781,7 @@ const getMockExamHistory = async (userId: string) => {
 ### Table: `subscription_plans`
 
 **Columns:**
+
 - `id` (UUID, PK)
 - `name` (TEXT)
 - `description` (TEXT)
@@ -761,14 +799,14 @@ const getMockExamHistory = async (userId: string) => {
 ```typescript
 const getSubscriptionPlans = async () => {
   const { data, error } = await supabase
-    .from('subscription_plans')
-    .select('*')
-    .eq('is_active', true)
-    .order('display_order', { ascending: true })
-  
-  if (error) throw error
-  return data
-}
+    .from("subscription_plans")
+    .select("*")
+    .eq("is_active", true)
+    .order("display_order", { ascending: true });
+
+  if (error) throw error;
+  return data;
+};
 ```
 
 ---
@@ -776,6 +814,7 @@ const getSubscriptionPlans = async () => {
 ### Table: `subscriptions`
 
 **Columns:**
+
 - `id` (UUID, PK)
 - `user_id` (UUID, FK → users.id)
 - `plan_id` (UUID, FK → subscription_plans.id)
@@ -794,8 +833,9 @@ const getSubscriptionPlans = async () => {
 ```typescript
 const getUserSubscription = async (userId: string) => {
   const { data, error } = await supabase
-    .from('subscriptions')
-    .select(`
+    .from("subscriptions")
+    .select(
+      `
       *,
       subscription_plans (
         id,
@@ -805,14 +845,15 @@ const getUserSubscription = async (userId: string) => {
         billing_cycle,
         features
       )
-    `)
-    .eq('user_id', userId)
-    .eq('status', 'active')
-    .maybeSingle()
-  
-  if (error) throw error
-  return data
-}
+    `,
+    )
+    .eq("user_id", userId)
+    .eq("status", "active")
+    .maybeSingle();
+
+  if (error) throw error;
+  return data;
+};
 ```
 
 ### Check if User has Premium Access
@@ -820,15 +861,15 @@ const getUserSubscription = async (userId: string) => {
 ```typescript
 const hasPremiumAccess = async (userId: string) => {
   const { data, error } = await supabase
-    .from('subscriptions')
-    .select('status')
-    .eq('user_id', userId)
-    .eq('status', 'active')
-    .maybeSingle()
-  
-  if (error) throw error
-  return !!data
-}
+    .from("subscriptions")
+    .select("status")
+    .eq("user_id", userId)
+    .eq("status", "active")
+    .maybeSingle();
+
+  if (error) throw error;
+  return !!data;
+};
 ```
 
 ---
@@ -838,6 +879,7 @@ const hasPremiumAccess = async (userId: string) => {
 ### Table: `ai_recommendations`
 
 **Columns:**
+
 - `id` (UUID, PK)
 - `user_id` (UUID, FK → users.id)
 - `recommendation_data` (JSONB)
@@ -848,43 +890,43 @@ const hasPremiumAccess = async (userId: string) => {
 ```typescript
 const getAIRecommendations = async (userId: string) => {
   const { data, error } = await supabase
-    .from('ai_recommendations')
-    .select('*')
-    .eq('user_id', userId)
-    .order('created_at', { ascending: false })
-    .limit(5)
-  
-  if (error) throw error
-  return data
-}
+    .from("ai_recommendations")
+    .select("*")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false })
+    .limit(5);
+
+  if (error) throw error;
+  return data;
+};
 ```
 
 ### Generate AI Recommendation
 
 ```typescript
 interface RecommendationData {
-  type: 'weak_topic' | 'next_lesson' | 'practice_suggestion'
-  topicId: string
-  reason: string
-  confidence: number
+  type: "weak_topic" | "next_lesson" | "practice_suggestion";
+  topicId: string;
+  reason: string;
+  confidence: number;
 }
 
 const saveAIRecommendation = async (
-  userId: string, 
-  recommendation: RecommendationData
+  userId: string,
+  recommendation: RecommendationData,
 ) => {
   const { data, error } = await supabase
-    .from('ai_recommendations')
+    .from("ai_recommendations")
     .insert({
       user_id: userId,
       recommendation_data: recommendation,
     })
     .select()
-    .single()
-  
-  if (error) throw error
-  return data
-}
+    .single();
+
+  if (error) throw error;
+  return data;
+};
 ```
 
 ---
@@ -897,28 +939,28 @@ const saveAIRecommendation = async (
 const getUserStats = async (userId: string) => {
   // Total lessons completed
   const { count: lessonsCompleted } = await supabase
-    .from('learning_completions')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', userId)
-  
+    .from("learning_completions")
+    .select("*", { count: "exact", head: true })
+    .eq("user_id", userId);
+
   // Total practice sessions
   const { count: practiceSessions } = await supabase
-    .from('practice_sessions')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', userId)
-  
+    .from("practice_sessions")
+    .select("*", { count: "exact", head: true })
+    .eq("user_id", userId);
+
   // Total mock exams
   const { count: mockExams } = await supabase
-    .from('mock_exams')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', userId)
-  
+    .from("mock_exams")
+    .select("*", { count: "exact", head: true })
+    .eq("user_id", userId);
+
   return {
     lessonsCompleted: lessonsCompleted || 0,
     practiceSessions: practiceSessions || 0,
     mockExams: mockExams || 0,
-  }
-}
+  };
+};
 ```
 
 ### Get Learning Streak
@@ -926,33 +968,34 @@ const getUserStats = async (userId: string) => {
 ```typescript
 const getLearningStreak = async (userId: string) => {
   const { data, error } = await supabase
-    .from('learning_completions')
-    .select('completed_at')
-    .eq('user_id', userId)
-    .order('completed_at', { ascending: false })
-  
-  if (error) throw error
-  
+    .from("learning_completions")
+    .select("completed_at")
+    .eq("user_id", userId)
+    .order("completed_at", { ascending: false });
+
+  if (error) throw error;
+
   // Calculate streak from completed_at dates
-  let streak = 0
-  let currentDate = new Date()
-  
+  let streak = 0;
+  let currentDate = new Date();
+
   for (const completion of data) {
-    const completionDate = new Date(completion.completed_at)
+    const completionDate = new Date(completion.completed_at);
     const daysDiff = Math.floor(
-      (currentDate.getTime() - completionDate.getTime()) / (1000 * 60 * 60 * 24)
-    )
-    
+      (currentDate.getTime() - completionDate.getTime()) /
+        (1000 * 60 * 60 * 24),
+    );
+
     if (daysDiff === streak) {
-      streak++
-      currentDate = completionDate
+      streak++;
+      currentDate = completionDate;
     } else {
-      break
+      break;
     }
   }
-  
-  return streak
-}
+
+  return streak;
+};
 ```
 
 ---
@@ -963,35 +1006,33 @@ const getLearningStreak = async (userId: string) => {
 
 ```typescript
 const uploadProfilePicture = async (userId: string, file: File) => {
-  const fileName = `${userId}/${Date.now()}.jpg`
-  
+  const fileName = `${userId}/${Date.now()}.jpg`;
+
   const { data, error } = await supabase.storage
-    .from('profile-pictures')
+    .from("profile-pictures")
     .upload(fileName, file, {
-      cacheControl: '3600',
+      cacheControl: "3600",
       upsert: true,
-    })
-  
-  if (error) throw error
-  
+    });
+
+  if (error) throw error;
+
   const { data: urlData } = supabase.storage
-    .from('profile-pictures')
-    .getPublicUrl(fileName)
-  
-  return urlData.publicUrl
-}
+    .from("profile-pictures")
+    .getPublicUrl(fileName);
+
+  return urlData.publicUrl;
+};
 ```
 
 ### Get Lesson Media URL
 
 ```typescript
 const getLessonMediaUrl = (path: string) => {
-  const { data } = supabase.storage
-    .from('lesson-media')
-    .getPublicUrl(path)
-  
-  return data.publicUrl
-}
+  const { data } = supabase.storage.from("lesson-media").getPublicUrl(path);
+
+  return data.publicUrl;
+};
 ```
 
 ---
@@ -1001,53 +1042,59 @@ const getLessonMediaUrl = (path: string) => {
 ### Subscribe to Lesson Updates
 
 ```typescript
-const subscribeLessonUpdates = (topicId: string, callback: (payload: any) => void) => {
+const subscribeLessonUpdates = (
+  topicId: string,
+  callback: (payload: any) => void,
+) => {
   const subscription = supabase
-    .channel('lesson-updates')
+    .channel("lesson-updates")
     .on(
-      'postgres_changes',
+      "postgres_changes",
       {
-        event: '*',
-        schema: 'public',
-        table: 'lessons',
+        event: "*",
+        schema: "public",
+        table: "lessons",
         filter: `topic_id=eq.${topicId}`,
       },
-      callback
+      callback,
     )
-    .subscribe()
-  
-  return subscription
-}
+    .subscribe();
+
+  return subscription;
+};
 ```
 
 ### Subscribe to User Progress
 
 ```typescript
-const subscribeUserProgress = (userId: string, callback: (payload: any) => void) => {
+const subscribeUserProgress = (
+  userId: string,
+  callback: (payload: any) => void,
+) => {
   const subscription = supabase
-    .channel('user-progress')
+    .channel("user-progress")
     .on(
-      'postgres_changes',
+      "postgres_changes",
       {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'learning_completions',
+        event: "INSERT",
+        schema: "public",
+        table: "learning_completions",
         filter: `user_id=eq.${userId}`,
       },
-      callback
+      callback,
     )
-    .subscribe()
-  
-  return subscription
-}
+    .subscribe();
+
+  return subscription;
+};
 ```
 
 ### Unsubscribe
 
 ```typescript
 const unsubscribe = (subscription: any) => {
-  supabase.removeChannel(subscription)
-}
+  supabase.removeChannel(subscription);
+};
 ```
 
 ---
@@ -1057,6 +1104,7 @@ const unsubscribe = (subscription: any) => {
 ### Users can only access their own data:
 
 **Tables with Self-Access Only:**
+
 - `user_profiles` - Users can read/update their own profile
 - `subscriptions` - Users can view their own subscriptions
 - `practice_sessions` - Users can access only their sessions
@@ -1064,6 +1112,7 @@ const unsubscribe = (subscription: any) => {
 - `ai_recommendations` - Users see only their recommendations
 
 **Public Read Tables:**
+
 - `modules` - Everyone can read active modules
 - `topics` - Everyone can read active topics
 - `lessons` - Everyone can read active lessons
@@ -1072,6 +1121,7 @@ const unsubscribe = (subscription: any) => {
 - `subscription_plans` - Everyone can view available plans
 
 **Write Restrictions:**
+
 - Content tables (modules, topics, lessons, etc.) - Read-only for students
 - Only admin users can create/update/delete content
 - Students can only INSERT their own progress, practice, and exam records
@@ -1084,22 +1134,22 @@ const unsubscribe = (subscription: any) => {
 
 ```typescript
 interface User {
-  id: string
-  email: string
-  role: string
-  is_active: boolean
-  created_at: string
-  updated_at: string
+  id: string;
+  email: string;
+  role: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
 }
 
 interface UserProfile {
-  id: string
-  user_id: string
-  full_name: string
-  phone_number?: string
-  date_of_birth?: string
-  created_at: string
-  updated_at: string
+  id: string;
+  user_id: string;
+  full_name: string;
+  phone_number?: string;
+  date_of_birth?: string;
+  created_at: string;
+  updated_at: string;
 }
 ```
 
@@ -1107,74 +1157,74 @@ interface UserProfile {
 
 ```typescript
 interface Module {
-  id: string
-  title: string
-  description: string
-  thumbnail_url?: string
-  is_active: boolean
-  display_order: number
-  created_at: string
-  updated_at: string
+  id: string;
+  title: string;
+  description: string;
+  thumbnail_url?: string;
+  is_active: boolean;
+  display_order: number;
+  created_at: string;
+  updated_at: string;
 }
 
 interface Topic {
-  id: string
-  module_id: string
-  title: string
-  description: string
-  is_active: boolean
-  display_order: number
-  created_at: string
-  updated_at: string
+  id: string;
+  module_id: string;
+  title: string;
+  description: string;
+  is_active: boolean;
+  display_order: number;
+  created_at: string;
+  updated_at: string;
 }
 
 interface Lesson {
-  id: string
-  topic_id: string
-  title: string
-  content: string
-  video_url?: string
-  audio_url?: string
-  duration?: number
-  is_active: boolean
-  display_order: number
-  created_at: string
-  updated_at: string
+  id: string;
+  topic_id: string;
+  title: string;
+  content: string;
+  video_url?: string;
+  audio_url?: string;
+  duration?: number;
+  is_active: boolean;
+  display_order: number;
+  created_at: string;
+  updated_at: string;
 }
 
 interface Question {
-  id: string
-  lesson_id?: string
-  question_text: string
-  question_type: 'multiple_choice' | 'true_false' | 'short_answer'
-  difficulty: 'easy' | 'medium' | 'hard'
-  points: number
-  explanation?: string
-  image_url?: string
-  is_active: boolean
-  created_at: string
-  updated_at: string
-  options?: QuestionOption[]
+  id: string;
+  lesson_id?: string;
+  question_text: string;
+  question_type: "multiple_choice" | "true_false" | "short_answer";
+  difficulty: "easy" | "medium" | "hard";
+  points: number;
+  explanation?: string;
+  image_url?: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+  options?: QuestionOption[];
 }
 
 interface QuestionOption {
-  id: string
-  question_id: string
-  option_text: string
-  is_correct: boolean
-  display_order: number
+  id: string;
+  question_id: string;
+  option_text: string;
+  is_correct: boolean;
+  display_order: number;
 }
 
 interface Flashcard {
-  id: string
-  lesson_id: string
-  front: string
-  back: string
-  image_url?: string
-  is_active: boolean
-  display_order: number
-  created_at: string
-  updated_at: string
+  id: string;
+  lesson_id: string;
+  front: string;
+  back: string;
+  image_url?: string;
+  is_active: boolean;
+  display_order: number;
+  created_at: string;
+  updated_at: string;
 }
 ```
 
@@ -1182,28 +1232,28 @@ interface Flashcard {
 
 ```typescript
 interface LearningCompletion {
-  id: string
-  user_id: string
-  lesson_id: string
-  completed_at: string
+  id: string;
+  user_id: string;
+  lesson_id: string;
+  completed_at: string;
 }
 
 interface PracticeSession {
-  id: string
-  user_id: string
-  created_at: string
-  updated_at: string
+  id: string;
+  user_id: string;
+  created_at: string;
+  updated_at: string;
 }
 
 interface MockExam {
-  id: string
-  user_id: string
+  id: string;
+  user_id: string;
   exam_data: {
-    topicId: string
-    questionIds: string[]
-    duration: number
-  }
-  created_at: string
+    topicId: string;
+    questionIds: string[];
+    duration: number;
+  };
+  created_at: string;
 }
 ```
 
@@ -1211,32 +1261,32 @@ interface MockExam {
 
 ```typescript
 interface SubscriptionPlan {
-  id: string
-  name: string
-  description: string
-  price: number
-  billing_cycle: 'monthly' | 'yearly' | 'lifetime'
-  features: string[]
-  max_users?: number
-  is_active: boolean
-  display_order: number
-  created_at: string
-  updated_at: string
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  billing_cycle: "monthly" | "yearly" | "lifetime";
+  features: string[];
+  max_users?: number;
+  is_active: boolean;
+  display_order: number;
+  created_at: string;
+  updated_at: string;
 }
 
 interface Subscription {
-  id: string
-  user_id: string
-  plan_id: string
-  status: 'active' | 'cancelled' | 'expired' | 'trial'
-  start_date: string
-  end_date?: string
-  auto_renew: boolean
-  payment_method?: string
-  last_payment_date?: string
-  next_payment_date?: string
-  created_at: string
-  updated_at: string
+  id: string;
+  user_id: string;
+  plan_id: string;
+  status: "active" | "cancelled" | "expired" | "trial";
+  start_date: string;
+  end_date?: string;
+  auto_renew: boolean;
+  payment_method?: string;
+  last_payment_date?: string;
+  next_payment_date?: string;
+  created_at: string;
+  updated_at: string;
 }
 ```
 
@@ -1257,33 +1307,34 @@ The JeevaBot chatbot uses Google's Gemini AI Studio API for conversational AI su
 ```typescript
 const getUserConversations = async (userId: string) => {
   const { data, error } = await supabase
-    .from('chat_conversations')
-    .select('*')
-    .eq('user_id', userId)
-    .order('updated_at', { ascending: false })
-  
-  if (error) throw error
-  return data
-}
+    .from("chat_conversations")
+    .select("*")
+    .eq("user_id", userId)
+    .order("updated_at", { ascending: false });
+
+  if (error) throw error;
+  return data;
+};
 ```
 
 **Response:**
+
 ```typescript
 interface ChatConversation {
-  id: string
-  user_id: string
-  title: string
+  id: string;
+  user_id: string;
+  title: string;
   context_data: {
     currentLesson?: {
-      id: string
-      title: string
-      moduleId: string
-    }
-    userLevel?: string
-    recentTopics?: string[]
-  }
-  created_at: string
-  updated_at: string
+      id: string;
+      title: string;
+      moduleId: string;
+    };
+    userLevel?: string;
+    recentTopics?: string[];
+  };
+  created_at: string;
+  updated_at: string;
 }
 ```
 
@@ -1292,20 +1343,23 @@ interface ChatConversation {
 #### Create Conversation
 
 ```typescript
-const createConversation = async (userId: string, title: string = 'New Conversation') => {
+const createConversation = async (
+  userId: string,
+  title: string = "New Conversation",
+) => {
   const { data, error } = await supabase
-    .from('chat_conversations')
+    .from("chat_conversations")
     .insert({
       user_id: userId,
       title,
-      context_data: {}
+      context_data: {},
     })
     .select()
-    .single()
-  
-  if (error) throw error
-  return data
-}
+    .single();
+
+  if (error) throw error;
+  return data;
+};
 ```
 
 ---
@@ -1315,30 +1369,31 @@ const createConversation = async (userId: string, title: string = 'New Conversat
 ```typescript
 const getConversationMessages = async (conversationId: string) => {
   const { data, error } = await supabase
-    .from('chat_messages')
-    .select('*')
-    .eq('conversation_id', conversationId)
-    .order('created_at', { ascending: true })
-  
-  if (error) throw error
-  return data
-}
+    .from("chat_messages")
+    .select("*")
+    .eq("conversation_id", conversationId)
+    .order("created_at", { ascending: true });
+
+  if (error) throw error;
+  return data;
+};
 ```
 
 **Response:**
+
 ```typescript
 interface ChatMessage {
-  id: string
-  conversation_id: string
-  role: 'user' | 'assistant'
-  content: string
+  id: string;
+  conversation_id: string;
+  role: "user" | "assistant";
+  content: string;
   metadata?: {
-    model?: string
-    tokensUsed?: number
-    responseTime?: number
-    confidenceScore?: number
-  }
-  created_at: string
+    model?: string;
+    tokensUsed?: number;
+    responseTime?: number;
+    confidenceScore?: number;
+  };
+  created_at: string;
 }
 ```
 
@@ -1347,63 +1402,63 @@ interface ChatMessage {
 #### Send Message
 
 ```typescript
-import { getModelResponse } from '@/lib/gemini'
-import { buildChatContext } from '@/utils/chatContext'
+import { getModelResponse } from "@/lib/gemini";
+import { buildChatContext } from "@/utils/chatContext";
 
 const sendMessage = async (
   conversationId: string,
   userId: string,
-  content: string
+  content: string,
 ) => {
   // 1. Save user message
   const { data: userMsg, error: userError } = await supabase
-    .from('chat_messages')
+    .from("chat_messages")
     .insert({
       conversation_id: conversationId,
-      role: 'user',
-      content
+      role: "user",
+      content,
     })
     .select()
-    .single()
-  
-  if (userError) throw userError
-  
+    .single();
+
+  if (userError) throw userError;
+
   // 2. Build context from user data
-  const context = await buildChatContext(userId)
-  
+  const context = await buildChatContext(userId);
+
   // 3. Get conversation history
-  const history = await getConversationMessages(conversationId)
-  const conversationHistory = history.map(m => ({
+  const history = await getConversationMessages(conversationId);
+  const conversationHistory = history.map((m) => ({
     role: m.role,
-    content: m.content
-  }))
-  
+    content: m.content,
+  }));
+
   // 4. Call Gemini API
   const aiResponse = await getModelResponse(
     `${context}\n\nStudent Question: ${content}`,
-    conversationHistory
-  )
-  
+    conversationHistory,
+  );
+
   // 5. Save AI response
   const { data: aiMsg, error: aiError } = await supabase
-    .from('chat_messages')
+    .from("chat_messages")
     .insert({
       conversation_id: conversationId,
-      role: 'assistant',
+      role: "assistant",
       content: aiResponse,
       metadata: {
-        model: 'gemini-1.5-flash',
+        model: "gemini-1.5-flash",
         tokensUsed: Math.ceil(aiResponse.length / 4),
-        responseTime: 0 // Populate from actual timing
-      }
+        responseTime: 0, // Populate from actual timing
+      },
     })
     .select()
-    .single()
-  
-  if (aiError) throw aiError
-  
-  return { userMsg, aiMsg }
-}
+    .single();
+
+  if (aiError) throw aiError;
+
+  return { userMsg, aiMsg };
+};
 ```
 
 ---
@@ -1414,22 +1469,22 @@ const sendMessage = async (
 
 ```typescript
 const checkMessageLimit = async (userId: string): Promise<boolean> => {
-  const today = new Date().toISOString().split('T')[0]
-  
+  const today = new Date().toISOString().split("T")[0];
+
   const { data, error } = await supabase
-    .from('ai_usage_stats')
-    .select('message_count')
-    .eq('user_id', userId)
-    .eq('date', today)
-    .single()
-  
-  if (error && error.code !== 'PGRST116') throw error
-  
-  const maxMessages = 50 // Daily limit
-  const currentCount = data?.message_count || 0
-  
-  return currentCount < maxMessages
-}
+    .from("ai_usage_stats")
+    .select("message_count")
+    .eq("user_id", userId)
+    .eq("date", today)
+    .single();
+
+  if (error && error.code !== "PGRST116") throw error;
+
+  const maxMessages = 50; // Daily limit
+  const currentCount = data?.message_count || 0;
+
+  return currentCount < maxMessages;
+};
 ```
 
 ---
@@ -1438,18 +1493,19 @@ const checkMessageLimit = async (userId: string): Promise<boolean> => {
 
 ```typescript
 const updateUsageStats = async (userId: string, tokensUsed: number = 0) => {
-  const today = new Date().toISOString().split('T')[0]
-  
-  await supabase.rpc('increment_ai_usage', {
+  const today = new Date().toISOString().split("T")[0];
+
+  await supabase.rpc("increment_ai_usage", {
     p_user_id: userId,
     p_date: today,
     p_message_count: 1,
-    p_tokens: tokensUsed
-  })
-}
+    p_tokens: tokensUsed,
+  });
+};
 ```
 
 **Database Function:**
+
 ```sql
 CREATE OR REPLACE FUNCTION increment_ai_usage(
   p_user_id UUID,
@@ -1477,27 +1533,31 @@ $$ LANGUAGE plpgsql;
 ```typescript
 const getUserUsageStats = async (userId: string, days: number = 30) => {
   const { data, error } = await supabase
-    .from('ai_usage_stats')
-    .select('*')
-    .eq('user_id', userId)
-    .gte('date', new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString())
-    .order('date', { ascending: false })
-  
-  if (error) throw error
-  return data
-}
+    .from("ai_usage_stats")
+    .select("*")
+    .eq("user_id", userId)
+    .gte(
+      "date",
+      new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString(),
+    )
+    .order("date", { ascending: false });
+
+  if (error) throw error;
+  return data;
+};
 ```
 
 **Response:**
+
 ```typescript
 interface AIUsageStats {
-  id: string
-  user_id: string
-  date: string
-  message_count: number
-  total_tokens: number
-  created_at: string
-  updated_at: string
+  id: string;
+  user_id: string;
+  date: string;
+  message_count: number;
+  total_tokens: number;
+  created_at: string;
+  updated_at: string;
 }
 ```
 
@@ -1508,21 +1568,21 @@ interface AIUsageStats {
 #### Initialize Gemini Client
 
 ```typescript
-import { GoogleGenerativeAI } from '@google/generative-ai'
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || ''  // Backend only!
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || ""; // Backend only!
 
-export const genAI = new GoogleGenerativeAI(GEMINI_API_KEY)
+export const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 
-export const chatModel = genAI.getGenerativeModel({ 
-  model: 'gemini-1.5-flash',
+export const chatModel = genAI.getGenerativeModel({
+  model: "gemini-1.5-flash",
   generationConfig: {
     temperature: 0.7,
     topK: 40,
     topP: 0.95,
     maxOutputTokens: 1024,
   },
-})
+});
 ```
 
 ---
@@ -1532,26 +1592,26 @@ export const chatModel = genAI.getGenerativeModel({
 ```typescript
 export const getModelResponse = async (
   prompt: string,
-  conversationHistory: { role: string; content: string }[] = []
+  conversationHistory: { role: string; content: string }[] = [],
 ): Promise<string> => {
   try {
     const chat = chatModel.startChat({
-      history: conversationHistory.map(msg => ({
-        role: msg.role === 'user' ? 'user' : 'model',
+      history: conversationHistory.map((msg) => ({
+        role: msg.role === "user" ? "user" : "model",
         parts: [{ text: msg.content }],
       })),
-    })
+    });
 
-    const result = await chat.sendMessage(prompt)
-    const response = result.response
-    return response.text()
+    const result = await chat.sendMessage(prompt);
+    const response = result.response;
+    return response.text();
   } catch (error) {
-    console.error('Gemini API Error:', error)
-    
+    console.error("Gemini API Error:", error);
+
     // Fallback response
-    return "I'm having trouble connecting right now. Please try again in a moment."
+    return "I'm having trouble connecting right now. Please try again in a moment.";
   }
-}
+};
 ```
 
 ---
@@ -1562,36 +1622,36 @@ export const getModelResponse = async (
 export const buildChatContext = async (userId: string): Promise<string> => {
   // Get user's current lesson
   const { data: currentLesson } = await supabase
-    .from('learning_completions')
-    .select('lesson:lessons(*), module:modules(*)')
-    .eq('user_id', userId)
-    .order('updated_at', { ascending: false })
+    .from("learning_completions")
+    .select("lesson:lessons(*), module:modules(*)")
+    .eq("user_id", userId)
+    .order("updated_at", { ascending: false })
     .limit(1)
-    .single()
+    .single();
 
   // Get recent practice performance
   const { data: recentPractice } = await supabase
-    .from('practice_sessions')
-    .select('score, topic:topics(title)')
-    .eq('user_id', userId)
-    .order('created_at', { ascending: false })
-    .limit(5)
+    .from("practice_sessions")
+    .select("score, topic:topics(title)")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false })
+    .limit(5);
 
   // Build context string
   let context = `You are JeevaBot, an AI tutor for medical exam preparation.
 
 Student Context:
-`
+`;
 
   if (currentLesson) {
-    context += `- Currently studying: ${currentLesson.lesson?.title} in ${currentLesson.module?.title}\n`
+    context += `- Currently studying: ${currentLesson.lesson?.title} in ${currentLesson.module?.title}\n`;
   }
 
   if (recentPractice && recentPractice.length > 0) {
-    context += `- Recent practice scores:\n`
-    recentPractice.forEach(p => {
-      context += `  * ${p.topic?.title}: ${p.score}%\n`
-    })
+    context += `- Recent practice scores:\n`;
+    recentPractice.forEach((p) => {
+      context += `  * ${p.topic?.title}: ${p.score}%\n`;
+    });
   }
 
   context += `
@@ -1603,10 +1663,10 @@ Instructions:
 5. Suggest relevant practice topics when appropriate
 6. Keep responses under 200 words unless detailed explanation is requested
 
-Remember: You're a supportive tutor, not just an information source.`
+Remember: You're a supportive tutor, not just an information source.`;
 
-  return context
-}
+  return context;
+};
 ```
 
 ---
@@ -1614,54 +1674,59 @@ Remember: You're a supportive tutor, not just an information source.`
 ### React Hook Example
 
 ```typescript
-import { useState, useCallback } from 'react'
-import { supabase } from '@/lib/supabase'
-import { getModelResponse } from '@/lib/gemini'
-import { buildChatContext } from '@/utils/chatContext'
+import { useState, useCallback } from "react";
+import { supabase } from "@/lib/supabase";
+import { getModelResponse } from "@/lib/gemini";
+import { buildChatContext } from "@/utils/chatContext";
 
 export const useChatbot = (conversationId?: string) => {
-  const [messages, setMessages] = useState<ChatMessage[]>([])
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const sendMessage = useCallback(async (content: string, userId: string) => {
-    if (!userId || !content.trim()) return
+  const sendMessage = useCallback(
+    async (content: string, userId: string) => {
+      if (!userId || !content.trim()) return;
 
-    setLoading(true)
-    setError(null)
+      setLoading(true);
+      setError(null);
 
-    try {
-      // Check rate limit
-      const canSend = await checkMessageLimit(userId)
-      if (!canSend) {
-        throw new Error('Daily message limit reached')
+      try {
+        // Check rate limit
+        const canSend = await checkMessageLimit(userId);
+        if (!canSend) {
+          throw new Error("Daily message limit reached");
+        }
+
+        // Create/get conversation
+        let convId = conversationId;
+        if (!convId) {
+          const conv = await createConversation(
+            userId,
+            content.substring(0, 50),
+          );
+          convId = conv.id;
+        }
+
+        // Send message and get response
+        const { userMsg, aiMsg } = await sendMessage(convId, userId, content);
+
+        // Update UI
+        setMessages((prev) => [...prev, userMsg, aiMsg]);
+
+        // Track usage
+        await updateUsageStats(userId, aiMsg.metadata?.tokensUsed);
+      } catch (err: any) {
+        setError(err.message || "Failed to send message");
+      } finally {
+        setLoading(false);
       }
+    },
+    [conversationId],
+  );
 
-      // Create/get conversation
-      let convId = conversationId
-      if (!convId) {
-        const conv = await createConversation(userId, content.substring(0, 50))
-        convId = conv.id
-      }
-
-      // Send message and get response
-      const { userMsg, aiMsg } = await sendMessage(convId, userId, content)
-
-      // Update UI
-      setMessages(prev => [...prev, userMsg, aiMsg])
-
-      // Track usage
-      await updateUsageStats(userId, aiMsg.metadata?.tokensUsed)
-
-    } catch (err: any) {
-      setError(err.message || 'Failed to send message')
-    } finally {
-      setLoading(false)
-    }
-  }, [conversationId])
-
-  return { messages, loading, error, sendMessage }
-}
+  return { messages, loading, error, sendMessage };
+};
 ```
 
 ---
@@ -1672,10 +1737,10 @@ export const useChatbot = (conversationId?: string) => {
 // Graceful degradation when AI fails
 const getAIResponseWithFallback = async (prompt: string): Promise<string> => {
   try {
-    return await getModelResponse(prompt)
+    return await getModelResponse(prompt);
   } catch (error) {
-    console.error('AI Error:', error)
-    
+    console.error("AI Error:", error);
+
     // Return helpful fallback message
     return `I'm currently experiencing technical difficulties. Here are some alternatives:
     
@@ -1684,9 +1749,9 @@ const getAIResponseWithFallback = async (prompt: string): Promise<string> => {
 3. Contact support for personalized help
 4. Try again in a few moments
 
-Sorry for the inconvenience!`
+Sorry for the inconvenience!`;
   }
-}
+};
 ```
 
 ---
@@ -1694,31 +1759,31 @@ Sorry for the inconvenience!`
 ## 🚀 Quick Start Example
 
 ```typescript
-import { supabase } from './lib/supabase'
+import { supabase } from "./lib/supabase";
 
 // Complete learning flow example
 const learningFlow = async (userId: string) => {
   // 1. Get available modules
-  const modules = await getModules()
-  
+  const modules = await getModules();
+
   // 2. Select first module and get topics
-  const topics = await getTopicsByModule(modules[0].id)
-  
+  const topics = await getTopicsByModule(modules[0].id);
+
   // 3. Get lessons for first topic
-  const lessons = await getLessonsByTopic(topics[0].id)
-  
+  const lessons = await getLessonsByTopic(topics[0].id);
+
   // 4. Get lesson content
-  const lesson = await getLessonById(lessons[0].id)
-  
+  const lesson = await getLessonById(lessons[0].id);
+
   // 5. Mark lesson as complete
-  await markLessonComplete(userId, lesson.id)
-  
+  await markLessonComplete(userId, lesson.id);
+
   // 6. Get practice questions
-  const questions = await getQuestionsByLesson(lesson.id)
-  
+  const questions = await getQuestionsByLesson(lesson.id);
+
   // 7. Start practice session
-  const session = await startPracticeSession(userId)
-  
+  const session = await startPracticeSession(userId);
+
   // 8. Save practice results
   await savePracticeResults(session.id, [
     {
@@ -1727,12 +1792,12 @@ const learningFlow = async (userId: string) => {
       isCorrect: questions[0].options[0].is_correct,
       timeTaken: 30,
     },
-  ])
-  
+  ]);
+
   // 9. Check progress
-  const progress = await getTopicProgress(userId, topics[0].id)
-  console.log(`Progress: ${progress.percentage}%`)
-}
+  const progress = await getTopicProgress(userId, topics[0].id);
+  console.log(`Progress: ${progress.percentage}%`);
+};
 ```
 
 ---
@@ -1740,58 +1805,66 @@ const learningFlow = async (userId: string) => {
 ## 📝 Best Practices
 
 ### 1. **Error Handling**
+
 ```typescript
 try {
-  const data = await getModules()
-  return data
+  const data = await getModules();
+  return data;
 } catch (error) {
-  console.error('Failed to fetch modules:', error)
-  throw error
+  console.error("Failed to fetch modules:", error);
+  throw error;
 }
 ```
 
 ### 2. **Caching with React Query**
+
 ```typescript
-import { useQuery } from '@tanstack/react-query'
+import { useQuery } from "@tanstack/react-query";
 
 const useModules = () => {
   return useQuery({
-    queryKey: ['modules'],
+    queryKey: ["modules"],
     queryFn: getModules,
     staleTime: 5 * 60 * 1000, // 5 minutes
-  })
-}
+  });
+};
 ```
 
 ### 3. **Pagination**
+
 ```typescript
-const getLessonsPaginated = async (topicId: string, page: number, limit: number) => {
-  const from = page * limit
-  const to = from + limit - 1
-  
+const getLessonsPaginated = async (
+  topicId: string,
+  page: number,
+  limit: number,
+) => {
+  const from = page * limit;
+  const to = from + limit - 1;
+
   const { data, error } = await supabase
-    .from('lessons')
-    .select('*')
-    .eq('topic_id', topicId)
-    .range(from, to)
-  
-  if (error) throw error
-  return data
-}
+    .from("lessons")
+    .select("*")
+    .eq("topic_id", topicId)
+    .range(from, to);
+
+  if (error) throw error;
+  return data;
+};
 ```
 
 ### 4. **Optimistic Updates**
+
 ```typescript
 const markComplete = async (userId: string, lessonId: string) => {
   // Update UI immediately
-  queryClient.setQueryData(['completions', userId], (old: any) => [
+  queryClient.setQueryData(["completions", userId], (old: any) => [
     ...old,
     { lesson_id: lessonId, completed_at: new Date().toISOString() },
-  ])
-  
+  ]);
+
   // Then update server
-  await markLessonComplete(userId, lessonId)
-}
+  await markLessonComplete(userId, lessonId);
+};
 ```
 
 ---

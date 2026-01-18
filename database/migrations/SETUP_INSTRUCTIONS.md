@@ -32,6 +32,7 @@ Your admin portal's content management UI is ready, but the database tables need
 ## 📋 What This Creates
 
 ### Tables:
+
 - **modules** - Course modules with thumbnails and ordering
 - **topics** - Topics within modules
 - **lessons** - Individual lessons with video support
@@ -40,11 +41,13 @@ Your admin portal's content management UI is ready, but the database tables need
 - **question_options** - Answer choices for questions
 
 ### Security (RLS Policies):
+
 - **Superadmin**: Full CRUD access on all tables
 - **Editor**: Create, Read, Update (cannot delete)
 - **Moderator**: Read-only access
 
 ### Relationships:
+
 ```
 modules
   └── topics (cascade delete)
@@ -57,6 +60,7 @@ modules
 ## ✅ After Running
 
 Once the migration completes:
+
 1. Your content management pages will work
 2. You can create modules, topics, lessons, etc.
 3. Analytics dashboard will activate (currently deferred)
@@ -65,13 +69,16 @@ Once the migration completes:
 ## 🐛 Troubleshooting
 
 **Error: "relation admin_users does not exist"**
+
 - The admin_users table needs to be created first
 - Run the admin_users creation SQL before this migration
 
 **Error: "role authenticated does not exist"**
+
 - This is expected - the policies will work when users log in through your app
 - The SQL Editor runs as a database admin, not a logged-in user
 
 **Error: "schema auth does not exist"**
+
 - Make sure you're running this in Supabase SQL Editor, not a local database
 - Supabase provides the auth schema automatically

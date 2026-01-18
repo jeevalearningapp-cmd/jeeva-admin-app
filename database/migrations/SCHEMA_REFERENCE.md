@@ -6,18 +6,18 @@ This document provides a quick reference for the new database schema created by 
 
 ## Table Overview
 
-| Table Name | Purpose | Key Fields |
-|------------|---------|------------|
-| `practice_questions` | Questions for Practice Module | category, subdivision |
-| `practice_question_options` | Options for practice questions | question_id (FK) |
-| `learning_questions` | Questions for Learning Module | topic_id, subtopic_id, video_lesson_id |
-| `learning_question_options` | Options for learning questions | question_id (FK) |
-| `mock_exam_questions` | Questions for Mock Exam (renamed) | lesson_id |
-| `mock_exam_question_options` | Options for mock exam questions | question_id (FK) |
-| `topic_core_notes` | Comprehensive topic-level content | topic_id (UNIQUE) |
-| `topic_flash_content` | Quick revision screens (5 per topic) | topic_id, screen_number (1-5) |
-| `subtopic_progress` | User progress through subtopics | user_id, subtopic_id, score |
-| `topic_progress` | User progress through topics | user_id, topic_id, progress_percentage |
+| Table Name                   | Purpose                              | Key Fields                             |
+| ---------------------------- | ------------------------------------ | -------------------------------------- |
+| `practice_questions`         | Questions for Practice Module        | category, subdivision                  |
+| `practice_question_options`  | Options for practice questions       | question_id (FK)                       |
+| `learning_questions`         | Questions for Learning Module        | topic_id, subtopic_id, video_lesson_id |
+| `learning_question_options`  | Options for learning questions       | question_id (FK)                       |
+| `mock_exam_questions`        | Questions for Mock Exam (renamed)    | lesson_id                              |
+| `mock_exam_question_options` | Options for mock exam questions      | question_id (FK)                       |
+| `topic_core_notes`           | Comprehensive topic-level content    | topic_id (UNIQUE)                      |
+| `topic_flash_content`        | Quick revision screens (5 per topic) | topic_id, screen_number (1-5)          |
+| `subtopic_progress`          | User progress through subtopics      | user_id, subtopic_id, score            |
+| `topic_progress`             | User progress through topics         | user_id, topic_id, progress_percentage |
 
 ## Practice Questions Schema
 
@@ -41,21 +41,25 @@ CREATE TABLE practice_questions (
 ```
 
 **Indexes:**
+
 - `idx_practice_questions_category` on `category`
 - `idx_practice_questions_subdivision` on `subdivision`
 - `idx_practice_questions_active` on `is_active` (partial index)
 
 **Fixed Categories:**
+
 - Numeracy
 - Clinical Knowledge
 
 **Fixed Subdivisions (Numeracy):**
+
 - Dosage Calculations
 - Unit Conversions
 - IV Flow Rate Calculations
 - Fluid Balance
 
 **Fixed Subdivisions (Clinical Knowledge):**
+
 - Medical-Surgical Nursing
 - Pharmacology
 - Infection Control
@@ -98,12 +102,14 @@ CREATE TABLE learning_questions (
 ```
 
 **Indexes:**
+
 - `idx_learning_questions_topic_id` on `topic_id`
 - `idx_learning_questions_subtopic_id` on `subtopic_id`
 - `idx_learning_questions_video_lesson_id` on `video_lesson_id`
 - `idx_learning_questions_active` on `is_active` (partial index)
 
 **Key Relationships:**
+
 - Each question MUST be mapped to a video lesson (`video_lesson_id`)
 - Each subtopic should have 5-10 questions
 - Questions are filtered by `video_lesson_id` when displaying for a subtopic
@@ -162,6 +168,7 @@ CREATE TABLE topic_core_notes (
 ```
 
 **JSONB Structure for sections:**
+
 ```json
 [
   {
@@ -178,6 +185,7 @@ CREATE TABLE topic_core_notes (
 ```
 
 **Usage:**
+
 - One core notes entry per topic
 - Covers the entire topic comprehensively
 - Organized by sections for easy navigation
@@ -201,11 +209,13 @@ CREATE TABLE topic_flash_content (
 ```
 
 **Constraints:**
+
 - Exactly 5 screens per topic (screen_number 1-5)
 - UNIQUE constraint on (topic_id, screen_number)
 - CHECK constraint ensures screen_number is between 1 and 5
 
 **Usage:**
+
 - Quick revision content
 - Displayed one screen at a time
 - Supports images and rich text
@@ -234,17 +244,20 @@ CREATE TABLE subtopic_progress (
 ```
 
 **Status Values:**
+
 - `locked` - Subtopic not yet accessible (previous subtopic not completed)
 - `in_progress` - User has started but not completed (score < 80%)
 - `completed` - User has passed with >= 80% score
 
 **Indexes:**
+
 - `idx_subtopic_progress_user_id` on `user_id`
 - `idx_subtopic_progress_topic_id` on `topic_id`
 - `idx_subtopic_progress_subtopic_id` on `subtopic_id`
 - `idx_subtopic_progress_status` on `status`
 
 **Business Rules:**
+
 - 80% passing threshold to unlock next subtopic
 - Unlimited retries allowed
 - Best score is tracked across all attempts
@@ -268,6 +281,7 @@ CREATE TABLE topic_progress (
 ```
 
 **Progress Calculation:**
+
 ```
 progress_percentage = (
   (core_notes_completed ? 20 : 0) +
@@ -277,6 +291,7 @@ progress_percentage = (
 ```
 
 **Indexes:**
+
 - `idx_topic_progress_user_id` on `user_id`
 - `idx_topic_progress_topic_id` on `topic_id`
 
@@ -291,11 +306,13 @@ ALTER TABLE lessons ADD COLUMN podcast_url TEXT;
 ```
 
 **Field Descriptions:**
+
 - `is_mandatory` - Whether the lesson must be completed (videos are mandatory, podcasts are optional)
 - `content_type` - Type of content: 'video', 'audio', or 'text'
 - `podcast_url` - URL for optional podcast content
 
 **Usage:**
+
 - Video lessons are mandatory (`is_mandatory = true`)
 - Podcasts are optional (`is_mandatory = false`)
 - Content type determines how to render the lesson
@@ -304,21 +321,23 @@ ALTER TABLE lessons ADD COLUMN podcast_url TEXT;
 
 ### Admin Access Levels
 
-| Role | Practice Questions | Learning Questions | Mock Exam Questions | Content Tables | Progress Tables |
-|------|-------------------|-------------------|---------------------|----------------|-----------------|
-| **Superadmin** | Full CRUD | Full CRUD | Full CRUD | Full CRUD | View All |
-| **Editor** | Create, Read, Update | Create, Read, Update | Create, Read, Update | Create, Read, Update | View All |
-| **Moderator** | Read Only | Read Only | Read Only | Read Only | View All |
-| **User** | - | - | - | Read Active Only | Own Data Only |
+| Role           | Practice Questions   | Learning Questions   | Mock Exam Questions  | Content Tables       | Progress Tables |
+| -------------- | -------------------- | -------------------- | -------------------- | -------------------- | --------------- |
+| **Superadmin** | Full CRUD            | Full CRUD            | Full CRUD            | Full CRUD            | View All        |
+| **Editor**     | Create, Read, Update | Create, Read, Update | Create, Read, Update | Create, Read, Update | View All        |
+| **Moderator**  | Read Only            | Read Only            | Read Only            | Read Only            | View All        |
+| **User**       | -                    | -                    | -                    | Read Active Only     | Own Data Only   |
 
 ### User Access Rules
 
 **Content Access:**
+
 - Users can only read active content (`is_active = true`)
 - Users cannot modify any content tables
 - Users can only access unlocked subtopics
 
 **Progress Access:**
+
 - Users can only view/update their own progress
 - Users cannot view other users' progress
 - Admins can view all users' progress for analytics
@@ -412,12 +431,12 @@ previous_subtopic AS (
   ORDER BY display_order DESC
   LIMIT 1
 )
-SELECT 
-  CASE 
+SELECT
+  CASE
     WHEN NOT EXISTS (SELECT 1 FROM previous_subtopic) THEN true  -- First subtopic
     WHEN EXISTS (
-      SELECT 1 FROM subtopic_progress 
-      WHERE user_id = 'user-uuid' 
+      SELECT 1 FROM subtopic_progress
+      WHERE user_id = 'user-uuid'
         AND subtopic_id = (SELECT id FROM previous_subtopic)
         AND status = 'completed'
     ) THEN true  -- Previous subtopic completed

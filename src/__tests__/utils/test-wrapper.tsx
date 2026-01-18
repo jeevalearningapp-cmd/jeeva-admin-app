@@ -1,7 +1,7 @@
-import { ReactNode } from 'react'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { BrowserRouter } from 'react-router-dom'
-import { render, RenderOptions } from '@testing-library/react'
+import { ReactNode } from "react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter } from "react-router-dom";
+import { render, RenderOptions } from "@testing-library/react";
 
 /**
  * Creates a fresh QueryClient for each test
@@ -18,7 +18,7 @@ export function createTestQueryClient() {
         retry: false,
       },
     },
-  })
+  });
 }
 
 /**
@@ -28,13 +28,13 @@ export function createTestQueryClient() {
  * - BrowserRouter: for routing hooks (useNavigate, useLocation, etc)
  */
 export function TestWrapper({ children }: { children: ReactNode }) {
-  const testQueryClient = createTestQueryClient()
+  const testQueryClient = createTestQueryClient();
 
   return (
     <QueryClientProvider client={testQueryClient}>
       <BrowserRouter>{children}</BrowserRouter>
     </QueryClientProvider>
-  )
+  );
 }
 
 /**
@@ -52,7 +52,7 @@ export function TestWrapper({ children }: { children: ReactNode }) {
  */
 export function renderWithProviders(
   ui: React.ReactElement,
-  options?: Omit<RenderOptions, 'wrapper'>
+  options?: Omit<RenderOptions, "wrapper">,
 ) {
-  return render(ui, { wrapper: TestWrapper, ...options })
+  return render(ui, { wrapper: TestWrapper, ...options });
 }

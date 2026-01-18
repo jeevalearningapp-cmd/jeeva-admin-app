@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState } from "react";
 import {
   Box,
   Button,
@@ -18,202 +18,263 @@ import {
   CircularProgress,
   Chip,
   IconButton,
-  Tooltip
-} from '@mui/material'
+  Tooltip,
+} from "@mui/material";
 import {
   Upload,
   Download,
   Close,
   CheckCircle,
   Error as ErrorIcon,
-  Info
-} from '@mui/icons-material'
-import { parseCSV, CSVTemplate, downloadCSV } from '@/utils/csvTemplates'
+  Info,
+} from "@mui/icons-material";
+import { parseCSV, CSVTemplate, downloadCSV } from "@/utils/csvTemplates";
 
 export interface CSVUploadProps {
-  template: CSVTemplate
-  onUpload: (data: Record<string, string>[]) => Promise<boolean>
-  contentType: 'lesson' | 'question' | 'flashcard'
+  template: CSVTemplate;
+  onUpload: (data: Record<string, string>[]) => Promise<boolean>;
+  contentType: "lesson" | "question" | "flashcard";
 }
 
 interface ValidationError {
-  row: number
-  field: string
-  message: string
+  row: number;
+  field: string;
+  message: string;
 }
 
 export const CSVUpload: React.FC<CSVUploadProps> = ({
   template,
   onUpload,
-  contentType
+  contentType,
 }) => {
-  const [open, setOpen] = useState(false)
-  const [file, setFile] = useState<File | null>(null)
-  const [parsedData, setParsedData] = useState<string[][]>([])
-  const [validatedData, setValidatedData] = useState<Record<string, string>[]>([])
-  const [errors, setErrors] = useState<ValidationError[]>([])
-  const [uploading, setUploading] = useState(false)
-  const [uploadSuccess, setUploadSuccess] = useState(false)
+  const [open, setOpen] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
+  const [parsedData, setParsedData] = useState<string[][]>([]);
+  const [validatedData, setValidatedData] = useState<Record<string, string>[]>(
+    [],
+  );
+  const [errors, setErrors] = useState<ValidationError[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const [uploadSuccess, setUploadSuccess] = useState(false);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = event.target.files?.[0]
+    const selectedFile = event.target.files?.[0];
     if (selectedFile) {
-      setFile(selectedFile)
-      setUploadSuccess(false)
-      const reader = new FileReader()
+      setFile(selectedFile);
+      setUploadSuccess(false);
+      const reader = new FileReader();
       reader.onload = (e) => {
-        const text = e.target?.result as string
-        const data = parseCSV(text)
-        setParsedData(data)
-        validateData(data)
-      }
-      reader.readAsText(selectedFile)
+        const text = e.target?.result as string;
+        const data = parseCSV(text);
+        setParsedData(data);
+        validateData(data);
+      };
+      reader.readAsText(selectedFile);
     }
-  }
+  };
 
   const validateData = (data: string[][]) => {
     if (data.length === 0) {
-      setErrors([{ row: 0, field: 'file', message: 'CSV file is empty' }])
-      return
+      setErrors([{ row: 0, field: "file", message: "CSV file is empty" }]);
+      return;
     }
 
-    const csvHeaders = data[0].map(h => h.trim())
-    const expectedHeaders = template.headers
-    const newErrors: ValidationError[] = []
-    const validated: Record<string, string>[] = []
+    const csvHeaders = data[0].map((h) => h.trim());
+    const expectedHeaders = template.headers;
+    const newErrors: ValidationError[] = [];
+    const validated: Record<string, string>[] = [];
 
     // Create case-insensitive header mapping
-    const headerMap = new Map<string, string>()
+    const headerMap = new Map<string, string>();
     csvHeaders.forEach((csvHeader, index) => {
       const matchingTemplate = expectedHeaders.find(
-        th => th.toLowerCase() === csvHeader.toLowerCase()
-      )
+        (th) => th.toLowerCase() === csvHeader.toLowerCase(),
+      );
       if (matchingTemplate) {
-        headerMap.set(matchingTemplate, csvHeader)
+        headerMap.set(matchingTemplate, csvHeader);
       }
-    })
+    });
 
     // Validate headers
     const missingHeaders = expectedHeaders.filter(
-      h => !Array.from(headerMap.keys()).includes(h)
-    )
+      (h) => !Array.from(headerMap.keys()).includes(h),
+    );
     if (missingHeaders.length > 0) {
       newErrors.push({
         row: 0,
-        field: 'headers',
-        message: `Missing required columns: ${missingHeaders.join(', ')}`
-      })
+        field: "headers",
+        message: `Missing required columns: ${missingHeaders.join(", ")}`,
+      });
     }
 
     // Validate data rows
     for (let i = 1; i < data.length; i++) {
-      const row = data[i]
-      const rowData: Record<string, string> = {}
+      const row = data[i];
+      const rowData: Record<string, string> = {};
 
       // Initialize all template columns with empty strings
-      template.headers.forEach(templateHeader => {
-        const csvHeader = headerMap.get(templateHeader)
-        const csvIndex = csvHeader ? csvHeaders.indexOf(csvHeader) : -1
-        rowData[templateHeader] = csvIndex >= 0 ? (row[csvIndex] || '') : ''
-      })
+      template.headers.forEach((templateHeader) => {
+        const csvHeader = headerMap.get(templateHeader);
+        const csvIndex = csvHeader ? csvHeaders.indexOf(csvHeader) : -1;
+        rowData[templateHeader] = csvIndex >= 0 ? row[csvIndex] || "" : "";
+      });
 
       // Type-specific validation
-      if (contentType === 'question') {
+      if (contentType === "question") {
         if (!rowData.question_text) {
-          newErrors.push({ row: i, field: 'question_text', message: 'Question text is required' })
+          newErrors.push({
+            row: i,
+            field: "question_text",
+            message: "Question text is required",
+          });
         }
-        if (!['multiple_choice', 'true_false', 'short_answer'].includes(rowData.question_type)) {
-          newErrors.push({ row: i, field: 'question_type', message: 'Invalid question type' })
+        if (
+          !["multiple_choice", "true_false", "short_answer"].includes(
+            rowData.question_type,
+          )
+        ) {
+          newErrors.push({
+            row: i,
+            field: "question_type",
+            message: "Invalid question type",
+          });
         }
-        if (!['easy', 'medium', 'hard'].includes(rowData.difficulty)) {
-          newErrors.push({ row: i, field: 'difficulty', message: 'Invalid difficulty level' })
+        if (!["easy", "medium", "hard"].includes(rowData.difficulty)) {
+          newErrors.push({
+            row: i,
+            field: "difficulty",
+            message: "Invalid difficulty level",
+          });
         }
 
         // Validate options based on question type
-        if (rowData.question_type === 'multiple_choice' || rowData.question_type === 'true_false') {
-          let hasCorrect = false
-          let hasOptions = false
+        if (
+          rowData.question_type === "multiple_choice" ||
+          rowData.question_type === "true_false"
+        ) {
+          let hasCorrect = false;
+          let hasOptions = false;
           for (let j = 1; j <= 4; j++) {
             if (rowData[`option_${j}`]) {
-              hasOptions = true
-              if (rowData[`option_${j}_correct`]?.toLowerCase() === 'true') {
-                hasCorrect = true
+              hasOptions = true;
+              if (rowData[`option_${j}_correct`]?.toLowerCase() === "true") {
+                hasCorrect = true;
               }
             }
           }
           if (!hasOptions) {
-            newErrors.push({ row: i, field: 'options', message: 'At least one option is required' })
+            newErrors.push({
+              row: i,
+              field: "options",
+              message: "At least one option is required",
+            });
           }
           if (!hasCorrect) {
-            newErrors.push({ row: i, field: 'options', message: 'At least one option must be marked as correct' })
+            newErrors.push({
+              row: i,
+              field: "options",
+              message: "At least one option must be marked as correct",
+            });
           }
-        } else if (rowData.question_type === 'short_answer') {
+        } else if (rowData.question_type === "short_answer") {
           if (!rowData.option_1) {
-            newErrors.push({ row: i, field: 'option_1', message: 'Correct answer is required for short answer questions' })
+            newErrors.push({
+              row: i,
+              field: "option_1",
+              message: "Correct answer is required for short answer questions",
+            });
           }
         }
-      } else if (contentType === 'flashcard') {
+      } else if (contentType === "flashcard") {
         if (!rowData.front) {
-          newErrors.push({ row: i, field: 'front', message: 'Front text is required' })
+          newErrors.push({
+            row: i,
+            field: "front",
+            message: "Front text is required",
+          });
         }
         if (!rowData.back) {
-          newErrors.push({ row: i, field: 'back', message: 'Back text is required' })
+          newErrors.push({
+            row: i,
+            field: "back",
+            message: "Back text is required",
+          });
         }
-      } else if (contentType === 'lesson') {
+      } else if (contentType === "lesson") {
         if (!rowData.title) {
-          newErrors.push({ row: i, field: 'title', message: 'Lesson title is required' })
+          newErrors.push({
+            row: i,
+            field: "title",
+            message: "Lesson title is required",
+          });
         }
         if (!rowData.content) {
-          newErrors.push({ row: i, field: 'content', message: 'Lesson content is required' })
+          newErrors.push({
+            row: i,
+            field: "content",
+            message: "Lesson content is required",
+          });
         }
       }
 
-      validated.push(rowData)
+      validated.push(rowData);
     }
 
-    setErrors(newErrors)
-    setValidatedData(validated)
-  }
+    setErrors(newErrors);
+    setValidatedData(validated);
+  };
 
   const handleUpload = async () => {
-    if (errors.length > 0) return
+    if (errors.length > 0) return;
 
-    setUploading(true)
+    setUploading(true);
     try {
-      const success = await onUpload(validatedData)
+      const success = await onUpload(validatedData);
       if (success) {
-        setUploadSuccess(true)
+        setUploadSuccess(true);
         setTimeout(() => {
-          setOpen(false)
-          resetState()
-        }, 2000)
+          setOpen(false);
+          resetState();
+        }, 2000);
       } else {
-        setErrors([{ row: 0, field: 'upload', message: 'Upload failed. Please check the console for details.' }])
+        setErrors([
+          {
+            row: 0,
+            field: "upload",
+            message: "Upload failed. Please check the console for details.",
+          },
+        ]);
       }
     } catch (error: any) {
-      console.error('Upload failed:', error)
-      setErrors([{ row: 0, field: 'upload', message: error?.message || 'Upload failed. Please try again.' }])
+      console.error("Upload failed:", error);
+      setErrors([
+        {
+          row: 0,
+          field: "upload",
+          message: error?.message || "Upload failed. Please try again.",
+        },
+      ]);
     } finally {
-      setUploading(false)
+      setUploading(false);
     }
-  }
+  };
 
   const resetState = () => {
-    setFile(null)
-    setParsedData([])
-    setValidatedData([])
-    setErrors([])
-    setUploadSuccess(false)
-  }
+    setFile(null);
+    setParsedData([]);
+    setValidatedData([]);
+    setErrors([]);
+    setUploadSuccess(false);
+  };
 
   const handleClose = () => {
-    setOpen(false)
-    resetState()
-  }
+    setOpen(false);
+    resetState();
+  };
 
   const getContentTypeLabel = () => {
-    return contentType.charAt(0).toUpperCase() + contentType.slice(1) + 's'
-  }
+    return contentType.charAt(0).toUpperCase() + contentType.slice(1) + "s";
+  };
 
   return (
     <>
@@ -227,7 +288,11 @@ export const CSVUpload: React.FC<CSVUploadProps> = ({
 
       <Dialog open={open} onClose={handleClose} maxWidth="lg" fullWidth>
         <DialogTitle>
-          <Box display="flex" justifyContent="space-between" alignItems="center">
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+          >
             <Typography variant="h6">
               Bulk Upload {getContentTypeLabel()}
             </Typography>
@@ -244,7 +309,8 @@ export const CSVUpload: React.FC<CSVUploadProps> = ({
                 <strong>Step 1:</strong> Download the CSV template below
               </Typography>
               <Typography variant="body2" mb={1}>
-                <strong>Step 2:</strong> Fill in your data following the sample format
+                <strong>Step 2:</strong> Fill in your data following the sample
+                format
               </Typography>
               <Typography variant="body2">
                 <strong>Step 3:</strong> Upload the completed CSV file
@@ -267,7 +333,7 @@ export const CSVUpload: React.FC<CSVUploadProps> = ({
               startIcon={<Upload />}
               disabled={uploading}
             >
-              {file ? file.name : 'Choose CSV File'}
+              {file ? file.name : "Choose CSV File"}
               <input
                 type="file"
                 hidden
@@ -295,7 +361,8 @@ export const CSVUpload: React.FC<CSVUploadProps> = ({
           {uploadSuccess && (
             <Box mb={3}>
               <Alert severity="success" icon={<CheckCircle />}>
-                Upload successful! {validatedData.length} {getContentTypeLabel().toLowerCase()} added.
+                Upload successful! {validatedData.length}{" "}
+                {getContentTypeLabel().toLowerCase()} added.
               </Alert>
             </Box>
           )}
@@ -329,7 +396,9 @@ export const CSVUpload: React.FC<CSVUploadProps> = ({
                       <TableRow key={rowIndex}>
                         {row.map((cell, cellIndex) => (
                           <TableCell key={cellIndex}>
-                            {cell.length > 50 ? cell.substring(0, 50) + '...' : cell}
+                            {cell.length > 50
+                              ? cell.substring(0, 50) + "..."
+                              : cell}
                           </TableCell>
                         ))}
                       </TableRow>
@@ -356,10 +425,12 @@ export const CSVUpload: React.FC<CSVUploadProps> = ({
             disabled={!file || errors.length > 0 || uploading || uploadSuccess}
             startIcon={uploading ? <CircularProgress size={20} /> : <Upload />}
           >
-            {uploading ? 'Uploading...' : `Upload ${validatedData.length} Items`}
+            {uploading
+              ? "Uploading..."
+              : `Upload ${validatedData.length} Items`}
           </Button>
         </DialogActions>
       </Dialog>
     </>
-  )
-}
+  );
+};

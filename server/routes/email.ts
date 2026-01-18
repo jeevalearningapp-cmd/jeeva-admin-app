@@ -1,35 +1,35 @@
-import { Router } from 'express'
-import { emailService } from '../services/emailService'
+import { Router } from "express";
+import { emailService } from "../services/emailService";
 
-const router = Router()
+const router = Router();
 
-router.post('/send', async (req, res) => {
+router.post("/send", async (req, res) => {
   try {
-    const { to, subject, html, from } = req.body
+    const { to, subject, html, from } = req.body;
 
     if (!to || !subject || !html) {
       return res.status(400).json({
-        error: 'Missing required fields: to, subject, html'
-      })
+        error: "Missing required fields: to, subject, html",
+      });
     }
 
     const data = await emailService.sendEmail({
       to,
       subject,
       html,
-      from
-    })
+      from,
+    });
 
-    res.json({ success: true, data })
+    res.json({ success: true, data });
   } catch (error: any) {
-    console.error('Email send error:', error)
-    res.status(500).json({ error: error.message || 'Failed to send email' })
+    console.error("Email send error:", error);
+    res.status(500).json({ error: error.message || "Failed to send email" });
   }
-})
+});
 
-router.post('/welcome', async (req, res) => {
+router.post("/welcome", async (req, res) => {
   try {
-    const { to, userName, confirmationUrl } = req.body
+    const { to, userName, confirmationUrl } = req.body;
 
     const html = `
       <!DOCTYPE html>
@@ -83,23 +83,32 @@ router.post('/welcome', async (req, res) => {
         
       </body>
       </html>
-    `
+    `;
 
     const data = await emailService.sendEmail({
       to,
-      subject: 'Welcome to Jeeva Learning - Confirm Your Email 🎓',
+      subject: "Welcome to Jeeva Learning - Confirm Your Email 🎓",
       html,
-    })
+    });
 
-    res.json({ success: true, data })
+    res.json({ success: true, data });
   } catch (error: any) {
-    res.status(500).json({ error: error.message })
+    res.status(500).json({ error: error.message });
   }
-})
+});
 
-router.post('/subscription-confirmation', async (req, res) => {
+router.post("/subscription-confirmation", async (req, res) => {
   try {
-    const { to, userName, planName, price, billingCycle, startDate, nextBillingDate, appUrl } = req.body
+    const {
+      to,
+      userName,
+      planName,
+      price,
+      billingCycle,
+      startDate,
+      nextBillingDate,
+      appUrl,
+    } = req.body;
 
     const html = `
       <!DOCTYPE html>
@@ -157,31 +166,31 @@ router.post('/subscription-confirmation', async (req, res) => {
         
       </body>
       </html>
-    `
+    `;
 
     const data = await emailService.sendEmail({
       to,
       subject: `🎉 Welcome to ${planName} - Subscription Confirmed!`,
       html,
-    })
+    });
 
-    res.json({ success: true, data })
+    res.json({ success: true, data });
   } catch (error: any) {
-    res.status(500).json({ error: error.message })
+    res.status(500).json({ error: error.message });
   }
-})
+});
 
-router.post('/test', async (req, res) => {
+router.post("/test", async (req, res) => {
   try {
-    const { to } = req.body
+    const { to } = req.body;
 
     if (!to) {
-      return res.status(400).json({ error: 'Email address required' })
+      return res.status(400).json({ error: "Email address required" });
     }
 
     const data = await emailService.sendEmail({
       to,
-      subject: '✅ Brevo Integration Test - Jeeva Learning',
+      subject: "✅ Brevo Integration Test - Jeeva Learning",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
           <h2 style="color: #007aff;">✅ Email Integration Success!</h2>
@@ -191,12 +200,12 @@ router.post('/test', async (req, res) => {
           <p style="color: #666; font-size: 14px;">Sent via Brevo API/SMTP</p>
         </div>
       `,
-    })
+    });
 
-    res.json({ success: true, message: 'Test email sent successfully!', data })
+    res.json({ success: true, message: "Test email sent successfully!", data });
   } catch (error: any) {
-    res.status(500).json({ error: error.message })
+    res.status(500).json({ error: error.message });
   }
-})
+});
 
-export default router
+export default router;

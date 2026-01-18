@@ -27,13 +27,13 @@ The Jeeva Admin Portal uses Supabase Authentication integrated with a custom Aut
 ### 1. Access Auth State in Components
 
 ```tsx
-import { useAuth } from '@/context'
+import { useAuth } from "@/context";
 
 function MyComponent() {
-  const { user, adminUser, loading, login, logout } = useAuth()
+  const { user, adminUser, loading, login, logout } = useAuth();
 
   if (loading) {
-    return <div>Loading...</div>
+    return <div>Loading...</div>;
   }
 
   return (
@@ -42,26 +42,26 @@ function MyComponent() {
       <p>Role: {adminUser?.role}</p>
       <button onClick={logout}>Logout</button>
     </div>
-  )
+  );
 }
 ```
 
 ### 2. Login Flow
 
 ```tsx
-import { useAuth } from '@/context'
+import { useAuth } from "@/context";
 
 function LoginForm() {
-  const { login } = useAuth()
-  
+  const { login } = useAuth();
+
   const handleLogin = async (email: string, password: string) => {
     try {
-      await login(email, password)
+      await login(email, password);
       // User is automatically redirected after successful login
     } catch (error) {
-      console.error('Login failed:', error)
+      console.error("Login failed:", error);
     }
-  }
+  };
 }
 ```
 
@@ -71,23 +71,23 @@ function LoginForm() {
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
 
 // Protect any route
-<Route 
-  path="/dashboard" 
+<Route
+  path="/dashboard"
   element={
     <ProtectedRoute>
       <Dashboard />
     </ProtectedRoute>
-  } 
+  }
 />
 
 // Restrict by role
-<Route 
-  path="/admin-users" 
+<Route
+  path="/admin-users"
   element={
     <ProtectedRoute allowedRoles={['superadmin']}>
       <AdminUsers />
     </ProtectedRoute>
-  } 
+  }
 />
 ```
 
@@ -96,37 +96,41 @@ import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
 The `adminUser` object contains role information:
 
 ```tsx
-const { adminUser } = useAuth()
+const { adminUser } = useAuth();
 
 // Check role
-if (adminUser?.role === 'superadmin') {
+if (adminUser?.role === "superadmin") {
   // Show superadmin features
 }
 
 // Conditional rendering
-{adminUser?.role !== 'moderator' && (
-  <Button>Edit Content</Button>
-)}
+{
+  adminUser?.role !== "moderator" && <Button>Edit Content</Button>;
+}
 ```
 
 ## Auth State Properties
 
 ### `user`
+
 - Type: `User | null`
 - Supabase auth user object
 - Contains: id, email, metadata
 
 ### `adminUser`
+
 - Type: `AdminUser | null`
 - Admin-specific data from `admin_users` table
 - Contains: id, email, role, is_active
 
 ### `session`
+
 - Type: `Session | null`
 - Current Supabase session
 - Contains: access_token, refresh_token
 
 ### `loading`
+
 - Type: `boolean`
 - True while checking authentication status
 - Use for loading states
@@ -134,16 +138,19 @@ if (adminUser?.role === 'superadmin') {
 ## Auth Functions
 
 ### `login(email: string, password: string)`
+
 - Signs in user with Supabase
 - Verifies user is an active admin
 - Throws error if not authorized
 
 ### `logout()`
+
 - Signs out current user
 - Clears session and state
 - Redirects to login
 
 ### `checkAdminRole()`
+
 - Queries `admin_users` table
 - Returns AdminUser or null
 - Used internally by AuthContext
@@ -183,45 +190,46 @@ VITE_SUPABASE_ANON_KEY=your-anon-key
 
 ```tsx
 // App.tsx
-import { AuthProvider } from './context'
+import { AuthProvider } from "./context";
 
 function App() {
   return (
     <AuthProvider>
-      <Router>
-        {/* Your routes */}
-      </Router>
+      <Router>{/* Your routes */}</Router>
     </AuthProvider>
-  )
+  );
 }
 
 // Protected Page
-import { useAuth } from '@/context'
+import { useAuth } from "@/context";
 
 function Dashboard() {
-  const { adminUser } = useAuth()
-  
+  const { adminUser } = useAuth();
+
   return (
     <div>
       <h1>Welcome, {adminUser?.role}</h1>
     </div>
-  )
+  );
 }
 ```
 
 ## Troubleshooting
 
 **Login fails with "User is not an active admin"**
+
 - Ensure user exists in `admin_users` table
 - Check `is_active` is `true`
 - Verify RLS policies allow read access
 
 **Infinite loading state**
+
 - Check Supabase credentials are correct
 - Verify network connection
 - Check browser console for errors
 
 **Session not persisting**
+
 - Supabase handles persistence automatically
 - Check browser local storage is enabled
 - Ensure cookies are not blocked

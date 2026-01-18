@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState } from "react";
 import {
   Box,
   Typography,
@@ -23,142 +23,171 @@ import {
   FormControl,
   InputLabel,
   Select,
-  MenuItem
-} from '@mui/material'
+  MenuItem,
+} from "@mui/material";
 import {
   AddOutlined,
   EditOutlined,
   DeleteOutlined,
-  SearchOutlined
-} from '@mui/icons-material'
-import { Alert } from '@mui/material'
-import { useTopics, useCreateTopic, useUpdateTopic, useDeleteTopic } from '@/hooks/useTopics'
-import { useModules } from '@/hooks/useModules'
-import { PageLoader } from '@/components/common'
-import { Topic, CreateTopicInput } from '@/types/content'
+  SearchOutlined,
+} from "@mui/icons-material";
+import { Alert } from "@mui/material";
+import {
+  useTopics,
+  useCreateTopic,
+  useUpdateTopic,
+  useDeleteTopic,
+} from "@/hooks/useTopics";
+import { useModules } from "@/hooks/useModules";
+import { PageLoader } from "@/components/common";
+import { Topic, CreateTopicInput } from "@/types/content";
 
 export const TopicsPage: React.FC = () => {
-  const [dialogOpen, setDialogOpen] = useState(false)
-  const [editingTopic, setEditingTopic] = useState<Topic | null>(null)
-  const [searchQuery, setSearchQuery] = useState('')
-  const [moduleFilter, setModuleFilter] = useState<string>('all')
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingTopic, setEditingTopic] = useState<Topic | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [moduleFilter, setModuleFilter] = useState<string>("all");
   const [formData, setFormData] = useState<CreateTopicInput>({
-    moduleId: '',
-    title: '',
-    description: '',
+    moduleId: "",
+    title: "",
+    description: "",
     isActive: true,
-    displayOrder: 0
-  })
-  const [touched, setTouched] = useState({ moduleId: false, title: false, description: false })
-  const [submitError, setSubmitError] = useState<string>('')
-  const [initialLoad, setInitialLoad] = useState(true)
+    displayOrder: 0,
+  });
+  const [touched, setTouched] = useState({
+    moduleId: false,
+    title: false,
+    description: false,
+  });
+  const [submitError, setSubmitError] = useState<string>("");
+  const [initialLoad, setInitialLoad] = useState(true);
 
-  const { data: topics, isLoading } = useTopics()
-  const { data: modules } = useModules()
-  const createMutation = useCreateTopic()
-  const updateMutation = useUpdateTopic()
-  const deleteMutation = useDeleteTopic()
+  const { data: topics, isLoading } = useTopics();
+  const { data: modules } = useModules();
+  const createMutation = useCreateTopic();
+  const updateMutation = useUpdateTopic();
+  const deleteMutation = useDeleteTopic();
 
   React.useEffect(() => {
     if (!isLoading && initialLoad) {
-      setInitialLoad(false)
+      setInitialLoad(false);
     }
-  }, [isLoading, initialLoad])
+  }, [isLoading, initialLoad]);
 
   if (isLoading && initialLoad) {
-    return <PageLoader />
+    return <PageLoader />;
   }
 
-  const filteredTopics = topics?.filter(topic => {
-    const matchesSearch = topic.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      topic.description.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesModule = moduleFilter === 'all' || topic.moduleId === moduleFilter
-    return matchesSearch && matchesModule
-  })
+  const filteredTopics = topics?.filter((topic) => {
+    const matchesSearch =
+      topic.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      topic.description.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesModule =
+      moduleFilter === "all" || topic.moduleId === moduleFilter;
+    return matchesSearch && matchesModule;
+  });
 
   const handleOpenDialog = (topic?: Topic) => {
     if (topic) {
-      setEditingTopic(topic)
+      setEditingTopic(topic);
       setFormData({
         moduleId: topic.moduleId,
         title: topic.title,
         description: topic.description,
         isActive: topic.isActive,
-        displayOrder: topic.displayOrder
-      })
+        displayOrder: topic.displayOrder,
+      });
     } else {
-      setEditingTopic(null)
+      setEditingTopic(null);
       setFormData({
-        moduleId: '',
-        title: '',
-        description: '',
+        moduleId: "",
+        title: "",
+        description: "",
         isActive: true,
-        displayOrder: 0
-      })
+        displayOrder: 0,
+      });
     }
-    setTouched({ moduleId: false, title: false, description: false })
-    setSubmitError('')
-    setDialogOpen(true)
-  }
+    setTouched({ moduleId: false, title: false, description: false });
+    setSubmitError("");
+    setDialogOpen(true);
+  };
 
   const handleCloseDialog = () => {
-    setDialogOpen(false)
-    setEditingTopic(null)
-    setTouched({ moduleId: false, title: false, description: false })
-    setSubmitError('')
-  }
+    setDialogOpen(false);
+    setEditingTopic(null);
+    setTouched({ moduleId: false, title: false, description: false });
+    setSubmitError("");
+  };
 
   const validate = () => {
-    return formData.moduleId.trim() !== '' && formData.title.trim() !== '' && formData.description.trim() !== ''
-  }
+    return (
+      formData.moduleId.trim() !== "" &&
+      formData.title.trim() !== "" &&
+      formData.description.trim() !== ""
+    );
+  };
 
-  const getFieldError = (field: 'moduleId' | 'title' | 'description') => {
-    if (!touched[field]) return ''
-    if (field === 'moduleId' && !formData.moduleId) return 'Module is required'
-    if (field === 'title' && !formData.title.trim()) return 'Title is required'
-    if (field === 'description' && !formData.description.trim()) return 'Description is required'
-    return ''
-  }
+  const getFieldError = (field: "moduleId" | "title" | "description") => {
+    if (!touched[field]) return "";
+    if (field === "moduleId" && !formData.moduleId) return "Module is required";
+    if (field === "title" && !formData.title.trim()) return "Title is required";
+    if (field === "description" && !formData.description.trim())
+      return "Description is required";
+    return "";
+  };
 
   const handleSubmit = async () => {
-    setTouched({ moduleId: true, title: true, description: true })
-    if (!validate()) return
+    setTouched({ moduleId: true, title: true, description: true });
+    if (!validate()) return;
 
-    setSubmitError('')
+    setSubmitError("");
     try {
       if (editingTopic) {
         await updateMutation.mutateAsync({
           id: editingTopic.id,
-          input: formData
-        })
+          input: formData,
+        });
       } else {
-        await createMutation.mutateAsync(formData)
+        await createMutation.mutateAsync(formData);
       }
-      handleCloseDialog()
+      handleCloseDialog();
     } catch (error: any) {
-      setSubmitError(error.message || 'An error occurred. Please try again.')
+      setSubmitError(error.message || "An error occurred. Please try again.");
     }
-  }
+  };
 
   const handleDelete = async (id: string) => {
-    if (window.confirm('Are you sure you want to delete this topic? This will also delete all related lessons.')) {
-      await deleteMutation.mutateAsync(id)
+    if (
+      window.confirm(
+        "Are you sure you want to delete this topic? This will also delete all related lessons.",
+      )
+    ) {
+      await deleteMutation.mutateAsync(id);
     }
-  }
+  };
 
   const handleToggleActive = async (topic: Topic) => {
     await updateMutation.mutateAsync({
       id: topic.id,
-      input: { isActive: !topic.isActive }
-    })
-  }
+      input: { isActive: !topic.isActive },
+    });
+  };
 
   return (
     <Box>
       {/* Header */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 3,
+        }}
+      >
         <Box>
-          <Typography variant="h4" gutterBottom>Topics</Typography>
+          <Typography variant="h4" gutterBottom>
+            Topics
+          </Typography>
           <Typography variant="body2" color="text.secondary">
             Manage topics within modules
           </Typography>
@@ -167,14 +196,14 @@ export const TopicsPage: React.FC = () => {
           variant="contained"
           startIcon={<AddOutlined />}
           onClick={() => handleOpenDialog()}
-          sx={{ borderRadius: '12px' }}
+          sx={{ borderRadius: "12px" }}
         >
           Add Topic
         </Button>
       </Box>
 
       {/* Search and Filter */}
-      <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
+      <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
         <TextField
           placeholder="Search topics..."
           value={searchQuery}
@@ -197,15 +226,24 @@ export const TopicsPage: React.FC = () => {
             label="Filter by Module"
           >
             <MenuItem value="all">All Modules</MenuItem>
-            {modules?.map(module => (
-              <MenuItem key={module.id} value={module.id}>{module.title}</MenuItem>
+            {modules?.map((module) => (
+              <MenuItem key={module.id} value={module.id}>
+                {module.title}
+              </MenuItem>
             ))}
           </Select>
         </FormControl>
       </Box>
 
       {/* Topics Table */}
-      <TableContainer component={Paper} sx={{ bgcolor: 'background.paper', border: '1px solid #E5E7EB', borderRadius: '16px' }}>
+      <TableContainer
+        component={Paper}
+        sx={{
+          bgcolor: "background.paper",
+          border: "1px solid #E5E7EB",
+          borderRadius: "16px",
+        }}
+      >
         <Table>
           <TableHead>
             <TableRow>
@@ -227,7 +265,10 @@ export const TopicsPage: React.FC = () => {
                 </TableCell>
                 <TableCell>
                   <Chip
-                    label={modules?.find(m => m.id === topic.moduleId)?.title || 'Unknown'}
+                    label={
+                      modules?.find((m) => m.id === topic.moduleId)?.title ||
+                      "Unknown"
+                    }
                     size="small"
                   />
                 </TableCell>
@@ -268,8 +309,8 @@ export const TopicsPage: React.FC = () => {
               <TableRow>
                 <TableCell colSpan={6} align="center" sx={{ py: 4 }}>
                   <Typography variant="body2" color="text.secondary">
-                    {searchQuery || moduleFilter !== 'all'
-                      ? 'No topics found matching your filters.'
+                    {searchQuery || moduleFilter !== "all"
+                      ? "No topics found matching your filters."
                       : 'No topics yet. Click "Add Topic" to create one.'}
                   </Typography>
                 </TableCell>
@@ -280,73 +321,93 @@ export const TopicsPage: React.FC = () => {
       </TableContainer>
 
       {/* Add/Edit Dialog */}
-      <Dialog open={dialogOpen} onClose={handleCloseDialog} maxWidth="md" fullWidth>
-        <DialogTitle>
-          {editingTopic ? 'Edit Topic' : 'Add Topic'}
-        </DialogTitle>
+      <Dialog
+        open={dialogOpen}
+        onClose={handleCloseDialog}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>{editingTopic ? "Edit Topic" : "Add Topic"}</DialogTitle>
         <DialogContent>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 2 }}>
             {submitError && (
-              <Alert severity="error" onClose={() => setSubmitError('')}>
+              <Alert severity="error" onClose={() => setSubmitError("")}>
                 {submitError}
               </Alert>
             )}
-            <FormControl 
-              fullWidth 
-              required 
-              error={!!getFieldError('moduleId')}
-            >
+            <FormControl fullWidth required error={!!getFieldError("moduleId")}>
               <InputLabel>Module</InputLabel>
               <Select
                 value={formData.moduleId}
-                onChange={(e) => setFormData({ ...formData, moduleId: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, moduleId: e.target.value })
+                }
                 onBlur={() => setTouched({ ...touched, moduleId: true })}
                 label="Module"
               >
-                {modules?.filter(m => m.isActive).map(module => (
-                  <MenuItem key={module.id} value={module.id}>{module.title}</MenuItem>
-                ))}
+                {modules
+                  ?.filter((m) => m.isActive)
+                  .map((module) => (
+                    <MenuItem key={module.id} value={module.id}>
+                      {module.title}
+                    </MenuItem>
+                  ))}
               </Select>
-              {getFieldError('moduleId') && (
-                <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 2 }}>
-                  {getFieldError('moduleId')}
+              {getFieldError("moduleId") && (
+                <Typography
+                  variant="caption"
+                  color="error"
+                  sx={{ mt: 0.5, ml: 2 }}
+                >
+                  {getFieldError("moduleId")}
                 </Typography>
               )}
             </FormControl>
             <TextField
               label="Title"
               value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, title: e.target.value })
+              }
               onBlur={() => setTouched({ ...touched, title: true })}
               fullWidth
               required
-              error={!!getFieldError('title')}
-              helperText={getFieldError('title')}
+              error={!!getFieldError("title")}
+              helperText={getFieldError("title")}
             />
             <TextField
               label="Description"
               value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, description: e.target.value })
+              }
               onBlur={() => setTouched({ ...touched, description: true })}
               fullWidth
               multiline
               rows={3}
               required
-              error={!!getFieldError('description')}
-              helperText={getFieldError('description')}
+              error={!!getFieldError("description")}
+              helperText={getFieldError("description")}
             />
             <TextField
               label="Display Order"
               type="number"
               value={formData.displayOrder}
-              onChange={(e) => setFormData({ ...formData, displayOrder: parseInt(e.target.value) || 0 })}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  displayOrder: parseInt(e.target.value) || 0,
+                })
+              }
               fullWidth
             />
             <FormControlLabel
               control={
                 <Switch
                   checked={formData.isActive}
-                  onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, isActive: e.target.checked })
+                  }
                 />
               }
               label="Active"
@@ -354,17 +415,27 @@ export const TopicsPage: React.FC = () => {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDialog} sx={{ borderRadius: '12px' }}>Cancel</Button>
+          <Button onClick={handleCloseDialog} sx={{ borderRadius: "12px" }}>
+            Cancel
+          </Button>
           <Button
             onClick={handleSubmit}
             variant="contained"
-            disabled={!validate() || createMutation.isPending || updateMutation.isPending}
-            sx={{ borderRadius: '12px' }}
+            disabled={
+              !validate() ||
+              createMutation.isPending ||
+              updateMutation.isPending
+            }
+            sx={{ borderRadius: "12px" }}
           >
-            {(createMutation.isPending || updateMutation.isPending) ? 'Saving...' : (editingTopic ? 'Update' : 'Create')}
+            {createMutation.isPending || updateMutation.isPending
+              ? "Saving..."
+              : editingTopic
+                ? "Update"
+                : "Create"}
           </Button>
         </DialogActions>
       </Dialog>
     </Box>
-  )
-}
+  );
+};

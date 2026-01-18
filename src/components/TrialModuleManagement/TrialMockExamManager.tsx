@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState } from "react";
 import {
   Box,
   Button,
@@ -13,25 +13,27 @@ import {
   LinearProgress,
   Divider,
   Alert,
-} from '@mui/material'
-import { InfoOutlined } from '@mui/icons-material'
+} from "@mui/material";
+import { InfoOutlined } from "@mui/icons-material";
 
 interface MockExamConfig {
-  questionCount: number
-  timeLimitMinutes: number
-  passingScore: number
-  allowMarkForReview: boolean
-  allowAnswerChanges: boolean
-  showQuestionNavigator: boolean
-  autoSubmitAtTimeLimit: boolean
-  showResultsImmediately: boolean
+  questionCount: number;
+  timeLimitMinutes: number;
+  passingScore: number;
+  allowMarkForReview: boolean;
+  allowAnswerChanges: boolean;
+  showQuestionNavigator: boolean;
+  autoSubmitAtTimeLimit: boolean;
+  showResultsImmediately: boolean;
 }
 
 interface MockExamManagerProps {
-  onStatusChange: (status: 'idle' | 'loading' | 'success' | 'error') => void
+  onStatusChange: (status: "idle" | "loading" | "success" | "error") => void;
 }
 
-export default function TrialMockExamManager({ onStatusChange }: MockExamManagerProps) {
+export default function TrialMockExamManager({
+  onStatusChange,
+}: MockExamManagerProps) {
   const [config, setConfig] = useState<MockExamConfig>({
     questionCount: 20,
     timeLimitMinutes: 30,
@@ -41,26 +43,27 @@ export default function TrialMockExamManager({ onStatusChange }: MockExamManager
     showQuestionNavigator: true,
     autoSubmitAtTimeLimit: true,
     showResultsImmediately: true,
-  })
+  });
 
-  const [selectedQuestions, setSelectedQuestions] = useState(0)
+  const [selectedQuestions, setSelectedQuestions] = useState(0);
 
   const handleSaveConfig = async () => {
-    onStatusChange('loading')
+    onStatusChange("loading");
     try {
       // Save configuration
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-      onStatusChange('success')
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      onStatusChange("success");
     } catch (error) {
-      onStatusChange('error')
+      onStatusChange("error");
     }
-  }
+  };
 
   return (
     <Box>
       {/* Info Alert */}
       <Alert severity="info" sx={{ mb: 3 }} icon={<InfoOutlined />}>
-        Trial mock exam: 20 questions, 30 minutes, representative sample from all topics with detailed results and suggestions.
+        Trial mock exam: 20 questions, 30 minutes, representative sample from
+        all topics with detailed results and suggestions.
       </Alert>
 
       {/* Summary Cards */}
@@ -84,7 +87,9 @@ export default function TrialMockExamManager({ onStatusChange }: MockExamManager
               <Typography color="text.secondary" gutterBottom>
                 Time Limit
               </Typography>
-              <Typography variant="h5">{config.timeLimitMinutes} min</Typography>
+              <Typography variant="h5">
+                {config.timeLimitMinutes} min
+              </Typography>
               <Typography variant="caption" color="text.secondary">
                 30 min for trial
               </Typography>
@@ -110,7 +115,9 @@ export default function TrialMockExamManager({ onStatusChange }: MockExamManager
               <Typography color="text.secondary" gutterBottom>
                 Questions Selected
               </Typography>
-              <Typography variant="h5">{selectedQuestions}/{config.questionCount}</Typography>
+              <Typography variant="h5">
+                {selectedQuestions}/{config.questionCount}
+              </Typography>
               <Box sx={{ mt: 1 }}>
                 <LinearProgress
                   variant="determinate"
@@ -146,7 +153,11 @@ export default function TrialMockExamManager({ onStatusChange }: MockExamManager
                 }
                 label="Allow Mark for Review"
               />
-              <Typography variant="caption" color="text.secondary" sx={{ ml: 4, display: 'block' }}>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ ml: 4, display: "block" }}
+              >
                 Users can mark questions to review later
               </Typography>
             </Box>
@@ -168,7 +179,11 @@ export default function TrialMockExamManager({ onStatusChange }: MockExamManager
                 }
                 label="Allow Answer Changes"
               />
-              <Typography variant="caption" color="text.secondary" sx={{ ml: 4, display: 'block' }}>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ ml: 4, display: "block" }}
+              >
                 Users can change their answers before submit
               </Typography>
             </Box>
@@ -190,7 +205,11 @@ export default function TrialMockExamManager({ onStatusChange }: MockExamManager
                 }
                 label="Show Question Navigator"
               />
-              <Typography variant="caption" color="text.secondary" sx={{ ml: 4, display: 'block' }}>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ ml: 4, display: "block" }}
+              >
                 Display all question numbers for easy navigation
               </Typography>
             </Box>
@@ -212,7 +231,11 @@ export default function TrialMockExamManager({ onStatusChange }: MockExamManager
                 }
                 label="Auto-Submit at Time Limit"
               />
-              <Typography variant="caption" color="text.secondary" sx={{ ml: 4, display: 'block' }}>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ ml: 4, display: "block" }}
+              >
                 Automatically submit when time expires
               </Typography>
             </Box>
@@ -234,8 +257,13 @@ export default function TrialMockExamManager({ onStatusChange }: MockExamManager
                 }
                 label="Show Results Immediately"
               />
-              <Typography variant="caption" color="text.secondary" sx={{ ml: 4, display: 'block' }}>
-                Display detailed results right after exam completion (recommended for learning)
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ ml: 4, display: "block" }}
+              >
+                Display detailed results right after exam completion
+                (recommended for learning)
               </Typography>
             </Box>
           </Grid>
@@ -301,14 +329,12 @@ export default function TrialMockExamManager({ onStatusChange }: MockExamManager
       </Paper>
 
       {/* Save Button */}
-      <Box sx={{ display: 'flex', gap: 2 }}>
+      <Box sx={{ display: "flex", gap: 2 }}>
         <Button variant="contained" onClick={handleSaveConfig}>
           Save Configuration
         </Button>
-        <Button variant="outlined">
-          Preview Results Screen
-        </Button>
+        <Button variant="outlined">Preview Results Screen</Button>
       </Box>
     </Box>
-  )
+  );
 }

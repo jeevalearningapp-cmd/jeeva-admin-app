@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase'
+import { supabase } from "@/lib/supabase";
 import type {
   Payment,
   PaymentCustomer,
@@ -10,12 +10,14 @@ import type {
   PaymentFilters,
   CreatePaymentCustomerInput,
   CreateRefundInput,
-} from '@/types/payments'
+} from "@/types/payments";
 
 export const paymentsAPI = {
-  async createPaymentCustomer(input: CreatePaymentCustomerInput): Promise<PaymentCustomer> {
+  async createPaymentCustomer(
+    input: CreatePaymentCustomerInput,
+  ): Promise<PaymentCustomer> {
     const { data, error } = await supabase
-      .from('payment_customers')
+      .from("payment_customers")
       .insert({
         user_id: input.userId,
         gateway: input.gateway,
@@ -26,45 +28,48 @@ export const paymentsAPI = {
         country_code: input.countryCode,
       })
       .select()
-      .single()
+      .single();
 
     if (error) {
-      throw new Error(`Failed to create payment customer: ${error.message}`)
+      throw new Error(`Failed to create payment customer: ${error.message}`);
     }
 
-    return transformPaymentCustomerFromDB(data)
+    return transformPaymentCustomerFromDB(data);
   },
 
-  async getPaymentCustomer(userId: string, gateway: PaymentGateway): Promise<PaymentCustomer | null> {
+  async getPaymentCustomer(
+    userId: string,
+    gateway: PaymentGateway,
+  ): Promise<PaymentCustomer | null> {
     const { data, error } = await supabase
-      .from('payment_customers')
-      .select('*')
-      .eq('user_id', userId)
-      .eq('gateway', gateway)
-      .maybeSingle()
+      .from("payment_customers")
+      .select("*")
+      .eq("user_id", userId)
+      .eq("gateway", gateway)
+      .maybeSingle();
 
     if (error) {
-      throw new Error(`Failed to get payment customer: ${error.message}`)
+      throw new Error(`Failed to get payment customer: ${error.message}`);
     }
 
-    return data ? transformPaymentCustomerFromDB(data) : null
+    return data ? transformPaymentCustomerFromDB(data) : null;
   },
 
   async createPayment(input: {
-    userId: string
-    gateway: PaymentGateway
-    amount: number
-    currency: CurrencyCode
-    subscriptionId?: string
-    subscriptionPlanId?: string
-    discountCouponId?: string
-    originalAmount: number
-    discountAmount: number
-    stripePaymentIntentId?: string
-    metadata?: any
+    userId: string;
+    gateway: PaymentGateway;
+    amount: number;
+    currency: CurrencyCode;
+    subscriptionId?: string;
+    subscriptionPlanId?: string;
+    discountCouponId?: string;
+    originalAmount: number;
+    discountAmount: number;
+    stripePaymentIntentId?: string;
+    metadata?: any;
   }): Promise<Payment> {
     const { data, error } = await supabase
-      .from('payments')
+      .from("payments")
       .insert({
         user_id: input.userId,
         gateway: input.gateway,
@@ -77,120 +82,123 @@ export const paymentsAPI = {
         discount_amount: input.discountAmount,
         final_amount: input.amount,
         stripe_payment_intent_id: input.stripePaymentIntentId,
-        status: 'pending',
+        status: "pending",
         metadata: input.metadata || {},
       })
       .select()
-      .single()
+      .single();
 
     if (error) {
-      throw new Error(`Failed to create payment: ${error.message}`)
+      throw new Error(`Failed to create payment: ${error.message}`);
     }
 
-    return transformPaymentFromDB(data)
+    return transformPaymentFromDB(data);
   },
 
   async updatePayment(
     paymentId: string,
     update: {
-      status?: PaymentStatus
-      razorpayPaymentId?: string
-      failureCode?: string
-      failureMessage?: string
-      gatewayResponse?: any
-      paymentMethodType?: string
-    }
+      status?: PaymentStatus;
+      razorpayPaymentId?: string;
+      failureCode?: string;
+      failureMessage?: string;
+      gatewayResponse?: any;
+      paymentMethodType?: string;
+    },
   ): Promise<Payment> {
-    const updateData: any = {}
+    const updateData: any = {};
 
-    if (update.status) updateData.status = update.status
-    if (update.failureCode) updateData.failure_code = update.failureCode
-    if (update.failureMessage) updateData.failure_message = update.failureMessage
-    if (update.gatewayResponse) updateData.gateway_response = update.gatewayResponse
-    if (update.paymentMethodType) updateData.payment_method_type = update.paymentMethodType
+    if (update.status) updateData.status = update.status;
+    if (update.failureCode) updateData.failure_code = update.failureCode;
+    if (update.failureMessage)
+      updateData.failure_message = update.failureMessage;
+    if (update.gatewayResponse)
+      updateData.gateway_response = update.gatewayResponse;
+    if (update.paymentMethodType)
+      updateData.payment_method_type = update.paymentMethodType;
 
     const { data, error } = await supabase
-      .from('payments')
+      .from("payments")
       .update(updateData)
-      .eq('id', paymentId)
+      .eq("id", paymentId)
       .select()
-      .single()
+      .single();
 
     if (error) {
-      throw new Error(`Failed to update payment: ${error.message}`)
+      throw new Error(`Failed to update payment: ${error.message}`);
     }
 
-    return transformPaymentFromDB(data)
+    return transformPaymentFromDB(data);
   },
 
   async getPayment(paymentId: string): Promise<Payment> {
     const { data, error } = await supabase
-      .from('payments')
-      .select('*')
-      .eq('id', paymentId)
-      .single()
+      .from("payments")
+      .select("*")
+      .eq("id", paymentId)
+      .single();
 
     if (error) {
-      throw new Error(`Failed to get payment: ${error.message}`)
+      throw new Error(`Failed to get payment: ${error.message}`);
     }
 
-    return transformPaymentFromDB(data)
+    return transformPaymentFromDB(data);
   },
 
   async getPayments(filters?: PaymentFilters): Promise<Payment[]> {
     let query = supabase
-      .from('payments')
-      .select('*')
-      .order('created_at', { ascending: false })
+      .from("payments")
+      .select("*")
+      .order("created_at", { ascending: false });
 
     if (filters?.status && filters.status.length > 0) {
-      query = query.in('status', filters.status)
+      query = query.in("status", filters.status);
     }
 
     if (filters?.gateway && filters.gateway.length > 0) {
-      query = query.in('gateway', filters.gateway)
+      query = query.in("gateway", filters.gateway);
     }
 
     if (filters?.dateFrom) {
-      query = query.gte('created_at', filters.dateFrom)
+      query = query.gte("created_at", filters.dateFrom);
     }
 
     if (filters?.dateTo) {
-      query = query.lte('created_at', filters.dateTo)
+      query = query.lte("created_at", filters.dateTo);
     }
 
     if (filters?.subscriptionPlanId) {
-      query = query.eq('subscription_plan_id', filters.subscriptionPlanId)
+      query = query.eq("subscription_plan_id", filters.subscriptionPlanId);
     }
 
-    const { data, error } = await query
+    const { data, error } = await query;
 
     if (error) {
-      throw new Error(`Failed to get payments: ${error.message}`)
+      throw new Error(`Failed to get payments: ${error.message}`);
     }
 
-    return data.map(transformPaymentFromDB)
+    return data.map(transformPaymentFromDB);
   },
 
   async getUserPayments(userId: string): Promise<Payment[]> {
     const { data, error } = await supabase
-      .from('payments')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false })
+      .from("payments")
+      .select("*")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false });
 
     if (error) {
-      throw new Error(`Failed to get user payments: ${error.message}`)
+      throw new Error(`Failed to get user payments: ${error.message}`);
     }
 
-    return data.map(transformPaymentFromDB)
+    return data.map(transformPaymentFromDB);
   },
 
   async createRefund(input: CreateRefundInput): Promise<PaymentRefund> {
-    const payment = await this.getPayment(input.paymentId)
+    const payment = await this.getPayment(input.paymentId);
 
     const { data, error } = await supabase
-      .from('payment_refunds')
+      .from("payment_refunds")
       .insert({
         payment_id: input.paymentId,
         gateway: payment.gateway,
@@ -198,76 +206,82 @@ export const paymentsAPI = {
         currency: payment.currency,
         reason: input.reason,
         refunded_by: input.refundedBy,
-        status: 'pending',
+        status: "pending",
       })
       .select()
-      .single()
+      .single();
 
     if (error) {
-      throw new Error(`Failed to create refund: ${error.message}`)
+      throw new Error(`Failed to create refund: ${error.message}`);
     }
 
-    return transformPaymentRefundFromDB(data)
+    return transformPaymentRefundFromDB(data);
   },
 
   async updateRefund(
     refundId: string,
     update: {
-      status?: PaymentStatus
-      stripeRefundId?: string
-    }
+      status?: PaymentStatus;
+      stripeRefundId?: string;
+    },
   ): Promise<PaymentRefund> {
-    const updateData: any = {}
+    const updateData: any = {};
 
-    if (update.status) updateData.status = update.status
-    if (update.stripeRefundId) updateData.stripe_refund_id = update.stripeRefundId
+    if (update.status) updateData.status = update.status;
+    if (update.stripeRefundId)
+      updateData.stripe_refund_id = update.stripeRefundId;
 
     const { data, error } = await supabase
-      .from('payment_refunds')
+      .from("payment_refunds")
       .update(updateData)
-      .eq('id', refundId)
+      .eq("id", refundId)
       .select()
-      .single()
+      .single();
 
     if (error) {
-      throw new Error(`Failed to update refund: ${error.message}`)
+      throw new Error(`Failed to update refund: ${error.message}`);
     }
 
-    return transformPaymentRefundFromDB(data)
+    return transformPaymentRefundFromDB(data);
   },
 
   async getPaymentsSummary(filters?: PaymentFilters) {
     let query = supabase
-      .from('payments')
-      .select('amount, final_amount, status')
+      .from("payments")
+      .select("amount, final_amount, status");
 
     if (filters?.status && filters.status.length > 0) {
-      query = query.in('status', filters.status)
+      query = query.in("status", filters.status);
     }
 
     if (filters?.gateway && filters.gateway.length > 0) {
-      query = query.in('gateway', filters.gateway)
+      query = query.in("gateway", filters.gateway);
     }
 
     if (filters?.dateFrom) {
-      query = query.gte('created_at', filters.dateFrom)
+      query = query.gte("created_at", filters.dateFrom);
     }
 
     if (filters?.dateTo) {
-      query = query.lte('created_at', filters.dateTo)
+      query = query.lte("created_at", filters.dateTo);
     }
 
-    const { data, error } = await query
+    const { data, error } = await query;
 
     if (error) {
-      throw new Error(`Failed to get payments summary: ${error.message}`)
+      throw new Error(`Failed to get payments summary: ${error.message}`);
     }
 
-    const payments = data || []
-    const totalPayments = payments.length
-    const successfulPayments = payments.filter(p => p.status === 'succeeded').length
-    const failedPayments = payments.filter(p => p.status === 'failed').length
-    const totalAmount = payments.reduce((sum, p) => sum + parseFloat(p.final_amount || 0), 0)
+    const payments = data || [];
+    const totalPayments = payments.length;
+    const successfulPayments = payments.filter(
+      (p) => p.status === "succeeded",
+    ).length;
+    const failedPayments = payments.filter((p) => p.status === "failed").length;
+    const totalAmount = payments.reduce(
+      (sum, p) => sum + parseFloat(p.final_amount || 0),
+      0,
+    );
 
     return {
       totalPayments,
@@ -275,49 +289,62 @@ export const paymentsAPI = {
       successfulPayments,
       failedPayments,
       refundedAmount: 0,
-    }
+    };
   },
 
-  async refundPayment(paymentId: string, input: { amount?: number; reason?: string; refundedBy: string }) {
+  async refundPayment(
+    paymentId: string,
+    input: { amount?: number; reason?: string; refundedBy: string },
+  ) {
     return this.createRefund({
       paymentId,
       amount: input.amount,
       reason: input.reason,
       refundedBy: input.refundedBy,
-    })
+    });
   },
 
-  async logWebhookEvent(gateway: PaymentGateway, eventId: string, eventType: string, payload: any) {
-    const { error } = await supabase.from('payment_webhook_events').insert({
+  async logWebhookEvent(
+    gateway: PaymentGateway,
+    eventId: string,
+    eventType: string,
+    payload: any,
+  ) {
+    const { error } = await supabase.from("payment_webhook_events").insert({
       gateway,
       event_id: eventId,
       event_type: eventType,
       payload,
       processed: false,
-    })
+    });
 
-    if (error && !error.message.includes('duplicate key')) {
-      console.error('Failed to log webhook event:', error)
+    if (error && !error.message.includes("duplicate key")) {
+      console.error("Failed to log webhook event:", error);
     }
   },
 
-  async markWebhookProcessed(gateway: PaymentGateway, eventId: string, success: boolean, errorMessage?: string) {
+  async markWebhookProcessed(
+    gateway: PaymentGateway,
+    eventId: string,
+    success: boolean,
+    errorMessage?: string,
+  ) {
     const { error } = await supabase
-      .from('payment_webhook_events')
+      .from("payment_webhook_events")
       .update({
         processed: success,
         processed_at: new Date().toISOString(),
         error_message: errorMessage,
         retry_count: success ? 0 : 1,
       })
-      .eq('gateway', gateway)
-      .eq('event_id', eventId)
+      .eq("gateway", gateway)
+      .eq("event_id", eventId);
 
     if (error) {
-      console.error('Failed to mark webhook processed:', error)
+      console.error("Failed to mark webhook processed:", error);
     }
   },
-}
+};
 
 function transformPaymentCustomerFromDB(data: any): PaymentCustomer {
   return {
@@ -331,7 +358,7 @@ function transformPaymentCustomerFromDB(data: any): PaymentCustomer {
     countryCode: data.country_code,
     createdAt: data.created_at,
     updatedAt: data.updated_at,
-  }
+  };
 }
 
 function transformPaymentFromDB(data: any): Payment {
@@ -363,12 +390,18 @@ function transformPaymentFromDB(data: any): Payment {
     completedAt: data.completed_at,
     // Stripe Adaptive Pricing presentment fields
     stripeCheckoutSessionId: data.stripe_checkout_session_id,
-    amountChargedLocal: data.amount_charged_local ? parseFloat(data.amount_charged_local) : undefined,
+    amountChargedLocal: data.amount_charged_local
+      ? parseFloat(data.amount_charged_local)
+      : undefined,
     currencyChargedLocal: data.currency_charged_local,
-    amountChargedGbp: data.amount_charged_gbp ? parseFloat(data.amount_charged_gbp) : undefined,
-    fxRateApplied: data.fx_rate_applied ? parseFloat(data.fx_rate_applied) : undefined,
+    amountChargedGbp: data.amount_charged_gbp
+      ? parseFloat(data.amount_charged_gbp)
+      : undefined,
+    fxRateApplied: data.fx_rate_applied
+      ? parseFloat(data.fx_rate_applied)
+      : undefined,
     countryDetected: data.country_detected,
-  }
+  };
 }
 
 function transformPaymentRefundFromDB(data: any): PaymentRefund {
@@ -385,5 +418,5 @@ function transformPaymentRefundFromDB(data: any): PaymentRefund {
     createdAt: data.created_at,
     updatedAt: data.updated_at,
     completedAt: data.completed_at,
-  }
+  };
 }

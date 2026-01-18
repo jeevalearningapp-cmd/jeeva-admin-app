@@ -1,8 +1,10 @@
-import { LEARNING_TOPICS } from '../src/constants/learningStructure';
-import * as fs from 'fs';
+import { LEARNING_TOPICS } from "../src/constants/learningStructure";
+import * as fs from "fs";
 
-const PODCAST_URL = 'https://qsvjvgsnbslgypykuznd.supabase.co/storage/v1/object/public/Podcast%20audio/NMC-code.mp3';
-const VIDEO_URL = 'https://qsvjvgsnbslgypykuznd.supabase.co/storage/v1/object/public/Video%20tutorial/1.1%20Prioritise%20people.mp4';
+const PODCAST_URL =
+  "https://qsvjvgsnbslgypykuznd.supabase.co/storage/v1/object/public/Podcast%20audio/NMC-code.mp3";
+const VIDEO_URL =
+  "https://qsvjvgsnbslgypykuznd.supabase.co/storage/v1/object/public/Video%20tutorial/1.1%20Prioritise%20people.mp4";
 
 const TEXT_CONTENT = `# NMC CODE
 
@@ -60,13 +62,13 @@ function generateSQL(): string {
     // Process each subtopic
     for (const subtopic of topic.subtopics) {
       sql += `-- Subtopic ${subtopic.id}: ${subtopic.title}\n`;
-      
+
       // Create 3 lessons
       sql += `INSERT INTO lessons (topic_id, title, content, audio_url, video_url, lesson_type, category, duration, is_active, display_order, passing_score_percentage) VALUES\n`;
       sql += `  ('${topic.id}', '${escapeSQL(subtopic.title)} - Audio Podcast', 'Listen to this audio podcast about ${escapeSQL(subtopic.title)}', '${PODCAST_URL}', NULL, 'audio', '${subtopic.id}', 10, true, 1, 80),\n`;
       sql += `  ('${topic.id}', '${escapeSQL(subtopic.title)} - Video Tutorial', 'Watch this video tutorial about ${escapeSQL(subtopic.title)}', NULL, '${VIDEO_URL}', 'video', '${subtopic.id}', 15, true, 2, 80),\n`;
       sql += `  ('${topic.id}', '${escapeSQL(subtopic.title)} - Introduction', '${escapeSQL(TEXT_CONTENT)}', NULL, NULL, 'text', '${subtopic.id}', 8, true, 3, 80);\n\n`;
-      
+
       lessonCount += 3;
 
       // Create 2 questions
@@ -108,6 +110,8 @@ function generateSQL(): string {
 
 // Generate and write the SQL file
 const sql = generateSQL();
-fs.writeFileSync('scripts/seed_learning_complete.sql', sql);
-console.log('✅ SQL seed file generated: scripts/seed_learning_complete.sql');
-console.log('📝 Run this file in Supabase SQL Editor to seed all Learning Module content');
+fs.writeFileSync("scripts/seed_learning_complete.sql", sql);
+console.log("✅ SQL seed file generated: scripts/seed_learning_complete.sql");
+console.log(
+  "📝 Run this file in Supabase SQL Editor to seed all Learning Module content",
+);

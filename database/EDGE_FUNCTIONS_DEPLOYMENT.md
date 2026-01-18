@@ -27,6 +27,7 @@ npm install -g supabase
 ```
 
 Verify installation:
+
 ```bash
 supabase --version
 ```
@@ -66,6 +67,7 @@ supabase functions deploy process-automated-notifications
 ```
 
 **Expected output:**
+
 ```
 Deploying send-notification (project ref: YOUR-PROJECT-REF)
 Bundled send-notification in 250ms.
@@ -88,9 +90,11 @@ supabase secrets set SUPABASE_SERVICE_ROLE_KEY=your-service-role-key-here
 ```
 
 **Important:** The service role key is different from the anon key. Find it in:
+
 - Supabase Dashboard → Settings → API → service_role secret (click "Reveal" to copy)
 
 Verify secrets are set:
+
 ```bash
 supabase secrets list
 ```
@@ -110,6 +114,7 @@ curl -X POST https://YOUR-PROJECT-REF.supabase.co/functions/v1/send-notification
 ```
 
 **Expected response:**
+
 ```json
 {
   "success": true,
@@ -156,6 +161,7 @@ Now that the Edge Functions are deployed, set up automated scheduling:
    - Click "Run"
 
 4. **Verify jobs are scheduled**
+
    ```sql
    SELECT * FROM cron.job;
    ```
@@ -176,6 +182,7 @@ For real-time automated notifications, set up database triggers:
 2. **Run the SQL in Supabase SQL Editor**
 
 This creates triggers for:
+
 - Welcome notifications (when new user signs up)
 - Subscription activation notifications
 - Content approved/rejected notifications
@@ -233,6 +240,7 @@ supabase functions logs track-receipts --follow
 ```
 
 Or view in Supabase Dashboard:
+
 - Edge Functions → Select function → Logs tab
 
 ---
@@ -242,6 +250,7 @@ Or view in Supabase Dashboard:
 ### Error: "Function not found"
 
 **Solution:** Make sure you deployed the function:
+
 ```bash
 supabase functions deploy send-notification
 ```
@@ -249,6 +258,7 @@ supabase functions deploy send-notification
 ### Error: "SUPABASE_URL is not defined"
 
 **Solution:** Set the environment variables:
+
 ```bash
 supabase secrets set SUPABASE_URL=https://YOUR-PROJECT-REF.supabase.co
 supabase secrets set SUPABASE_SERVICE_ROLE_KEY=your-key
@@ -263,16 +273,19 @@ supabase secrets set SUPABASE_SERVICE_ROLE_KEY=your-key
 **Check these:**
 
 1. **Queue has items?**
+
    ```sql
    SELECT * FROM notification_queue WHERE status = 'pending';
    ```
 
 2. **Cron job running?**
+
    ```sql
    SELECT * FROM cron.job_run_details ORDER BY start_time DESC LIMIT 10;
    ```
 
 3. **Edge Function logs show errors?**
+
    ```bash
    supabase functions logs send-notification
    ```
@@ -291,9 +304,10 @@ supabase secrets set SUPABASE_SERVICE_ROLE_KEY=your-key
 - `MessageTooBig` - Notification payload exceeds 4KB limit
 
 View Expo errors in notification_targets:
+
 ```sql
-SELECT error_message, COUNT(*) 
-FROM notification_targets 
+SELECT error_message, COUNT(*)
+FROM notification_targets
 WHERE delivery_status = 'failed'
 GROUP BY error_message;
 ```
@@ -306,7 +320,7 @@ GROUP BY error_message;
 
 ```sql
 -- Overall delivery rates
-SELECT 
+SELECT
   status,
   COUNT(*) as total,
   SUM(total_delivered) as delivered,
@@ -316,7 +330,7 @@ FROM notifications
 GROUP BY status;
 
 -- Recent notifications
-SELECT 
+SELECT
   n.title,
   n.status,
   n.total_recipients,
@@ -331,7 +345,7 @@ LIMIT 20;
 
 ```sql
 -- Delete notifications older than 90 days
-DELETE FROM notifications 
+DELETE FROM notifications
 WHERE created_at < NOW() - INTERVAL '90 days'
 AND status = 'sent';
 
@@ -359,11 +373,13 @@ supabase functions deploy send-notification
 ## Cost Estimation
 
 **Supabase Edge Functions:**
+
 - 500,000 invocations/month: FREE
 - $2 per million after that
 - Estimate: ~$5-10/month for 50,000 users
 
 **Expo Push Notifications:**
+
 - Up to 100 push/sec: FREE
 - More than enough for most use cases
 

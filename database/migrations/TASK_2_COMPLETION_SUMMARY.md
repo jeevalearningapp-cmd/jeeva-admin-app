@@ -86,6 +86,7 @@ That's it! The script handles everything.
 ### For Development/Testing
 
 Run individual scripts step-by-step:
+
 ```sql
 \i jeeva-admin-portal/database/migrations/learning_module_restructure.sql
 \i jeeva-admin-portal/database/migrations/classify_questions.sql
@@ -107,15 +108,19 @@ Run individual scripts step-by-step:
 ## What Problem This Solves
 
 ### The Original Error
+
 ```
 ERROR: 42P01: relation "mock_exam_questions" does not exist
 ```
 
 ### Root Cause
+
 Individual migration scripts expected the schema to already be set up (Task 1 completed). The `questions` table needed to be renamed to `mock_exam_questions` first.
 
 ### Solution
+
 The `run_complete_migration.sql` script handles both:
+
 1. Schema migration (Task 1) - Creates tables and renames questions
 2. Data migration (Task 2) - Migrates questions to new tables
 

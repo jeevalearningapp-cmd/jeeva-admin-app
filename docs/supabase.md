@@ -4,57 +4,57 @@
 
 ## 📦 Tables, Fields, and Relationships
 
-| Table Name           | Key Fields (PK)                  | FK / Relationships         | Purpose                             |
+| Table Name | Key Fields (PK) | FK / Relationships | Purpose |
 
 |----------------------|----------------------------------|----------------------------|-------------------------------------|
 
-| users                | id (UUID), email, role           | N/A                        | End-user (student) registry         |
+| users | id (UUID), email, role | N/A | End-user (student) registry |
 
-| user_profiles        | id (UUID), user_id (FK)           | user_id ➔ users.id         | Profile info                        |
+| user_profiles | id (UUID), user_id (FK) | user_id ➔ users.id | Profile info |
 
-| subscriptions        | id (PK), user_id (FK)            | user_id ➔ users.id         | Subscription plans/records          |
+| subscriptions | id (PK), user_id (FK) | user_id ➔ users.id | Subscription plans/records |
 
-| admin_users          | id (PK), email, role             | N/A                        | Admin user list/roles               |
+| admin_users | id (PK), email, role | N/A | Admin user list/roles |
 
-| modules              | id (PK), name                    | N/A                        | Course/module registry              |
+| modules | id (PK), name | N/A | Course/module registry |
 
-| topics               | id (PK), module_id (FK)          | module_id ➔ modules.id     | Topic to module link                |
+| topics | id (PK), module_id (FK) | module_id ➔ modules.id | Topic to module link |
 
-| subtopics            | id (PK), topic_id (FK)           | topic_id ➔ topics.id       | Subtopic to topic                   |
+| subtopics | id (PK), topic_id (FK) | topic_id ➔ topics.id | Subtopic to topic |
 
-| lessons              | id (PK), subtopic_id (FK)        | subtopic_id ➔ subtopics.id | Lesson content                      |
+| lessons | id (PK), subtopic_id (FK) | subtopic_id ➔ subtopics.id | Lesson content |
 
-| flashcards           | id (PK), lesson_id (FK)          | lesson_id ➔ lessons.id     | Flashcard learning                  |
+| flashcards | id (PK), lesson_id (FK) | lesson_id ➔ lessons.id | Flashcard learning |
 
-| questions            | id (PK), lesson_id (FK)          | lesson_id ➔ lessons.id     | Question bank                       |
+| questions | id (PK), lesson_id (FK) | lesson_id ➔ lessons.id | Question bank |
 
-| question_options     | id (PK), question_id (FK)        | question_id ➔ questions.id | MCQ options                         |
+| question_options | id (PK), question_id (FK) | question_id ➔ questions.id | MCQ options |
 
-| question_media       | id (PK), question_id (FK)        | question_id ➔ questions.id | Images, media                       |
+| question_media | id (PK), question_id (FK) | question_id ➔ questions.id | Images, media |
 
-| practice_sessions    | id (PK), user_id (FK)            | user_id ➔ users.id         | Practice sessions log               |
+| practice_sessions | id (PK), user_id (FK) | user_id ➔ users.id | Practice sessions log |
 
-| practice_results     | id (PK), session_id (FK)         | session_id ➔ practice_sessions.id | Answer log                  |
+| practice_results | id (PK), session_id (FK) | session_id ➔ practice_sessions.id | Answer log |
 
-| lesson_quizzes       | id (PK), lesson_id/user_id (FK)  | lesson_id, user_id         | Quiz participation                  |
+| lesson_quizzes | id (PK), lesson_id/user_id (FK) | lesson_id, user_id | Quiz participation |
 
-| mock_exams           | id (PK), user_id (FK)            | user_id                    | Mock exam attempts                  |
+| mock_exams | id (PK), user_id (FK) | user_id | Mock exam attempts |
 
-| mock_exam_results    | id (PK), exam_id (FK)            | exam_id                    | Mock exam results                   |
+| mock_exam_results | id (PK), exam_id (FK) | exam_id | Mock exam results |
 
-| learning_completions | id (PK), user_id, lesson_id      | user_id, lesson_id         | Lesson/module completion            |
+| learning_completions | id (PK), user_id, lesson_id | user_id, lesson_id | Lesson/module completion |
 
-| ai_recommendations   | id (PK), user_id (FK)            | user_id                    | AI-driven learning recommendation   |
+| ai_recommendations | id (PK), user_id (FK) | user_id | AI-driven learning recommendation |
 
-| learning_paths       | id (PK), user_id (FK)            | user_id                    | Adaptive learning paths             |
+| learning_paths | id (PK), user_id (FK) | user_id | Adaptive learning paths |
 
-| user_analytics       | id (PK), user_id (FK)            | user_id                    | Progress, engagement, metrics       |
+| user_analytics | id (PK), user_id (FK) | user_id | Progress, engagement, metrics |
 
-| content_approvals    | id (PK), resource_id, by_admin_id(FK)| by_admin_id ➔ admin_users.id| Content review queue         |
+| content_approvals | id (PK), resource_id, by_admin_id(FK)| by_admin_id ➔ admin_users.id| Content review queue |
 
-| app_settings         | id (PK), key, value              | N/A                        | System, feature flags               |
+| app_settings | id (PK), key, value | N/A | System, feature flags |
 
-| dashboard_hero       | id (PK), title, active           | N/A                        | Dashboard/banner/hero               |
+| dashboard_hero | id (PK), title, active | N/A | Dashboard/banner/hero |
 
 All content relationships are hierarchical (modules > topics > subtopics > lessons > questions/flashcards). Practice/results, analytics, and AI are user-linked.
 
@@ -64,63 +64,63 @@ All content relationships are hierarchical (modules > topics > subtopics > lesso
 
 **Admin roles (web):**
 
-| Route/Section     | superadmin | editor               | moderator              |
+| Route/Section | superadmin | editor | moderator |
 
 |-------------------|:----------:|:--------------------:|:----------------------:|
 
-| All content       | Yes        | Yes                  | Limited/review         |
+| All content | Yes | Yes | Limited/review |
 
-| User management   | Yes        | No                   | No                     |
+| User management | Yes | No | No |
 
-| Admin mgmt        | Yes        | No                   | No                     |
+| Admin mgmt | Yes | No | No |
 
-| Subscriptions     | Yes        | No                   | No                     |
+| Subscriptions | Yes | No | No |
 
-| Analytics         | Yes        | Content only         | Review only            |
+| Analytics | Yes | Content only | Review only |
 
-| Approvals         | Yes        | Yes                  | Yes                    |
+| Approvals | Yes | Yes | Yes |
 
-| Settings          | Yes        | No                   | No                     |
+| Settings | Yes | No | No |
 
 **Student roles (mobile):**
 
-| Feature Access    | guest      | trial user           | paid user              | coaching user           |
+| Feature Access | guest | trial user | paid user | coaching user |
 
 |-------------------|:----------:|:--------------------:|:----------------------:|:----------------------:|
 
-| Content Preview   | Yes        | Yes                  | Yes                    | Yes                    |
+| Content Preview | Yes | Yes | Yes | Yes |
 
-| Full content      | No         | Limited              | Yes                    | Yes (+coaching)        |
+| Full content | No | Limited | Yes | Yes (+coaching) |
 
-| Quizzes/Practice  | No         | Limited              | Yes                    | Yes                    |
+| Quizzes/Practice | No | Limited | Yes | Yes |
 
-| AI/Personalization| No         | Basic                | Yes                    | Advanced/Coach         |
+| AI/Personalization| No | Basic | Yes | Advanced/Coach |
 
-| Analytics         | No         | Basic                | Full                   | Full+                  |
+| Analytics | No | Basic | Full | Full+ |
 
 ---
 
 ## 🔑 RLS (Row Level Security) Policy Matrix
 
-| Table                | SELECT        | INSERT         | UPDATE        | DELETE        |
+| Table | SELECT | INSERT | UPDATE | DELETE |
 
 |----------------------|--------------|---------------|--------------|--------------|
 
-| users                | self/admin   | anyone        | self/admin   | self/admin   |
+| users | self/admin | anyone | self/admin | self/admin |
 
-| user_profiles        | self         | self          | self         | self         |
+| user_profiles | self | self | self | self |
 
-| subscriptions        | self         | self/payment  | self/admin   | self/admin   |
+| subscriptions | self | self/payment | self/admin | self/admin |
 
-| admin_users          | self-active  | superadmin    | superadmin   | superadmin   |
+| admin_users | self-active | superadmin | superadmin | superadmin |
 
-| content/lessons/etc. | public       | editor/super  | editor/super | superadmin   |
+| content/lessons/etc. | public | editor/super | editor/super | superadmin |
 
-| question_options/media| public      | editor/super  | editor/super | superadmin   |
+| question_options/media| public | editor/super | editor/super | superadmin |
 
-| practice_sessions    | self         | self          | self         | self         |
+| practice_sessions | self | self | self | self |
 
-| etc...               | -            | -             | -            | -            |
+| etc... | - | - | - | - |
 
 ---
 

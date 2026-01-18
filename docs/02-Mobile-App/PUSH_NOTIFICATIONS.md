@@ -11,11 +11,13 @@ This document explains what needs to be built in Phase 4 to make push notificati
 ## What's Missing
 
 Currently, when an admin creates a notification in the portal:
+
 1. ✅ Notification is saved to the `notifications` table
 2. ✅ Status is set to `draft` or `scheduled`
 3. ❌ **Nothing actually processes or sends the notification**
 
 **Phase 4 Requirements:**
+
 - Supabase Edge Functions to process notification queue
 - Expo Push API integration
 - Receipt tracking and retry logic
@@ -47,6 +49,7 @@ Create Notification   -->   notifications table  -->   Process Queue    -->     
 **Purpose:** Process the notification queue and send notifications via Expo Push API
 
 **Key Responsibilities:**
+
 1. Fetch pending notifications from queue
 2. Get push tokens for targeted users
 3. Call Expo Push Notification API
@@ -58,46 +61,46 @@ Create Notification   -->   notifications table  -->   Process Queue    -->     
 ```typescript
 // supabase/functions/send-notification/index.ts
 
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 serve(async (req) => {
   const supabaseClient = createClient(
-    Deno.env.get('SUPABASE_URL') ?? '',
-    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-  )
+    Deno.env.get("SUPABASE_URL") ?? "",
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+  );
 
   // 1. Fetch notifications from queue that need processing
   const { data: queueItems } = await supabaseClient
-    .from('notification_queue')
-    .select('*, notifications(*)')
-    .eq('status', 'pending')
-    .lte('run_at', new Date().toISOString())
-    .limit(10)
+    .from("notification_queue")
+    .select("*, notifications(*)")
+    .eq("status", "pending")
+    .lte("run_at", new Date().toISOString())
+    .limit(10);
 
   for (const item of queueItems || []) {
     // 2. Get target users based on audience filter
-    const userIds = await getTargetUsers(item.notifications.audience_filter)
+    const userIds = await getTargetUsers(item.notifications.audience_filter);
 
     // 3. Get push tokens for those users
     const { data: tokens } = await supabaseClient
-      .from('push_tokens')
-      .select('*')
-      .in('user_id', userIds)
-      .eq('is_active', true)
+      .from("push_tokens")
+      .select("*")
+      .in("user_id", userIds)
+      .eq("is_active", true);
 
     // 4. Create notification targets
     for (const token of tokens || []) {
-      await supabaseClient.from('notification_targets').insert({
+      await supabaseClient.from("notification_targets").insert({
         notification_id: item.notification_id,
         user_id: token.user_id,
         push_token_id: token.id,
-        delivery_status: 'pending',
-      })
+        delivery_status: "pending",
+      });
     }
 
     // 5. Send to Expo Push API in batches
-    const tickets = await sendToExpoPush(tokens, item.notifications)
+    const tickets = await sendToExpoPush(tokens, item.notifications);
 
     // 6. Update targets with ticket IDs
     // 7. Update queue status
@@ -105,32 +108,32 @@ serve(async (req) => {
   }
 
   return new Response(JSON.stringify({ success: true }), {
-    headers: { 'Content-Type': 'application/json' },
-  })
-})
+    headers: { "Content-Type": "application/json" },
+  });
+});
 
 async function sendToExpoPush(tokens, notification) {
-  const messages = tokens.map(token => ({
+  const messages = tokens.map((token) => ({
     to: token.expo_push_token,
-    sound: 'default',
+    sound: "default",
     title: notification.title,
     body: notification.body,
     data: notification.data || {},
     badge: 1,
-  }))
+  }));
 
   // Call Expo Push API
-  const response = await fetch('https://exp.host/--/api/v2/push/send', {
-    method: 'POST',
+  const response = await fetch("https://exp.host/--/api/v2/push/send", {
+    method: "POST",
     headers: {
-      Accept: 'application/json',
-      'Accept-encoding': 'gzip, deflate',
-      'Content-Type': 'application/json',
+      Accept: "application/json",
+      "Accept-encoding": "gzip, deflate",
+      "Content-Type": "application/json",
     },
     body: JSON.stringify(messages),
-  })
+  });
 
-  return await response.json()
+  return await response.json();
 }
 ```
 
@@ -141,6 +144,7 @@ async function sendToExpoPush(tokens, notification) {
 **Purpose:** Automatically process scheduled notifications
 
 **Setup:**
+
 1. Use Supabase pg_cron extension
 2. Schedule Edge Function to run every minute
 3. Process notifications where `run_at <= NOW()`
@@ -173,6 +177,7 @@ SELECT cron.schedule(
 **Purpose:** Fetch delivery receipts from Expo and update status
 
 **Key Points:**
+
 - Expo provides receipt IDs after initial send
 - Poll Expo's receipt API to get delivery confirmation
 - Update `notification_targets` with delivery status
@@ -187,6 +192,7 @@ SELECT cron.schedule(
 **Examples:**
 
 1. **Subscription Expiring:**
+
 ```sql
 -- Create a cron job that checks for expiring subscriptions
 SELECT cron.schedule(
@@ -194,7 +200,7 @@ SELECT cron.schedule(
   '0 10 * * *', -- Every day at 10 AM
   $$
   INSERT INTO notifications (title, body, notification_type, audience_filter, status)
-  SELECT 
+  SELECT
     'Subscription Expiring Soon',
     'Your subscription expires in ' || (end_date - CURRENT_DATE) || ' days. Renew now!',
     'subscription_expiring',
@@ -209,6 +215,7 @@ SELECT cron.schedule(
 ```
 
 2. **Content Approved:**
+
 ```typescript
 // Database trigger on content_approvals table
 CREATE OR REPLACE FUNCTION notify_content_approved()
@@ -286,7 +293,7 @@ EXPO_ACCESS_TOKEN=optional-if-using-expo-push-api-v2
 ## Deployment Checklist
 
 - [ ] Deploy `send-notification` Edge Function
-- [ ] Deploy `track-receipts` Edge Function  
+- [ ] Deploy `track-receipts` Edge Function
 - [ ] Set up pg_cron job for queue processing
 - [ ] Set up pg_cron job for receipt tracking
 - [ ] Add database triggers for automated notifications
@@ -304,7 +311,7 @@ EXPO_ACCESS_TOKEN=optional-if-using-expo-push-api-v2
 
 ```sql
 -- Overall stats
-SELECT 
+SELECT
   status,
   COUNT(*) as count,
   AVG(total_delivered::float / NULLIF(total_recipients, 0) * 100) as avg_delivery_rate
@@ -335,15 +342,18 @@ supabase functions logs send-notification --follow
 ## Cost Estimation
 
 **Expo Push Notifications:**
+
 - FREE for up to 100 push/sec
 - Sufficient for ~50,000 users
 
 **Supabase Edge Functions:**
+
 - 500,000 invocations/month free
 - $2 per million after
 - Estimate: ~$5-10/month for active usage
 
 **pg_cron:**
+
 - Included in Supabase Pro plan
 
 ---

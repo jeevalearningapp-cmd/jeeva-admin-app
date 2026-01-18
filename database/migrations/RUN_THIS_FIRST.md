@@ -3,6 +3,7 @@
 ## The Problem We Fixed
 
 You got this error:
+
 ```
 ERROR: 42704: type payment_status does not exist
 ```
@@ -46,11 +47,13 @@ Created 3 new tables
 ## If You Still Get Errors
 
 1. **Check if enum exists:**
+
    ```sql
    SELECT * FROM pg_type WHERE typname = 'payment_status';
    ```
 
 2. **Manually create enum if needed:**
+
    ```sql
    CREATE TYPE payment_status AS ENUM ('pending', 'processing', 'succeeded', 'failed', 'cancelled', 'refunded');
    ```

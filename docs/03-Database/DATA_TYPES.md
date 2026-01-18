@@ -32,13 +32,14 @@ PostgreSQL CHECK constraints are used to enforce allowed values for specific col
 **Type:** VARCHAR(20)  
 **Default:** 'email'
 
-| Value | Description |
-|-------|-------------|
-| `email` | Standard email/password authentication |
-| `google` | Google OAuth authentication |
-| `apple` | Apple Sign-In authentication |
+| Value    | Description                            |
+| -------- | -------------------------------------- |
+| `email`  | Standard email/password authentication |
+| `google` | Google OAuth authentication            |
+| `apple`  | Apple Sign-In authentication           |
 
 **Usage Example:**
+
 ```sql
 SELECT * FROM users WHERE oauth_provider = 'google';
 ```
@@ -51,13 +52,14 @@ SELECT * FROM users WHERE oauth_provider = 'google';
 **Column:** `role`  
 **Type:** TEXT
 
-| Value | Description | Permissions |
-|-------|-------------|-------------|
+| Value        | Description        | Permissions                                    |
+| ------------ | ------------------ | ---------------------------------------------- |
 | `superadmin` | Full system access | All CRUD operations, user management, settings |
-| `editor` | Content management | Create, edit, delete content |
-| `moderator` | Content review | Review and approve content |
+| `editor`     | Content management | Create, edit, delete content                   |
+| `moderator`  | Content review     | Review and approve content                     |
 
 **Usage Example:**
+
 ```sql
 SELECT * FROM admin_users WHERE role = 'superadmin';
 ```
@@ -72,16 +74,17 @@ SELECT * FROM admin_users WHERE role = 'superadmin';
 **Column:** `content_type`  
 **Type:** TEXT
 
-| Value | Description |
-|-------|-------------|
-| `text` | Rich text content block |
-| `image` | Image content |
-| `video` | Video content with URL |
-| `audio` | Audio/podcast content |
-| `code` | Code snippet block |
-| `quiz` | Embedded quiz content |
+| Value   | Description             |
+| ------- | ----------------------- |
+| `text`  | Rich text content block |
+| `image` | Image content           |
+| `video` | Video content with URL  |
+| `audio` | Audio/podcast content   |
+| `code`  | Code snippet block      |
+| `quiz`  | Embedded quiz content   |
 
 **Usage Example:**
+
 ```sql
 SELECT * FROM lesson_content WHERE content_type = 'video';
 ```
@@ -94,13 +97,14 @@ SELECT * FROM lesson_content WHERE content_type = 'video';
 **Column:** `question_type`  
 **Type:** TEXT
 
-| Value | Description |
-|-------|-------------|
+| Value             | Description                           |
+| ----------------- | ------------------------------------- |
 | `multiple_choice` | Multiple choice question with options |
-| `true_false` | True/False question |
-| `short_answer` | Short text answer question |
+| `true_false`      | True/False question                   |
+| `short_answer`    | Short text answer question            |
 
 **Usage Example:**
+
 ```sql
 SELECT * FROM questions WHERE question_type = 'multiple_choice';
 ```
@@ -113,13 +117,14 @@ SELECT * FROM questions WHERE question_type = 'multiple_choice';
 **Column:** `difficulty`  
 **Type:** TEXT
 
-| Value | Description | Points Multiplier |
-|-------|-------------|-------------------|
-| `easy` | Basic understanding questions | 1x |
-| `medium` | Intermediate application questions | 1.5x |
-| `hard` | Advanced analysis questions | 2x |
+| Value    | Description                        | Points Multiplier |
+| -------- | ---------------------------------- | ----------------- |
+| `easy`   | Basic understanding questions      | 1x                |
+| `medium` | Intermediate application questions | 1.5x              |
+| `hard`   | Advanced analysis questions        | 2x                |
 
 **Usage Example:**
+
 ```sql
 SELECT * FROM questions WHERE difficulty = 'hard';
 ```
@@ -132,14 +137,15 @@ SELECT * FROM questions WHERE difficulty = 'hard';
 **Column:** `media_type`  
 **Type:** TEXT
 
-| Value | Description |
-|-------|-------------|
-| `image` | Image attachment (PNG, JPG, etc.) |
-| `audio` | Audio file attachment |
-| `video` | Video file attachment |
-| `document` | Document attachment (PDF, etc.) |
+| Value      | Description                       |
+| ---------- | --------------------------------- |
+| `image`    | Image attachment (PNG, JPG, etc.) |
+| `audio`    | Audio file attachment             |
+| `video`    | Video file attachment             |
+| `document` | Document attachment (PDF, etc.)   |
 
 **Usage Example:**
+
 ```sql
 SELECT * FROM question_media WHERE media_type = 'image';
 ```
@@ -152,14 +158,15 @@ SELECT * FROM question_media WHERE media_type = 'image';
 **Column:** `access_type`  
 **Type:** TEXT
 
-| Value | Description |
-|-------|-------------|
-| `free` | Free access for all users |
-| `trial` | Available during trial period |
-| `subscription` | Requires active subscription |
-| `premium` | Requires premium subscription tier |
+| Value          | Description                        |
+| -------------- | ---------------------------------- |
+| `free`         | Free access for all users          |
+| `trial`        | Available during trial period      |
+| `subscription` | Requires active subscription       |
+| `premium`      | Requires premium subscription tier |
 
 **Usage Example:**
+
 ```sql
 SELECT * FROM module_access_rules WHERE access_type = 'trial';
 ```
@@ -175,13 +182,14 @@ SELECT * FROM module_access_rules WHERE access_type = 'trial';
 **Type:** TEXT  
 **Default:** 'not_started'
 
-| Value | Description |
-|-------|-------------|
-| `not_started` | User has not begun this content |
+| Value         | Description                               |
+| ------------- | ----------------------------------------- |
+| `not_started` | User has not begun this content           |
 | `in_progress` | User is currently working on this content |
-| `completed` | User has finished this content |
+| `completed`   | User has finished this content            |
 
 **Usage Example:**
+
 ```sql
 SELECT * FROM learning_progress WHERE status = 'completed';
 ```
@@ -195,13 +203,14 @@ SELECT * FROM learning_progress WHERE status = 'completed';
 **Type:** TEXT  
 **Default:** 'in_progress'
 
-| Value | Description |
-|-------|-------------|
+| Value         | Description                 |
+| ------------- | --------------------------- |
 | `in_progress` | Session is currently active |
-| `completed` | Session finished normally |
-| `abandoned` | Session was left incomplete |
+| `completed`   | Session finished normally   |
+| `abandoned`   | Session was left incomplete |
 
 **Usage Example:**
+
 ```sql
 SELECT * FROM practice_sessions WHERE status = 'completed';
 ```
@@ -215,14 +224,15 @@ SELECT * FROM practice_sessions WHERE status = 'completed';
 **Type:** TEXT  
 **Default:** 'in_progress'
 
-| Value | Description |
-|-------|-------------|
+| Value         | Description                   |
+| ------------- | ----------------------------- |
 | `in_progress` | Exam is currently being taken |
-| `completed` | Exam finished and submitted |
-| `abandoned` | Exam was left incomplete |
-| `timed_out` | Exam time limit exceeded |
+| `completed`   | Exam finished and submitted   |
+| `abandoned`   | Exam was left incomplete      |
+| `timed_out`   | Exam time limit exceeded      |
 
 **Usage Example:**
+
 ```sql
 SELECT * FROM mock_exams WHERE status = 'timed_out';
 ```
@@ -237,13 +247,14 @@ SELECT * FROM mock_exams WHERE status = 'timed_out';
 **Column:** `content_type`  
 **Type:** VARCHAR(50)
 
-| Value | Description |
-|-------|-------------|
-| `practice` | Practice question attempts |
-| `learning` | Learning module progress |
-| `mock_exam` | Mock exam attempts |
+| Value       | Description                |
+| ----------- | -------------------------- |
+| `practice`  | Practice question attempts |
+| `learning`  | Learning module progress   |
+| `mock_exam` | Mock exam attempts         |
 
 **Usage Example:**
+
 ```sql
 SELECT * FROM trial_attempt_records WHERE content_type = 'mock_exam';
 ```
@@ -257,11 +268,11 @@ SELECT * FROM trial_attempt_records WHERE content_type = 'mock_exam';
 **Type:** VARCHAR(50)  
 **Default:** 'in_progress'
 
-| Value | Description |
-|-------|-------------|
-| `in_progress` | Attempt is currently active |
-| `completed` | Attempt finished successfully |
-| `abandoned` | Attempt was left incomplete |
+| Value         | Description                   |
+| ------------- | ----------------------------- |
+| `in_progress` | Attempt is currently active   |
+| `completed`   | Attempt finished successfully |
+| `abandoned`   | Attempt was left incomplete   |
 
 ---
 
@@ -272,11 +283,11 @@ SELECT * FROM trial_attempt_records WHERE content_type = 'mock_exam';
 **Type:** VARCHAR(50)  
 **Default:** 'completed'
 
-| Value | Description |
-|-------|-------------|
-| `in_progress` | Exam attempt is active |
-| `completed` | Exam attempt finished |
-| `abandoned` | Exam attempt was abandoned |
+| Value         | Description                |
+| ------------- | -------------------------- |
+| `in_progress` | Exam attempt is active     |
+| `completed`   | Exam attempt finished      |
+| `abandoned`   | Exam attempt was abandoned |
 
 ---
 
@@ -288,15 +299,16 @@ SELECT * FROM trial_attempt_records WHERE content_type = 'mock_exam';
 **Column:** `status`  
 **Type:** TEXT
 
-| Value | Description |
-|-------|-------------|
-| `trial` | User is in trial period |
-| `active` | Subscription is currently active |
-| `expired` | Subscription has expired |
-| `cancelled` | Subscription was cancelled |
-| `pending` | Payment pending confirmation |
+| Value       | Description                      |
+| ----------- | -------------------------------- |
+| `trial`     | User is in trial period          |
+| `active`    | Subscription is currently active |
+| `expired`   | Subscription has expired         |
+| `cancelled` | Subscription was cancelled       |
+| `pending`   | Payment pending confirmation     |
 
 **Usage Example:**
+
 ```sql
 SELECT * FROM subscriptions WHERE status = 'active';
 ```
@@ -309,12 +321,13 @@ SELECT * FROM subscriptions WHERE status = 'active';
 **Column:** `payment_gateway`  
 **Type:** TEXT
 
-| Value | Description | Regions |
-|-------|-------------|---------|
-| `stripe` | Stripe payment processing | Global (UK, US, EU) |
-| `razorpay` | Razorpay payment processing | India |
+| Value      | Description                 | Regions             |
+| ---------- | --------------------------- | ------------------- |
+| `stripe`   | Stripe payment processing   | Global (UK, US, EU) |
+| `razorpay` | Razorpay payment processing | India               |
 
 **Usage Example:**
+
 ```sql
 SELECT * FROM subscriptions WHERE payment_gateway = 'stripe';
 ```
@@ -327,12 +340,13 @@ SELECT * FROM subscriptions WHERE payment_gateway = 'stripe';
 **Column:** `discount_type`  
 **Type:** TEXT
 
-| Value | Description | Example |
-|-------|-------------|---------|
-| `percentage` | Percentage discount off total | 20% off |
-| `fixed_amount` | Fixed amount discount | $10 off |
+| Value          | Description                   | Example |
+| -------------- | ----------------------------- | ------- |
+| `percentage`   | Percentage discount off total | 20% off |
+| `fixed_amount` | Fixed amount discount         | $10 off |
 
 **Usage Example:**
+
 ```sql
 SELECT * FROM discount_coupons WHERE discount_type = 'percentage';
 ```
@@ -347,15 +361,16 @@ SELECT * FROM discount_coupons WHERE discount_type = 'percentage';
 **Column:** `resource_type`  
 **Type:** TEXT
 
-| Value | Description |
-|-------|-------------|
-| `module` | Module content |
-| `topic` | Topic content |
-| `lesson` | Lesson content |
-| `question` | Question content |
+| Value       | Description       |
+| ----------- | ----------------- |
+| `module`    | Module content    |
+| `topic`     | Topic content     |
+| `lesson`    | Lesson content    |
+| `question`  | Question content  |
 | `flashcard` | Flashcard content |
 
 **Usage Example:**
+
 ```sql
 SELECT * FROM content_approvals WHERE resource_type = 'question';
 ```
@@ -369,13 +384,14 @@ SELECT * FROM content_approvals WHERE resource_type = 'question';
 **Type:** TEXT  
 **Default:** 'pending'
 
-| Value | Description |
-|-------|-------------|
-| `pending` | Awaiting review |
+| Value      | Description                      |
+| ---------- | -------------------------------- |
+| `pending`  | Awaiting review                  |
 | `approved` | Content approved for publication |
-| `rejected` | Content rejected with feedback |
+| `rejected` | Content rejected with feedback   |
 
 **Usage Example:**
+
 ```sql
 SELECT * FROM content_approvals WHERE status = 'pending';
 ```
@@ -390,12 +406,13 @@ SELECT * FROM content_approvals WHERE status = 'pending';
 **Column:** `role`  
 **Type:** TEXT
 
-| Value | Description |
-|-------|-------------|
-| `user` | Message from the user |
+| Value       | Description                   |
+| ----------- | ----------------------------- |
+| `user`      | Message from the user         |
 | `assistant` | Message from the AI assistant |
 
 **Usage Example:**
+
 ```sql
 SELECT * FROM chat_messages WHERE role = 'assistant';
 ```
@@ -410,15 +427,16 @@ SELECT * FROM chat_messages WHERE role = 'assistant';
 **Column:** `notification_type`  
 **Type:** TEXT
 
-| Value | Description |
-|-------|-------------|
-| `announcement` | General announcements |
-| `reminder` | Study reminders |
-| `achievement` | Achievement/milestone notifications |
-| `promotional` | Promotional offers |
-| `system` | System notifications |
+| Value          | Description                         |
+| -------------- | ----------------------------------- |
+| `announcement` | General announcements               |
+| `reminder`     | Study reminders                     |
+| `achievement`  | Achievement/milestone notifications |
+| `promotional`  | Promotional offers                  |
+| `system`       | System notifications                |
 
 **Usage Example:**
+
 ```sql
 SELECT * FROM notifications WHERE notification_type = 'achievement';
 ```
@@ -432,15 +450,16 @@ SELECT * FROM notifications WHERE notification_type = 'achievement';
 **Type:** TEXT  
 **Default:** 'pending'
 
-| Value | Description |
-|-------|-------------|
-| `pending` | Awaiting delivery |
-| `sent` | Sent to delivery service |
-| `delivered` | Successfully delivered |
-| `failed` | Delivery failed |
-| `cancelled` | Delivery cancelled |
+| Value       | Description              |
+| ----------- | ------------------------ |
+| `pending`   | Awaiting delivery        |
+| `sent`      | Sent to delivery service |
+| `delivered` | Successfully delivered   |
+| `failed`    | Delivery failed          |
+| `cancelled` | Delivery cancelled       |
 
 **Usage Example:**
+
 ```sql
 SELECT * FROM notification_queue WHERE delivery_status = 'failed';
 ```
@@ -454,13 +473,14 @@ SELECT * FROM notification_queue WHERE delivery_status = 'failed';
 **Type:** TEXT  
 **Default:** 'push'
 
-| Value | Description |
-|-------|-------------|
-| `push` | Push notification to device |
-| `email` | Email notification |
-| `in_app` | In-app notification |
+| Value    | Description                 |
+| -------- | --------------------------- |
+| `push`   | Push notification to device |
+| `email`  | Email notification          |
+| `in_app` | In-app notification         |
 
 **Usage Example:**
+
 ```sql
 SELECT * FROM notification_queue WHERE delivery_channel = 'email';
 ```
@@ -473,13 +493,14 @@ SELECT * FROM notification_queue WHERE delivery_channel = 'email';
 **Column:** `platform`  
 **Type:** TEXT
 
-| Value | Description |
-|-------|-------------|
-| `ios` | Apple iOS devices |
-| `android` | Android devices |
-| `web` | Web browser push |
+| Value     | Description       |
+| --------- | ----------------- |
+| `ios`     | Apple iOS devices |
+| `android` | Android devices   |
+| `web`     | Web browser push  |
 
 **Usage Example:**
+
 ```sql
 SELECT * FROM push_tokens WHERE platform = 'ios';
 ```
@@ -488,31 +509,31 @@ SELECT * FROM push_tokens WHERE platform = 'ios';
 
 ### 1.9 Enum Summary Table
 
-| Table | Column | Allowed Values |
-|-------|--------|----------------|
-| `users` | `oauth_provider` | 'email', 'google', 'apple' |
-| `admin_users` | `role` | 'superadmin', 'editor', 'moderator' |
-| `lesson_content` | `content_type` | 'text', 'image', 'video', 'audio', 'code', 'quiz' |
-| `questions` | `question_type` | 'multiple_choice', 'true_false', 'short_answer' |
-| `questions` | `difficulty` | 'easy', 'medium', 'hard' |
-| `question_media` | `media_type` | 'image', 'audio', 'video', 'document' |
-| `module_access_rules` | `access_type` | 'free', 'trial', 'subscription', 'premium' |
-| `learning_progress` | `status` | 'not_started', 'in_progress', 'completed' |
-| `practice_sessions` | `status` | 'in_progress', 'completed', 'abandoned' |
-| `mock_exams` | `status` | 'in_progress', 'completed', 'abandoned', 'timed_out' |
-| `trial_attempt_records` | `content_type` | 'practice', 'learning', 'mock_exam' |
-| `trial_attempt_records` | `status` | 'in_progress', 'completed', 'abandoned' |
-| `trial_exam_attempts` | `status` | 'in_progress', 'completed', 'abandoned' |
-| `subscriptions` | `status` | 'trial', 'active', 'expired', 'cancelled', 'pending' |
-| `subscriptions` | `payment_gateway` | 'stripe', 'razorpay' |
-| `discount_coupons` | `discount_type` | 'percentage', 'fixed_amount' |
-| `content_approvals` | `resource_type` | 'module', 'topic', 'lesson', 'question', 'flashcard' |
-| `content_approvals` | `status` | 'pending', 'approved', 'rejected' |
-| `chat_messages` | `role` | 'user', 'assistant' |
-| `notifications` | `notification_type` | 'announcement', 'reminder', 'achievement', 'promotional', 'system' |
-| `notification_queue` | `delivery_status` | 'pending', 'sent', 'delivered', 'failed', 'cancelled' |
-| `notification_queue` | `delivery_channel` | 'push', 'email', 'in_app' |
-| `push_tokens` | `platform` | 'ios', 'android', 'web' |
+| Table                   | Column              | Allowed Values                                                     |
+| ----------------------- | ------------------- | ------------------------------------------------------------------ |
+| `users`                 | `oauth_provider`    | 'email', 'google', 'apple'                                         |
+| `admin_users`           | `role`              | 'superadmin', 'editor', 'moderator'                                |
+| `lesson_content`        | `content_type`      | 'text', 'image', 'video', 'audio', 'code', 'quiz'                  |
+| `questions`             | `question_type`     | 'multiple_choice', 'true_false', 'short_answer'                    |
+| `questions`             | `difficulty`        | 'easy', 'medium', 'hard'                                           |
+| `question_media`        | `media_type`        | 'image', 'audio', 'video', 'document'                              |
+| `module_access_rules`   | `access_type`       | 'free', 'trial', 'subscription', 'premium'                         |
+| `learning_progress`     | `status`            | 'not_started', 'in_progress', 'completed'                          |
+| `practice_sessions`     | `status`            | 'in_progress', 'completed', 'abandoned'                            |
+| `mock_exams`            | `status`            | 'in_progress', 'completed', 'abandoned', 'timed_out'               |
+| `trial_attempt_records` | `content_type`      | 'practice', 'learning', 'mock_exam'                                |
+| `trial_attempt_records` | `status`            | 'in_progress', 'completed', 'abandoned'                            |
+| `trial_exam_attempts`   | `status`            | 'in_progress', 'completed', 'abandoned'                            |
+| `subscriptions`         | `status`            | 'trial', 'active', 'expired', 'cancelled', 'pending'               |
+| `subscriptions`         | `payment_gateway`   | 'stripe', 'razorpay'                                               |
+| `discount_coupons`      | `discount_type`     | 'percentage', 'fixed_amount'                                       |
+| `content_approvals`     | `resource_type`     | 'module', 'topic', 'lesson', 'question', 'flashcard'               |
+| `content_approvals`     | `status`            | 'pending', 'approved', 'rejected'                                  |
+| `chat_messages`         | `role`              | 'user', 'assistant'                                                |
+| `notifications`         | `notification_type` | 'announcement', 'reminder', 'achievement', 'promotional', 'system' |
+| `notification_queue`    | `delivery_status`   | 'pending', 'sent', 'delivered', 'failed', 'cancelled'              |
+| `notification_queue`    | `delivery_channel`  | 'push', 'email', 'in_app'                                          |
+| `push_tokens`           | `platform`          | 'ios', 'android', 'web'                                            |
 
 ---
 
@@ -529,6 +550,7 @@ PostgreSQL JSONB columns store structured JSON data with indexing support. This 
 **Type:** JSONB
 
 **Structure:**
+
 ```json
 {
   "model": "string",
@@ -539,6 +561,7 @@ PostgreSQL JSONB columns store structured JSON data with indexing support. This 
 ```
 
 **Example:**
+
 ```json
 {
   "model": "iPhone 14 Pro",
@@ -567,6 +590,7 @@ PostgreSQL JSONB columns store structured JSON data with indexing support. This 
 **Type:** JSONB
 
 **Structure:**
+
 ```json
 {
   "modules": [
@@ -586,6 +610,7 @@ PostgreSQL JSONB columns store structured JSON data with indexing support. This 
 ```
 
 **Example:**
+
 ```json
 {
   "modules": [
@@ -619,6 +644,7 @@ PostgreSQL JSONB columns store structured JSON data with indexing support. This 
 **Type:** JSONB
 
 **Structure:**
+
 ```json
 [
   {
@@ -631,6 +657,7 @@ PostgreSQL JSONB columns store structured JSON data with indexing support. This 
 ```
 
 **Example:**
+
 ```json
 [
   {
@@ -665,6 +692,7 @@ PostgreSQL JSONB columns store structured JSON data with indexing support. This 
 **Type:** JSONB
 
 **Structure:**
+
 ```json
 {
   "questionId": "uuid",
@@ -676,6 +704,7 @@ PostgreSQL JSONB columns store structured JSON data with indexing support. This 
 ```
 
 **Example:**
+
 ```json
 {
   "questionId": "550e8400-e29b-41d4-a716-446655440000",
@@ -704,6 +733,7 @@ PostgreSQL JSONB columns store structured JSON data with indexing support. This 
 **Type:** JSONB
 
 **Structure:**
+
 ```json
 {
   "easy": "number",
@@ -713,6 +743,7 @@ PostgreSQL JSONB columns store structured JSON data with indexing support. This 
 ```
 
 **Example:**
+
 ```json
 {
   "easy": 30,
@@ -739,6 +770,7 @@ PostgreSQL JSONB columns store structured JSON data with indexing support. This 
 **Type:** JSONB
 
 **Structure:**
+
 ```json
 {
   "topicId": "uuid",
@@ -749,6 +781,7 @@ PostgreSQL JSONB columns store structured JSON data with indexing support. This 
 ```
 
 **Example:**
+
 ```json
 {
   "topicId": "550e8400-e29b-41d4-a716-446655440000",
@@ -779,6 +812,7 @@ PostgreSQL JSONB columns store structured JSON data with indexing support. This 
 **Type:** JSONB
 
 **Structure:**
+
 ```json
 {
   "score": "number",
@@ -792,6 +826,7 @@ PostgreSQL JSONB columns store structured JSON data with indexing support. This 
 ```
 
 **Example:**
+
 ```json
 {
   "score": 85,
@@ -823,6 +858,7 @@ PostgreSQL JSONB columns store structured JSON data with indexing support. This 
 **Type:** JSONB
 
 **Structure:**
+
 ```json
 {
   "type": "string",
@@ -834,6 +870,7 @@ PostgreSQL JSONB columns store structured JSON data with indexing support. This 
 ```
 
 **Example:**
+
 ```json
 {
   "type": "weak_topic",
@@ -865,6 +902,7 @@ PostgreSQL JSONB columns store structured JSON data with indexing support. This 
 **Type:** JSONB
 
 **Structure:**
+
 ```json
 {
   "totalStudyTime": "number",
@@ -879,6 +917,7 @@ PostgreSQL JSONB columns store structured JSON data with indexing support. This 
 ```
 
 **Example:**
+
 ```json
 {
   "totalStudyTime": 7200,
@@ -914,6 +953,7 @@ PostgreSQL JSONB columns store structured JSON data with indexing support. This 
 **Type:** JSONB
 
 **Structure:**
+
 ```json
 {
   "questionId": "answer"
@@ -921,6 +961,7 @@ PostgreSQL JSONB columns store structured JSON data with indexing support. This 
 ```
 
 **Example:**
+
 ```json
 {
   "550e8400-e29b-41d4-a716-446655440001": "A",
@@ -940,6 +981,7 @@ PostgreSQL JSONB columns store structured JSON data with indexing support. This 
 **Type:** JSONB
 
 **Structure:**
+
 ```json
 {
   "questionId": "boolean"
@@ -947,6 +989,7 @@ PostgreSQL JSONB columns store structured JSON data with indexing support. This 
 ```
 
 **Example:**
+
 ```json
 {
   "550e8400-e29b-41d4-a716-446655440001": true,
@@ -965,6 +1008,7 @@ PostgreSQL JSONB columns store structured JSON data with indexing support. This 
 **Type:** JSONB
 
 **Structure:**
+
 ```json
 {
   "topicName": {
@@ -976,6 +1020,7 @@ PostgreSQL JSONB columns store structured JSON data with indexing support. This 
 ```
 
 **Example:**
+
 ```json
 {
   "Clinical Skills": {
@@ -1000,6 +1045,7 @@ PostgreSQL JSONB columns store structured JSON data with indexing support. This 
 **Type:** JSONB
 
 **Structure:**
+
 ```json
 {
   "contentId": "boolean"
@@ -1007,6 +1053,7 @@ PostgreSQL JSONB columns store structured JSON data with indexing support. This 
 ```
 
 **Example:**
+
 ```json
 {
   "550e8400-e29b-41d4-a716-446655440001": true,
@@ -1027,6 +1074,7 @@ PostgreSQL JSONB columns store structured JSON data with indexing support. This 
 **Type:** JSONB
 
 **Structure:**
+
 ```json
 {
   "questionId": "answer"
@@ -1034,6 +1082,7 @@ PostgreSQL JSONB columns store structured JSON data with indexing support. This 
 ```
 
 **Example:**
+
 ```json
 {
   "550e8400-e29b-41d4-a716-446655440001": "A",
@@ -1053,6 +1102,7 @@ PostgreSQL JSONB columns store structured JSON data with indexing support. This 
 **Type:** JSONB
 
 **Structure:**
+
 ```json
 [
   {
@@ -1066,6 +1116,7 @@ PostgreSQL JSONB columns store structured JSON data with indexing support. This 
 ```
 
 **Example:**
+
 ```json
 [
   {
@@ -1096,6 +1147,7 @@ PostgreSQL JSONB columns store structured JSON data with indexing support. This 
 **Type:** JSONB
 
 **Structure:**
+
 ```json
 {
   "currentLesson": {
@@ -1109,6 +1161,7 @@ PostgreSQL JSONB columns store structured JSON data with indexing support. This 
 ```
 
 **Example:**
+
 ```json
 {
   "currentLesson": {
@@ -1137,6 +1190,7 @@ PostgreSQL JSONB columns store structured JSON data with indexing support. This 
 **Type:** JSONB
 
 **Structure:**
+
 ```json
 {
   "model": "string",
@@ -1147,6 +1201,7 @@ PostgreSQL JSONB columns store structured JSON data with indexing support. This 
 ```
 
 **Example:**
+
 ```json
 {
   "model": "gemini-1.5-flash",
@@ -1175,6 +1230,7 @@ PostgreSQL JSONB columns store structured JSON data with indexing support. This 
 **Type:** JSONB
 
 **Structure:**
+
 ```json
 {
   "actionType": "string",
@@ -1184,6 +1240,7 @@ PostgreSQL JSONB columns store structured JSON data with indexing support. This 
 ```
 
 **Example:**
+
 ```json
 {
   "actionType": "open_lesson",
@@ -1204,6 +1261,7 @@ PostgreSQL JSONB columns store structured JSON data with indexing support. This 
 **Type:** JSONB
 
 **Structure:**
+
 ```json
 {
   "model": "string",
@@ -1213,6 +1271,7 @@ PostgreSQL JSONB columns store structured JSON data with indexing support. This 
 ```
 
 **Example:**
+
 ```json
 {
   "model": "iPhone 14 Pro",
@@ -1232,6 +1291,7 @@ PostgreSQL JSONB columns store structured JSON data with indexing support. This 
 **Type:** JSONB
 
 **Structure:**
+
 ```json
 {
   "model": "string",
@@ -1242,6 +1302,7 @@ PostgreSQL JSONB columns store structured JSON data with indexing support. This 
 ```
 
 **Example:**
+
 ```json
 {
   "model": "Samsung Galaxy S23",
@@ -1255,28 +1316,28 @@ PostgreSQL JSONB columns store structured JSON data with indexing support. This 
 
 ### 2.7 JSONB Summary Table
 
-| Table | Column | Structure Type | Description |
-|-------|--------|----------------|-------------|
-| `user_sessions` | `device_info` | Object | Device metadata |
-| `learning_paths` | `path_data` | Object | Learning path configuration |
-| `lesson_quiz_results` | `answers_data` | Array | Quiz answer details |
-| `practice_results` | `answer_log` | Object | Practice answer log |
-| `mock_exam_config` | `difficulty_distribution` | Object | Difficulty percentages |
-| `mock_exams` | `exam_data` | Object | Exam configuration |
-| `mock_results` | `results_data` | Object | Exam results summary |
-| `ai_recommendations` | `recommendation_data` | Object | AI recommendation details |
-| `user_analytics` | `analytics_data` | Object | User analytics metrics |
-| `trial_exam_attempts` | `user_answers` | Object | User's exam answers |
-| `trial_exam_attempts` | `marked_for_review` | Object | Review markers |
-| `trial_exam_attempts` | `topic_scores` | Object | Topic score breakdown |
-| `trial_learning_progress` | `content_viewed` | Object | Content view status |
-| `trial_attempt_records` | `answers_data` | Object | Attempt answers |
-| `trial_attempt_records` | `question_details` | Array | Cached question info |
-| `chat_conversations` | `context_data` | Object | AI context |
-| `chat_messages` | `metadata` | Object | AI response metadata |
-| `notifications` | `data` | Object | Notification payload |
-| `push_tokens` | `device_info` | Object | Device metadata |
-| `analytics_sessions` | `device_info` | Object | Session device info |
+| Table                     | Column                    | Structure Type | Description                 |
+| ------------------------- | ------------------------- | -------------- | --------------------------- |
+| `user_sessions`           | `device_info`             | Object         | Device metadata             |
+| `learning_paths`          | `path_data`               | Object         | Learning path configuration |
+| `lesson_quiz_results`     | `answers_data`            | Array          | Quiz answer details         |
+| `practice_results`        | `answer_log`              | Object         | Practice answer log         |
+| `mock_exam_config`        | `difficulty_distribution` | Object         | Difficulty percentages      |
+| `mock_exams`              | `exam_data`               | Object         | Exam configuration          |
+| `mock_results`            | `results_data`            | Object         | Exam results summary        |
+| `ai_recommendations`      | `recommendation_data`     | Object         | AI recommendation details   |
+| `user_analytics`          | `analytics_data`          | Object         | User analytics metrics      |
+| `trial_exam_attempts`     | `user_answers`            | Object         | User's exam answers         |
+| `trial_exam_attempts`     | `marked_for_review`       | Object         | Review markers              |
+| `trial_exam_attempts`     | `topic_scores`            | Object         | Topic score breakdown       |
+| `trial_learning_progress` | `content_viewed`          | Object         | Content view status         |
+| `trial_attempt_records`   | `answers_data`            | Object         | Attempt answers             |
+| `trial_attempt_records`   | `question_details`        | Array          | Cached question info        |
+| `chat_conversations`      | `context_data`            | Object         | AI context                  |
+| `chat_messages`           | `metadata`                | Object         | AI response metadata        |
+| `notifications`           | `data`                    | Object         | Notification payload        |
+| `push_tokens`             | `device_info`             | Object         | Device metadata             |
+| `analytics_sessions`      | `device_info`             | Object         | Session device info         |
 
 ---
 
@@ -1296,6 +1357,7 @@ PostgreSQL array columns store ordered lists of values. This section documents a
 **Description:** Array of topic UUIDs to include questions from when generating a mock exam.
 
 **Example:**
+
 ```sql
 -- Insert with array
 INSERT INTO mock_exam_config (title, topic_ids, total_questions)
@@ -1306,15 +1368,16 @@ VALUES (
 );
 
 -- Query with array contains
-SELECT * FROM mock_exam_config 
+SELECT * FROM mock_exam_config
 WHERE '550e8400-e29b-41d4-a716-446655440001'::uuid = ANY(topic_ids);
 
 -- Query with array overlap
-SELECT * FROM mock_exam_config 
+SELECT * FROM mock_exam_config
 WHERE topic_ids && ARRAY['550e8400-e29b-41d4-a716-446655440001'::uuid];
 ```
 
 **Usage:**
+
 - Used to define which topics should be included in a mock exam
 - Questions are randomly selected from these topics based on difficulty distribution
 - Empty array or NULL means all topics are included
@@ -1333,6 +1396,7 @@ WHERE topic_ids && ARRAY['550e8400-e29b-41d4-a716-446655440001'::uuid];
 **Description:** Array of feature descriptions included in the subscription plan.
 
 **Example:**
+
 ```sql
 -- Insert with array
 INSERT INTO subscription_plans (name, price_usd, duration_days, features)
@@ -1344,11 +1408,11 @@ VALUES (
 );
 
 -- Query plans with specific feature
-SELECT * FROM subscription_plans 
+SELECT * FROM subscription_plans
 WHERE 'AI tutor access' = ANY(features);
 
 -- Count features
-SELECT name, array_length(features, 1) as feature_count 
+SELECT name, array_length(features, 1) as feature_count
 FROM subscription_plans;
 ```
 
@@ -1374,6 +1438,7 @@ FROM subscription_plans;
 **Description:** Array of subscription plan UUIDs that the coupon can be applied to. NULL means applicable to all plans.
 
 **Example:**
+
 ```sql
 -- Insert coupon for specific plans
 INSERT INTO discount_coupons (code, discount_type, discount_value, applicable_plans)
@@ -1394,12 +1459,13 @@ VALUES (
 );
 
 -- Check if coupon applies to a plan
-SELECT * FROM discount_coupons 
-WHERE applicable_plans IS NULL 
+SELECT * FROM discount_coupons
+WHERE applicable_plans IS NULL
    OR '550e8400-e29b-41d4-a716-446655440001'::uuid = ANY(applicable_plans);
 ```
 
 **Usage:**
+
 - NULL value means coupon applies to all subscription plans
 - Non-empty array restricts coupon to specific plans
 - Used during checkout to validate coupon applicability
@@ -1418,6 +1484,7 @@ WHERE applicable_plans IS NULL
 **Description:** Array of template variable names that can be substituted in the email body.
 
 **Example:**
+
 ```sql
 -- Insert template with variables
 INSERT INTO email_templates (name, subject, body, variables)
@@ -1429,7 +1496,7 @@ VALUES (
 );
 
 -- Query templates with specific variable
-SELECT * FROM email_templates 
+SELECT * FROM email_templates
 WHERE 'user_name' = ANY(variables);
 ```
 
@@ -1459,6 +1526,7 @@ WHERE 'user_name' = ANY(variables);
 **Description:** Array of question UUIDs that make up the trial mock exam. Questions are presented in the order specified.
 
 **Example:**
+
 ```sql
 -- Insert trial exam with questions
 INSERT INTO trial_mock_exams (module_id, name, question_count, time_limit_minutes, passing_score, question_ids)
@@ -1476,11 +1544,11 @@ VALUES (
 );
 
 -- Get question count
-SELECT name, array_length(question_ids, 1) as actual_question_count 
+SELECT name, array_length(question_ids, 1) as actual_question_count
 FROM trial_mock_exams;
 
 -- Get questions in order
-SELECT q.* 
+SELECT q.*
 FROM trial_mock_exams tme
 CROSS JOIN LATERAL unnest(tme.question_ids) WITH ORDINALITY AS u(question_id, ord)
 JOIN questions q ON q.id = u.question_id
@@ -1489,6 +1557,7 @@ ORDER BY u.ord;
 ```
 
 **Usage:**
+
 - Defines the exact questions and order for a trial mock exam
 - Array length should match `question_count` column
 - Questions are presented to users in array order
@@ -1529,13 +1598,13 @@ SELECT array_agg(column_name) FROM table GROUP BY group_column;
 
 ### 3.6 Array Columns Summary Table
 
-| Table | Column | Element Type | Nullable | Description |
-|-------|--------|--------------|----------|-------------|
-| `mock_exam_config` | `topic_ids` | UUID | Yes | Topics to include in exam |
-| `subscription_plans` | `features` | TEXT | Yes | Plan feature list |
-| `discount_coupons` | `applicable_plans` | UUID | Yes | Plans coupon applies to |
-| `email_templates` | `variables` | TEXT | Yes | Template variable names |
-| `trial_mock_exams` | `question_ids` | UUID | No | Exam question list |
+| Table                | Column             | Element Type | Nullable | Description               |
+| -------------------- | ------------------ | ------------ | -------- | ------------------------- |
+| `mock_exam_config`   | `topic_ids`        | UUID         | Yes      | Topics to include in exam |
+| `subscription_plans` | `features`         | TEXT         | Yes      | Plan feature list         |
+| `discount_coupons`   | `applicable_plans` | UUID         | Yes      | Plans coupon applies to   |
+| `email_templates`    | `variables`        | TEXT         | Yes      | Template variable names   |
+| `trial_mock_exams`   | `question_ids`     | UUID         | No       | Exam question list        |
 
 ---
 
@@ -1545,22 +1614,22 @@ The Jeeva Learning database primarily uses PostgreSQL built-in types with CHECK 
 
 ### 4.1 Commonly Used PostgreSQL Types
 
-| Type | Usage | Example Tables |
-|------|-------|----------------|
-| `UUID` | Primary keys, foreign keys | All tables |
-| `TEXT` | Variable-length strings | Most tables |
-| `VARCHAR(n)` | Length-limited strings | `trial_mock_exams`, `trial_attempt_records` |
-| `INTEGER` | Whole numbers | `duration`, `score`, `display_order` |
-| `NUMERIC` | Decimal numbers | `price_usd`, `discount_value` |
-| `DECIMAL(p,s)` | Precise decimals | `percentage_score` |
-| `BOOLEAN` | True/false values | `is_active`, `is_trial` |
-| `TIMESTAMP` | Date and time | `created_at`, `updated_at` |
-| `TIMESTAMPTZ` | Timestamp with timezone | Trial module tables |
-| `DATE` | Date only | `date`, `period_start` |
-| `JSONB` | Binary JSON | Various metadata columns |
-| `UUID[]` | UUID arrays | `topic_ids`, `question_ids` |
-| `TEXT[]` | Text arrays | `features`, `variables` |
-| `INET` | IP addresses | `ip_address` |
+| Type           | Usage                      | Example Tables                              |
+| -------------- | -------------------------- | ------------------------------------------- |
+| `UUID`         | Primary keys, foreign keys | All tables                                  |
+| `TEXT`         | Variable-length strings    | Most tables                                 |
+| `VARCHAR(n)`   | Length-limited strings     | `trial_mock_exams`, `trial_attempt_records` |
+| `INTEGER`      | Whole numbers              | `duration`, `score`, `display_order`        |
+| `NUMERIC`      | Decimal numbers            | `price_usd`, `discount_value`               |
+| `DECIMAL(p,s)` | Precise decimals           | `percentage_score`                          |
+| `BOOLEAN`      | True/false values          | `is_active`, `is_trial`                     |
+| `TIMESTAMP`    | Date and time              | `created_at`, `updated_at`                  |
+| `TIMESTAMPTZ`  | Timestamp with timezone    | Trial module tables                         |
+| `DATE`         | Date only                  | `date`, `period_start`                      |
+| `JSONB`        | Binary JSON                | Various metadata columns                    |
+| `UUID[]`       | UUID arrays                | `topic_ids`, `question_ids`                 |
+| `TEXT[]`       | Text arrays                | `features`, `variables`                     |
+| `INET`         | IP addresses               | `ip_address`                                |
 
 ### 4.2 Type Casting Examples
 
@@ -1589,19 +1658,19 @@ SELECT '29.99'::numeric;
 
 ```sql
 -- List all columns with CHECK constraints (enums)
-SELECT 
+SELECT
   tc.table_name,
   tc.constraint_name,
   cc.check_clause
 FROM information_schema.table_constraints tc
-JOIN information_schema.check_constraints cc 
+JOIN information_schema.check_constraints cc
   ON tc.constraint_name = cc.constraint_name
 WHERE tc.constraint_type = 'CHECK'
   AND tc.table_schema = 'public'
 ORDER BY tc.table_name;
 
 -- List all JSONB columns
-SELECT 
+SELECT
   table_name,
   column_name,
   data_type
@@ -1611,7 +1680,7 @@ WHERE table_schema = 'public'
 ORDER BY table_name;
 
 -- List all array columns
-SELECT 
+SELECT
   table_name,
   column_name,
   data_type,
@@ -1625,7 +1694,9 @@ ORDER BY table_name;
 ### B. Quick Reference
 
 #### Enum Columns Count: 23
+
 #### JSONB Columns Count: 20
+
 #### Array Columns Count: 5
 
 ---
@@ -1633,4 +1704,3 @@ ORDER BY table_name;
 **Document Version:** 1.0  
 **Last Updated:** December 3, 2025  
 **Schema:** public
-

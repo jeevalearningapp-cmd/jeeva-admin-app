@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState } from "react";
 import {
   Box,
   Typography,
@@ -29,91 +29,103 @@ import {
   Switch,
   FormControlLabel,
   Drawer,
-} from '@mui/material'
+} from "@mui/material";
 import {
   SearchOutlined as SearchIcon,
   AddOutlined as AddIcon,
   EditOutlined as EditIcon,
   DeleteOutlined as DeleteIcon,
   CloseOutlined as CloseIcon,
-} from '@mui/icons-material'
-import { useAdminUsers, useCreateAdminUser, useUpdateAdminUser, useUpdateAdminUserStatus, useDeleteAdminUser } from '@/hooks'
-import { AdminUser } from '@/types'
-import { useSnackbar } from 'notistack'
-import { PageLoader } from '@/components/common'
+} from "@mui/icons-material";
+import {
+  useAdminUsers,
+  useCreateAdminUser,
+  useUpdateAdminUser,
+  useUpdateAdminUserStatus,
+  useDeleteAdminUser,
+} from "@/hooks";
+import { AdminUser } from "@/types";
+import { useSnackbar } from "notistack";
+import { PageLoader } from "@/components/common";
 
 export const AdminUsersPage: React.FC = () => {
-  const [page, setPage] = useState(0)
-  const [rowsPerPage, setRowsPerPage] = useState(10)
-  const [search, setSearch] = useState('')
-  const [roleFilter, setRoleFilter] = useState<string>('')
-  const [createDialogOpen, setCreateDialogOpen] = useState(false)
-  const [editDrawerOpen, setEditDrawerOpen] = useState(false)
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  const [selectedAdmin, setSelectedAdmin] = useState<AdminUser | null>(null)
-  const [initialLoad, setInitialLoad] = useState(true)
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [search, setSearch] = useState("");
+  const [roleFilter, setRoleFilter] = useState<string>("");
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [editDrawerOpen, setEditDrawerOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [selectedAdmin, setSelectedAdmin] = useState<AdminUser | null>(null);
+  const [initialLoad, setInitialLoad] = useState(true);
   const [newAdmin, setNewAdmin] = useState({
-    email: '',
-    full_name: '',
-    role: 'editor' as 'superadmin' | 'editor' | 'moderator',
-  })
-  const { enqueueSnackbar } = useSnackbar()
+    email: "",
+    full_name: "",
+    role: "editor" as "superadmin" | "editor" | "moderator",
+  });
+  const { enqueueSnackbar } = useSnackbar();
 
   const { data, isLoading, error } = useAdminUsers({
     search,
     role: roleFilter || undefined,
     page: page + 1,
     limit: rowsPerPage,
-  })
+  });
 
   React.useEffect(() => {
     if (!isLoading && initialLoad) {
-      setInitialLoad(false)
+      setInitialLoad(false);
     }
-  }, [isLoading, initialLoad])
+  }, [isLoading, initialLoad]);
 
-  const createAdmin = useCreateAdminUser()
-  const updateAdmin = useUpdateAdminUser()
-  const updateStatus = useUpdateAdminUserStatus()
-  const deleteAdmin = useDeleteAdminUser()
+  const createAdmin = useCreateAdminUser();
+  const updateAdmin = useUpdateAdminUser();
+  const updateStatus = useUpdateAdminUserStatus();
+  const deleteAdmin = useDeleteAdminUser();
 
   const handleChangePage = (_: unknown, newPage: number) => {
-    setPage(newPage)
-  }
+    setPage(newPage);
+  };
 
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(parseInt(event.target.value, 10))
-    setPage(0)
-  }
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearch(event.target.value)
-    setPage(0)
-  }
+    setSearch(event.target.value);
+    setPage(0);
+  };
 
   const handleRoleFilterChange = (event: any) => {
-    setRoleFilter(event.target.value)
-    setPage(0)
-  }
+    setRoleFilter(event.target.value);
+    setPage(0);
+  };
 
   const handleCreateAdmin = async () => {
     try {
-      await createAdmin.mutateAsync(newAdmin)
-      setCreateDialogOpen(false)
-      setNewAdmin({ email: '', full_name: '', role: 'editor' })
-      enqueueSnackbar('Admin user created successfully', { variant: 'success' })
+      await createAdmin.mutateAsync(newAdmin);
+      setCreateDialogOpen(false);
+      setNewAdmin({ email: "", full_name: "", role: "editor" });
+      enqueueSnackbar("Admin user created successfully", {
+        variant: "success",
+      });
     } catch (error: any) {
-      enqueueSnackbar(error.message || 'Failed to create admin user', { variant: 'error' })
+      enqueueSnackbar(error.message || "Failed to create admin user", {
+        variant: "error",
+      });
     }
-  }
+  };
 
   const handleEditAdmin = (admin: AdminUser) => {
-    setSelectedAdmin(admin)
-    setEditDrawerOpen(true)
-  }
+    setSelectedAdmin(admin);
+    setEditDrawerOpen(true);
+  };
 
   const handleUpdateAdmin = async () => {
-    if (!selectedAdmin) return
+    if (!selectedAdmin) return;
 
     try {
       await updateAdmin.mutateAsync({
@@ -122,71 +134,84 @@ export const AdminUsersPage: React.FC = () => {
           full_name: selectedAdmin.full_name,
           role: selectedAdmin.role,
         },
-      })
-      setEditDrawerOpen(false)
-      setSelectedAdmin(null)
-      enqueueSnackbar('Admin user updated successfully', { variant: 'success' })
+      });
+      setEditDrawerOpen(false);
+      setSelectedAdmin(null);
+      enqueueSnackbar("Admin user updated successfully", {
+        variant: "success",
+      });
     } catch (error: any) {
-      enqueueSnackbar(error.message || 'Failed to update admin user', { variant: 'error' })
+      enqueueSnackbar(error.message || "Failed to update admin user", {
+        variant: "error",
+      });
     }
-  }
+  };
 
-  const handleStatusToggle = async (adminId: string, currentStatus: boolean) => {
+  const handleStatusToggle = async (
+    adminId: string,
+    currentStatus: boolean,
+  ) => {
     try {
       await updateStatus.mutateAsync({
         id: adminId,
         isActive: !currentStatus,
-      })
-      
+      });
+
       if (selectedAdmin && selectedAdmin.id === adminId) {
         setSelectedAdmin({
           ...selectedAdmin,
           is_active: !currentStatus,
-        })
+        });
       }
-      
+
       enqueueSnackbar(
-        `Admin user ${!currentStatus ? 'activated' : 'deactivated'} successfully`,
-        { variant: 'success' }
-      )
+        `Admin user ${!currentStatus ? "activated" : "deactivated"} successfully`,
+        { variant: "success" },
+      );
     } catch (error: any) {
-      enqueueSnackbar(error.message || 'Failed to update status', { variant: 'error' })
+      enqueueSnackbar(error.message || "Failed to update status", {
+        variant: "error",
+      });
     }
-  }
+  };
 
   const handleDeleteClick = (admin: AdminUser) => {
-    setSelectedAdmin(admin)
-    setDeleteDialogOpen(true)
-  }
+    setSelectedAdmin(admin);
+    setDeleteDialogOpen(true);
+  };
 
   const handleDeleteConfirm = async () => {
-    if (!selectedAdmin) return
+    if (!selectedAdmin) return;
 
     try {
-      await deleteAdmin.mutateAsync(selectedAdmin.id)
-      setDeleteDialogOpen(false)
-      setSelectedAdmin(null)
-      enqueueSnackbar('Admin user deleted successfully', { variant: 'success' })
+      await deleteAdmin.mutateAsync(selectedAdmin.id);
+      setDeleteDialogOpen(false);
+      setSelectedAdmin(null);
+      enqueueSnackbar("Admin user deleted successfully", {
+        variant: "success",
+      });
     } catch (error: any) {
-      enqueueSnackbar(error.message || 'Failed to delete admin user', { variant: 'error' })
+      enqueueSnackbar(error.message || "Failed to delete admin user", {
+        variant: "error",
+      });
     }
-  }
+  };
 
   const getRoleColor = (role: string) => {
     switch (role) {
-      case 'superadmin':
-        return 'error'
-      case 'editor':
-        return 'primary'
-      case 'moderator':
-        return 'warning'
+      case "superadmin":
+        return "error";
+      case "editor":
+        return "primary";
+      case "moderator":
+        return "warning";
       default:
-        return 'default'
+        return "default";
     }
-  }
+  };
 
   if (isLoading && initialLoad) {
-    return <PageLoader />
+    return <PageLoader />;
   }
 
   if (error) {
@@ -199,12 +224,19 @@ export const AdminUsersPage: React.FC = () => {
           Error loading admin users: {error.message}
         </Alert>
       </Box>
-    )
+    );
   }
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 3,
+        }}
+      >
         <Typography variant="h4">Admin Users</Typography>
         <Button
           variant="contained"
@@ -216,7 +248,7 @@ export const AdminUsersPage: React.FC = () => {
       </Box>
 
       <Paper sx={{ p: 2, mb: 2 }}>
-        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+        <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
           <TextField
             fullWidth
             placeholder="Search by email or name..."
@@ -232,7 +264,11 @@ export const AdminUsersPage: React.FC = () => {
           />
           <FormControl sx={{ minWidth: 200 }}>
             <InputLabel>Role</InputLabel>
-            <Select value={roleFilter} onChange={handleRoleFilterChange} label="Role">
+            <Select
+              value={roleFilter}
+              onChange={handleRoleFilterChange}
+              label="Role"
+            >
               <MenuItem value="">All Roles</MenuItem>
               <MenuItem value="superadmin">Superadmin</MenuItem>
               <MenuItem value="editor">Editor</MenuItem>
@@ -263,34 +299,43 @@ export const AdminUsersPage: React.FC = () => {
             ) : data?.adminUsers.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={5} align="center" sx={{ py: 4 }}>
-                  <Typography color="text.secondary">No admin users found</Typography>
+                  <Typography color="text.secondary">
+                    No admin users found
+                  </Typography>
                 </TableCell>
               </TableRow>
             ) : (
               data?.adminUsers.map((admin) => (
                 <TableRow key={admin.id} hover>
                   <TableCell>{admin.email}</TableCell>
-                  <TableCell>{admin.full_name || '-'}</TableCell>
+                  <TableCell>{admin.full_name || "-"}</TableCell>
                   <TableCell>
                     <Chip
                       label={admin.role}
                       size="small"
                       color={getRoleColor(admin.role)}
-                      sx={{ textTransform: 'capitalize' }}
+                      sx={{ textTransform: "capitalize" }}
                     />
                   </TableCell>
                   <TableCell>
                     <Chip
-                      label={admin.is_active ? 'Active' : 'Inactive'}
+                      label={admin.is_active ? "Active" : "Inactive"}
                       size="small"
-                      color={admin.is_active ? 'success' : 'default'}
+                      color={admin.is_active ? "success" : "default"}
                     />
                   </TableCell>
                   <TableCell align="right">
-                    <IconButton size="small" onClick={() => handleEditAdmin(admin)}>
+                    <IconButton
+                      size="small"
+                      onClick={() => handleEditAdmin(admin)}
+                    >
                       <EditIcon />
                     </IconButton>
-                    <IconButton size="small" color="error" onClick={() => handleDeleteClick(admin)}>
+                    <IconButton
+                      size="small"
+                      color="error"
+                      onClick={() => handleDeleteClick(admin)}
+                    >
                       <DeleteIcon />
                     </IconButton>
                   </TableCell>
@@ -311,7 +356,12 @@ export const AdminUsersPage: React.FC = () => {
       </TableContainer>
 
       {/* Create Admin Dialog */}
-      <Dialog open={createDialogOpen} onClose={() => setCreateDialogOpen(false)} maxWidth="sm" fullWidth>
+      <Dialog
+        open={createDialogOpen}
+        onClose={() => setCreateDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+      >
         <DialogTitle>Add Admin User</DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 1 }}>
@@ -320,14 +370,18 @@ export const AdminUsersPage: React.FC = () => {
               type="email"
               fullWidth
               value={newAdmin.email}
-              onChange={(e) => setNewAdmin({ ...newAdmin, email: e.target.value })}
+              onChange={(e) =>
+                setNewAdmin({ ...newAdmin, email: e.target.value })
+              }
               required
             />
             <TextField
               label="Full Name"
               fullWidth
               value={newAdmin.full_name}
-              onChange={(e) => setNewAdmin({ ...newAdmin, full_name: e.target.value })}
+              onChange={(e) =>
+                setNewAdmin({ ...newAdmin, full_name: e.target.value })
+              }
             />
             <FormControl fullWidth>
               <InputLabel>Role</InputLabel>
@@ -336,7 +390,10 @@ export const AdminUsersPage: React.FC = () => {
                 onChange={(e) =>
                   setNewAdmin({
                     ...newAdmin,
-                    role: e.target.value as 'superadmin' | 'editor' | 'moderator',
+                    role: e.target.value as
+                      | "superadmin"
+                      | "editor"
+                      | "moderator",
                   })
                 }
                 label="Role"
@@ -355,7 +412,7 @@ export const AdminUsersPage: React.FC = () => {
             variant="contained"
             disabled={!newAdmin.email || createAdmin.isPending}
           >
-            {createAdmin.isPending ? 'Creating...' : 'Create'}
+            {createAdmin.isPending ? "Creating..." : "Create"}
           </Button>
         </DialogActions>
       </Dialog>
@@ -365,11 +422,18 @@ export const AdminUsersPage: React.FC = () => {
         anchor="right"
         open={editDrawerOpen}
         onClose={() => setEditDrawerOpen(false)}
-        PaperProps={{ sx: { width: { xs: '100%', sm: 400 } } }}
+        PaperProps={{ sx: { width: { xs: "100%", sm: 400 } } }}
       >
         {selectedAdmin && (
           <Box sx={{ p: 3 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                mb: 3,
+              }}
+            >
               <Typography variant="h6">Edit Admin User</Typography>
               <IconButton onClick={() => setEditDrawerOpen(false)}>
                 <CloseIcon />
@@ -387,9 +451,12 @@ export const AdminUsersPage: React.FC = () => {
               <TextField
                 label="Full Name"
                 fullWidth
-                value={selectedAdmin.full_name || ''}
+                value={selectedAdmin.full_name || ""}
                 onChange={(e) =>
-                  setSelectedAdmin({ ...selectedAdmin, full_name: e.target.value })
+                  setSelectedAdmin({
+                    ...selectedAdmin,
+                    full_name: e.target.value,
+                  })
                 }
               />
 
@@ -400,7 +467,10 @@ export const AdminUsersPage: React.FC = () => {
                   onChange={(e) =>
                     setSelectedAdmin({
                       ...selectedAdmin,
-                      role: e.target.value as 'superadmin' | 'editor' | 'moderator',
+                      role: e.target.value as
+                        | "superadmin"
+                        | "editor"
+                        | "moderator",
                     })
                   }
                   label="Role"
@@ -412,18 +482,27 @@ export const AdminUsersPage: React.FC = () => {
               </FormControl>
 
               <Box>
-                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ display: "block", mb: 1 }}
+                >
                   Status
                 </Typography>
                 <FormControlLabel
                   control={
                     <Switch
                       checked={selectedAdmin.is_active}
-                      onChange={() => handleStatusToggle(selectedAdmin.id, selectedAdmin.is_active)}
+                      onChange={() =>
+                        handleStatusToggle(
+                          selectedAdmin.id,
+                          selectedAdmin.is_active,
+                        )
+                      }
                       disabled={updateStatus.isPending}
                     />
                   }
-                  label={selectedAdmin.is_active ? 'Active' : 'Inactive'}
+                  label={selectedAdmin.is_active ? "Active" : "Inactive"}
                 />
               </Box>
 
@@ -431,7 +510,10 @@ export const AdminUsersPage: React.FC = () => {
                 <Typography variant="caption" color="text.secondary">
                   Admin ID
                 </Typography>
-                <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>
+                <Typography
+                  variant="body2"
+                  sx={{ fontFamily: "monospace", fontSize: "0.75rem" }}
+                >
                   {selectedAdmin.id}
                 </Typography>
               </Box>
@@ -449,7 +531,11 @@ export const AdminUsersPage: React.FC = () => {
             </Stack>
 
             <Stack direction="row" spacing={2} sx={{ mt: 3 }}>
-              <Button variant="outlined" fullWidth onClick={() => setEditDrawerOpen(false)}>
+              <Button
+                variant="outlined"
+                fullWidth
+                onClick={() => setEditDrawerOpen(false)}
+              >
                 Cancel
               </Button>
               <Button
@@ -458,7 +544,7 @@ export const AdminUsersPage: React.FC = () => {
                 onClick={handleUpdateAdmin}
                 disabled={updateAdmin.isPending}
               >
-                {updateAdmin.isPending ? 'Saving...' : 'Save Changes'}
+                {updateAdmin.isPending ? "Saving..." : "Save Changes"}
               </Button>
             </Stack>
           </Box>
@@ -466,12 +552,18 @@ export const AdminUsersPage: React.FC = () => {
       </Drawer>
 
       {/* Delete Confirmation Dialog */}
-      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)} maxWidth="xs" fullWidth>
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        maxWidth="xs"
+        fullWidth
+      >
         <DialogTitle>Confirm Delete</DialogTitle>
         <DialogContent>
           <Typography>
-            Are you sure you want to delete admin user{' '}
-            <strong>{selectedAdmin?.email}</strong>? This action cannot be undone.
+            Are you sure you want to delete admin user{" "}
+            <strong>{selectedAdmin?.email}</strong>? This action cannot be
+            undone.
           </Typography>
         </DialogContent>
         <DialogActions>
@@ -482,12 +574,12 @@ export const AdminUsersPage: React.FC = () => {
             variant="contained"
             disabled={deleteAdmin.isPending}
           >
-            {deleteAdmin.isPending ? 'Deleting...' : 'Delete'}
+            {deleteAdmin.isPending ? "Deleting..." : "Delete"}
           </Button>
         </DialogActions>
       </Dialog>
     </Box>
-  )
-}
+  );
+};
 
-export default AdminUsersPage
+export default AdminUsersPage;

@@ -1,29 +1,37 @@
 # Flashcard System Setup
 
 ## Overview
+
 The flashcard system enables topic-level memorization cards for the Learning Module. Flashcards help students review key concepts through a front/back card format.
 
 ## Prerequisites
+
 Before running this migration, ensure you've completed:
+
 1. Initial database setup (`create_content_tables.sql`)
 2. NMC restructuring migration (`restructure_for_nmc_modules.sql`)
 
 ## Migration Steps
 
 ### 1. Run the Flashcard Migration
+
 Open your Supabase SQL Editor and execute:
+
 ```sql
 -- Copy and paste contents from add_category_to_flashcards.sql
 ```
 
 This migration:
+
 - ✅ Adds `category` column to flashcards table
 - ✅ Creates index for efficient category-based queries
 - ✅ Makes `lesson_id` nullable for backward compatibility
 - ✅ Enables topic-level organization (Numeracy, NMC Code, etc.)
 
 ### 2. Verify Migration Success
+
 Check that flashcards table now has:
+
 - `category` column (VARCHAR 100)
 - `lesson_id` is nullable
 - Index `idx_flashcards_category` exists
@@ -31,6 +39,7 @@ Check that flashcards table now has:
 ## Usage in Admin Portal
 
 ### Creating Flashcards
+
 1. Navigate to **Content Management** page
 2. Select **Learning Module**
 3. Choose a topic (e.g., "NMC Code")
@@ -38,6 +47,7 @@ Check that flashcards table now has:
 5. Click **Add Flashcard** or use CSV bulk upload
 
 ### CSV Bulk Upload Format
+
 ```csv
 front,back,image_url
 "What is the NMC Code?","A set of professional standards nurses must uphold...",""
@@ -45,11 +55,13 @@ front,back,image_url
 ```
 
 **Template includes:**
+
 - `front` (required): Question or term
 - `back` (required): Answer or definition
 - `image_url` (optional): URL to helpful image
 
 ### Features
+
 - ✨ **CRUD Operations**: Create, edit, delete individual flashcards
 - 📤 **Bulk CSV Upload**: Import multiple flashcards at once
 - 🎯 **Topic-Specific**: Flashcards organized by Learning Module topics
@@ -57,7 +69,9 @@ front,back,image_url
 - 🖼️ **Image Support**: Add visual aids to flashcards
 
 ## Mobile App Integration
+
 Once created in admin portal, flashcards:
+
 - Appear in the Learning Module for the respective topic
 - Students can flip cards to reveal answers
 - Support spaced repetition learning
@@ -66,6 +80,7 @@ Once created in admin portal, flashcards:
 ## Database Schema
 
 ### Flashcard Structure
+
 ```sql
 CREATE TABLE flashcards (
   id UUID PRIMARY KEY,
@@ -82,6 +97,7 @@ CREATE TABLE flashcards (
 ```
 
 ### Category Values (Learning Module Topics)
+
 - Numeracy
 - The NMC Code
 - Mental Capacity Act

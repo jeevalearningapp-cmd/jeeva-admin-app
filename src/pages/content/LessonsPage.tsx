@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState } from "react";
 import {
   Box,
   Typography,
@@ -23,180 +23,212 @@ import {
   FormControl,
   InputLabel,
   Select,
-  MenuItem
-} from '@mui/material'
+  MenuItem,
+} from "@mui/material";
 import {
   AddOutlined,
   EditOutlined,
   DeleteOutlined,
   SearchOutlined,
   VideoLibraryOutlined,
-  UploadFileOutlined
-} from '@mui/icons-material'
-import { Alert } from '@mui/material'
-import { useLessons, useCreateLesson, useUpdateLesson, useDeleteLesson } from '@/hooks/useLessons'
-import { useTopics } from '@/hooks/useTopics'
-import { PageLoader } from '@/components/common'
-import { Lesson, CreateLessonInput, FIXED_MODULE_IDS } from '@/types/content'
-import { CSVUpload } from '@/components/common/CSVUpload'
-import { lessonTemplate } from '@/utils/csvTemplates'
-import { useBulkUpload } from '@/hooks/useBulkUpload'
-import { LEARNING_TOPICS, getAllSubtopics } from '@/constants/learningStructure'
-import { RichTextEditor } from '@/components/common/RichTextEditor'
+  UploadFileOutlined,
+} from "@mui/icons-material";
+import { Alert } from "@mui/material";
+import {
+  useLessons,
+  useCreateLesson,
+  useUpdateLesson,
+  useDeleteLesson,
+} from "@/hooks/useLessons";
+import { useTopics } from "@/hooks/useTopics";
+import { PageLoader } from "@/components/common";
+import { Lesson, CreateLessonInput, FIXED_MODULE_IDS } from "@/types/content";
+import { CSVUpload } from "@/components/common/CSVUpload";
+import { lessonTemplate } from "@/utils/csvTemplates";
+import { useBulkUpload } from "@/hooks/useBulkUpload";
+import {
+  LEARNING_TOPICS,
+  getAllSubtopics,
+} from "@/constants/learningStructure";
+import { RichTextEditor } from "@/components/common/RichTextEditor";
 
 export const LessonsPage: React.FC = () => {
-  const [dialogOpen, setDialogOpen] = useState(false)
-  const [csvUploadOpen, setCsvUploadOpen] = useState(false)
-  const [bulkTopicId, setBulkTopicId] = useState<string>('')
-  const [editingLesson, setEditingLesson] = useState<Lesson | null>(null)
-  const [searchQuery, setSearchQuery] = useState('')
-  const [topicFilter, setTopicFilter] = useState<string>('all')
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [csvUploadOpen, setCsvUploadOpen] = useState(false);
+  const [bulkTopicId, setBulkTopicId] = useState<string>("");
+  const [editingLesson, setEditingLesson] = useState<Lesson | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [topicFilter, setTopicFilter] = useState<string>("all");
   const [formData, setFormData] = useState<CreateLessonInput>({
-    topicId: '',
-    title: '',
-    content: '',
-    videoUrl: '',
-    audioUrl: '',
-    lessonType: 'text',
+    topicId: "",
+    title: "",
+    content: "",
+    videoUrl: "",
+    audioUrl: "",
+    lessonType: "text",
     passingScorePercentage: 80,
-    category: '',
+    category: "",
     duration: 0,
     isActive: true,
-    displayOrder: 0
-  })
-  const [touched, setTouched] = useState({ topicId: false, title: false, content: false })
-  const [submitError, setSubmitError] = useState<string>('')
-  const [initialLoad, setInitialLoad] = useState(true)
+    displayOrder: 0,
+  });
+  const [touched, setTouched] = useState({
+    topicId: false,
+    title: false,
+    content: false,
+  });
+  const [submitError, setSubmitError] = useState<string>("");
+  const [initialLoad, setInitialLoad] = useState(true);
 
-  const { data: lessons, isLoading } = useLessons()
-  const { data: topics } = useTopics()
-  const createMutation = useCreateLesson()
-  const updateMutation = useUpdateLesson()
-  const deleteMutation = useDeleteLesson()
-  const { uploadLessons } = useBulkUpload()
+  const { data: lessons, isLoading } = useLessons();
+  const { data: topics } = useTopics();
+  const createMutation = useCreateLesson();
+  const updateMutation = useUpdateLesson();
+  const deleteMutation = useDeleteLesson();
+  const { uploadLessons } = useBulkUpload();
 
   React.useEffect(() => {
     if (!isLoading && initialLoad) {
-      setInitialLoad(false)
+      setInitialLoad(false);
     }
-  }, [isLoading, initialLoad])
+  }, [isLoading, initialLoad]);
 
   if (isLoading && initialLoad) {
-    return <PageLoader />
+    return <PageLoader />;
   }
 
   const filteredLessons = lessons?.filter((lesson: Lesson) => {
-    const matchesSearch = lesson.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      lesson.content.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesTopic = topicFilter === 'all' || lesson.topicId === topicFilter
-    return matchesSearch && matchesTopic
-  })
+    const matchesSearch =
+      lesson.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      lesson.content.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesTopic =
+      topicFilter === "all" || lesson.topicId === topicFilter;
+    return matchesSearch && matchesTopic;
+  });
 
   const handleOpenDialog = (lesson?: Lesson) => {
     if (lesson) {
-      setEditingLesson(lesson)
+      setEditingLesson(lesson);
       setFormData({
         topicId: lesson.topicId,
         title: lesson.title,
         content: lesson.content,
         videoUrl: lesson.videoUrl,
-        audioUrl: lesson.audioUrl || '',
-        lessonType: lesson.lessonType || 'text',
+        audioUrl: lesson.audioUrl || "",
+        lessonType: lesson.lessonType || "text",
         passingScorePercentage: lesson.passingScorePercentage || 80,
-        category: lesson.category || '',
+        category: lesson.category || "",
         duration: lesson.duration,
         isActive: lesson.isActive,
-        displayOrder: lesson.displayOrder
-      })
+        displayOrder: lesson.displayOrder,
+      });
     } else {
-      setEditingLesson(null)
+      setEditingLesson(null);
       setFormData({
-        topicId: '',
-        title: '',
-        content: '',
-        videoUrl: '',
-        audioUrl: '',
-        lessonType: 'text',
+        topicId: "",
+        title: "",
+        content: "",
+        videoUrl: "",
+        audioUrl: "",
+        lessonType: "text",
         passingScorePercentage: 80,
-        category: '',
+        category: "",
         duration: 0,
         isActive: true,
-        displayOrder: 0
-      })
+        displayOrder: 0,
+      });
     }
-    setTouched({ topicId: false, title: false, content: false })
-    setSubmitError('')
-    setDialogOpen(true)
-  }
+    setTouched({ topicId: false, title: false, content: false });
+    setSubmitError("");
+    setDialogOpen(true);
+  };
 
   const handleCloseDialog = () => {
-    setDialogOpen(false)
-    setEditingLesson(null)
-    setTouched({ topicId: false, title: false, content: false })
-    setSubmitError('')
-  }
+    setDialogOpen(false);
+    setEditingLesson(null);
+    setTouched({ topicId: false, title: false, content: false });
+    setSubmitError("");
+  };
 
   const validate = () => {
-    return formData.topicId.trim() !== '' && formData.title.trim() !== '' && formData.content.trim() !== ''
-  }
+    return (
+      formData.topicId.trim() !== "" &&
+      formData.title.trim() !== "" &&
+      formData.content.trim() !== ""
+    );
+  };
 
-  const getFieldError = (field: 'topicId' | 'title' | 'content') => {
-    if (!touched[field]) return ''
-    if (field === 'topicId' && !formData.topicId) return 'Topic is required'
-    if (field === 'title' && !formData.title.trim()) return 'Title is required'
-    if (field === 'content' && !formData.content.trim()) return 'Content is required'
-    return ''
-  }
+  const getFieldError = (field: "topicId" | "title" | "content") => {
+    if (!touched[field]) return "";
+    if (field === "topicId" && !formData.topicId) return "Topic is required";
+    if (field === "title" && !formData.title.trim()) return "Title is required";
+    if (field === "content" && !formData.content.trim())
+      return "Content is required";
+    return "";
+  };
 
   const handleSubmit = async () => {
-    setTouched({ topicId: true, title: true, content: true })
-    if (!validate()) return
+    setTouched({ topicId: true, title: true, content: true });
+    if (!validate()) return;
 
-    setSubmitError('')
+    setSubmitError("");
     try {
       if (editingLesson) {
         await updateMutation.mutateAsync({
           id: editingLesson.id,
-          input: formData
-        })
+          input: formData,
+        });
       } else {
-        await createMutation.mutateAsync(formData)
+        await createMutation.mutateAsync(formData);
       }
-      handleCloseDialog()
+      handleCloseDialog();
     } catch (error: any) {
-      setSubmitError(error.message || 'An error occurred. Please try again.')
+      setSubmitError(error.message || "An error occurred. Please try again.");
     }
-  }
+  };
 
   const handleDelete = async (id: string) => {
-    if (window.confirm('Are you sure you want to delete this lesson? This will also delete all related questions and flashcards.')) {
-      await deleteMutation.mutateAsync(id)
+    if (
+      window.confirm(
+        "Are you sure you want to delete this lesson? This will also delete all related questions and flashcards.",
+      )
+    ) {
+      await deleteMutation.mutateAsync(id);
     }
-  }
+  };
 
   const handleToggleActive = async (lesson: Lesson) => {
     await updateMutation.mutateAsync({
       id: lesson.id,
-      input: { isActive: !lesson.isActive }
-    })
-  }
+      input: { isActive: !lesson.isActive },
+    });
+  };
 
   return (
     <Box>
       {/* Header */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 3,
+        }}
+      >
         <Box>
-          <Typography variant="h4" gutterBottom>Lessons</Typography>
+          <Typography variant="h4" gutterBottom>
+            Lessons
+          </Typography>
           <Typography variant="body2" color="text.secondary">
             Manage lesson content and videos
           </Typography>
         </Box>
-        <Box sx={{ display: 'flex', gap: 2 }}>
+        <Box sx={{ display: "flex", gap: 2 }}>
           <Button
             variant="contained"
             startIcon={<AddOutlined />}
             onClick={() => handleOpenDialog()}
-            sx={{ borderRadius: '12px' }}
+            sx={{ borderRadius: "12px" }}
           >
             Add Lesson
           </Button>
@@ -204,7 +236,7 @@ export const LessonsPage: React.FC = () => {
             variant="outlined"
             startIcon={<UploadFileOutlined />}
             onClick={() => setCsvUploadOpen(true)}
-            sx={{ borderRadius: '12px' }}
+            sx={{ borderRadius: "12px" }}
           >
             Bulk Upload
           </Button>
@@ -212,7 +244,7 @@ export const LessonsPage: React.FC = () => {
       </Box>
 
       {/* Search and Filter */}
-      <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
+      <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
         <TextField
           placeholder="Search lessons..."
           value={searchQuery}
@@ -235,15 +267,24 @@ export const LessonsPage: React.FC = () => {
             label="Filter by Topic"
           >
             <MenuItem value="all">All Topics</MenuItem>
-            {topics?.map(topic => (
-              <MenuItem key={topic.id} value={topic.id}>{topic.title}</MenuItem>
+            {topics?.map((topic) => (
+              <MenuItem key={topic.id} value={topic.id}>
+                {topic.title}
+              </MenuItem>
             ))}
           </Select>
         </FormControl>
       </Box>
 
       {/* Lessons Table */}
-      <TableContainer component={Paper} sx={{ bgcolor: 'background.paper', border: '1px solid #E5E7EB', borderRadius: '16px' }}>
+      <TableContainer
+        component={Paper}
+        sx={{
+          bgcolor: "background.paper",
+          border: "1px solid #E5E7EB",
+          borderRadius: "16px",
+        }}
+      >
         <Table>
           <TableHead>
             <TableRow>
@@ -267,15 +308,25 @@ export const LessonsPage: React.FC = () => {
                 </TableCell>
                 <TableCell>
                   <Chip
-                    label={topics?.find(t => t.id === lesson.topicId)?.title || 'Unknown'}
+                    label={
+                      topics?.find((t) => t.id === lesson.topicId)?.title ||
+                      "Unknown"
+                    }
                     size="small"
                   />
                 </TableCell>
                 <TableCell>
                   {lesson.category ? (
-                    <Chip label={lesson.category} size="small" color="primary" variant="outlined" />
+                    <Chip
+                      label={lesson.category}
+                      size="small"
+                      color="primary"
+                      variant="outlined"
+                    />
                   ) : (
-                    <Typography variant="caption" color="text.secondary">—</Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      —
+                    </Typography>
                   )}
                 </TableCell>
                 <TableCell>
@@ -318,8 +369,8 @@ export const LessonsPage: React.FC = () => {
               <TableRow>
                 <TableCell colSpan={8} align="center" sx={{ py: 4 }}>
                   <Typography variant="body2" color="text.secondary">
-                    {searchQuery || topicFilter !== 'all'
-                      ? 'No lessons found matching your filters.'
+                    {searchQuery || topicFilter !== "all"
+                      ? "No lessons found matching your filters."
                       : 'No lessons yet. Click "Add Lesson" to create one.'}
                   </Typography>
                 </TableCell>
@@ -330,71 +381,97 @@ export const LessonsPage: React.FC = () => {
       </TableContainer>
 
       {/* Add/Edit Dialog */}
-      <Dialog open={dialogOpen} onClose={handleCloseDialog} maxWidth="md" fullWidth>
+      <Dialog
+        open={dialogOpen}
+        onClose={handleCloseDialog}
+        maxWidth="md"
+        fullWidth
+      >
         <DialogTitle>
-          {editingLesson ? 'Edit Lesson' : 'Add Lesson'}
+          {editingLesson ? "Edit Lesson" : "Add Lesson"}
         </DialogTitle>
         <DialogContent>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 2 }}>
             {submitError && (
-              <Alert severity="error" onClose={() => setSubmitError('')}>
+              <Alert severity="error" onClose={() => setSubmitError("")}>
                 {submitError}
               </Alert>
             )}
-            <FormControl fullWidth required error={!!getFieldError('topicId')}>
+            <FormControl fullWidth required error={!!getFieldError("topicId")}>
               <InputLabel>Topic</InputLabel>
               <Select
                 value={formData.topicId}
-                onChange={(e) => setFormData({ ...formData, topicId: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, topicId: e.target.value })
+                }
                 onBlur={() => setTouched({ ...touched, topicId: true })}
                 label="Topic"
               >
-                {topics?.filter(t => t.isActive).map(topic => (
-                  <MenuItem key={topic.id} value={topic.id}>{topic.title}</MenuItem>
-                ))}
+                {topics
+                  ?.filter((t) => t.isActive)
+                  .map((topic) => (
+                    <MenuItem key={topic.id} value={topic.id}>
+                      {topic.title}
+                    </MenuItem>
+                  ))}
               </Select>
-              {getFieldError('topicId') && (
-                <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 2 }}>
-                  {getFieldError('topicId')}
+              {getFieldError("topicId") && (
+                <Typography
+                  variant="caption"
+                  color="error"
+                  sx={{ mt: 0.5, ml: 2 }}
+                >
+                  {getFieldError("topicId")}
                 </Typography>
               )}
             </FormControl>
-            
+
             {/* Category Dropdown - Only show for Learning Module topics */}
-            {formData.topicId && topics?.find(t => t.id === formData.topicId)?.moduleId === FIXED_MODULE_IDS.LEARNING && (
-              <FormControl fullWidth>
-                <InputLabel>Subtopic</InputLabel>
-                <Select
-                  value={formData.category || ''}
-                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  label="Subtopic"
-                >
-                  <MenuItem value="">
-                    <em>None</em>
-                  </MenuItem>
-                  {getAllSubtopics().map((subtopic) => (
-                    <MenuItem key={subtopic.id} value={subtopic.id}>
-                      {subtopic.displayLabel}
+            {formData.topicId &&
+              topics?.find((t) => t.id === formData.topicId)?.moduleId ===
+                FIXED_MODULE_IDS.LEARNING && (
+                <FormControl fullWidth>
+                  <InputLabel>Subtopic</InputLabel>
+                  <Select
+                    value={formData.category || ""}
+                    onChange={(e) =>
+                      setFormData({ ...formData, category: e.target.value })
+                    }
+                    label="Subtopic"
+                  >
+                    <MenuItem value="">
+                      <em>None</em>
                     </MenuItem>
-                  ))}
-                </Select>
-                <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, ml: 2 }}>
-                  Select which subtopic this lesson belongs to (e.g., "1.1 Prioritise People")
-                </Typography>
-              </FormControl>
-            )}
-            
+                    {getAllSubtopics().map((subtopic) => (
+                      <MenuItem key={subtopic.id} value={subtopic.id}>
+                        {subtopic.displayLabel}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{ mt: 0.5, ml: 2 }}
+                  >
+                    Select which subtopic this lesson belongs to (e.g., "1.1
+                    Prioritise People")
+                  </Typography>
+                </FormControl>
+              )}
+
             <TextField
               label="Title"
               value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, title: e.target.value })
+              }
               onBlur={() => setTouched({ ...touched, title: true })}
               fullWidth
               required
-              error={!!getFieldError('title')}
-              helperText={getFieldError('title')}
+              error={!!getFieldError("title")}
+              helperText={getFieldError("title")}
             />
-            
+
             <Box>
               <Typography variant="body2" sx={{ mb: 1, fontWeight: 500 }}>
                 Lesson Content *
@@ -402,38 +479,51 @@ export const LessonsPage: React.FC = () => {
               <RichTextEditor
                 content={formData.content}
                 onChange={(content) => {
-                  setFormData({ ...formData, content })
-                  setTouched({ ...touched, content: true })
+                  setFormData({ ...formData, content });
+                  setTouched({ ...touched, content: true });
                 }}
                 placeholder="Write your lesson content here... Use the toolbar for formatting."
               />
-              {getFieldError('content') && (
-                <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 2 }}>
-                  {getFieldError('content')}
+              {getFieldError("content") && (
+                <Typography
+                  variant="caption"
+                  color="error"
+                  sx={{ mt: 0.5, ml: 2 }}
+                >
+                  {getFieldError("content")}
                 </Typography>
               )}
             </Box>
             <TextField
               label="Video URL"
               value={formData.videoUrl}
-              onChange={(e) => setFormData({ ...formData, videoUrl: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, videoUrl: e.target.value })
+              }
               fullWidth
               placeholder="https://www.youtube.com/watch?v=..."
             />
             <TextField
               label="Audio URL (MP3, WAV)"
               value={formData.audioUrl}
-              onChange={(e) => setFormData({ ...formData, audioUrl: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, audioUrl: e.target.value })
+              }
               fullWidth
               placeholder="https://example.com/audio.mp3"
               helperText="Optional: Add audio/podcast content for this lesson"
             />
-            
+
             <FormControl fullWidth>
               <InputLabel>Lesson Type</InputLabel>
               <Select
                 value={formData.lessonType}
-                onChange={(e) => setFormData({ ...formData, lessonType: e.target.value as any })}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    lessonType: e.target.value as any,
+                  })
+                }
                 label="Lesson Type"
               >
                 <MenuItem value="text">Text</MenuItem>
@@ -441,42 +531,63 @@ export const LessonsPage: React.FC = () => {
                 <MenuItem value="audio">Audio</MenuItem>
                 <MenuItem value="quiz">Quiz</MenuItem>
               </Select>
-              <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, ml: 2 }}>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ mt: 0.5, ml: 2 }}
+              >
                 Select the primary format of this lesson
               </Typography>
             </FormControl>
-            
-            {formData.lessonType === 'quiz' && (
+
+            {formData.lessonType === "quiz" && (
               <TextField
                 label="Passing Score (%)"
                 type="number"
                 value={formData.passingScorePercentage}
-                onChange={(e) => setFormData({ ...formData, passingScorePercentage: parseInt(e.target.value) || 80 })}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    passingScorePercentage: parseInt(e.target.value) || 80,
+                  })
+                }
                 fullWidth
                 inputProps={{ min: 0, max: 100 }}
                 helperText="Minimum score required to pass this quiz (0-100%)"
               />
             )}
-            
+
             <TextField
               label="Duration (minutes)"
               type="number"
               value={formData.duration}
-              onChange={(e) => setFormData({ ...formData, duration: parseInt(e.target.value) || 0 })}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  duration: parseInt(e.target.value) || 0,
+                })
+              }
               fullWidth
             />
             <TextField
               label="Display Order"
               type="number"
               value={formData.displayOrder}
-              onChange={(e) => setFormData({ ...formData, displayOrder: parseInt(e.target.value) || 0 })}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  displayOrder: parseInt(e.target.value) || 0,
+                })
+              }
               fullWidth
             />
             <FormControlLabel
               control={
                 <Switch
                   checked={formData.isActive}
-                  onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, isActive: e.target.checked })
+                  }
                 />
               }
               label="Active"
@@ -484,20 +595,38 @@ export const LessonsPage: React.FC = () => {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDialog} sx={{ borderRadius: '12px' }}>Cancel</Button>
+          <Button onClick={handleCloseDialog} sx={{ borderRadius: "12px" }}>
+            Cancel
+          </Button>
           <Button
             onClick={handleSubmit}
             variant="contained"
-            disabled={!validate() || createMutation.isPending || updateMutation.isPending}
-            sx={{ borderRadius: '12px' }}
+            disabled={
+              !validate() ||
+              createMutation.isPending ||
+              updateMutation.isPending
+            }
+            sx={{ borderRadius: "12px" }}
           >
-            {(createMutation.isPending || updateMutation.isPending) ? 'Saving...' : (editingLesson ? 'Update' : 'Create')}
+            {createMutation.isPending || updateMutation.isPending
+              ? "Saving..."
+              : editingLesson
+                ? "Update"
+                : "Create"}
           </Button>
         </DialogActions>
       </Dialog>
 
       {/* CSV Bulk Upload - Topic Selection */}
-      <Dialog open={csvUploadOpen} onClose={() => { setCsvUploadOpen(false); setBulkTopicId('') }} maxWidth="sm" fullWidth>
+      <Dialog
+        open={csvUploadOpen}
+        onClose={() => {
+          setCsvUploadOpen(false);
+          setBulkTopicId("");
+        }}
+        maxWidth="sm"
+        fullWidth
+      >
         <DialogTitle>Select Topic for Bulk Upload</DialogTitle>
         <DialogContent>
           <Box sx={{ mt: 2 }}>
@@ -511,20 +640,31 @@ export const LessonsPage: React.FC = () => {
                 onChange={(e) => setBulkTopicId(e.target.value)}
                 label="Topic"
               >
-                {topics?.filter(t => t.isActive).map(topic => (
-                  <MenuItem key={topic.id} value={topic.id}>{topic.title}</MenuItem>
-                ))}
+                {topics
+                  ?.filter((t) => t.isActive)
+                  .map((topic) => (
+                    <MenuItem key={topic.id} value={topic.id}>
+                      {topic.title}
+                    </MenuItem>
+                  ))}
               </Select>
             </FormControl>
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => { setCsvUploadOpen(false); setBulkTopicId('') }}>Cancel</Button>
+          <Button
+            onClick={() => {
+              setCsvUploadOpen(false);
+              setBulkTopicId("");
+            }}
+          >
+            Cancel
+          </Button>
           <Button
             variant="contained"
             onClick={() => {
               if (bulkTopicId) {
-                setCsvUploadOpen(false)
+                setCsvUploadOpen(false);
               }
             }}
             disabled={!bulkTopicId}
@@ -536,20 +676,20 @@ export const LessonsPage: React.FC = () => {
 
       {/* CSV Bulk Upload Component - Shown after topic selection */}
       {bulkTopicId && !csvUploadOpen && (
-        <Box sx={{ position: 'fixed', bottom: 20, right: 20, zIndex: 1000 }}>
+        <Box sx={{ position: "fixed", bottom: 20, right: 20, zIndex: 1000 }}>
           <CSVUpload
             template={lessonTemplate}
             onUpload={async (data) => {
-              const result = await uploadLessons(data, bulkTopicId)
+              const result = await uploadLessons(data, bulkTopicId);
               if (result) {
-                setBulkTopicId('') // Reset topic after successful upload
+                setBulkTopicId(""); // Reset topic after successful upload
               }
-              return result
+              return result;
             }}
             contentType="lesson"
           />
         </Box>
       )}
     </Box>
-  )
-}
+  );
+};

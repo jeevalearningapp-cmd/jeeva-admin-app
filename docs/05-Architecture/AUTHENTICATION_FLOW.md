@@ -80,11 +80,11 @@ npm install @supabase/supabase-js @react-native-async-storage/async-storage
 **File:** `lib/supabase.ts`
 
 ```typescript
-import { createClient } from '@supabase/supabase-js'
-import AsyncStorage from '@react-native-async-storage/async-storage'
+import { createClient } from "@supabase/supabase-js";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL!
-const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!
+const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL!;
+const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!;
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
@@ -93,21 +93,21 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     persistSession: true,
     detectSessionInUrl: false,
   },
-})
+});
 
 // Auth state change listener
 supabase.auth.onAuthStateChange((event, session) => {
-  console.log('Auth event:', event)
-  console.log('Session:', session)
-  
-  if (event === 'SIGNED_IN') {
-    console.log('User signed in')
-  } else if (event === 'SIGNED_OUT') {
-    console.log('User signed out')
-  } else if (event === 'TOKEN_REFRESHED') {
-    console.log('Token refreshed')
+  console.log("Auth event:", event);
+  console.log("Session:", session);
+
+  if (event === "SIGNED_IN") {
+    console.log("User signed in");
+  } else if (event === "SIGNED_OUT") {
+    console.log("User signed out");
+  } else if (event === "TOKEN_REFRESHED") {
+    console.log("Token refreshed");
   }
-})
+});
 ```
 
 ### Step 3: Environment Configuration
@@ -142,6 +142,7 @@ EXPO_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 ### 1. Sign Up Flow
 
 **UI Flow:**
+
 ```
 Sign Up Screen
     ↓
@@ -166,12 +167,12 @@ Dashboard
 
 ```typescript
 // hooks/useAuth.ts
-import { supabase } from '@/lib/supabase'
+import { supabase } from "@/lib/supabase";
 
 interface SignUpParams {
-  email: string
-  password: string
-  fullName: string
+  email: string;
+  password: string;
+  fullName: string;
 }
 
 export const useAuth = () => {
@@ -185,33 +186,33 @@ export const useAuth = () => {
           data: {
             full_name: fullName,
           },
-          emailRedirectTo: 'jeevalearning://auth/callback',
+          emailRedirectTo: "jeevalearning://auth/callback",
         },
-      })
+      });
 
-      if (error) throw error
+      if (error) throw error;
 
       // 2. Create user profile
       if (data.user) {
         const { error: profileError } = await supabase
-          .from('user_profiles')
+          .from("user_profiles")
           .insert({
             user_id: data.user.id,
             full_name: fullName,
-          })
+          });
 
-        if (profileError) throw profileError
+        if (profileError) throw profileError;
       }
 
-      return { success: true, data }
+      return { success: true, data };
     } catch (error) {
-      console.error('Sign up error:', error)
-      throw error
+      console.error("Sign up error:", error);
+      throw error;
     }
-  }
+  };
 
-  return { signUp }
-}
+  return { signUp };
+};
 ```
 
 **Sign Up Screen Example:**
@@ -228,7 +229,7 @@ export default function SignUpScreen() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
-  
+
   const { signUp } = useAuth()
   const router = useRouter()
 
@@ -267,14 +268,14 @@ export default function SignUpScreen() {
   return (
     <View style={{ padding: 20 }}>
       <Text style={{ fontSize: 24, marginBottom: 20 }}>Create Account</Text>
-      
+
       <TextInput
         placeholder="Full Name"
         value={fullName}
         onChangeText={setFullName}
         autoCapitalize="words"
       />
-      
+
       <TextInput
         placeholder="Email"
         value={email}
@@ -282,14 +283,14 @@ export default function SignUpScreen() {
         keyboardType="email-address"
         autoCapitalize="none"
       />
-      
+
       <TextInput
         placeholder="Password"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
       />
-      
+
       <TouchableOpacity onPress={handleSignUp} disabled={loading}>
         <Text>{loading ? 'Creating Account...' : 'Sign Up'}</Text>
       </TouchableOpacity>
@@ -303,6 +304,7 @@ export default function SignUpScreen() {
 ### 2. Sign In Flow
 
 **UI Flow:**
+
 ```
 Login Screen
     ↓
@@ -327,19 +329,19 @@ export const useAuth = () => {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
-      })
+      });
 
-      if (error) throw error
+      if (error) throw error;
 
-      return { success: true, data }
+      return { success: true, data };
     } catch (error) {
-      console.error('Sign in error:', error)
-      throw error
+      console.error("Sign in error:", error);
+      throw error;
     }
-  }
+  };
 
-  return { signIn, signUp }
-}
+  return { signIn, signUp };
+};
 ```
 
 **Login Screen Example:**
@@ -355,7 +357,7 @@ export default function LoginScreen() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
-  
+
   const { signIn } = useAuth()
   const router = useRouter()
 
@@ -379,7 +381,7 @@ export default function LoginScreen() {
   return (
     <View style={{ padding: 20 }}>
       <Text style={{ fontSize: 24, marginBottom: 20 }}>Welcome Back</Text>
-      
+
       <TextInput
         placeholder="Email"
         value={email}
@@ -387,18 +389,18 @@ export default function LoginScreen() {
         keyboardType="email-address"
         autoCapitalize="none"
       />
-      
+
       <TextInput
         placeholder="Password"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
       />
-      
+
       <TouchableOpacity onPress={handleLogin} disabled={loading}>
         <Text>{loading ? 'Signing In...' : 'Sign In'}</Text>
       </TouchableOpacity>
-      
+
       <TouchableOpacity onPress={() => router.push('/auth/forgot-password')}>
         <Text>Forgot Password?</Text>
       </TouchableOpacity>
@@ -412,6 +414,7 @@ export default function LoginScreen() {
 ### 3. Email Verification Flow
 
 **Flow:**
+
 ```
 User Signs Up
     ↓
@@ -451,10 +454,10 @@ export default function VerifyEmailScreen() {
 
   const handleDeepLink = async ({ url }: { url: string }) => {
     const { queryParams } = Linking.parse(url)
-    
+
     if (queryParams?.token_hash && queryParams?.type === 'signup') {
       setVerifying(true)
-      
+
       try {
         const { data, error } = await supabase.auth.verifyOtp({
           token_hash: queryParams.token_hash as string,
@@ -474,7 +477,7 @@ export default function VerifyEmailScreen() {
 
   const resendVerification = async () => {
     const { data: { user } } = await supabase.auth.getUser()
-    
+
     if (user) {
       const { error } = await supabase.auth.resend({
         type: 'signup',
@@ -495,9 +498,9 @@ export default function VerifyEmailScreen() {
       <Text style={{ marginBottom: 20 }}>
         We've sent a verification link to your email. Please check your inbox.
       </Text>
-      
+
       {verifying && <Text>Verifying...</Text>}
-      
+
       <TouchableOpacity onPress={resendVerification}>
         <Text>Resend Verification Email</Text>
       </TouchableOpacity>
@@ -511,6 +514,7 @@ export default function VerifyEmailScreen() {
 ### 4. Password Reset Flow
 
 **Flow:**
+
 ```
 Forgot Password Screen
     ↓
@@ -574,7 +578,7 @@ export default function ForgotPasswordScreen() {
   return (
     <View style={{ padding: 20 }}>
       <Text style={{ fontSize: 24, marginBottom: 20 }}>Reset Password</Text>
-      
+
       <TextInput
         placeholder="Enter your email"
         value={email}
@@ -582,7 +586,7 @@ export default function ForgotPasswordScreen() {
         keyboardType="email-address"
         autoCapitalize="none"
       />
-      
+
       <TouchableOpacity onPress={handleResetPassword} disabled={loading}>
         <Text>{loading ? 'Sending...' : 'Send Reset Link'}</Text>
       </TouchableOpacity>
@@ -650,21 +654,21 @@ export default function ResetPasswordScreen() {
   return (
     <View style={{ padding: 20 }}>
       <Text style={{ fontSize: 24, marginBottom: 20 }}>New Password</Text>
-      
+
       <TextInput
         placeholder="New Password"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
       />
-      
+
       <TextInput
         placeholder="Confirm Password"
         value={confirmPassword}
         onChangeText={setConfirmPassword}
         secureTextEntry
       />
-      
+
       <TouchableOpacity onPress={handleUpdatePassword} disabled={loading}>
         <Text>{loading ? 'Updating...' : 'Update Password'}</Text>
       </TouchableOpacity>
@@ -678,6 +682,7 @@ export default function ResetPasswordScreen() {
 ### 5. Social Authentication (Google & Apple)
 
 **Flow:**
+
 ```
 Login Screen
     ↓
@@ -702,39 +707,39 @@ export const useAuth = () => {
   const signInWithGoogle = async () => {
     try {
       const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
+        provider: "google",
         options: {
-          redirectTo: 'jeevalearning://auth/callback',
+          redirectTo: "jeevalearning://auth/callback",
         },
-      })
+      });
 
-      if (error) throw error
-      return data
+      if (error) throw error;
+      return data;
     } catch (error) {
-      console.error('Google sign in error:', error)
-      throw error
+      console.error("Google sign in error:", error);
+      throw error;
     }
-  }
+  };
 
   const signInWithApple = async () => {
     try {
       const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'apple',
+        provider: "apple",
         options: {
-          redirectTo: 'jeevalearning://auth/callback',
+          redirectTo: "jeevalearning://auth/callback",
         },
-      })
+      });
 
-      if (error) throw error
-      return data
+      if (error) throw error;
+      return data;
     } catch (error) {
-      console.error('Apple sign in error:', error)
-      throw error
+      console.error("Apple sign in error:", error);
+      throw error;
     }
-  }
+  };
 
-  return { signIn, signUp, signInWithGoogle, signInWithApple }
-}
+  return { signIn, signUp, signInWithGoogle, signInWithApple };
+};
 ```
 
 **Login Screen with Social Auth:**
@@ -763,12 +768,12 @@ export default function LoginScreen() {
   return (
     <View>
       {/* Email/Password fields */}
-      
+
       <View style={{ marginTop: 20 }}>
         <TouchableOpacity onPress={handleGoogleSignIn}>
           <Text>Sign in with Google</Text>
         </TouchableOpacity>
-        
+
         <TouchableOpacity onPress={handleAppleSignIn}>
           <Text>Sign in with Apple</Text>
         </TouchableOpacity>
@@ -789,16 +794,16 @@ export default function LoginScreen() {
 export const useAuth = () => {
   const signOut = async () => {
     try {
-      const { error } = await supabase.auth.signOut()
-      if (error) throw error
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
     } catch (error) {
-      console.error('Sign out error:', error)
-      throw error
+      console.error("Sign out error:", error);
+      throw error;
     }
-  }
+  };
 
-  return { signIn, signUp, signOut }
-}
+  return { signIn, signUp, signOut };
+};
 ```
 
 **Usage Example:**
@@ -903,16 +908,16 @@ Supabase automatically refreshes tokens, but you can manually trigger:
 
 ```typescript
 const refreshSession = async () => {
-  const { data, error } = await supabase.auth.refreshSession()
-  
+  const { data, error } = await supabase.auth.refreshSession();
+
   if (error) {
-    console.error('Session refresh failed:', error)
+    console.error("Session refresh failed:", error);
     // Redirect to login
-    router.replace('/auth/login')
+    router.replace("/auth/login");
   }
-  
-  return data.session
-}
+
+  return data.session;
+};
 ```
 
 ---
@@ -922,49 +927,51 @@ const refreshSession = async () => {
 ### 1. Password Validation
 
 ```typescript
-const validatePassword = (password: string): { valid: boolean; message?: string } => {
+const validatePassword = (
+  password: string,
+): { valid: boolean; message?: string } => {
   if (password.length < 8) {
-    return { valid: false, message: 'Password must be at least 8 characters' }
+    return { valid: false, message: "Password must be at least 8 characters" };
   }
-  
+
   if (!/[A-Z]/.test(password)) {
-    return { valid: false, message: 'Password must contain uppercase letter' }
+    return { valid: false, message: "Password must contain uppercase letter" };
   }
-  
+
   if (!/[a-z]/.test(password)) {
-    return { valid: false, message: 'Password must contain lowercase letter' }
+    return { valid: false, message: "Password must contain lowercase letter" };
   }
-  
+
   if (!/[0-9]/.test(password)) {
-    return { valid: false, message: 'Password must contain a number' }
+    return { valid: false, message: "Password must contain a number" };
   }
-  
-  return { valid: true }
-}
+
+  return { valid: true };
+};
 ```
 
 ### 2. Email Validation
 
 ```typescript
 const validateEmail = (email: string): boolean => {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  return emailRegex.test(email)
-}
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};
 ```
 
 ### 3. Secure Storage
 
 ```typescript
-import * as SecureStore from 'expo-secure-store'
+import * as SecureStore from "expo-secure-store";
 
 // Store sensitive data
-await SecureStore.setItemAsync('user_token', token)
+await SecureStore.setItemAsync("user_token", token);
 
 // Retrieve sensitive data
-const token = await SecureStore.getItemAsync('user_token')
+const token = await SecureStore.getItemAsync("user_token");
 
 // Delete sensitive data
-await SecureStore.deleteItemAsync('user_token')
+await SecureStore.deleteItemAsync("user_token");
 ```
 
 ### 4. Rate Limiting
@@ -972,29 +979,32 @@ await SecureStore.deleteItemAsync('user_token')
 Implement client-side rate limiting for auth attempts:
 
 ```typescript
-const [loginAttempts, setLoginAttempts] = useState(0)
-const [lockoutTime, setLockoutTime] = useState<Date | null>(null)
+const [loginAttempts, setLoginAttempts] = useState(0);
+const [lockoutTime, setLockoutTime] = useState<Date | null>(null);
 
 const handleLogin = async () => {
   if (lockoutTime && new Date() < lockoutTime) {
-    Alert.alert('Too many attempts', 'Please wait before trying again')
-    return
+    Alert.alert("Too many attempts", "Please wait before trying again");
+    return;
   }
 
   try {
-    await signIn(email, password)
-    setLoginAttempts(0)
+    await signIn(email, password);
+    setLoginAttempts(0);
   } catch (error) {
-    const attempts = loginAttempts + 1
-    setLoginAttempts(attempts)
-    
+    const attempts = loginAttempts + 1;
+    setLoginAttempts(attempts);
+
     if (attempts >= 5) {
-      const lockout = new Date(Date.now() + 15 * 60 * 1000) // 15 min lockout
-      setLockoutTime(lockout)
-      Alert.alert('Account locked', 'Too many failed attempts. Try again in 15 minutes.')
+      const lockout = new Date(Date.now() + 15 * 60 * 1000); // 15 min lockout
+      setLockoutTime(lockout);
+      Alert.alert(
+        "Account locked",
+        "Too many failed attempts. Try again in 15 minutes.",
+      );
     }
   }
-}
+};
 ```
 
 ---
@@ -1005,34 +1015,34 @@ const handleLogin = async () => {
 
 ```typescript
 // __tests__/auth.test.ts
-import { supabase } from '@/lib/supabase'
+import { supabase } from "@/lib/supabase";
 
-describe('Authentication', () => {
-  it('should sign up new user', async () => {
+describe("Authentication", () => {
+  it("should sign up new user", async () => {
     const { data, error } = await supabase.auth.signUp({
-      email: 'test@example.com',
-      password: 'password123',
-    })
-    
-    expect(error).toBeNull()
-    expect(data.user).toBeDefined()
-  })
+      email: "test@example.com",
+      password: "password123",
+    });
 
-  it('should sign in existing user', async () => {
+    expect(error).toBeNull();
+    expect(data.user).toBeDefined();
+  });
+
+  it("should sign in existing user", async () => {
     const { data, error } = await supabase.auth.signInWithPassword({
-      email: 'test@example.com',
-      password: 'password123',
-    })
-    
-    expect(error).toBeNull()
-    expect(data.session).toBeDefined()
-  })
+      email: "test@example.com",
+      password: "password123",
+    });
 
-  it('should sign out user', async () => {
-    const { error } = await supabase.auth.signOut()
-    expect(error).toBeNull()
-  })
-})
+    expect(error).toBeNull();
+    expect(data.session).toBeDefined();
+  });
+
+  it("should sign out user", async () => {
+    const { error } = await supabase.auth.signOut();
+    expect(error).toBeNull();
+  });
+});
 ```
 
 ### Manual Testing Checklist
@@ -1060,38 +1070,41 @@ describe('Authentication', () => {
 ### Common Errors & Solutions
 
 **1. "User already registered"**
+
 ```typescript
-if (error.message.includes('already registered')) {
-  Alert.alert('Account Exists', 'This email is already registered. Please sign in.')
-  router.push('/auth/login')
+if (error.message.includes("already registered")) {
+  Alert.alert(
+    "Account Exists",
+    "This email is already registered. Please sign in.",
+  );
+  router.push("/auth/login");
 }
 ```
 
 **2. "Invalid login credentials"**
+
 ```typescript
-if (error.message.includes('Invalid login')) {
-  Alert.alert('Login Failed', 'Incorrect email or password')
+if (error.message.includes("Invalid login")) {
+  Alert.alert("Login Failed", "Incorrect email or password");
 }
 ```
 
 **3. "Email not confirmed"**
+
 ```typescript
-if (error.message.includes('Email not confirmed')) {
-  Alert.alert(
-    'Verify Email',
-    'Please verify your email before signing in',
-    [
-      { text: 'Resend', onPress: resendVerification },
-      { text: 'OK' }
-    ]
-  )
+if (error.message.includes("Email not confirmed")) {
+  Alert.alert("Verify Email", "Please verify your email before signing in", [
+    { text: "Resend", onPress: resendVerification },
+    { text: "OK" },
+  ]);
 }
 ```
 
 **4. Network errors**
+
 ```typescript
-if (error.message.includes('network')) {
-  Alert.alert('Network Error', 'Please check your internet connection')
+if (error.message.includes("network")) {
+  Alert.alert("Network Error", "Please check your internet connection");
 }
 ```
 
@@ -1100,18 +1113,18 @@ if (error.message.includes('network')) {
 ```typescript
 // utils/errorHandler.ts
 export const handleAuthError = (error: any) => {
-  if (error.message.includes('already registered')) {
-    return 'This email is already registered'
-  } else if (error.message.includes('Invalid login')) {
-    return 'Incorrect email or password'
-  } else if (error.message.includes('Email not confirmed')) {
-    return 'Please verify your email first'
-  } else if (error.message.includes('network')) {
-    return 'Network error. Check your connection'
+  if (error.message.includes("already registered")) {
+    return "This email is already registered";
+  } else if (error.message.includes("Invalid login")) {
+    return "Incorrect email or password";
+  } else if (error.message.includes("Email not confirmed")) {
+    return "Please verify your email first";
+  } else if (error.message.includes("network")) {
+    return "Network error. Check your connection";
   } else {
-    return error.message || 'An error occurred'
+    return error.message || "An error occurred";
   }
-}
+};
 ```
 
 ---
@@ -1168,12 +1181,12 @@ export default function AuthCallbackScreen() {
 
   const handleAuthCallback = (url: string) => {
     const { queryParams } = Linking.parse(url)
-    
+
     // Handle email verification
     if (queryParams?.type === 'signup') {
       router.replace('/(tabs)/home')
     }
-    
+
     // Handle password reset
     if (queryParams?.type === 'recovery') {
       router.replace('/auth/reset-password')
@@ -1265,12 +1278,14 @@ const { user, session, loading } = useAuthContext()
 ## ✅ Authentication Checklist
 
 ### Setup
+
 - [ ] Install Supabase SDK
 - [ ] Configure AsyncStorage
 - [ ] Set environment variables
 - [ ] Configure deep linking
 
 ### Implementation
+
 - [ ] Sign up flow
 - [ ] Sign in flow
 - [ ] Email verification
@@ -1279,6 +1294,7 @@ const { user, session, loading } = useAuthContext()
 - [ ] Sign out
 
 ### Security
+
 - [ ] Password validation
 - [ ] Email validation
 - [ ] Secure token storage
@@ -1286,12 +1302,14 @@ const { user, session, loading } = useAuthContext()
 - [ ] Error handling
 
 ### Session Management
+
 - [ ] Auto login on app start
 - [ ] Token refresh
 - [ ] Auth state listener
 - [ ] Protected routes
 
 ### Testing
+
 - [ ] Unit tests
 - [ ] Manual testing
 - [ ] Edge cases

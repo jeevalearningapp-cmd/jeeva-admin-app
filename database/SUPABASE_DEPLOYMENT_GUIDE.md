@@ -22,9 +22,11 @@ This guide will help you deploy all database migrations to your Supabase project
 Run migrations in this exact order to avoid foreign key errors:
 
 ### 1. Core Content Tables
+
 **File:** `create_content_tables.sql`
 
 **What it creates:**
+
 - `modules` - Course modules (e.g., "Practice MCQs", "Learning Content", "Mock Exams")
 - `topics` - Topics within modules
 - `lessons` - Individual lessons with rich text content
@@ -33,6 +35,7 @@ Run migrations in this exact order to avoid foreign key errors:
 - `question_options` - Answer choices for questions
 
 **RLS Policies:**
+
 - Superadmin: Full CRUD
 - Editor: Create, Read, Update
 - Moderator: Read-only
@@ -40,9 +43,11 @@ Run migrations in this exact order to avoid foreign key errors:
 ---
 
 ### 2. NMC Exam Structure
+
 **File:** `restructure_for_nmc_modules.sql`
 
 **What it creates:**
+
 - Updates content structure for UK NMC CBT exam format
 - `lesson_quiz_results` - Track quiz scores (80% passing requirement)
 - Adds NMC-specific fields to existing tables
@@ -52,9 +57,11 @@ Run migrations in this exact order to avoid foreign key errors:
 ---
 
 ### 3. Learning Progress Tracking
+
 **File:** `create_learning_completions.sql`
 
 **What it creates:**
+
 - `learning_completions` - Track which lessons users have completed
 - Timestamps for completion tracking
 - Progress percentage calculations
@@ -64,15 +71,18 @@ Run migrations in this exact order to avoid foreign key errors:
 ---
 
 ### 4. App Configuration
+
 **File:** `create_app_settings.sql`
 
 **What it creates:**
+
 - `app_settings` - Global app configuration (JSONB storage)
 - Automated notification rules
 - Feature flags
 - System-wide settings
 
 **Use cases:**
+
 - Configure automated notifications (subscription expiring, welcome messages)
 - Toggle features on/off
 - Store API keys and configurations
@@ -80,19 +90,23 @@ Run migrations in this exact order to avoid foreign key errors:
 ---
 
 ### 5. Push Notifications
+
 **File:** `create_push_notifications.sql`
 
 **What it creates:**
+
 - `push_tokens` - Store Expo push notification tokens from mobile devices
 - `notifications` - Notification campaigns and messages
 - `notification_targets` - Delivery tracking per user
 - `notification_queue` - Scheduled notification processing
 
 **Functions:**
+
 - `get_notification_stats()` - Get delivery metrics for a notification
 - `mark_inactive_push_tokens()` - Clean up stale tokens
 
 **RLS Policies:**
+
 - Admins: Full access to all tables
 - Users: Read-only access to their own push tokens and notifications
 
@@ -139,6 +153,7 @@ For each migration file (in the order listed above):
 2. You should see these tables:
 
 **Content Management:**
+
 - modules
 - topics
 - lessons
@@ -148,12 +163,15 @@ For each migration file (in the order listed above):
 - lesson_quiz_results
 
 **User Progress:**
+
 - learning_completions
 
 **Platform:**
+
 - app_settings
 
 **Push Notifications:**
+
 - push_tokens
 - notifications
 - notification_targets
@@ -179,6 +197,7 @@ VALUES (
 ```
 
 **How to get your user ID:**
+
 1. Sign up through your admin portal first
 2. In Supabase Dashboard → Authentication → Users
 3. Copy the User UID
@@ -274,6 +293,7 @@ After running all migrations:
    - Upload questions
 
 2. ✅ **Configure App Settings**
+
    ```sql
    INSERT INTO app_settings (key, value, description)
    VALUES (

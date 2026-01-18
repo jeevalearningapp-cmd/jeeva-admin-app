@@ -40,10 +40,10 @@ Row Level Security (RLS) is a PostgreSQL feature that restricts which rows can b
 
 ### Policy Types
 
-| Policy Type | Description |
-|-------------|-------------|
-| USING | Filters rows for SELECT, UPDATE, DELETE operations |
-| WITH CHECK | Validates new/modified rows for INSERT, UPDATE operations |
+| Policy Type | Description                                               |
+| ----------- | --------------------------------------------------------- |
+| USING       | Filters rows for SELECT, UPDATE, DELETE operations        |
+| WITH CHECK  | Validates new/modified rows for INSERT, UPDATE operations |
 
 ### Common Patterns
 
@@ -75,10 +75,10 @@ FOR ALL USING (auth.role() = 'admin');
 
 **RLS Enabled:** Yes
 
-| Policy Name | Operation | USING Expression | WITH CHECK Expression |
-|-------------|-----------|------------------|----------------------|
-| users_select_own | SELECT | `auth.uid() = id` | - |
-| users_update_own | UPDATE | `auth.uid() = id` | `auth.uid() = id` |
+| Policy Name      | Operation | USING Expression  | WITH CHECK Expression |
+| ---------------- | --------- | ----------------- | --------------------- |
+| users_select_own | SELECT    | `auth.uid() = id` | -                     |
+| users_update_own | UPDATE    | `auth.uid() = id` | `auth.uid() = id`     |
 
 **Description:** Users can only view and update their own user record.
 
@@ -88,11 +88,11 @@ FOR ALL USING (auth.role() = 'admin');
 
 **RLS Enabled:** Yes
 
-| Policy Name | Operation | USING Expression | WITH CHECK Expression |
-|-------------|-----------|------------------|----------------------|
-| profiles_select_own | SELECT | `auth.uid() = user_id` | - |
-| profiles_insert_own | INSERT | - | `auth.uid() = user_id` |
-| profiles_update_own | UPDATE | `auth.uid() = user_id` | `auth.uid() = user_id` |
+| Policy Name         | Operation | USING Expression       | WITH CHECK Expression  |
+| ------------------- | --------- | ---------------------- | ---------------------- |
+| profiles_select_own | SELECT    | `auth.uid() = user_id` | -                      |
+| profiles_insert_own | INSERT    | -                      | `auth.uid() = user_id` |
+| profiles_update_own | UPDATE    | `auth.uid() = user_id` | `auth.uid() = user_id` |
 
 **Description:** Users can view, create, and update their own profile.
 
@@ -102,11 +102,11 @@ FOR ALL USING (auth.role() = 'admin');
 
 **RLS Enabled:** Yes
 
-| Policy Name | Operation | USING Expression | WITH CHECK Expression |
-|-------------|-----------|------------------|----------------------|
-| sessions_select_own | SELECT | `auth.uid() = user_id` | - |
-| sessions_insert_own | INSERT | - | `auth.uid() = user_id` |
-| sessions_delete_own | DELETE | `auth.uid() = user_id` | - |
+| Policy Name         | Operation | USING Expression       | WITH CHECK Expression  |
+| ------------------- | --------- | ---------------------- | ---------------------- |
+| sessions_select_own | SELECT    | `auth.uid() = user_id` | -                      |
+| sessions_insert_own | INSERT    | -                      | `auth.uid() = user_id` |
+| sessions_delete_own | DELETE    | `auth.uid() = user_id` | -                      |
 
 **Description:** Users can manage their own session records.
 
@@ -116,10 +116,10 @@ FOR ALL USING (auth.role() = 'admin');
 
 **RLS Enabled:** Yes
 
-| Policy Name | Operation | USING Expression | WITH CHECK Expression |
-|-------------|-----------|------------------|----------------------|
-| admin_select_self | SELECT | `auth.uid() = id` | - |
-| admin_superadmin_all | ALL | `EXISTS (SELECT 1 FROM admin_users WHERE id = auth.uid() AND role = 'superadmin')` | - |
+| Policy Name          | Operation | USING Expression                                                                   | WITH CHECK Expression |
+| -------------------- | --------- | ---------------------------------------------------------------------------------- | --------------------- |
+| admin_select_self    | SELECT    | `auth.uid() = id`                                                                  | -                     |
+| admin_superadmin_all | ALL       | `EXISTS (SELECT 1 FROM admin_users WHERE id = auth.uid() AND role = 'superadmin')` | -                     |
 
 **Description:** Admins can view their own record. Superadmins have full access to all admin records.
 
@@ -129,11 +129,11 @@ FOR ALL USING (auth.role() = 'admin');
 
 **RLS Enabled:** Yes
 
-| Policy Name | Operation | USING Expression | WITH CHECK Expression |
-|-------------|-----------|------------------|----------------------|
-| prefs_select_own | SELECT | `auth.uid() = user_id` | - |
-| prefs_insert_own | INSERT | - | `auth.uid() = user_id` |
-| prefs_update_own | UPDATE | `auth.uid() = user_id` | `auth.uid() = user_id` |
+| Policy Name      | Operation | USING Expression       | WITH CHECK Expression  |
+| ---------------- | --------- | ---------------------- | ---------------------- |
+| prefs_select_own | SELECT    | `auth.uid() = user_id` | -                      |
+| prefs_insert_own | INSERT    | -                      | `auth.uid() = user_id` |
+| prefs_update_own | UPDATE    | `auth.uid() = user_id` | `auth.uid() = user_id` |
 
 **Description:** Users can manage their own notification preferences.
 
@@ -145,10 +145,10 @@ FOR ALL USING (auth.role() = 'admin');
 
 **RLS Enabled:** Yes
 
-| Policy Name | Operation | USING Expression | WITH CHECK Expression |
-|-------------|-----------|------------------|----------------------|
-| modules_public_read | SELECT | `is_active = true` | - |
-| modules_admin_all | ALL | `EXISTS (SELECT 1 FROM admin_users WHERE id = auth.uid())` | - |
+| Policy Name         | Operation | USING Expression                                           | WITH CHECK Expression |
+| ------------------- | --------- | ---------------------------------------------------------- | --------------------- |
+| modules_public_read | SELECT    | `is_active = true`                                         | -                     |
+| modules_admin_all   | ALL       | `EXISTS (SELECT 1 FROM admin_users WHERE id = auth.uid())` | -                     |
 
 **Description:** Active modules are publicly readable. Admins have full access.
 
@@ -158,10 +158,10 @@ FOR ALL USING (auth.role() = 'admin');
 
 **RLS Enabled:** Yes
 
-| Policy Name | Operation | USING Expression | WITH CHECK Expression |
-|-------------|-----------|------------------|----------------------|
-| topics_public_read | SELECT | `is_active = true` | - |
-| topics_admin_all | ALL | `EXISTS (SELECT 1 FROM admin_users WHERE id = auth.uid())` | - |
+| Policy Name        | Operation | USING Expression                                           | WITH CHECK Expression |
+| ------------------ | --------- | ---------------------------------------------------------- | --------------------- |
+| topics_public_read | SELECT    | `is_active = true`                                         | -                     |
+| topics_admin_all   | ALL       | `EXISTS (SELECT 1 FROM admin_users WHERE id = auth.uid())` | -                     |
 
 **Description:** Active topics are publicly readable. Admins have full access.
 
@@ -171,10 +171,10 @@ FOR ALL USING (auth.role() = 'admin');
 
 **RLS Enabled:** Yes
 
-| Policy Name | Operation | USING Expression | WITH CHECK Expression |
-|-------------|-----------|------------------|----------------------|
-| subtopics_public_read | SELECT | `is_active = true` | - |
-| subtopics_admin_all | ALL | `EXISTS (SELECT 1 FROM admin_users WHERE id = auth.uid())` | - |
+| Policy Name           | Operation | USING Expression                                           | WITH CHECK Expression |
+| --------------------- | --------- | ---------------------------------------------------------- | --------------------- |
+| subtopics_public_read | SELECT    | `is_active = true`                                         | -                     |
+| subtopics_admin_all   | ALL       | `EXISTS (SELECT 1 FROM admin_users WHERE id = auth.uid())` | -                     |
 
 **Description:** Active subtopics are publicly readable. Admins have full access.
 
@@ -184,10 +184,10 @@ FOR ALL USING (auth.role() = 'admin');
 
 **RLS Enabled:** Yes
 
-| Policy Name | Operation | USING Expression | WITH CHECK Expression |
-|-------------|-----------|------------------|----------------------|
-| lessons_public_read | SELECT | `is_active = true` | - |
-| lessons_admin_all | ALL | `EXISTS (SELECT 1 FROM admin_users WHERE id = auth.uid())` | - |
+| Policy Name         | Operation | USING Expression                                           | WITH CHECK Expression |
+| ------------------- | --------- | ---------------------------------------------------------- | --------------------- |
+| lessons_public_read | SELECT    | `is_active = true`                                         | -                     |
+| lessons_admin_all   | ALL       | `EXISTS (SELECT 1 FROM admin_users WHERE id = auth.uid())` | -                     |
 
 **Description:** Active lessons are publicly readable. Admins have full access.
 
@@ -197,10 +197,10 @@ FOR ALL USING (auth.role() = 'admin');
 
 **RLS Enabled:** Yes
 
-| Policy Name | Operation | USING Expression | WITH CHECK Expression |
-|-------------|-----------|------------------|----------------------|
-| content_public_read | SELECT | `EXISTS (SELECT 1 FROM lessons WHERE id = lesson_id AND is_active = true)` | - |
-| content_admin_all | ALL | `EXISTS (SELECT 1 FROM admin_users WHERE id = auth.uid())` | - |
+| Policy Name         | Operation | USING Expression                                                           | WITH CHECK Expression |
+| ------------------- | --------- | -------------------------------------------------------------------------- | --------------------- |
+| content_public_read | SELECT    | `EXISTS (SELECT 1 FROM lessons WHERE id = lesson_id AND is_active = true)` | -                     |
+| content_admin_all   | ALL       | `EXISTS (SELECT 1 FROM admin_users WHERE id = auth.uid())`                 | -                     |
 
 **Description:** Content is readable if parent lesson is active. Admins have full access.
 
@@ -210,10 +210,10 @@ FOR ALL USING (auth.role() = 'admin');
 
 **RLS Enabled:** Yes
 
-| Policy Name | Operation | USING Expression | WITH CHECK Expression |
-|-------------|-----------|------------------|----------------------|
-| quizzes_public_read | SELECT | `EXISTS (SELECT 1 FROM lessons WHERE id = lesson_id AND is_active = true)` | - |
-| quizzes_admin_all | ALL | `EXISTS (SELECT 1 FROM admin_users WHERE id = auth.uid())` | - |
+| Policy Name         | Operation | USING Expression                                                           | WITH CHECK Expression |
+| ------------------- | --------- | -------------------------------------------------------------------------- | --------------------- |
+| quizzes_public_read | SELECT    | `EXISTS (SELECT 1 FROM lessons WHERE id = lesson_id AND is_active = true)` | -                     |
+| quizzes_admin_all   | ALL       | `EXISTS (SELECT 1 FROM admin_users WHERE id = auth.uid())`                 | -                     |
 
 **Description:** Quiz mappings are readable if parent lesson is active. Admins have full access.
 
@@ -223,10 +223,10 @@ FOR ALL USING (auth.role() = 'admin');
 
 **RLS Enabled:** Yes
 
-| Policy Name | Operation | USING Expression | WITH CHECK Expression |
-|-------------|-----------|------------------|----------------------|
-| questions_public_read | SELECT | `is_active = true` | - |
-| questions_admin_all | ALL | `EXISTS (SELECT 1 FROM admin_users WHERE id = auth.uid())` | - |
+| Policy Name           | Operation | USING Expression                                           | WITH CHECK Expression |
+| --------------------- | --------- | ---------------------------------------------------------- | --------------------- |
+| questions_public_read | SELECT    | `is_active = true`                                         | -                     |
+| questions_admin_all   | ALL       | `EXISTS (SELECT 1 FROM admin_users WHERE id = auth.uid())` | -                     |
 
 **Description:** Active questions are publicly readable. Admins have full access.
 
@@ -236,10 +236,10 @@ FOR ALL USING (auth.role() = 'admin');
 
 **RLS Enabled:** Yes
 
-| Policy Name | Operation | USING Expression | WITH CHECK Expression |
-|-------------|-----------|------------------|----------------------|
-| options_public_read | SELECT | `EXISTS (SELECT 1 FROM questions WHERE id = question_id AND is_active = true)` | - |
-| options_admin_all | ALL | `EXISTS (SELECT 1 FROM admin_users WHERE id = auth.uid())` | - |
+| Policy Name         | Operation | USING Expression                                                               | WITH CHECK Expression |
+| ------------------- | --------- | ------------------------------------------------------------------------------ | --------------------- |
+| options_public_read | SELECT    | `EXISTS (SELECT 1 FROM questions WHERE id = question_id AND is_active = true)` | -                     |
+| options_admin_all   | ALL       | `EXISTS (SELECT 1 FROM admin_users WHERE id = auth.uid())`                     | -                     |
 
 **Description:** Options are readable if parent question is active. Admins have full access.
 
@@ -249,10 +249,10 @@ FOR ALL USING (auth.role() = 'admin');
 
 **RLS Enabled:** Yes
 
-| Policy Name | Operation | USING Expression | WITH CHECK Expression |
-|-------------|-----------|------------------|----------------------|
-| media_public_read | SELECT | `EXISTS (SELECT 1 FROM questions WHERE id = question_id AND is_active = true)` | - |
-| media_admin_all | ALL | `EXISTS (SELECT 1 FROM admin_users WHERE id = auth.uid())` | - |
+| Policy Name       | Operation | USING Expression                                                               | WITH CHECK Expression |
+| ----------------- | --------- | ------------------------------------------------------------------------------ | --------------------- |
+| media_public_read | SELECT    | `EXISTS (SELECT 1 FROM questions WHERE id = question_id AND is_active = true)` | -                     |
+| media_admin_all   | ALL       | `EXISTS (SELECT 1 FROM admin_users WHERE id = auth.uid())`                     | -                     |
 
 **Description:** Media is readable if parent question is active. Admins have full access.
 
@@ -262,10 +262,10 @@ FOR ALL USING (auth.role() = 'admin');
 
 **RLS Enabled:** Yes
 
-| Policy Name | Operation | USING Expression | WITH CHECK Expression |
-|-------------|-----------|------------------|----------------------|
-| flashcards_public_read | SELECT | `is_active = true` | - |
-| flashcards_admin_all | ALL | `EXISTS (SELECT 1 FROM admin_users WHERE id = auth.uid())` | - |
+| Policy Name            | Operation | USING Expression                                           | WITH CHECK Expression |
+| ---------------------- | --------- | ---------------------------------------------------------- | --------------------- |
+| flashcards_public_read | SELECT    | `is_active = true`                                         | -                     |
+| flashcards_admin_all   | ALL       | `EXISTS (SELECT 1 FROM admin_users WHERE id = auth.uid())` | -                     |
 
 **Description:** Active flashcards are publicly readable. Admins have full access.
 
@@ -275,10 +275,10 @@ FOR ALL USING (auth.role() = 'admin');
 
 **RLS Enabled:** Yes
 
-| Policy Name | Operation | USING Expression | WITH CHECK Expression |
-|-------------|-----------|------------------|----------------------|
-| rules_public_read | SELECT | `is_active = true` | - |
-| rules_admin_all | ALL | `EXISTS (SELECT 1 FROM admin_users WHERE id = auth.uid())` | - |
+| Policy Name       | Operation | USING Expression                                           | WITH CHECK Expression |
+| ----------------- | --------- | ---------------------------------------------------------- | --------------------- |
+| rules_public_read | SELECT    | `is_active = true`                                         | -                     |
+| rules_admin_all   | ALL       | `EXISTS (SELECT 1 FROM admin_users WHERE id = auth.uid())` | -                     |
 
 **Description:** Active access rules are publicly readable. Admins have full access.
 
@@ -290,10 +290,10 @@ FOR ALL USING (auth.role() = 'admin');
 
 **RLS Enabled:** Yes
 
-| Policy Name | Operation | USING Expression | WITH CHECK Expression |
-|-------------|-----------|------------------|----------------------|
-| completions_select_own | SELECT | `auth.uid() = user_id` | - |
-| completions_insert_own | INSERT | - | `auth.uid() = user_id` |
+| Policy Name            | Operation | USING Expression       | WITH CHECK Expression  |
+| ---------------------- | --------- | ---------------------- | ---------------------- |
+| completions_select_own | SELECT    | `auth.uid() = user_id` | -                      |
+| completions_insert_own | INSERT    | -                      | `auth.uid() = user_id` |
 
 **Description:** Users can view and record their own lesson completions.
 
@@ -303,11 +303,11 @@ FOR ALL USING (auth.role() = 'admin');
 
 **RLS Enabled:** Yes
 
-| Policy Name | Operation | USING Expression | WITH CHECK Expression |
-|-------------|-----------|------------------|----------------------|
-| progress_select_own | SELECT | `auth.uid() = user_id` | - |
-| progress_insert_own | INSERT | - | `auth.uid() = user_id` |
-| progress_update_own | UPDATE | `auth.uid() = user_id` | `auth.uid() = user_id` |
+| Policy Name         | Operation | USING Expression       | WITH CHECK Expression  |
+| ------------------- | --------- | ---------------------- | ---------------------- |
+| progress_select_own | SELECT    | `auth.uid() = user_id` | -                      |
+| progress_insert_own | INSERT    | -                      | `auth.uid() = user_id` |
+| progress_update_own | UPDATE    | `auth.uid() = user_id` | `auth.uid() = user_id` |
 
 **Description:** Users can manage their own learning progress records.
 
@@ -317,11 +317,11 @@ FOR ALL USING (auth.role() = 'admin');
 
 **RLS Enabled:** Yes
 
-| Policy Name | Operation | USING Expression | WITH CHECK Expression |
-|-------------|-----------|------------------|----------------------|
-| paths_select_own | SELECT | `auth.uid() = user_id` | - |
-| paths_insert_own | INSERT | - | `auth.uid() = user_id` |
-| paths_update_own | UPDATE | `auth.uid() = user_id` | `auth.uid() = user_id` |
+| Policy Name      | Operation | USING Expression       | WITH CHECK Expression  |
+| ---------------- | --------- | ---------------------- | ---------------------- |
+| paths_select_own | SELECT    | `auth.uid() = user_id` | -                      |
+| paths_insert_own | INSERT    | -                      | `auth.uid() = user_id` |
+| paths_update_own | UPDATE    | `auth.uid() = user_id` | `auth.uid() = user_id` |
 
 **Description:** Users can manage their own learning paths.
 
@@ -331,10 +331,10 @@ FOR ALL USING (auth.role() = 'admin');
 
 **RLS Enabled:** Yes
 
-| Policy Name | Operation | USING Expression | WITH CHECK Expression |
-|-------------|-----------|------------------|----------------------|
-| quiz_results_select_own | SELECT | `auth.uid() = user_id` | - |
-| quiz_results_insert_own | INSERT | - | `auth.uid() = user_id` |
+| Policy Name             | Operation | USING Expression       | WITH CHECK Expression  |
+| ----------------------- | --------- | ---------------------- | ---------------------- |
+| quiz_results_select_own | SELECT    | `auth.uid() = user_id` | -                      |
+| quiz_results_insert_own | INSERT    | -                      | `auth.uid() = user_id` |
 
 **Description:** Users can view and record their own quiz results.
 
@@ -344,11 +344,11 @@ FOR ALL USING (auth.role() = 'admin');
 
 **RLS Enabled:** Yes
 
-| Policy Name | Operation | USING Expression | WITH CHECK Expression |
-|-------------|-----------|------------------|----------------------|
-| sessions_select_own | SELECT | `auth.uid() = user_id` | - |
-| sessions_insert_own | INSERT | - | `auth.uid() = user_id` |
-| sessions_update_own | UPDATE | `auth.uid() = user_id` | `auth.uid() = user_id` |
+| Policy Name         | Operation | USING Expression       | WITH CHECK Expression  |
+| ------------------- | --------- | ---------------------- | ---------------------- |
+| sessions_select_own | SELECT    | `auth.uid() = user_id` | -                      |
+| sessions_insert_own | INSERT    | -                      | `auth.uid() = user_id` |
+| sessions_update_own | UPDATE    | `auth.uid() = user_id` | `auth.uid() = user_id` |
 
 **Description:** Users can manage their own practice sessions.
 
@@ -358,10 +358,10 @@ FOR ALL USING (auth.role() = 'admin');
 
 **RLS Enabled:** Yes
 
-| Policy Name | Operation | USING Expression | WITH CHECK Expression |
-|-------------|-----------|------------------|----------------------|
-| results_select_own | SELECT | `EXISTS (SELECT 1 FROM practice_sessions WHERE id = session_id AND user_id = auth.uid())` | - |
-| results_insert_own | INSERT | - | `EXISTS (SELECT 1 FROM practice_sessions WHERE id = session_id AND user_id = auth.uid())` |
+| Policy Name        | Operation | USING Expression                                                                          | WITH CHECK Expression                                                                     |
+| ------------------ | --------- | ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| results_select_own | SELECT    | `EXISTS (SELECT 1 FROM practice_sessions WHERE id = session_id AND user_id = auth.uid())` | -                                                                                         |
+| results_insert_own | INSERT    | -                                                                                         | `EXISTS (SELECT 1 FROM practice_sessions WHERE id = session_id AND user_id = auth.uid())` |
 
 **Description:** Users can manage results for their own practice sessions.
 
@@ -371,10 +371,10 @@ FOR ALL USING (auth.role() = 'admin');
 
 **RLS Enabled:** Yes
 
-| Policy Name | Operation | USING Expression | WITH CHECK Expression |
-|-------------|-----------|------------------|----------------------|
-| config_public_read | SELECT | `is_active = true` | - |
-| config_admin_all | ALL | `EXISTS (SELECT 1 FROM admin_users WHERE id = auth.uid())` | - |
+| Policy Name        | Operation | USING Expression                                           | WITH CHECK Expression |
+| ------------------ | --------- | ---------------------------------------------------------- | --------------------- |
+| config_public_read | SELECT    | `is_active = true`                                         | -                     |
+| config_admin_all   | ALL       | `EXISTS (SELECT 1 FROM admin_users WHERE id = auth.uid())` | -                     |
 
 **Description:** Active exam configs are publicly readable. Admins have full access.
 
@@ -384,11 +384,11 @@ FOR ALL USING (auth.role() = 'admin');
 
 **RLS Enabled:** Yes
 
-| Policy Name | Operation | USING Expression | WITH CHECK Expression |
-|-------------|-----------|------------------|----------------------|
-| exams_select_own | SELECT | `auth.uid() = user_id` | - |
-| exams_insert_own | INSERT | - | `auth.uid() = user_id` |
-| exams_update_own | UPDATE | `auth.uid() = user_id` | `auth.uid() = user_id` |
+| Policy Name      | Operation | USING Expression       | WITH CHECK Expression  |
+| ---------------- | --------- | ---------------------- | ---------------------- |
+| exams_select_own | SELECT    | `auth.uid() = user_id` | -                      |
+| exams_insert_own | INSERT    | -                      | `auth.uid() = user_id` |
+| exams_update_own | UPDATE    | `auth.uid() = user_id` | `auth.uid() = user_id` |
 
 **Description:** Users can manage their own mock exam attempts.
 
@@ -398,10 +398,10 @@ FOR ALL USING (auth.role() = 'admin');
 
 **RLS Enabled:** Yes
 
-| Policy Name | Operation | USING Expression | WITH CHECK Expression |
-|-------------|-----------|------------------|----------------------|
-| mock_results_select_own | SELECT | `EXISTS (SELECT 1 FROM mock_exams WHERE id = exam_id AND user_id = auth.uid())` | - |
-| mock_results_insert_own | INSERT | - | `EXISTS (SELECT 1 FROM mock_exams WHERE id = exam_id AND user_id = auth.uid())` |
+| Policy Name             | Operation | USING Expression                                                                | WITH CHECK Expression                                                           |
+| ----------------------- | --------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| mock_results_select_own | SELECT    | `EXISTS (SELECT 1 FROM mock_exams WHERE id = exam_id AND user_id = auth.uid())` | -                                                                               |
+| mock_results_insert_own | INSERT    | -                                                                               | `EXISTS (SELECT 1 FROM mock_exams WHERE id = exam_id AND user_id = auth.uid())` |
 
 **Description:** Users can manage results for their own mock exams.
 
@@ -411,11 +411,11 @@ FOR ALL USING (auth.role() = 'admin');
 
 **RLS Enabled:** Yes
 
-| Policy Name | Operation | USING Expression | WITH CHECK Expression |
-|-------------|-----------|------------------|----------------------|
-| mock_sessions_select_own | SELECT | `EXISTS (SELECT 1 FROM mock_exams WHERE id = exam_id AND user_id = auth.uid())` | - |
-| mock_sessions_insert_own | INSERT | - | `EXISTS (SELECT 1 FROM mock_exams WHERE id = exam_id AND user_id = auth.uid())` |
-| mock_sessions_update_own | UPDATE | `EXISTS (SELECT 1 FROM mock_exams WHERE id = exam_id AND user_id = auth.uid())` | - |
+| Policy Name              | Operation | USING Expression                                                                | WITH CHECK Expression                                                           |
+| ------------------------ | --------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| mock_sessions_select_own | SELECT    | `EXISTS (SELECT 1 FROM mock_exams WHERE id = exam_id AND user_id = auth.uid())` | -                                                                               |
+| mock_sessions_insert_own | INSERT    | -                                                                               | `EXISTS (SELECT 1 FROM mock_exams WHERE id = exam_id AND user_id = auth.uid())` |
+| mock_sessions_update_own | UPDATE    | `EXISTS (SELECT 1 FROM mock_exams WHERE id = exam_id AND user_id = auth.uid())` | -                                                                               |
 
 **Description:** Users can manage sessions for their own mock exams.
 
@@ -425,10 +425,10 @@ FOR ALL USING (auth.role() = 'admin');
 
 **RLS Enabled:** Yes
 
-| Policy Name | Operation | USING Expression | WITH CHECK Expression |
-|-------------|-----------|------------------|----------------------|
-| recommendations_select_own | SELECT | `auth.uid() = user_id` | - |
-| recommendations_update_own | UPDATE | `auth.uid() = user_id` | `auth.uid() = user_id` |
+| Policy Name                | Operation | USING Expression       | WITH CHECK Expression  |
+| -------------------------- | --------- | ---------------------- | ---------------------- |
+| recommendations_select_own | SELECT    | `auth.uid() = user_id` | -                      |
+| recommendations_update_own | UPDATE    | `auth.uid() = user_id` | `auth.uid() = user_id` |
 
 **Description:** Users can view and dismiss their own AI recommendations.
 
@@ -438,9 +438,9 @@ FOR ALL USING (auth.role() = 'admin');
 
 **RLS Enabled:** Yes
 
-| Policy Name | Operation | USING Expression | WITH CHECK Expression |
-|-------------|-----------|------------------|----------------------|
-| analytics_select_own | SELECT | `auth.uid() = user_id` | - |
+| Policy Name          | Operation | USING Expression       | WITH CHECK Expression |
+| -------------------- | --------- | ---------------------- | --------------------- |
+| analytics_select_own | SELECT    | `auth.uid() = user_id` | -                     |
 
 **Description:** Users can view their own analytics data.
 
@@ -452,10 +452,10 @@ FOR ALL USING (auth.role() = 'admin');
 
 **RLS Enabled:** Yes
 
-| Policy Name | Operation | USING Expression | WITH CHECK Expression |
-|-------------|-----------|------------------|----------------------|
-| trial_exams_public_read | SELECT | `true` | - |
-| trial_exams_admin_all | ALL | `EXISTS (SELECT 1 FROM admin_users WHERE id = auth.uid())` | - |
+| Policy Name             | Operation | USING Expression                                           | WITH CHECK Expression |
+| ----------------------- | --------- | ---------------------------------------------------------- | --------------------- |
+| trial_exams_public_read | SELECT    | `true`                                                     | -                     |
+| trial_exams_admin_all   | ALL       | `EXISTS (SELECT 1 FROM admin_users WHERE id = auth.uid())` | -                     |
 
 **Description:** Trial exams are publicly readable. Admins have full access.
 
@@ -465,11 +465,11 @@ FOR ALL USING (auth.role() = 'admin');
 
 **RLS Enabled:** Yes
 
-| Policy Name | Operation | USING Expression | WITH CHECK Expression |
-|-------------|-----------|------------------|----------------------|
-| trial_attempts_select_own | SELECT | `auth.uid() = user_id` | - |
-| trial_attempts_insert_own | INSERT | - | `auth.uid() = user_id` |
-| trial_attempts_update_own | UPDATE | `auth.uid() = user_id` | `auth.uid() = user_id` |
+| Policy Name               | Operation | USING Expression       | WITH CHECK Expression  |
+| ------------------------- | --------- | ---------------------- | ---------------------- |
+| trial_attempts_select_own | SELECT    | `auth.uid() = user_id` | -                      |
+| trial_attempts_insert_own | INSERT    | -                      | `auth.uid() = user_id` |
+| trial_attempts_update_own | UPDATE    | `auth.uid() = user_id` | `auth.uid() = user_id` |
 
 **Description:** Users can manage their own trial exam attempts.
 
@@ -479,11 +479,11 @@ FOR ALL USING (auth.role() = 'admin');
 
 **RLS Enabled:** Yes
 
-| Policy Name | Operation | USING Expression | WITH CHECK Expression |
-|-------------|-----------|------------------|----------------------|
-| trial_progress_select_own | SELECT | `auth.uid() = user_id` | - |
-| trial_progress_insert_own | INSERT | - | `auth.uid() = user_id` |
-| trial_progress_update_own | UPDATE | `auth.uid() = user_id` | `auth.uid() = user_id` |
+| Policy Name               | Operation | USING Expression       | WITH CHECK Expression  |
+| ------------------------- | --------- | ---------------------- | ---------------------- |
+| trial_progress_select_own | SELECT    | `auth.uid() = user_id` | -                      |
+| trial_progress_insert_own | INSERT    | -                      | `auth.uid() = user_id` |
+| trial_progress_update_own | UPDATE    | `auth.uid() = user_id` | `auth.uid() = user_id` |
 
 **Description:** Users can manage their own trial learning progress.
 
@@ -493,14 +493,12 @@ FOR ALL USING (auth.role() = 'admin');
 
 **RLS Enabled:** Yes
 
-| Policy Name | Operation | USING Expression | WITH CHECK Expression |
-|-------------|-----------|------------------|----------------------|
-| trial_records_select_own | SELECT | `auth.uid() = user_id` | - |
-| trial_records_insert_own | INSERT | - | `auth.uid() = user_id` |
+| Policy Name              | Operation | USING Expression       | WITH CHECK Expression  |
+| ------------------------ | --------- | ---------------------- | ---------------------- |
+| trial_records_select_own | SELECT    | `auth.uid() = user_id` | -                      |
+| trial_records_insert_own | INSERT    | -                      | `auth.uid() = user_id` |
 
 **Description:** Users can view and create their own trial attempt records.
-
-
 
 ---
 
@@ -510,10 +508,10 @@ FOR ALL USING (auth.role() = 'admin');
 
 **RLS Enabled:** Yes
 
-| Policy Name | Operation | USING Expression | WITH CHECK Expression |
-|-------------|-----------|------------------|----------------------|
-| plans_public_read | SELECT | `is_active = true` | - |
-| plans_admin_all | ALL | `EXISTS (SELECT 1 FROM admin_users WHERE id = auth.uid())` | - |
+| Policy Name       | Operation | USING Expression                                           | WITH CHECK Expression |
+| ----------------- | --------- | ---------------------------------------------------------- | --------------------- |
+| plans_public_read | SELECT    | `is_active = true`                                         | -                     |
+| plans_admin_all   | ALL       | `EXISTS (SELECT 1 FROM admin_users WHERE id = auth.uid())` | -                     |
 
 **Description:** Active subscription plans are publicly readable. Admins have full access.
 
@@ -523,12 +521,12 @@ FOR ALL USING (auth.role() = 'admin');
 
 **RLS Enabled:** Yes
 
-| Policy Name | Operation | USING Expression | WITH CHECK Expression |
-|-------------|-----------|------------------|----------------------|
-| subscriptions_select_own | SELECT | `auth.uid() = user_id` | - |
-| subscriptions_insert_own | INSERT | - | `auth.uid() = user_id` |
-| subscriptions_update_own | UPDATE | `auth.uid() = user_id` | `auth.uid() = user_id` |
-| subscriptions_admin_all | ALL | `EXISTS (SELECT 1 FROM admin_users WHERE id = auth.uid())` | - |
+| Policy Name              | Operation | USING Expression                                           | WITH CHECK Expression  |
+| ------------------------ | --------- | ---------------------------------------------------------- | ---------------------- |
+| subscriptions_select_own | SELECT    | `auth.uid() = user_id`                                     | -                      |
+| subscriptions_insert_own | INSERT    | -                                                          | `auth.uid() = user_id` |
+| subscriptions_update_own | UPDATE    | `auth.uid() = user_id`                                     | `auth.uid() = user_id` |
+| subscriptions_admin_all  | ALL       | `EXISTS (SELECT 1 FROM admin_users WHERE id = auth.uid())` | -                      |
 
 **Description:** Users can manage their own subscriptions. Admins have full access.
 
@@ -538,11 +536,11 @@ FOR ALL USING (auth.role() = 'admin');
 
 **RLS Enabled:** Yes
 
-| Policy Name | Operation | USING Expression | WITH CHECK Expression |
-|-------------|-----------|------------------|----------------------|
-| usage_select_own | SELECT | `EXISTS (SELECT 1 FROM subscriptions WHERE id = subscription_id AND user_id = auth.uid())` | - |
-| usage_insert_own | INSERT | - | `EXISTS (SELECT 1 FROM subscriptions WHERE id = subscription_id AND user_id = auth.uid())` |
-| usage_update_own | UPDATE | `EXISTS (SELECT 1 FROM subscriptions WHERE id = subscription_id AND user_id = auth.uid())` | - |
+| Policy Name      | Operation | USING Expression                                                                           | WITH CHECK Expression                                                                      |
+| ---------------- | --------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ |
+| usage_select_own | SELECT    | `EXISTS (SELECT 1 FROM subscriptions WHERE id = subscription_id AND user_id = auth.uid())` | -                                                                                          |
+| usage_insert_own | INSERT    | -                                                                                          | `EXISTS (SELECT 1 FROM subscriptions WHERE id = subscription_id AND user_id = auth.uid())` |
+| usage_update_own | UPDATE    | `EXISTS (SELECT 1 FROM subscriptions WHERE id = subscription_id AND user_id = auth.uid())` | -                                                                                          |
 
 **Description:** Users can manage usage records for their own subscriptions.
 
@@ -552,10 +550,10 @@ FOR ALL USING (auth.role() = 'admin');
 
 **RLS Enabled:** Yes
 
-| Policy Name | Operation | USING Expression | WITH CHECK Expression |
-|-------------|-----------|------------------|----------------------|
-| coupons_public_read | SELECT | `is_active = true AND (max_uses IS NULL OR times_used < max_uses)` | - |
-| coupons_admin_all | ALL | `EXISTS (SELECT 1 FROM admin_users WHERE id = auth.uid())` | - |
+| Policy Name         | Operation | USING Expression                                                   | WITH CHECK Expression |
+| ------------------- | --------- | ------------------------------------------------------------------ | --------------------- |
+| coupons_public_read | SELECT    | `is_active = true AND (max_uses IS NULL OR times_used < max_uses)` | -                     |
+| coupons_admin_all   | ALL       | `EXISTS (SELECT 1 FROM admin_users WHERE id = auth.uid())`         | -                     |
 
 **Description:** Active, non-exhausted coupons are publicly readable. Admins have full access.
 
@@ -567,10 +565,10 @@ FOR ALL USING (auth.role() = 'admin');
 
 **RLS Enabled:** Yes
 
-| Policy Name | Operation | USING Expression | WITH CHECK Expression |
-|-------------|-----------|------------------|----------------------|
-| settings_public_read | SELECT | `true` | - |
-| settings_admin_all | ALL | `EXISTS (SELECT 1 FROM admin_users WHERE id = auth.uid())` | - |
+| Policy Name          | Operation | USING Expression                                           | WITH CHECK Expression |
+| -------------------- | --------- | ---------------------------------------------------------- | --------------------- |
+| settings_public_read | SELECT    | `true`                                                     | -                     |
+| settings_admin_all   | ALL       | `EXISTS (SELECT 1 FROM admin_users WHERE id = auth.uid())` | -                     |
 
 **Description:** App settings are publicly readable. Admins have full access.
 
@@ -580,10 +578,10 @@ FOR ALL USING (auth.role() = 'admin');
 
 **RLS Enabled:** Yes
 
-| Policy Name | Operation | USING Expression | WITH CHECK Expression |
-|-------------|-----------|------------------|----------------------|
-| hero_public_read | SELECT | `is_active = true` | - |
-| hero_admin_all | ALL | `EXISTS (SELECT 1 FROM admin_users WHERE id = auth.uid())` | - |
+| Policy Name      | Operation | USING Expression                                           | WITH CHECK Expression |
+| ---------------- | --------- | ---------------------------------------------------------- | --------------------- |
+| hero_public_read | SELECT    | `is_active = true`                                         | -                     |
+| hero_admin_all   | ALL       | `EXISTS (SELECT 1 FROM admin_users WHERE id = auth.uid())` | -                     |
 
 **Description:** Active hero sections are publicly readable. Admins have full access.
 
@@ -593,11 +591,11 @@ FOR ALL USING (auth.role() = 'admin');
 
 **RLS Enabled:** Yes
 
-| Policy Name | Operation | USING Expression | WITH CHECK Expression |
-|-------------|-----------|------------------|----------------------|
-| approvals_admin_read | SELECT | `EXISTS (SELECT 1 FROM admin_users WHERE id = auth.uid())` | - |
-| approvals_admin_insert | INSERT | - | `EXISTS (SELECT 1 FROM admin_users WHERE id = auth.uid())` |
-| approvals_admin_update | UPDATE | `EXISTS (SELECT 1 FROM admin_users WHERE id = auth.uid())` | - |
+| Policy Name            | Operation | USING Expression                                           | WITH CHECK Expression                                      |
+| ---------------------- | --------- | ---------------------------------------------------------- | ---------------------------------------------------------- |
+| approvals_admin_read   | SELECT    | `EXISTS (SELECT 1 FROM admin_users WHERE id = auth.uid())` | -                                                          |
+| approvals_admin_insert | INSERT    | -                                                          | `EXISTS (SELECT 1 FROM admin_users WHERE id = auth.uid())` |
+| approvals_admin_update | UPDATE    | `EXISTS (SELECT 1 FROM admin_users WHERE id = auth.uid())` | -                                                          |
 
 **Description:** Only admins can view and manage content approvals.
 
@@ -607,9 +605,9 @@ FOR ALL USING (auth.role() = 'admin');
 
 **RLS Enabled:** Yes
 
-| Policy Name | Operation | USING Expression | WITH CHECK Expression |
-|-------------|-----------|------------------|----------------------|
-| templates_admin_all | ALL | `EXISTS (SELECT 1 FROM admin_users WHERE id = auth.uid())` | - |
+| Policy Name         | Operation | USING Expression                                           | WITH CHECK Expression |
+| ------------------- | --------- | ---------------------------------------------------------- | --------------------- |
+| templates_admin_all | ALL       | `EXISTS (SELECT 1 FROM admin_users WHERE id = auth.uid())` | -                     |
 
 **Description:** Only admins can manage email templates.
 
@@ -621,12 +619,12 @@ FOR ALL USING (auth.role() = 'admin');
 
 **RLS Enabled:** Yes
 
-| Policy Name | Operation | USING Expression | WITH CHECK Expression |
-|-------------|-----------|------------------|----------------------|
-| conversations_select_own | SELECT | `auth.uid() = user_id` | - |
-| conversations_insert_own | INSERT | - | `auth.uid() = user_id` |
-| conversations_update_own | UPDATE | `auth.uid() = user_id` | `auth.uid() = user_id` |
-| conversations_delete_own | DELETE | `auth.uid() = user_id` | - |
+| Policy Name              | Operation | USING Expression       | WITH CHECK Expression  |
+| ------------------------ | --------- | ---------------------- | ---------------------- |
+| conversations_select_own | SELECT    | `auth.uid() = user_id` | -                      |
+| conversations_insert_own | INSERT    | -                      | `auth.uid() = user_id` |
+| conversations_update_own | UPDATE    | `auth.uid() = user_id` | `auth.uid() = user_id` |
+| conversations_delete_own | DELETE    | `auth.uid() = user_id` | -                      |
 
 **Description:** Users can fully manage their own chat conversations.
 
@@ -636,10 +634,10 @@ FOR ALL USING (auth.role() = 'admin');
 
 **RLS Enabled:** Yes
 
-| Policy Name | Operation | USING Expression | WITH CHECK Expression |
-|-------------|-----------|------------------|----------------------|
-| messages_select_own | SELECT | `EXISTS (SELECT 1 FROM chat_conversations WHERE id = conversation_id AND user_id = auth.uid())` | - |
-| messages_insert_own | INSERT | - | `EXISTS (SELECT 1 FROM chat_conversations WHERE id = conversation_id AND user_id = auth.uid())` |
+| Policy Name         | Operation | USING Expression                                                                                | WITH CHECK Expression                                                                           |
+| ------------------- | --------- | ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| messages_select_own | SELECT    | `EXISTS (SELECT 1 FROM chat_conversations WHERE id = conversation_id AND user_id = auth.uid())` | -                                                                                               |
+| messages_insert_own | INSERT    | -                                                                                               | `EXISTS (SELECT 1 FROM chat_conversations WHERE id = conversation_id AND user_id = auth.uid())` |
 
 **Description:** Users can view and add messages to their own conversations.
 
@@ -649,11 +647,11 @@ FOR ALL USING (auth.role() = 'admin');
 
 **RLS Enabled:** Yes
 
-| Policy Name | Operation | USING Expression | WITH CHECK Expression |
-|-------------|-----------|------------------|----------------------|
-| ai_stats_select_own | SELECT | `auth.uid() = user_id` | - |
-| ai_stats_insert_own | INSERT | - | `auth.uid() = user_id` |
-| ai_stats_update_own | UPDATE | `auth.uid() = user_id` | `auth.uid() = user_id` |
+| Policy Name         | Operation | USING Expression       | WITH CHECK Expression  |
+| ------------------- | --------- | ---------------------- | ---------------------- |
+| ai_stats_select_own | SELECT    | `auth.uid() = user_id` | -                      |
+| ai_stats_insert_own | INSERT    | -                      | `auth.uid() = user_id` |
+| ai_stats_update_own | UPDATE    | `auth.uid() = user_id` | `auth.uid() = user_id` |
 
 **Description:** Users can manage their own AI usage statistics.
 
@@ -665,10 +663,10 @@ FOR ALL USING (auth.role() = 'admin');
 
 **RLS Enabled:** Yes
 
-| Policy Name | Operation | USING Expression | WITH CHECK Expression |
-|-------------|-----------|------------------|----------------------|
-| notifications_user_read | SELECT | `audience_filter->>'type' = 'all' OR audience_filter->'userIds' ? auth.uid()::text` | - |
-| notifications_admin_all | ALL | `EXISTS (SELECT 1 FROM admin_users WHERE id = auth.uid())` | - |
+| Policy Name             | Operation | USING Expression                                                                    | WITH CHECK Expression |
+| ----------------------- | --------- | ----------------------------------------------------------------------------------- | --------------------- |
+| notifications_user_read | SELECT    | `audience_filter->>'type' = 'all' OR audience_filter->'userIds' ? auth.uid()::text` | -                     |
+| notifications_admin_all | ALL       | `EXISTS (SELECT 1 FROM admin_users WHERE id = auth.uid())`                          | -                     |
 
 **Description:** Users can view notifications targeted to them. Admins have full access.
 
@@ -678,9 +676,9 @@ FOR ALL USING (auth.role() = 'admin');
 
 **RLS Enabled:** Yes
 
-| Policy Name | Operation | USING Expression | WITH CHECK Expression |
-|-------------|-----------|------------------|----------------------|
-| queue_admin_all | ALL | `EXISTS (SELECT 1 FROM admin_users WHERE id = auth.uid())` | - |
+| Policy Name     | Operation | USING Expression                                           | WITH CHECK Expression |
+| --------------- | --------- | ---------------------------------------------------------- | --------------------- |
+| queue_admin_all | ALL       | `EXISTS (SELECT 1 FROM admin_users WHERE id = auth.uid())` | -                     |
 
 **Description:** Only admins can manage the notification queue.
 
@@ -690,10 +688,10 @@ FOR ALL USING (auth.role() = 'admin');
 
 **RLS Enabled:** Yes
 
-| Policy Name | Operation | USING Expression | WITH CHECK Expression |
-|-------------|-----------|------------------|----------------------|
-| targets_select_own | SELECT | `auth.uid() = user_id` | - |
-| targets_update_own | UPDATE | `auth.uid() = user_id` | `auth.uid() = user_id` |
+| Policy Name        | Operation | USING Expression       | WITH CHECK Expression  |
+| ------------------ | --------- | ---------------------- | ---------------------- |
+| targets_select_own | SELECT    | `auth.uid() = user_id` | -                      |
+| targets_update_own | UPDATE    | `auth.uid() = user_id` | `auth.uid() = user_id` |
 
 **Description:** Users can view and update their own notification targets.
 
@@ -703,12 +701,12 @@ FOR ALL USING (auth.role() = 'admin');
 
 **RLS Enabled:** Yes
 
-| Policy Name | Operation | USING Expression | WITH CHECK Expression |
-|-------------|-----------|------------------|----------------------|
-| tokens_select_own | SELECT | `auth.uid() = user_id` | - |
-| tokens_insert_own | INSERT | - | `auth.uid() = user_id` |
-| tokens_update_own | UPDATE | `auth.uid() = user_id` | `auth.uid() = user_id` |
-| tokens_delete_own | DELETE | `auth.uid() = user_id` | - |
+| Policy Name       | Operation | USING Expression       | WITH CHECK Expression  |
+| ----------------- | --------- | ---------------------- | ---------------------- |
+| tokens_select_own | SELECT    | `auth.uid() = user_id` | -                      |
+| tokens_insert_own | INSERT    | -                      | `auth.uid() = user_id` |
+| tokens_update_own | UPDATE    | `auth.uid() = user_id` | `auth.uid() = user_id` |
+| tokens_delete_own | DELETE    | `auth.uid() = user_id` | -                      |
 
 **Description:** Users can fully manage their own push tokens.
 
@@ -718,10 +716,10 @@ FOR ALL USING (auth.role() = 'admin');
 
 **RLS Enabled:** Yes
 
-| Policy Name | Operation | USING Expression | WITH CHECK Expression |
-|-------------|-----------|------------------|----------------------|
-| reads_select_own | SELECT | `auth.uid() = user_id` | - |
-| reads_insert_own | INSERT | - | `auth.uid() = user_id` |
+| Policy Name      | Operation | USING Expression       | WITH CHECK Expression  |
+| ---------------- | --------- | ---------------------- | ---------------------- |
+| reads_select_own | SELECT    | `auth.uid() = user_id` | -                      |
+| reads_insert_own | INSERT    | -                      | `auth.uid() = user_id` |
 
 **Description:** Users can view and record their own notification reads.
 
@@ -733,66 +731,67 @@ FOR ALL USING (auth.role() = 'admin');
 
 This matrix shows which operations each role can perform on each table category.
 
-| Table Category | User (SELECT) | User (INSERT) | User (UPDATE) | User (DELETE) | Admin (ALL) |
-|----------------|---------------|---------------|---------------|---------------|-------------|
-| **Auth & Users** |
-| users | Own only | - | Own only | - | Superadmin |
-| user_profiles | Own only | Own only | Own only | - | Superadmin |
-| user_sessions | Own only | Own only | - | Own only | Superadmin |
-| admin_users | Own only | - | - | - | Superadmin |
-| notification_preferences | Own only | Own only | Own only | - | Superadmin |
-| **Learning Content** |
-| modules | Active only | - | - | - | ✓ |
-| topics | Active only | - | - | - | ✓ |
-| subtopics | Active only | - | - | - | ✓ |
-| lessons | Active only | - | - | - | ✓ |
-| lesson_content | Via lesson | - | - | - | ✓ |
-| lesson_quizzes | Via lesson | - | - | - | ✓ |
-| questions | Active only | - | - | - | ✓ |
-| question_options | Via question | - | - | - | ✓ |
-| question_media | Via question | - | - | - | ✓ |
-| flashcards | Active only | - | - | - | ✓ |
-| module_access_rules | Active only | - | - | - | ✓ |
-| **Progress & Practice** |
-| learning_completions | Own only | Own only | - | - | - |
-| learning_progress | Own only | Own only | Own only | - | - |
-| learning_paths | Own only | Own only | Own only | - | - |
-| lesson_quiz_results | Own only | Own only | - | - | - |
-| practice_sessions | Own only | Own only | Own only | - | - |
-| practice_results | Via session | Via session | - | - | - |
-| mock_exam_config | Active only | - | - | - | ✓ |
-| mock_exams | Own only | Own only | Own only | - | - |
-| mock_results | Via exam | Via exam | - | - | - |
-| mock_sessions | Via exam | Via exam | Via exam | - | - |
-| ai_recommendations | Own only | - | Own only | - | - |
-| user_analytics | Own only | - | - | - | - |
-| **Trial Module** |
-| trial_mock_exams | All | - | - | - | ✓ |
-| trial_exam_attempts | Own only | Own only | Own only | - | - |
-| trial_learning_progress | Own only | Own only | Own only | - | - |
-| trial_attempt_records | Own only | Own only | - | - | - |
-| **Subscriptions** |
-| subscription_plans | Active only | - | - | - | ✓ |
-| subscriptions | Own only | Own only | Own only | - | ✓ |
-| subscription_usage | Via sub | Via sub | Via sub | - | - |
-| discount_coupons | Active only | - | - | - | ✓ |
-| **System** |
-| app_settings | All | - | - | - | ✓ |
-| dashboard_hero | Active only | - | - | - | ✓ |
-| content_approvals | - | - | - | - | ✓ |
-| email_templates | - | - | - | - | ✓ |
-| **AI & Chat** |
-| chat_conversations | Own only | Own only | Own only | Own only | - |
-| chat_messages | Via conv | Via conv | - | - | - |
-| ai_usage_stats | Own only | Own only | Own only | - | - |
-| **Notifications** |
-| notifications | Targeted | - | - | - | ✓ |
-| notification_queue | - | - | - | - | ✓ |
-| notification_targets | Own only | - | Own only | - | - |
-| push_tokens | Own only | Own only | Own only | Own only | - |
-| user_notification_reads | Own only | Own only | - | - | - |
+| Table Category           | User (SELECT) | User (INSERT) | User (UPDATE) | User (DELETE) | Admin (ALL) |
+| ------------------------ | ------------- | ------------- | ------------- | ------------- | ----------- |
+| **Auth & Users**         |
+| users                    | Own only      | -             | Own only      | -             | Superadmin  |
+| user_profiles            | Own only      | Own only      | Own only      | -             | Superadmin  |
+| user_sessions            | Own only      | Own only      | -             | Own only      | Superadmin  |
+| admin_users              | Own only      | -             | -             | -             | Superadmin  |
+| notification_preferences | Own only      | Own only      | Own only      | -             | Superadmin  |
+| **Learning Content**     |
+| modules                  | Active only   | -             | -             | -             | ✓           |
+| topics                   | Active only   | -             | -             | -             | ✓           |
+| subtopics                | Active only   | -             | -             | -             | ✓           |
+| lessons                  | Active only   | -             | -             | -             | ✓           |
+| lesson_content           | Via lesson    | -             | -             | -             | ✓           |
+| lesson_quizzes           | Via lesson    | -             | -             | -             | ✓           |
+| questions                | Active only   | -             | -             | -             | ✓           |
+| question_options         | Via question  | -             | -             | -             | ✓           |
+| question_media           | Via question  | -             | -             | -             | ✓           |
+| flashcards               | Active only   | -             | -             | -             | ✓           |
+| module_access_rules      | Active only   | -             | -             | -             | ✓           |
+| **Progress & Practice**  |
+| learning_completions     | Own only      | Own only      | -             | -             | -           |
+| learning_progress        | Own only      | Own only      | Own only      | -             | -           |
+| learning_paths           | Own only      | Own only      | Own only      | -             | -           |
+| lesson_quiz_results      | Own only      | Own only      | -             | -             | -           |
+| practice_sessions        | Own only      | Own only      | Own only      | -             | -           |
+| practice_results         | Via session   | Via session   | -             | -             | -           |
+| mock_exam_config         | Active only   | -             | -             | -             | ✓           |
+| mock_exams               | Own only      | Own only      | Own only      | -             | -           |
+| mock_results             | Via exam      | Via exam      | -             | -             | -           |
+| mock_sessions            | Via exam      | Via exam      | Via exam      | -             | -           |
+| ai_recommendations       | Own only      | -             | Own only      | -             | -           |
+| user_analytics           | Own only      | -             | -             | -             | -           |
+| **Trial Module**         |
+| trial_mock_exams         | All           | -             | -             | -             | ✓           |
+| trial_exam_attempts      | Own only      | Own only      | Own only      | -             | -           |
+| trial_learning_progress  | Own only      | Own only      | Own only      | -             | -           |
+| trial_attempt_records    | Own only      | Own only      | -             | -             | -           |
+| **Subscriptions**        |
+| subscription_plans       | Active only   | -             | -             | -             | ✓           |
+| subscriptions            | Own only      | Own only      | Own only      | -             | ✓           |
+| subscription_usage       | Via sub       | Via sub       | Via sub       | -             | -           |
+| discount_coupons         | Active only   | -             | -             | -             | ✓           |
+| **System**               |
+| app_settings             | All           | -             | -             | -             | ✓           |
+| dashboard_hero           | Active only   | -             | -             | -             | ✓           |
+| content_approvals        | -             | -             | -             | -             | ✓           |
+| email_templates          | -             | -             | -             | -             | ✓           |
+| **AI & Chat**            |
+| chat_conversations       | Own only      | Own only      | Own only      | Own only      | -           |
+| chat_messages            | Via conv      | Via conv      | -             | -             | -           |
+| ai_usage_stats           | Own only      | Own only      | Own only      | -             | -           |
+| **Notifications**        |
+| notifications            | Targeted      | -             | -             | -             | ✓           |
+| notification_queue       | -             | -             | -             | -             | ✓           |
+| notification_targets     | Own only      | -             | Own only      | -             | -           |
+| push_tokens              | Own only      | Own only      | Own only      | Own only      | -           |
+| user_notification_reads  | Own only      | Own only      | -             | -             | -           |
 
 **Legend:**
+
 - Own only: User can only access their own records
 - Active only: User can only access active records
 - Via X: Access determined by parent record ownership
@@ -827,21 +826,21 @@ The following tables do not have RLS enabled and should be evaluated for securit
 
 These tables contain potentially sensitive data and should have RLS policies added:
 
-| Table | Risk Level | Recommended Policy |
-|-------|------------|-------------------|
-| analytics_sessions | High | Admin-only access for viewing, system insert |
-| daily_stats | High | Admin-only access |
+| Table              | Risk Level | Recommended Policy                           |
+| ------------------ | ---------- | -------------------------------------------- |
+| analytics_sessions | High       | Admin-only access for viewing, system insert |
+| daily_stats        | High       | Admin-only access                            |
 
 ### Medium Priority
 
 These tables are backup/archive tables with lower risk:
 
-| Table | Risk Level | Recommended Policy |
-|-------|------------|-------------------|
-| flashcards_backup | Medium | Admin-only access |
-| lessons_backup | Medium | Admin-only access |
-| questions_backup | Medium | Admin-only access |
-| hero_sections | Medium | Public read, admin write |
+| Table             | Risk Level | Recommended Policy       |
+| ----------------- | ---------- | ------------------------ |
+| flashcards_backup | Medium     | Admin-only access        |
+| lessons_backup    | Medium     | Admin-only access        |
+| questions_backup  | Medium     | Admin-only access        |
+| hero_sections     | Medium     | Public read, admin write |
 
 ### Recommended Implementation
 

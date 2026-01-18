@@ -1,56 +1,56 @@
-import { supabase } from '@/lib/supabase'
+import { supabase } from "@/lib/supabase";
 
 export interface LearningQuestionOption {
-  id: string
-  questionId: string
-  optionText: string
-  isCorrect: boolean
-  displayOrder: number
+  id: string;
+  questionId: string;
+  optionText: string;
+  isCorrect: boolean;
+  displayOrder: number;
 }
 
 export interface LearningQuestion {
-  id: string
-  topicId: string
-  subtopicId: string
-  videoLessonId: string
-  questionText: string
-  questionType: 'multiple_choice' | 'true_false'
-  difficulty: 'easy' | 'medium' | 'hard'
-  points: number
-  explanation?: string
-  imageUrl?: string
-  isActive: boolean
-  createdAt: string
-  updatedAt: string
-  options?: LearningQuestionOption[]
+  id: string;
+  topicId: string;
+  subtopicId: string;
+  videoLessonId: string;
+  questionText: string;
+  questionType: "multiple_choice" | "true_false";
+  difficulty: "easy" | "medium" | "hard";
+  points: number;
+  explanation?: string;
+  imageUrl?: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  options?: LearningQuestionOption[];
 }
 
 export interface CreateLearningQuestionInput {
-  topicId: string
-  subtopicId: string
-  videoLessonId: string
-  questionText: string
-  questionType: 'multiple_choice' | 'true_false'
-  difficulty: 'easy' | 'medium' | 'hard'
-  points?: number
-  explanation?: string
-  imageUrl?: string
-  isActive?: boolean
+  topicId: string;
+  subtopicId: string;
+  videoLessonId: string;
+  questionText: string;
+  questionType: "multiple_choice" | "true_false";
+  difficulty: "easy" | "medium" | "hard";
+  points?: number;
+  explanation?: string;
+  imageUrl?: string;
+  isActive?: boolean;
   options: {
-    optionText: string
-    isCorrect: boolean
-    displayOrder: number
-  }[]
+    optionText: string;
+    isCorrect: boolean;
+    displayOrder: number;
+  }[];
 }
 
 export interface UpdateLearningQuestionInput {
-  questionText?: string
-  questionType?: 'multiple_choice' | 'true_false'
-  difficulty?: 'easy' | 'medium' | 'hard'
-  points?: number
-  explanation?: string
-  imageUrl?: string
-  isActive?: boolean
+  questionText?: string;
+  questionType?: "multiple_choice" | "true_false";
+  difficulty?: "easy" | "medium" | "hard";
+  points?: number;
+  explanation?: string;
+  imageUrl?: string;
+  isActive?: boolean;
 }
 
 const mapToQuestion = (data: any): LearningQuestion => ({
@@ -67,7 +67,7 @@ const mapToQuestion = (data: any): LearningQuestion => ({
   isActive: data.is_active,
   createdAt: data.created_at,
   updatedAt: data.updated_at,
-})
+});
 
 const mapToOption = (data: any): LearningQuestionOption => ({
   id: data.id,
@@ -75,57 +75,59 @@ const mapToOption = (data: any): LearningQuestionOption => ({
   optionText: data.option_text,
   isCorrect: data.is_correct,
   displayOrder: data.display_order,
-})
+});
 
 export const learningQuestionsAPI = {
   async getByVideoLessonId(videoLessonId: string): Promise<LearningQuestion[]> {
     const { data, error } = await supabase
-      .from('learning_questions')
-      .select('*, learning_question_options(*)')
-      .eq('video_lesson_id', videoLessonId)
-      .order('created_at', { ascending: true })
+      .from("learning_questions")
+      .select("*, learning_question_options(*)")
+      .eq("video_lesson_id", videoLessonId)
+      .order("created_at", { ascending: true });
 
-    if (error) throw error
+    if (error) throw error;
     return (data || []).map((q) => ({
       ...mapToQuestion(q),
       options: (q.learning_question_options || []).map(mapToOption),
-    }))
+    }));
   },
 
   async getById(id: string): Promise<LearningQuestion> {
     const { data, error } = await supabase
-      .from('learning_questions')
-      .select('*, learning_question_options(*)')
-      .eq('id', id)
-      .single()
+      .from("learning_questions")
+      .select("*, learning_question_options(*)")
+      .eq("id", id)
+      .single();
 
-    if (error) throw error
+    if (error) throw error;
     return {
       ...mapToQuestion(data),
       options: (data.learning_question_options || []).map(mapToOption),
-    }
+    };
   },
 
   async create(input: CreateLearningQuestionInput): Promise<LearningQuestion> {
     // Create question
     const { data: questionData, error: questionError } = await supabase
-      .from('learning_questions')
-      .insert([{
-        topic_id: input.topicId,
-        subtopic_id: input.subtopicId,
-        video_lesson_id: input.videoLessonId,
-        question_text: input.questionText,
-        question_type: input.questionType,
-        difficulty: input.difficulty,
-        points: input.points ?? 1,
-        explanation: input.explanation,
-        image_url: input.imageUrl,
-        is_active: input.isActive ?? true,
-      }])
+      .from("learning_questions")
+      .insert([
+        {
+          topic_id: input.topicId,
+          subtopic_id: input.subtopicId,
+          video_lesson_id: input.videoLessonId,
+          question_text: input.questionText,
+          question_type: input.questionType,
+          difficulty: input.difficulty,
+          points: input.points ?? 1,
+          explanation: input.explanation,
+          image_url: input.imageUrl,
+          is_active: input.isActive ?? true,
+        },
+      ])
       .select()
-      .single()
+      .single();
 
-    if (questionError) throw questionError
+    if (questionError) throw questionError;
 
     // Create options
     const optionsToInsert = input.options.map((opt) => ({
@@ -133,63 +135,70 @@ export const learningQuestionsAPI = {
       option_text: opt.optionText,
       is_correct: opt.isCorrect,
       display_order: opt.displayOrder,
-    }))
+    }));
 
     const { data: optionsData, error: optionsError } = await supabase
-      .from('learning_question_options')
+      .from("learning_question_options")
       .insert(optionsToInsert)
-      .select()
+      .select();
 
-    if (optionsError) throw optionsError
+    if (optionsError) throw optionsError;
 
     return {
       ...mapToQuestion(questionData),
       options: (optionsData || []).map(mapToOption),
-    }
+    };
   },
 
-  async update(id: string, input: UpdateLearningQuestionInput): Promise<LearningQuestion> {
-    const updateData: any = {}
-    if (input.questionText !== undefined) updateData.question_text = input.questionText
-    if (input.questionType !== undefined) updateData.question_type = input.questionType
-    if (input.difficulty !== undefined) updateData.difficulty = input.difficulty
-    if (input.points !== undefined) updateData.points = input.points
-    if (input.explanation !== undefined) updateData.explanation = input.explanation
-    if (input.imageUrl !== undefined) updateData.image_url = input.imageUrl
-    if (input.isActive !== undefined) updateData.is_active = input.isActive
+  async update(
+    id: string,
+    input: UpdateLearningQuestionInput,
+  ): Promise<LearningQuestion> {
+    const updateData: any = {};
+    if (input.questionText !== undefined)
+      updateData.question_text = input.questionText;
+    if (input.questionType !== undefined)
+      updateData.question_type = input.questionType;
+    if (input.difficulty !== undefined)
+      updateData.difficulty = input.difficulty;
+    if (input.points !== undefined) updateData.points = input.points;
+    if (input.explanation !== undefined)
+      updateData.explanation = input.explanation;
+    if (input.imageUrl !== undefined) updateData.image_url = input.imageUrl;
+    if (input.isActive !== undefined) updateData.is_active = input.isActive;
 
     const { data, error } = await supabase
-      .from('learning_questions')
+      .from("learning_questions")
       .update(updateData)
-      .eq('id', id)
-      .select('*, learning_question_options(*)')
-      .single()
+      .eq("id", id)
+      .select("*, learning_question_options(*)")
+      .single();
 
-    if (error) throw error
+    if (error) throw error;
     return {
       ...mapToQuestion(data),
       options: (data.learning_question_options || []).map(mapToOption),
-    }
+    };
   },
 
   async delete(id: string): Promise<void> {
     const { error } = await supabase
-      .from('learning_questions')
+      .from("learning_questions")
       .delete()
-      .eq('id', id)
+      .eq("id", id);
 
-    if (error) throw error
+    if (error) throw error;
   },
 
   async updateOptions(
     questionId: string,
-    options: { optionText: string; isCorrect: boolean; displayOrder: number }[]
+    options: { optionText: string; isCorrect: boolean; displayOrder: number }[],
   ): Promise<void> {
     // Delete existing options
     await supabase
-      .from('learning_question_options')
+      .from("learning_question_options")
       .delete()
-      .eq('question_id', questionId)
+      .eq("question_id", questionId);
 
     // Insert new options
     const optionsToInsert = options.map((opt) => ({
@@ -197,12 +206,12 @@ export const learningQuestionsAPI = {
       option_text: opt.optionText,
       is_correct: opt.isCorrect,
       display_order: opt.displayOrder,
-    }))
+    }));
 
     const { error } = await supabase
-      .from('learning_question_options')
-      .insert(optionsToInsert)
+      .from("learning_question_options")
+      .insert(optionsToInsert);
 
-    if (error) throw error
+    if (error) throw error;
   },
-}
+};

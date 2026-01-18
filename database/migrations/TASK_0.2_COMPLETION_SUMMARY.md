@@ -17,6 +17,7 @@ All required deliverables for task 0.2 have been created:
 **File:** `backup_questions_tables.sql`
 
 Creates comprehensive backups including:
+
 - CSV exports of `questions` and `question_options` tables
 - In-database backup tables (`questions_backup`, `question_options_backup`)
 - Backup metadata tracking
@@ -26,10 +27,12 @@ Creates comprehensive backups including:
 ### 2. ✅ CSV Export Functionality
 
 The backup script exports both tables to CSV format:
+
 - `/tmp/questions_backup.csv` - All questions with metadata
 - `/tmp/question_options_backup.csv` - All question options
 
 CSV files include:
+
 - Headers for easy import
 - Proper escaping and quoting
 - Ordered by creation date for consistency
@@ -39,6 +42,7 @@ CSV files include:
 **File:** `BACKUP_RESTORE_GUIDE.md`
 
 Comprehensive documentation covering:
+
 - Backup locations (CSV files, database tables, cloud storage)
 - Backup retention policies
 - Storage recommendations
@@ -49,6 +53,7 @@ Comprehensive documentation covering:
 **File:** `restore_questions_backup.sql`
 
 Complete restore script that:
+
 - Verifies backup tables exist
 - Drops existing tables safely
 - Recreates tables from backup
@@ -62,6 +67,7 @@ Complete restore script that:
 **File:** `test_restore_dev.sh`
 
 Automated test script that:
+
 - Connects to development database
 - Verifies backup tables exist
 - Runs restore procedure
@@ -78,6 +84,7 @@ Automated test script that:
 **File:** `run_backup.sh`
 
 Shell script that automates the entire backup process:
+
 - Runs SQL backup script
 - Copies CSV files to backup directory
 - Exports backup metadata
@@ -90,6 +97,7 @@ Shell script that automates the entire backup process:
 **File:** `verify_backup.sql`
 
 Quick verification script to check:
+
 - Backup tables exist
 - Row counts match
 - Data integrity (no orphans, no duplicates)
@@ -101,6 +109,7 @@ Quick verification script to check:
 **File:** `README_BACKUP.md`
 
 Quick reference guide with:
+
 - Quick start commands
 - File descriptions
 - Pre-migration checklist
@@ -211,16 +220,16 @@ To actually run the backup (when ready):
 
 ## Files Created
 
-| File | Purpose | Type |
-|------|---------|------|
-| `backup_questions_tables.sql` | Create backups | SQL Script |
-| `restore_questions_backup.sql` | Restore from backup | SQL Script |
-| `verify_backup.sql` | Verify backup integrity | SQL Script |
-| `run_backup.sh` | Automated backup | Shell Script |
-| `test_restore_dev.sh` | Test restore on dev | Shell Script |
-| `BACKUP_RESTORE_GUIDE.md` | Comprehensive guide | Documentation |
-| `README_BACKUP.md` | Quick start guide | Documentation |
-| `TASK_0.2_COMPLETION_SUMMARY.md` | This summary | Documentation |
+| File                             | Purpose                 | Type          |
+| -------------------------------- | ----------------------- | ------------- |
+| `backup_questions_tables.sql`    | Create backups          | SQL Script    |
+| `restore_questions_backup.sql`   | Restore from backup     | SQL Script    |
+| `verify_backup.sql`              | Verify backup integrity | SQL Script    |
+| `run_backup.sh`                  | Automated backup        | Shell Script  |
+| `test_restore_dev.sh`            | Test restore on dev     | Shell Script  |
+| `BACKUP_RESTORE_GUIDE.md`        | Comprehensive guide     | Documentation |
+| `README_BACKUP.md`               | Quick start guide       | Documentation |
+| `TASK_0.2_COMPLETION_SUMMARY.md` | This summary            | Documentation |
 
 ---
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -20,24 +20,31 @@ import {
   Radio,
   RadioGroup,
   Divider,
-} from '@mui/material'
-import { DeleteOutlined, AddOutlined, ImageOutlined } from '@mui/icons-material'
-import { Subtopic } from '@/api/subtopics'
-import { learningQuestionsAPI, LearningQuestion } from '@/api/learningQuestions'
-import { useSnackbar } from 'notistack'
+} from "@mui/material";
+import {
+  DeleteOutlined,
+  AddOutlined,
+  ImageOutlined,
+} from "@mui/icons-material";
+import { Subtopic } from "@/api/subtopics";
+import {
+  learningQuestionsAPI,
+  LearningQuestion,
+} from "@/api/learningQuestions";
+import { useSnackbar } from "notistack";
 
 interface VideoMappedMCQFormProps {
-  open: boolean
-  onClose: () => void
-  subtopic: Subtopic
-  editingQuestion?: LearningQuestion | null
-  onSuccess: () => void
+  open: boolean;
+  onClose: () => void;
+  subtopic: Subtopic;
+  editingQuestion?: LearningQuestion | null;
+  onSuccess: () => void;
 }
 
 interface QuestionOption {
-  optionText: string
-  isCorrect: boolean
-  displayOrder: number
+  optionText: string;
+  isCorrect: boolean;
+  displayOrder: number;
 }
 
 export const VideoMappedMCQForm: React.FC<VideoMappedMCQFormProps> = ({
@@ -47,73 +54,77 @@ export const VideoMappedMCQForm: React.FC<VideoMappedMCQFormProps> = ({
   editingQuestion,
   onSuccess,
 }) => {
-  const [questionText, setQuestionText] = useState('')
-  const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium')
-  const [explanation, setExplanation] = useState('')
-  const [imageUrl, setImageUrl] = useState('')
-  const [isActive, setIsActive] = useState(true)
+  const [questionText, setQuestionText] = useState("");
+  const [difficulty, setDifficulty] = useState<"easy" | "medium" | "hard">(
+    "medium",
+  );
+  const [explanation, setExplanation] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
+  const [isActive, setIsActive] = useState(true);
   const [options, setOptions] = useState<QuestionOption[]>([
-    { optionText: '', isCorrect: false, displayOrder: 0 },
-    { optionText: '', isCorrect: false, displayOrder: 1 },
-    { optionText: '', isCorrect: false, displayOrder: 2 },
-    { optionText: '', isCorrect: false, displayOrder: 3 },
-  ])
-  const [touched, setTouched] = useState({ questionText: false })
-  const [submitError, setSubmitError] = useState<string>('')
-  const [isSaving, setIsSaving] = useState(false)
-  const { enqueueSnackbar } = useSnackbar()
+    { optionText: "", isCorrect: false, displayOrder: 0 },
+    { optionText: "", isCorrect: false, displayOrder: 1 },
+    { optionText: "", isCorrect: false, displayOrder: 2 },
+    { optionText: "", isCorrect: false, displayOrder: 3 },
+  ]);
+  const [touched, setTouched] = useState({ questionText: false });
+  const [submitError, setSubmitError] = useState<string>("");
+  const [isSaving, setIsSaving] = useState(false);
+  const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
     if (editingQuestion) {
-      setQuestionText(editingQuestion.questionText)
-      setDifficulty(editingQuestion.difficulty)
-      setExplanation(editingQuestion.explanation || '')
-      setImageUrl(editingQuestion.imageUrl || '')
-      setIsActive(editingQuestion.isActive)
+      setQuestionText(editingQuestion.questionText);
+      setDifficulty(editingQuestion.difficulty);
+      setExplanation(editingQuestion.explanation || "");
+      setImageUrl(editingQuestion.imageUrl || "");
+      setIsActive(editingQuestion.isActive);
       if (editingQuestion.options && editingQuestion.options.length > 0) {
         setOptions(
           editingQuestion.options.map((opt) => ({
             optionText: opt.optionText,
             isCorrect: opt.isCorrect,
             displayOrder: opt.displayOrder,
-          }))
-        )
+          })),
+        );
       }
     } else {
       // Reset form
-      setQuestionText('')
-      setDifficulty('medium')
-      setExplanation('')
-      setImageUrl('')
-      setIsActive(true)
+      setQuestionText("");
+      setDifficulty("medium");
+      setExplanation("");
+      setImageUrl("");
+      setIsActive(true);
       setOptions([
-        { optionText: '', isCorrect: false, displayOrder: 0 },
-        { optionText: '', isCorrect: false, displayOrder: 1 },
-        { optionText: '', isCorrect: false, displayOrder: 2 },
-        { optionText: '', isCorrect: false, displayOrder: 3 },
-      ])
+        { optionText: "", isCorrect: false, displayOrder: 0 },
+        { optionText: "", isCorrect: false, displayOrder: 1 },
+        { optionText: "", isCorrect: false, displayOrder: 2 },
+        { optionText: "", isCorrect: false, displayOrder: 3 },
+      ]);
     }
-    setTouched({ questionText: false })
-    setSubmitError('')
-  }, [editingQuestion, open])
+    setTouched({ questionText: false });
+    setSubmitError("");
+  }, [editingQuestion, open]);
 
   const validate = () => {
-    if (!questionText.trim()) return false
-    if (options.length < 2) return false
-    if (!options.some((opt) => opt.isCorrect)) return false
-    if (options.some((opt) => !opt.optionText.trim())) return false
-    return true
-  }
+    if (!questionText.trim()) return false;
+    if (options.length < 2) return false;
+    if (!options.some((opt) => opt.isCorrect)) return false;
+    if (options.some((opt) => !opt.optionText.trim())) return false;
+    return true;
+  };
 
   const handleSubmit = async () => {
-    setTouched({ questionText: true })
+    setTouched({ questionText: true });
     if (!validate()) {
-      setSubmitError('Please fill in all required fields and select a correct answer')
-      return
+      setSubmitError(
+        "Please fill in all required fields and select a correct answer",
+      );
+      return;
     }
 
-    setSubmitError('')
-    setIsSaving(true)
+    setSubmitError("");
+    setIsSaving(true);
 
     try {
       if (editingQuestion) {
@@ -124,10 +135,12 @@ export const VideoMappedMCQForm: React.FC<VideoMappedMCQFormProps> = ({
           explanation,
           imageUrl,
           isActive,
-        })
+        });
         // Update options
-        await learningQuestionsAPI.updateOptions(editingQuestion.id, options)
-        enqueueSnackbar('Question updated successfully', { variant: 'success' })
+        await learningQuestionsAPI.updateOptions(editingQuestion.id, options);
+        enqueueSnackbar("Question updated successfully", {
+          variant: "success",
+        });
       } else {
         // Create new question
         await learningQuestionsAPI.create({
@@ -135,70 +148,76 @@ export const VideoMappedMCQForm: React.FC<VideoMappedMCQFormProps> = ({
           subtopicId: subtopic.id,
           videoLessonId: subtopic.id,
           questionText,
-          questionType: 'multiple_choice',
+          questionType: "multiple_choice",
           difficulty,
           explanation,
           imageUrl,
           isActive,
           options,
-        })
-        enqueueSnackbar('Question created successfully', { variant: 'success' })
+        });
+        enqueueSnackbar("Question created successfully", {
+          variant: "success",
+        });
       }
-      onSuccess()
-      onClose()
+      onSuccess();
+      onClose();
     } catch (error: any) {
-      setSubmitError(error.message || 'An error occurred. Please try again.')
-      enqueueSnackbar('Failed to save question', { variant: 'error' })
+      setSubmitError(error.message || "An error occurred. Please try again.");
+      enqueueSnackbar("Failed to save question", { variant: "error" });
     } finally {
-      setIsSaving(false)
+      setIsSaving(false);
     }
-  }
+  };
 
   const handleAddOption = () => {
     if (options.length < 6) {
       setOptions([
         ...options,
-        { optionText: '', isCorrect: false, displayOrder: options.length },
-      ])
+        { optionText: "", isCorrect: false, displayOrder: options.length },
+      ]);
     }
-  }
+  };
 
   const handleRemoveOption = (index: number) => {
     if (options.length > 2) {
-      const updatedOptions = options.filter((_, i) => i !== index)
+      const updatedOptions = options.filter((_, i) => i !== index);
       // Reorder
       updatedOptions.forEach((opt, i) => {
-        opt.displayOrder = i
-      })
-      setOptions(updatedOptions)
+        opt.displayOrder = i;
+      });
+      setOptions(updatedOptions);
     }
-  }
+  };
 
-  const handleUpdateOption = (index: number, field: keyof QuestionOption, value: any) => {
-    const updatedOptions = [...options]
-    updatedOptions[index] = { ...updatedOptions[index], [field]: value }
-    setOptions(updatedOptions)
-  }
+  const handleUpdateOption = (
+    index: number,
+    field: keyof QuestionOption,
+    value: any,
+  ) => {
+    const updatedOptions = [...options];
+    updatedOptions[index] = { ...updatedOptions[index], [field]: value };
+    setOptions(updatedOptions);
+  };
 
   const handleSetCorrectAnswer = (index: number) => {
     const updatedOptions = options.map((opt, i) => ({
       ...opt,
       isCorrect: i === index,
-    }))
-    setOptions(updatedOptions)
-  }
+    }));
+    setOptions(updatedOptions);
+  };
 
-  const correctAnswerIndex = options.findIndex((opt) => opt.isCorrect)
+  const correctAnswerIndex = options.findIndex((opt) => opt.isCorrect);
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
       <DialogTitle>
-        {editingQuestion ? 'Edit Video-Mapped MCQ' : 'Add Video-Mapped MCQ'}
+        {editingQuestion ? "Edit Video-Mapped MCQ" : "Add Video-Mapped MCQ"}
       </DialogTitle>
       <DialogContent>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 2 }}>
           {submitError && (
-            <Alert severity="error" onClose={() => setSubmitError('')}>
+            <Alert severity="error" onClose={() => setSubmitError("")}>
               {submitError}
             </Alert>
           )}
@@ -226,8 +245,8 @@ export const VideoMappedMCQForm: React.FC<VideoMappedMCQFormProps> = ({
             error={touched.questionText && !questionText.trim()}
             helperText={
               touched.questionText && !questionText.trim()
-                ? 'Question text is required'
-                : ''
+                ? "Question text is required"
+                : ""
             }
           />
 
@@ -253,7 +272,9 @@ export const VideoMappedMCQForm: React.FC<VideoMappedMCQFormProps> = ({
             fullWidth
             placeholder="https://example.com/image.jpg"
             InputProps={{
-              startAdornment: <ImageOutlined sx={{ mr: 1, color: 'action.active' }} />,
+              startAdornment: (
+                <ImageOutlined sx={{ mr: 1, color: "action.active" }} />
+              ),
             }}
           />
 
@@ -261,7 +282,14 @@ export const VideoMappedMCQForm: React.FC<VideoMappedMCQFormProps> = ({
 
           {/* Options */}
           <Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                mb: 2,
+              }}
+            >
               <Typography variant="subtitle2">
                 Answer Options (Select the correct answer)
               </Typography>
@@ -275,19 +303,26 @@ export const VideoMappedMCQForm: React.FC<VideoMappedMCQFormProps> = ({
               </Button>
             </Box>
 
-            <RadioGroup value={correctAnswerIndex} onChange={(e) => handleSetCorrectAnswer(parseInt(e.target.value))}>
+            <RadioGroup
+              value={correctAnswerIndex}
+              onChange={(e) => handleSetCorrectAnswer(parseInt(e.target.value))}
+            >
               {options.map((option, index) => (
                 <Paper
                   key={index}
                   sx={{
                     p: 2,
                     mb: 1,
-                    border: '1px solid',
-                    borderColor: option.isCorrect ? 'success.main' : '#E5E7EB',
-                    bgcolor: option.isCorrect ? 'success.lighter' : 'background.paper',
+                    border: "1px solid",
+                    borderColor: option.isCorrect ? "success.main" : "#E5E7EB",
+                    bgcolor: option.isCorrect
+                      ? "success.lighter"
+                      : "background.paper",
                   }}
                 >
-                  <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+                  <Box
+                    sx={{ display: "flex", alignItems: "flex-start", gap: 1 }}
+                  >
                     <FormControlLabel
                       value={index}
                       control={<Radio />}
@@ -297,7 +332,7 @@ export const VideoMappedMCQForm: React.FC<VideoMappedMCQFormProps> = ({
                     <TextField
                       value={option.optionText}
                       onChange={(e) =>
-                        handleUpdateOption(index, 'optionText', e.target.value)
+                        handleUpdateOption(index, "optionText", e.target.value)
                       }
                       fullWidth
                       placeholder={`Option ${index + 1}`}
@@ -351,18 +386,22 @@ export const VideoMappedMCQForm: React.FC<VideoMappedMCQFormProps> = ({
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} disabled={isSaving} sx={{ borderRadius: '12px' }}>
+        <Button
+          onClick={onClose}
+          disabled={isSaving}
+          sx={{ borderRadius: "12px" }}
+        >
           Cancel
         </Button>
         <Button
           onClick={handleSubmit}
           variant="contained"
           disabled={!validate() || isSaving}
-          sx={{ borderRadius: '12px' }}
+          sx={{ borderRadius: "12px" }}
         >
-          {isSaving ? 'Saving...' : editingQuestion ? 'Update' : 'Create'}
+          {isSaving ? "Saving..." : editingQuestion ? "Update" : "Create"}
         </Button>
       </DialogActions>
     </Dialog>
-  )
-}
+  );
+};

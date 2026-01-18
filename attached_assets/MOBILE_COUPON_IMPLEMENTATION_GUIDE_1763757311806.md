@@ -19,25 +19,25 @@ Coupon/discount code system allowing users to enter promo codes during subscript
 
 ```typescript
 interface Coupon {
-  id: string
-  code: string // e.g., "SAVE20", "FRIEND50"
-  discountType: 'percentage' | 'fixed' // % off or $ off
-  discountValue: number // e.g., 20 (for 20%) or 10 (for $10)
-  maxUses: number // How many times can be used
-  currentUses: number // Times already used
-  expiryDate: Date
-  minPurchaseAmount: number // Minimum purchase to apply
-  applicablePlans: string[] // Which plans: ['monthly', 'yearly']
-  isActive: boolean
+  id: string;
+  code: string; // e.g., "SAVE20", "FRIEND50"
+  discountType: "percentage" | "fixed"; // % off or $ off
+  discountValue: number; // e.g., 20 (for 20%) or 10 (for $10)
+  maxUses: number; // How many times can be used
+  currentUses: number; // Times already used
+  expiryDate: Date;
+  minPurchaseAmount: number; // Minimum purchase to apply
+  applicablePlans: string[]; // Which plans: ['monthly', 'yearly']
+  isActive: boolean;
 }
 
 interface AppliedCoupon {
-  code: string
-  discountType: 'percentage' | 'fixed'
-  discountValue: number
-  originalPrice: number
-  discountAmount: number
-  finalPrice: number
+  code: string;
+  discountType: "percentage" | "fixed";
+  discountValue: number;
+  originalPrice: number;
+  discountAmount: number;
+  finalPrice: number;
 }
 ```
 
@@ -101,7 +101,7 @@ Response - Error:
 {
   valid: false,
   code: "INVALID20",
-  error: "COUPON_NOT_FOUND" | "COUPON_EXPIRED" | 
+  error: "COUPON_NOT_FOUND" | "COUPON_EXPIRED" |
          "COUPON_EXHAUSTED" | "MINIMUM_NOT_MET" |
          "NOT_APPLICABLE_TO_PLAN" | "ALREADY_USED",
   message: "This coupon code is invalid"
@@ -757,34 +757,34 @@ export function SubscriptionSuccessScreen({ route }) {
 ```typescript
 const COUPON_ERROR_CODES = {
   COUPON_NOT_FOUND: {
-    message: 'Coupon code not found',
-    actionable: true
+    message: "Coupon code not found",
+    actionable: true,
   },
   COUPON_EXPIRED: {
-    message: 'This coupon has expired',
-    actionable: false
+    message: "This coupon has expired",
+    actionable: false,
   },
   COUPON_EXHAUSTED: {
-    message: 'This coupon has reached its limit',
-    actionable: false
+    message: "This coupon has reached its limit",
+    actionable: false,
   },
   MINIMUM_NOT_MET: {
-    message: 'Minimum purchase amount not met for this coupon',
-    actionable: true
+    message: "Minimum purchase amount not met for this coupon",
+    actionable: true,
   },
   NOT_APPLICABLE_TO_PLAN: {
-    message: 'This coupon is not applicable to this plan',
-    actionable: false
+    message: "This coupon is not applicable to this plan",
+    actionable: false,
   },
   ALREADY_USED: {
-    message: 'You have already used this coupon',
-    actionable: false
+    message: "You have already used this coupon",
+    actionable: false,
   },
   NETWORK_ERROR: {
-    message: 'Could not validate coupon. Try again.',
-    actionable: true
-  }
-}
+    message: "Could not validate coupon. Try again.",
+    actionable: true,
+  },
+};
 ```
 
 ---
@@ -792,18 +792,21 @@ const COUPON_ERROR_CODES = {
 ## 8. Implementation Checklist
 
 ### Phase 1: Setup
+
 - [ ] Create CouponInputComponent
 - [ ] Create PaymentSummaryComponent
 - [ ] Set up API client for coupon validation
 - [ ] Create error handling utilities
 
 ### Phase 2: Integration
+
 - [ ] Integrate CouponInputComponent in PaymentScreen
 - [ ] Integrate PaymentSummaryComponent
 - [ ] Handle coupon application state
 - [ ] Pass coupon code to payment processing
 
 ### Phase 3: Display
+
 - [ ] Show original price
 - [ ] Show discount amount
 - [ ] Show final price
@@ -811,6 +814,7 @@ const COUPON_ERROR_CODES = {
 - [ ] Show coupon code label
 
 ### Phase 4: Error Handling
+
 - [ ] Handle invalid coupons
 - [ ] Handle expired coupons
 - [ ] Handle exhausted coupons
@@ -818,6 +822,7 @@ const COUPON_ERROR_CODES = {
 - [ ] Show user-friendly error messages
 
 ### Phase 5: Testing
+
 - [ ] Test valid coupon
 - [ ] Test invalid coupon
 - [ ] Test expired coupon
@@ -830,6 +835,7 @@ const COUPON_ERROR_CODES = {
 ## 9. Backend Integration Verified ✅
 
 **Already implemented in admin panel:**
+
 - ✅ Coupon CRUD (Create, Read, Update, Delete)
 - ✅ Coupon validation API endpoint
 - ✅ Discount calculation
@@ -838,6 +844,7 @@ const COUPON_ERROR_CODES = {
 - ✅ Plan applicability rules
 
 **API Endpoints Ready:**
+
 - ✅ POST /api/subscriptions/validate-coupon
 - ✅ POST /api/payments/create (with couponCode parameter)
 
@@ -846,6 +853,7 @@ const COUPON_ERROR_CODES = {
 ## 10. UX Best Practices
 
 ✅ **DO:**
+
 - Show "optional" field label (not required)
 - Display original price clearly
 - Highlight savings prominently
@@ -855,6 +863,7 @@ const COUPON_ERROR_CODES = {
 - Show error messages in plain language
 
 ❌ **DON'T:**
+
 - Make coupon mandatory
 - Hide the original price
 - Confuse discount calculation
@@ -867,6 +876,7 @@ const COUPON_ERROR_CODES = {
 ## 11. Testing Scenarios
 
 ### Test Case 1: Valid Coupon - Percentage Discount
+
 ```
 Input: "SAVE20", Monthly Plan ($9.99)
 Expected: 20% off → $7.99
@@ -874,6 +884,7 @@ Verify: Discount shown as "$2.00 off" and "You save $2.00"
 ```
 
 ### Test Case 2: Valid Coupon - Fixed Discount
+
 ```
 Input: "SAVE5", Monthly Plan ($9.99)
 Expected: $5 off → $4.99
@@ -881,6 +892,7 @@ Verify: Discount shown as "-$5.00" and "You save $5.00"
 ```
 
 ### Test Case 3: Invalid Coupon
+
 ```
 Input: "INVALID", Monthly Plan
 Expected: Error message "Coupon code not found"
@@ -888,6 +900,7 @@ Verify: Error displayed, coupon not applied
 ```
 
 ### Test Case 4: Expired Coupon
+
 ```
 Input: "EXPIRED20", Monthly Plan
 Expected: Error message "This coupon has expired"
@@ -895,6 +908,7 @@ Verify: Error displayed, original price shown
 ```
 
 ### Test Case 5: Coupon Already Used
+
 ```
 Input: "USED20", Monthly Plan (user already used once)
 Expected: Error message "You have already used this coupon"
@@ -905,15 +919,15 @@ Verify: Error displayed, cannot reuse
 
 ## 12. Summary
 
-| Feature | Status |
-|---------|--------|
-| Input coupon code | ✅ UI Component |
-| Validate coupon | ✅ API Ready |
-| Calculate discount | ✅ Backend |
-| Apply to payment | ✅ Backend |
-| Display breakdown | ✅ UI Component |
-| Error handling | ✅ Documented |
-| Admin management | ✅ Complete |
+| Feature            | Status          |
+| ------------------ | --------------- |
+| Input coupon code  | ✅ UI Component |
+| Validate coupon    | ✅ API Ready    |
+| Calculate discount | ✅ Backend      |
+| Apply to payment   | ✅ Backend      |
+| Display breakdown  | ✅ UI Component |
+| Error handling     | ✅ Documented   |
+| Admin management   | ✅ Complete     |
 
 **File:** `MOBILE_COUPON_IMPLEMENTATION_GUIDE.md`  
 **Status:** Complete  

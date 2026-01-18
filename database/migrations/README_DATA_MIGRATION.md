@@ -3,8 +3,9 @@
 ## Overview
 
 This guide covers the data migration process for separating questions from the `mock_exam_questions` table into three distinct tables:
+
 - `practice_questions` - Questions for the Practice Module
-- `learning_questions` - Questions for the Learning Module  
+- `learning_questions` - Questions for the Learning Module
 - `mock_exam_questions` - Questions for Mock Exams (questions without lesson associations)
 
 ## Quick Start
@@ -24,9 +25,11 @@ Before running the migration:
 ## Migration Scripts
 
 ### 0. run_complete_migration.sql (RECOMMENDED)
+
 **Purpose**: Run the complete migration in one transaction
 
 **What it does**:
+
 - Checks current database state
 - Creates all new tables (schema migration)
 - Renames questions → mock_exam_questions
@@ -38,12 +41,14 @@ Before running the migration:
 **When to run**: When you want to run the entire migration at once
 
 **How to run**:
+
 ```sql
 -- Run in Supabase SQL Editor or psql
 \i jeeva-admin-portal/database/migrations/run_complete_migration.sql
 ```
 
 **Expected output**:
+
 - Pre-migration status check
 - Schema creation confirmation
 - Migration counts for practice and learning questions
@@ -51,6 +56,7 @@ Before running the migration:
 - Total question counts across all tables
 
 **Advantages**:
+
 - ✅ Single transaction (all-or-nothing)
 - ✅ Automatic prerequisite checking
 - ✅ Handles both schema and data migration
@@ -62,9 +68,11 @@ Before running the migration:
 ---
 
 ### 1. classify_questions.sql
+
 **Purpose**: Analyze and classify questions before migration
 
 **What it does**:
+
 - Creates a `classify_question()` function to determine question type
 - Creates a `question_classification_analysis` view for reporting
 - Provides queries to understand question distribution
@@ -72,20 +80,24 @@ Before running the migration:
 **When to run**: Before migration to understand what will be migrated
 
 **How to run**:
+
 ```sql
 -- Run in Supabase SQL Editor or psql
 \i jeeva-admin-portal/database/migrations/classify_questions.sql
 ```
 
 **Expected output**:
+
 - Classification summary showing counts by type (practice, learning, mock_exam)
 - Detailed breakdown by module and topic
 - List of questions without lesson associations
 
 ### 2. migrate_practice_questions.sql
+
 **Purpose**: Migrate Practice Module questions
 
 **What it does**:
+
 - Copies questions from `mock_exam_questions` to `practice_questions`
 - Maps topic titles to categories (Numeracy, Clinical Knowledge)
 - Uses lesson titles as subdivisions
@@ -96,21 +108,25 @@ Before running the migration:
 **When to run**: After classification analysis
 
 **How to run**:
+
 ```sql
 -- Run in Supabase SQL Editor or psql
 \i jeeva-admin-portal/database/migrations/migrate_practice_questions.sql
 ```
 
 **Expected output**:
+
 - Migration summary with question and option counts
 - Warnings if any questions lack options or correct answers
 - Summary by category and subdivision
 - Verification queries showing migrated data
 
 ### 3. migrate_learning_questions.sql
+
 **Purpose**: Migrate Learning Module questions
 
 **What it does**:
+
 - Copies questions from `mock_exam_questions` to `learning_questions`
 - Maps questions to topics, subtopics, and video lessons
 - Copies question options to `learning_question_options`
@@ -120,21 +136,25 @@ Before running the migration:
 **When to run**: After practice questions migration
 
 **How to run**:
+
 ```sql
 -- Run in Supabase SQL Editor or psql
 \i jeeva-admin-portal/database/migrations/migrate_learning_questions.sql
 ```
 
 **Expected output**:
+
 - Migration summary with question and option counts
 - Warnings if any questions lack options or correct answers
 - Summary by topic and lesson
 - Verification queries showing migrated data
 
 ### 4. verify_mock_exam_questions.sql
+
 **Purpose**: Verify Mock Exam questions remain intact
 
 **What it does**:
+
 - Counts remaining questions in `mock_exam_questions`
 - Verifies foreign key relationships
 - Checks data integrity (options, correct answers)
@@ -144,21 +164,25 @@ Before running the migration:
 **When to run**: After all migrations complete
 
 **How to run**:
+
 ```sql
 -- Run in Supabase SQL Editor or psql
 \i jeeva-admin-portal/database/migrations/verify_mock_exam_questions.sql
 ```
 
 **Expected output**:
+
 - Count of remaining mock exam questions
 - Verification that all foreign keys are valid
 - Confirmation that mock exam functionality works
 - Overall migration summary across all three tables
 
 ### 5. rollback_question_migration.sql
+
 **Purpose**: Rollback migration if needed
 
 **What it does**:
+
 - Copies questions back from `practice_questions` to `mock_exam_questions`
 - Copies questions back from `learning_questions` to `mock_exam_questions`
 - Restores lesson associations for learning questions
@@ -168,6 +192,7 @@ Before running the migration:
 **When to run**: Only if migration needs to be rolled back
 
 **How to run**:
+
 ```sql
 -- Run in Supabase SQL Editor or psql
 \i jeeva-admin-portal/database/migrations/rollback_question_migration.sql
@@ -180,6 +205,7 @@ Before running the migration:
 ### Step-by-Step Process
 
 #### Step 1: Pre-Migration Analysis
+
 ```sql
 -- Run classification script
 \i jeeva-admin-portal/database/migrations/classify_questions.sql
@@ -191,6 +217,7 @@ Before running the migration:
 ```
 
 #### Step 2: Migrate Practice Questions
+
 ```sql
 -- Run practice migration
 \i jeeva-admin-portal/database/migrations/migrate_practice_questions.sql
@@ -202,6 +229,7 @@ Before running the migration:
 ```
 
 #### Step 3: Migrate Learning Questions
+
 ```sql
 -- Run learning migration
 \i jeeva-admin-portal/database/migrations/migrate_learning_questions.sql
@@ -214,6 +242,7 @@ Before running the migration:
 ```
 
 #### Step 4: Verify Mock Exam Questions
+
 ```sql
 -- Run verification script
 \i jeeva-admin-portal/database/migrations/verify_mock_exam_questions.sql
@@ -226,21 +255,22 @@ Before running the migration:
 ```
 
 #### Step 5: Final Verification
+
 ```sql
 -- Check total question counts across all tables
-SELECT 
+SELECT
   'practice_questions' as table_name,
   COUNT(*) as question_count,
   COUNT(CASE WHEN is_active THEN 1 END) as active_count
 FROM practice_questions
 UNION ALL
-SELECT 
+SELECT
   'learning_questions' as table_name,
   COUNT(*) as question_count,
   COUNT(CASE WHEN is_active THEN 1 END) as active_count
 FROM learning_questions
 UNION ALL
-SELECT 
+SELECT
   'mock_exam_questions' as table_name,
   COUNT(*) as question_count,
   COUNT(CASE WHEN is_active THEN 1 END) as active_count
@@ -258,9 +288,10 @@ ORDER BY table_name;
 **Cause**: Options were not properly copied or foreign keys are incorrect
 
 **Solution**:
+
 ```sql
 -- Check for questions without options
-SELECT 
+SELECT
   q.id,
   q.question_text
 FROM practice_questions q
@@ -278,9 +309,10 @@ WHERE NOT EXISTS (
 **Cause**: Correct answer flag was not set properly
 
 **Solution**:
+
 ```sql
 -- Check for questions without correct answers
-SELECT 
+SELECT
   q.id,
   q.question_text
 FROM practice_questions q
@@ -297,9 +329,10 @@ WHERE NOT EXISTS (
 **Cause**: Referenced topics, lessons, or users don't exist
 
 **Solution**:
+
 ```sql
 -- Check for invalid foreign keys
-SELECT 
+SELECT
   lq.id,
   lq.topic_id,
   lq.video_lesson_id
@@ -315,9 +348,10 @@ WHERE NOT EXISTS (SELECT 1 FROM topics WHERE id = lq.topic_id)
 **Cause**: Migration script didn't match module title pattern
 
 **Solution**:
+
 ```sql
 -- Find questions that should have been migrated
-SELECT 
+SELECT
   q.id,
   q.lesson_id,
   m.title as module_title
@@ -334,6 +368,7 @@ INNER JOIN modules m ON t.module_id = m.id;
 If you need to rollback the migration:
 
 ### Option 1: Restore Questions Only (Keep New Tables)
+
 ```sql
 -- Run rollback script (default behavior)
 \i jeeva-admin-portal/database/migrations/rollback_question_migration.sql
@@ -345,6 +380,7 @@ If you need to rollback the migration:
 ```
 
 ### Option 2: Full Rollback (Remove New Tables)
+
 ```sql
 -- Edit rollback_question_migration.sql
 -- Uncomment Step 4 (rename tables back)
@@ -361,6 +397,7 @@ If you need to rollback the migration:
 ```
 
 ### After Rollback
+
 1. Verify all questions are back in the questions table
 2. Update application code to use original table names
 3. Test all functionality

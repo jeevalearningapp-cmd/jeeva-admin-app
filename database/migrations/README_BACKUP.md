@@ -23,6 +23,7 @@ cd jeeva-admin-portal/database/migrations
 ```
 
 This will:
+
 - Create CSV exports of both tables
 - Create in-database backup tables
 - Generate backup summary report
@@ -42,6 +43,7 @@ pg_dump "$SUPABASE_DB_URL" -t questions_backup -t question_options_backup | psql
 ```
 
 This will:
+
 - Verify backup tables exist
 - Run restore procedure
 - Verify data integrity
@@ -58,14 +60,14 @@ psql "$SUPABASE_DB_URL" -f restore_questions_backup.sql
 
 ## Files in This Directory
 
-| File | Purpose |
-|------|---------|
-| `backup_questions_tables.sql` | SQL script to create backups |
-| `restore_questions_backup.sql` | SQL script to restore from backup |
-| `run_backup.sh` | Automated backup shell script |
-| `test_restore_dev.sh` | Test restore on development database |
-| `BACKUP_RESTORE_GUIDE.md` | Comprehensive backup/restore documentation |
-| `README_BACKUP.md` | This quick start guide |
+| File                           | Purpose                                    |
+| ------------------------------ | ------------------------------------------ |
+| `backup_questions_tables.sql`  | SQL script to create backups               |
+| `restore_questions_backup.sql` | SQL script to restore from backup          |
+| `run_backup.sh`                | Automated backup shell script              |
+| `test_restore_dev.sh`          | Test restore on development database       |
+| `BACKUP_RESTORE_GUIDE.md`      | Comprehensive backup/restore documentation |
+| `README_BACKUP.md`             | This quick start guide                     |
 
 ---
 
@@ -84,6 +86,7 @@ jeeva-admin-portal/database/migrations/backups/
 ```
 
 Additionally, backup tables are created in the database:
+
 - `questions_backup`
 - `question_options_backup`
 - `backup_metadata`
@@ -129,12 +132,12 @@ To verify backup integrity:
 
 ```sql
 -- Check row counts match
-SELECT 
+SELECT
   (SELECT COUNT(*) FROM questions) as original,
   (SELECT COUNT(*) FROM questions_backup) as backup;
 
 -- Check backup metadata
-SELECT * FROM backup_metadata 
+SELECT * FROM backup_metadata
 WHERE backup_name = 'pre_migration_backup'
 ORDER BY backup_date DESC;
 ```
@@ -174,6 +177,7 @@ psql "$SUPABASE_DB_URL" -c "SELECT current_database();"
 ## Support
 
 For detailed documentation, see:
+
 - [BACKUP_RESTORE_GUIDE.md](./BACKUP_RESTORE_GUIDE.md) - Comprehensive guide
 - [Requirements Document](../../.kiro/specs/learning-module-restructure/requirements.md)
 - [Design Document](../../.kiro/specs/learning-module-restructure/design.md)

@@ -23,6 +23,7 @@ This document provides **sequential prompts** for Replit Agent to build the Jeev
 ## 📱 PHASE 1: PROJECT SETUP & CONFIGURATION
 
 ### **Prompt 1: Environment Setup**
+
 ```
 Read the file docs/MOBILE_SETUP_GUIDE.md and set up the project structure and environment variables.
 
@@ -40,6 +41,7 @@ Read the file docs/MOBILE_SETUP_GUIDE.md and set up the project structure and en
 ---
 
 ### **Prompt 2: TypeScript & Path Aliases**
+
 ```
 Configure TypeScript with path aliases following docs/MOBILE_SETUP_GUIDE.md.
 
@@ -60,6 +62,7 @@ Configure TypeScript with path aliases following docs/MOBILE_SETUP_GUIDE.md.
 ---
 
 ### **Prompt 3: Install Navigation Dependencies**
+
 ```
 Install React Navigation dependencies following docs/MOBILE_SETUP_GUIDE.md.
 
@@ -75,6 +78,7 @@ Confirm installation is complete.
 ## 📱 PHASE 2: SUPABASE INTEGRATION
 
 ### **Prompt 4: Create Supabase Client**
+
 ```
 Read docs/API_DOCUMENTATION.md and create the Supabase client.
 
@@ -90,6 +94,7 @@ Read docs/API_DOCUMENTATION.md and create the Supabase client.
 ---
 
 ### **Prompt 5: Create TypeScript Types**
+
 ```
 Read docs/DATABASE_SCHEMA.md and create TypeScript types.
 
@@ -105,6 +110,7 @@ Read docs/DATABASE_SCHEMA.md and create TypeScript types.
 ## 📱 PHASE 3: AUTHENTICATION (Core Feature)
 
 ### **Prompt 6: Create Auth Context**
+
 ```
 Read docs/AUTHENTICATION_FLOW.md and create the Auth Context.
 
@@ -121,6 +127,7 @@ Read docs/AUTHENTICATION_FLOW.md and create the Auth Context.
 ---
 
 ### **Prompt 7: Create Login Screen**
+
 ```
 Read docs/UI_DESIGN_SPECS.md and docs/FEATURE_SPECIFICATIONS.md to create the Login screen.
 
@@ -140,6 +147,7 @@ Read docs/UI_DESIGN_SPECS.md and docs/FEATURE_SPECIFICATIONS.md to create the Lo
 ---
 
 ### **Prompt 8: Create Register Screen**
+
 ```
 Read docs/UI_DESIGN_SPECS.md and create the Register screen.
 
@@ -160,6 +168,7 @@ Read docs/UI_DESIGN_SPECS.md and create the Register screen.
 ## 📱 PHASE 4: NAVIGATION SETUP
 
 ### **Prompt 9: Create Navigation Structure**
+
 ```
 Create the navigation structure with Auth and Main stacks.
 
@@ -173,6 +182,7 @@ Create the navigation structure with Auth and Main stacks.
 ---
 
 ### **Prompt 10: Create Bottom Tab Navigation**
+
 ```
 Read docs/UI_DESIGN_SPECS.md and create Bottom Tab Navigation.
 
@@ -194,6 +204,7 @@ Read docs/UI_DESIGN_SPECS.md and create Bottom Tab Navigation.
 ## 📱 PHASE 5: CORE SCREENS
 
 ### **Prompt 11: Create Home/Dashboard Screen**
+
 ```
 Read docs/UI_DESIGN_SPECS.md and docs/FEATURE_SPECIFICATIONS.md to create Home screen.
 
@@ -211,6 +222,7 @@ Read docs/UI_DESIGN_SPECS.md and docs/FEATURE_SPECIFICATIONS.md to create Home s
 ---
 
 ### **Prompt 12: Create Courses/Modules Screen**
+
 ```
 Read docs/API_DOCUMENTATION.md and docs/UI_DESIGN_SPECS.md to create Courses screen.
 
@@ -228,6 +240,7 @@ Read docs/API_DOCUMENTATION.md and docs/UI_DESIGN_SPECS.md to create Courses scr
 ---
 
 ### **Prompt 13: Create Profile Screen**
+
 ```
 Read docs/UI_DESIGN_SPECS.md to create Profile screen.
 
@@ -252,6 +265,7 @@ Read docs/UI_DESIGN_SPECS.md to create Profile screen.
 ## 📱 PHASE 6: INTEGRATION & TESTING
 
 ### **Prompt 14: Update App.tsx**
+
 ```
 Update App.tsx to use the navigation and auth context.
 
@@ -264,6 +278,7 @@ Update App.tsx to use the navigation and auth context.
 ---
 
 ### **Prompt 15: Run & Test**
+
 ```
 Start the Expo development server.
 
@@ -278,6 +293,7 @@ Start the Expo development server.
 ## 📱 PHASE 7: ADDITIONAL FEATURES (After Core Works)
 
 ### **Prompt 16: Create API Service Layer**
+
 ```
 Read docs/API_DOCUMENTATION.md and create API service files.
 
@@ -292,6 +308,7 @@ Read docs/API_DOCUMENTATION.md and create API service files.
 ---
 
 ### **Prompt 17: Create Lesson Viewer**
+
 ```
 Read docs/FEATURE_SPECIFICATIONS.md and docs/UI_DESIGN_SPECS.md to create Lesson Viewer.
 
@@ -305,6 +322,7 @@ Read docs/FEATURE_SPECIFICATIONS.md and docs/UI_DESIGN_SPECS.md to create Lesson
 ---
 
 ### **Prompt 18: Create Practice/Quiz Screen**
+
 ```
 Read docs/FEATURE_SPECIFICATIONS.md to create Practice screen.
 
@@ -322,6 +340,7 @@ Read docs/FEATURE_SPECIFICATIONS.md to create Practice screen.
 ## 🤖 PHASE 8: AI CHATBOT - PHASE 1 (JeevaBot)
 
 ### **Prompt 19: Set Up Backend Chat API (Admin Portal)**
+
 ```
 ⚠️ CRITICAL: This step happens in the ADMIN PORTAL backend, NOT the mobile app!
 
@@ -357,6 +376,7 @@ Read docs/AI_PHASE1_CHATBOT.md and docs/AI_SECURITY.md to set up Google Gemini A
 ---
 
 ### **Prompt 20: Create Chat Database Tables**
+
 ```
 Read docs/DATABASE_SCHEMA.md section "AI & Chat (Phase 1)" and create chat tables in Supabase.
 
@@ -396,6 +416,7 @@ Read docs/DATABASE_SCHEMA.md section "AI & Chat (Phase 1)" and create chat table
 ---
 
 ### **Prompt 21: Build JeevaBot Chat UI**
+
 ```
 Read docs/AI_PHASE1_CHATBOT.md and docs/UI_DESIGN_SPECS.md to create the chat interface.
 
@@ -425,12 +446,13 @@ Read docs/AI_PHASE1_CHATBOT.md and docs/UI_DESIGN_SPECS.md to create the chat in
 ---
 
 ### **Prompt 22: Implement Mobile Chat UI & Backend Integration**
+
 ```
 Read docs/AI_PHASE1_CHATBOT.md to implement mobile chat with backend API integration.
 
 1. Create src/hooks/useChatbot.ts (MOBILE APP):
    ⚠️ NO Gemini SDK or API key in mobile app!
-   
+
    - useState for messages, loading, error
    - sendMessage function:
      * Create conversation in Supabase
@@ -455,6 +477,7 @@ Read docs/AI_PHASE1_CHATBOT.md to implement mobile chat with backend API integra
 ---
 
 ### **Prompt 23: Add Cost Controls & Monitoring**
+
 ```
 Read docs/AI_SECURITY.md to implement AI cost controls and usage monitoring.
 
@@ -496,6 +519,7 @@ Read docs/AI_SECURITY.md to implement AI cost controls and usage monitoring.
 After completing all 23 prompts, verify:
 
 **Core Functionality:**
+
 - [ ] User can register and login
 - [ ] Navigation works (Auth → Main → Tabs)
 - [ ] Home screen displays correctly
@@ -504,6 +528,7 @@ After completing all 23 prompts, verify:
 - [ ] Logout works
 
 **AI Chatbot (Phase 1):**
+
 - [ ] Chat screen accessible from bottom tab
 - [ ] Can send messages to JeevaBot
 - [ ] AI responses are context-aware
@@ -513,6 +538,7 @@ After completing all 23 prompts, verify:
 - [ ] Cost tracking active
 
 **UI/UX:**
+
 - [ ] Design matches UI_DESIGN_SPECS.md
 - [ ] Colors correct (#3B82F6, #4ADE80, etc.)
 - [ ] Typography correct (SF Pro/Roboto)
@@ -520,6 +546,7 @@ After completing all 23 prompts, verify:
 - [ ] Responsive on iOS and Android
 
 **Data & Security:**
+
 - [ ] Supabase connection working
 - [ ] API keys stored in .env (not code)
 - [ ] RLS policies active (users see only their data)
@@ -531,6 +558,7 @@ After completing all 23 prompts, verify:
 ## 🚀 Next Steps After Phase 1
 
 **Phase 2 (Future):**
+
 - Vertex AI integration for ML-powered recommendations
 - Adaptive learning paths
 - Auto-generated practice content
@@ -544,10 +572,12 @@ See `docs/AI_PHASE2_ROADMAP.md` for Phase 2 planning.
 ## 📞 Support
 
 **For Implementation Issues:**
+
 - Email: vollstek@gmail.com
 - Reference: Jeeva Mobile App Development
 
 **Documentation:**
+
 - [Mobile App Overview](./MOBILE_APP_OVERVIEW.md)
 - [API Documentation](./API_DOCUMENTATION.md)
 - [Database Schema](./DATABASE_SCHEMA.md)

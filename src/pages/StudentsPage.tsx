@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -24,7 +24,7 @@ import {
   FormControl,
   InputLabel,
   Divider,
-} from '@mui/material'
+} from "@mui/material";
 import {
   SearchOutlined as SearchIcon,
   VisibilityOutlined as VisibilityIcon,
@@ -33,215 +33,276 @@ import {
   PersonOutlined as PersonIcon,
   SchoolOutlined as SchoolIcon,
   PaymentOutlined as PaymentIcon,
-} from '@mui/icons-material'
-import { supabase } from '@/lib/supabase'
-import { useSnackbar } from 'notistack'
-import { PageLoader } from '@/components/common'
-import { formatDistanceToNow } from 'date-fns'
+} from "@mui/icons-material";
+import { supabase } from "@/lib/supabase";
+import { useSnackbar } from "notistack";
+import { PageLoader } from "@/components/common";
+import { formatDistanceToNow } from "date-fns";
 
 interface StudentProfile {
-  id: string
-  user_id: string
-  full_name: string | null
-  email: string | null
-  phone_number: string | null
-  current_country: string | null
-  date_of_birth: string | null
-  gender: string | null
-  nmc_attempts: number | null
-  uses_coaching: boolean | null
-  profile_completed: boolean
-  created_at: string
-  oauth_provider: string | null
-  subscription_status: string | null
-  subscription_end_date: string | null
-  days_remaining: number | null
+  id: string;
+  user_id: string;
+  full_name: string | null;
+  email: string | null;
+  phone_number: string | null;
+  current_country: string | null;
+  date_of_birth: string | null;
+  gender: string | null;
+  nmc_attempts: number | null;
+  uses_coaching: boolean | null;
+  profile_completed: boolean;
+  created_at: string;
+  oauth_provider: string | null;
+  subscription_status: string | null;
+  subscription_plan: string | null;
+  subscription_end_date: string | null;
+  days_remaining: number | null;
   // Last payment info for Stripe Adaptive Pricing (Requirements 5.1, 5.2)
-  last_payment_currency: string | null
-  last_payment_amount: number | null
-  last_payment_source: string | null
+  last_payment_currency: string | null;
+  last_payment_amount: number | null;
+  last_payment_source: string | null;
 }
 
 export const StudentsPage: React.FC = () => {
-  const [page, setPage] = useState(0)
-  const [rowsPerPage, setRowsPerPage] = useState(10)
-  const [search, setSearch] = useState('')
-  const [filterProvider, setFilterProvider] = useState<string>('all')
-  const [filterStatus, setFilterStatus] = useState<string>('all')
-  const [selectedStudent, setSelectedStudent] = useState<StudentProfile | null>(null)
-  const [students, setStudents] = useState<StudentProfile[]>([])
-  const [totalCount, setTotalCount] = useState(0)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const { enqueueSnackbar } = useSnackbar()
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [search, setSearch] = useState("");
+  const [filterProvider, setFilterProvider] = useState<string>("all");
+  const [filterStatus, setFilterStatus] = useState<string>("all");
+  const [selectedStudent, setSelectedStudent] = useState<StudentProfile | null>(
+    null,
+  );
+  const [students, setStudents] = useState<StudentProfile[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { enqueueSnackbar } = useSnackbar();
 
   const fetchStudents = async () => {
     try {
-      setLoading(true)
-      setError(null)
+      setLoading(true);
+      setError(null);
 
-      const { data, error: rpcError } = await supabase.rpc('get_student_details')
+      const { data, error: rpcError } = await supabase.rpc(
+        "get_student_details",
+      );
 
-      if (rpcError) throw rpcError
+      if (rpcError) throw rpcError;
 
       // Fetch last successful payment for each student (Requirements 5.1, 5.2)
-      const userIds = (data || []).map((s: any) => s.user_id).filter(Boolean)
-      let paymentsMap: Record<string, { currency: string; amount: number; source: string }> = {}
-      
+      const userIds = (data || []).map((s: any) => s.user_id).filter(Boolean);
+      const paymentsMap: Record<
+        string,
+        { currency: string; amount: number; source: string }
+      > = {};
+
       if (userIds.length > 0) {
         const { data: paymentsData } = await supabase
-          .from('payments')
-          .select('user_id, currency_charged_local, amount_charged_local, stripe_checkout_session_id, currency, final_amount, created_at')
-          .in('user_id', userIds)
-          .eq('status', 'succeeded')
-          .order('created_at', { ascending: false })
+          .from("payments")
+          .select(
+            "user_id, currency_charged_local, amount_charged_local, stripe_checkout_session_id, currency, final_amount, created_at",
+          )
+          .in("user_id", userIds)
+          .eq("status", "succeeded")
+          .order("created_at", { ascending: false });
 
         // Group by user_id and take the most recent payment
         if (paymentsData) {
           for (const payment of paymentsData) {
             if (!paymentsMap[payment.user_id]) {
               // Use presentment currency/amount if available, otherwise fall back to base currency
-              const currency = payment.currency_charged_local || payment.currency || 'GBP'
-              const amount = payment.amount_charged_local ?? payment.final_amount ?? 0
-              const source = payment.stripe_checkout_session_id ? 'Stripe Checkout' : 'Stripe'
-              paymentsMap[payment.user_id] = { currency, amount, source }
+              const currency =
+                payment.currency_charged_local || payment.currency || "GBP";
+              const amount =
+                payment.amount_charged_local ?? payment.final_amount ?? 0;
+              const source = payment.stripe_checkout_session_id
+                ? "Stripe Checkout"
+                : "Stripe";
+              paymentsMap[payment.user_id] = { currency, amount, source };
             }
           }
         }
       }
 
-      let enrichedStudents: StudentProfile[] = (data || []).map((student: any) => {
-        const lastPayment = paymentsMap[student.user_id]
-        return {
-          id: student.profile_id,
-          user_id: student.user_id,
-          full_name: student.full_name,
-          email: student.email,
-          phone_number: student.phone_number,
-          current_country: student.current_country,
-          date_of_birth: student.date_of_birth,
-          gender: student.gender,
-          nmc_attempts: student.nmc_attempts,
-          uses_coaching: student.uses_coaching,
-          profile_completed: student.profile_completed,
-          created_at: student.created_at,
-          oauth_provider: 'email',
-          subscription_status: student.subscription_status,
-          subscription_end_date: student.subscription_end_date,
-          days_remaining: student.days_remaining,
-          last_payment_currency: lastPayment?.currency || null,
-          last_payment_amount: lastPayment?.amount || null,
-          last_payment_source: lastPayment?.source || null,
+      // Fetch subscription plan from subscriptions table joined with subscription_plans
+      const subscriptionPlanMap: Record<string, string> = {};
+      if (userIds.length > 0) {
+        const { data: subsData } = await supabase
+          .from("subscriptions")
+          .select("user_id, subscription_plans(name)")
+          .in("user_id", userIds)
+          .eq("status", "active")
+          .order("created_at", { ascending: false });
+
+        if (subsData) {
+          for (const sub of subsData as any[]) {
+            // Only set if not already set (take most recent active subscription)
+            if (
+              !subscriptionPlanMap[sub.user_id] &&
+              sub.subscription_plans?.name
+            ) {
+              subscriptionPlanMap[sub.user_id] = sub.subscription_plans.name;
+            }
+          }
         }
-      })
+      }
+
+      let enrichedStudents: StudentProfile[] = (data || []).map(
+        (student: any) => {
+          const lastPayment = paymentsMap[student.user_id];
+          const planType = subscriptionPlanMap[student.user_id] || null;
+          return {
+            id: student.profile_id,
+            user_id: student.user_id,
+            full_name: student.full_name,
+            email: student.email,
+            phone_number: student.phone_number,
+            current_country: student.current_country,
+            date_of_birth: student.date_of_birth,
+            gender: student.gender,
+            nmc_attempts: student.nmc_attempts,
+            uses_coaching: student.uses_coaching,
+            profile_completed: student.profile_completed,
+            created_at: student.created_at,
+            oauth_provider: "email",
+            subscription_status: student.subscription_status,
+            subscription_plan: planType,
+            subscription_end_date: student.subscription_end_date,
+            days_remaining: student.days_remaining,
+            last_payment_currency: lastPayment?.currency || null,
+            last_payment_amount: lastPayment?.amount || null,
+            last_payment_source: lastPayment?.source || null,
+          };
+        },
+      );
 
       if (search) {
-        const searchLower = search.toLowerCase()
-        enrichedStudents = enrichedStudents.filter(s =>
-          s.full_name?.toLowerCase().includes(searchLower) ||
-          s.email?.toLowerCase().includes(searchLower) ||
-          s.phone_number?.includes(searchLower)
-        )
+        const searchLower = search.toLowerCase();
+        enrichedStudents = enrichedStudents.filter(
+          (s) =>
+            s.full_name?.toLowerCase().includes(searchLower) ||
+            s.email?.toLowerCase().includes(searchLower) ||
+            s.phone_number?.includes(searchLower),
+        );
       }
 
-      if (filterProvider !== 'all') {
-        enrichedStudents = enrichedStudents.filter(s => s.oauth_provider === filterProvider)
+      if (filterProvider !== "all") {
+        enrichedStudents = enrichedStudents.filter(
+          (s) => s.oauth_provider === filterProvider,
+        );
       }
 
-      if (filterStatus !== 'all') {
-        enrichedStudents = enrichedStudents.filter(s => s.subscription_status === filterStatus)
+      if (filterStatus !== "all") {
+        enrichedStudents = enrichedStudents.filter(
+          (s) => s.subscription_status === filterStatus,
+        );
       }
 
-      const from = page * rowsPerPage
-      const to = from + rowsPerPage
-      const paginatedStudents = enrichedStudents.slice(from, to)
+      const from = page * rowsPerPage;
+      const to = from + rowsPerPage;
+      const paginatedStudents = enrichedStudents.slice(from, to);
 
-      setStudents(paginatedStudents)
-      setTotalCount(enrichedStudents.length)
+      setStudents(paginatedStudents);
+      setTotalCount(enrichedStudents.length);
     } catch (err: any) {
-      setError(err.message)
-      enqueueSnackbar('Failed to load students', { variant: 'error' })
+      setError(err.message);
+      enqueueSnackbar("Failed to load students", { variant: "error" });
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
-    fetchStudents()
-  }, [page, rowsPerPage, search, filterProvider, filterStatus])
+    fetchStudents();
+  }, [page, rowsPerPage, search, filterProvider, filterStatus]);
 
   const handleChangePage = (_: unknown, newPage: number) => {
-    setPage(newPage)
-  }
+    setPage(newPage);
+  };
 
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(parseInt(event.target.value, 10))
-    setPage(0)
-  }
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearch(event.target.value)
-    setPage(0)
-  }
+    setSearch(event.target.value);
+    setPage(0);
+  };
 
   const handleFilterProviderChange = (value: string) => {
-    setFilterProvider(value)
-    setPage(0)
-  }
+    setFilterProvider(value);
+    setPage(0);
+  };
 
   const handleFilterStatusChange = (value: string) => {
-    setFilterStatus(value)
-    setPage(0)
-  }
+    setFilterStatus(value);
+    setPage(0);
+  };
 
   const handleViewStudent = (student: StudentProfile) => {
-    setSelectedStudent(student)
-  }
+    setSelectedStudent(student);
+  };
 
   const handleCloseDrawer = () => {
-    setSelectedStudent(null)
-  }
+    setSelectedStudent(null);
+  };
 
   const handleExportCSV = () => {
-    const headers = ['Name', 'Email', 'Country', 'OAuth Provider', 'Profile Completed', 'Subscription Status', 'Days Remaining', 'Registered']
-    const rows = students.map(s => [
-      s.full_name || '-',
-      s.email || '-',
-      s.current_country || '-',
-      s.oauth_provider || 'email',
-      s.profile_completed ? 'Yes' : 'No',
-      s.subscription_status || 'trial',
-      s.days_remaining || '-',
+    const headers = [
+      "Name",
+      "Email",
+      "Country",
+      "OAuth Provider",
+      "Profile Completed",
+      "Subscription Status",
+      "Days Remaining",
+      "Registered",
+    ];
+    const rows = students.map((s) => [
+      s.full_name || "-",
+      s.email || "-",
+      s.current_country || "-",
+      s.oauth_provider || "email",
+      s.profile_completed ? "Yes" : "No",
+      s.subscription_status || "trial",
+      s.days_remaining || "-",
       new Date(s.created_at).toLocaleDateString(),
-    ])
+    ]);
 
     const csvContent = [
-      headers.join(','),
-      ...rows.map(row => row.join(','))
-    ].join('\n')
+      headers.join(","),
+      ...rows.map((row) => row.join(",")),
+    ].join("\n");
 
-    const blob = new Blob([csvContent], { type: 'text/csv' })
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = `students_${new Date().toISOString().split('T')[0]}.csv`
-    link.click()
-    URL.revokeObjectURL(url)
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `students_${new Date().toISOString().split("T")[0]}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
 
-    enqueueSnackbar('CSV exported successfully', { variant: 'success' })
-  }
+    enqueueSnackbar("CSV exported successfully", { variant: "success" });
+  };
 
   const getSubscriptionStatusColor = (status: string | null) => {
     switch (status) {
-      case 'active': return 'success'
-      case 'trial': return 'info'
-      case 'expired': return 'error'
-      default: return 'default'
+      case "active":
+        return "success";
+      case "trial":
+        return "info";
+      case "expired":
+        return "error";
+      default:
+        return "default";
     }
-  }
+  };
 
   if (loading && students.length === 0) {
-    return <PageLoader />
+    return <PageLoader />;
   }
 
   if (error && students.length === 0) {
@@ -254,12 +315,19 @@ export const StudentsPage: React.FC = () => {
           Error loading students: {error}
         </Alert>
       </Box>
-    )
+    );
   }
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 3,
+        }}
+      >
         <Box>
           <Typography variant="h4">Mobile App Users</Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
@@ -277,7 +345,7 @@ export const StudentsPage: React.FC = () => {
       </Box>
 
       <Paper sx={{ p: 2, mb: 2 }}>
-        <Stack direction={{ xs: 'column', md: 'row' }} spacing={2}>
+        <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
           <TextField
             fullWidth
             placeholder="Search by name, email, or phone..."
@@ -329,6 +397,7 @@ export const StudentsPage: React.FC = () => {
               <TableCell>Country</TableCell>
               <TableCell>OAuth Provider</TableCell>
               <TableCell>Profile</TableCell>
+              <TableCell>Plan</TableCell>
               <TableCell>Subscription</TableCell>
               <TableCell>Days Left</TableCell>
               <TableCell align="right">Actions</TableCell>
@@ -344,47 +413,69 @@ export const StudentsPage: React.FC = () => {
             ) : students.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={8} align="center" sx={{ py: 4 }}>
-                  <Typography color="text.secondary">No students found</Typography>
+                  <Typography color="text.secondary">
+                    No students found
+                  </Typography>
                 </TableCell>
               </TableRow>
             ) : (
               students.map((student) => (
                 <TableRow key={student.id} hover>
-                  <TableCell>{student.full_name || '-'}</TableCell>
-                  <TableCell>{student.email || '-'}</TableCell>
-                  <TableCell>{student.current_country || '-'}</TableCell>
+                  <TableCell>{student.full_name || "-"}</TableCell>
+                  <TableCell>{student.email || "-"}</TableCell>
+                  <TableCell>{student.current_country || "-"}</TableCell>
                   <TableCell>
-                    <Chip 
-                      label={student.oauth_provider || 'email'} 
-                      size="small" 
+                    <Chip
+                      label={student.oauth_provider || "email"}
+                      size="small"
                       variant="outlined"
                     />
                   </TableCell>
                   <TableCell>
                     <Chip
-                      label={student.profile_completed ? 'Completed' : 'Incomplete'}
+                      label={
+                        student.profile_completed ? "Completed" : "Incomplete"
+                      }
                       size="small"
-                      color={student.profile_completed ? 'success' : 'warning'}
+                      color={student.profile_completed ? "success" : "warning"}
                       variant="outlined"
                     />
                   </TableCell>
                   <TableCell>
+                    {student.subscription_plan ? (
+                      <Chip
+                        label={student.subscription_plan}
+                        size="small"
+                        color="primary"
+                        variant="outlined"
+                      />
+                    ) : (
+                      <Typography variant="caption" color="text.secondary">
+                        -
+                      </Typography>
+                    )}
+                  </TableCell>
+                  <TableCell>
                     <Chip
-                      label={student.subscription_status || 'trial'}
+                      label={student.subscription_status || "trial"}
                       size="small"
-                      color={getSubscriptionStatusColor(student.subscription_status)}
+                      color={getSubscriptionStatusColor(
+                        student.subscription_status,
+                      )}
                     />
                   </TableCell>
                   <TableCell>
                     {student.days_remaining !== null ? (
-                      <Typography 
-                        variant="body2" 
-                        color={student.days_remaining < 7 ? 'error' : 'text.primary'}
+                      <Typography
+                        variant="body2"
+                        color={
+                          student.days_remaining < 7 ? "error" : "text.primary"
+                        }
                       >
                         {student.days_remaining} days
                       </Typography>
                     ) : (
-                      '-'
+                      "-"
                     )}
                   </TableCell>
                   <TableCell align="right">
@@ -417,12 +508,19 @@ export const StudentsPage: React.FC = () => {
         open={!!selectedStudent}
         onClose={handleCloseDrawer}
         PaperProps={{
-          sx: { width: { xs: '100%', sm: 500 } }
+          sx: { width: { xs: "100%", sm: 500 } },
         }}
       >
         {selectedStudent && (
           <Box sx={{ p: 3 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                mb: 3,
+              }}
+            >
               <Typography variant="h5">User Details</Typography>
               <IconButton onClick={handleCloseDrawer}>
                 <CloseIcon />
@@ -431,88 +529,148 @@ export const StudentsPage: React.FC = () => {
 
             <Stack spacing={3}>
               <Box>
-                <Typography variant="overline" color="text.secondary">Personal Information</Typography>
+                <Typography variant="overline" color="text.secondary">
+                  Personal Information
+                </Typography>
                 <Divider sx={{ my: 1 }} />
                 <Stack spacing={1.5}>
                   <Box>
-                    <Typography variant="caption" color="text.secondary">Full Name</Typography>
-                    <Typography variant="body1">{selectedStudent.full_name || '-'}</Typography>
-                  </Box>
-                  <Box>
-                    <Typography variant="caption" color="text.secondary">Email</Typography>
-                    <Typography variant="body1">{selectedStudent.email || '-'}</Typography>
-                  </Box>
-                  <Box>
-                    <Typography variant="caption" color="text.secondary">Phone Number</Typography>
-                    <Typography variant="body1">{selectedStudent.phone_number || '-'}</Typography>
-                  </Box>
-                  <Box>
-                    <Typography variant="caption" color="text.secondary">Gender</Typography>
-                    <Typography variant="body1">{selectedStudent.gender || '-'}</Typography>
-                  </Box>
-                  <Box>
-                    <Typography variant="caption" color="text.secondary">Date of Birth</Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      Full Name
+                    </Typography>
                     <Typography variant="body1">
-                      {selectedStudent.date_of_birth ? new Date(selectedStudent.date_of_birth).toLocaleDateString() : '-'}
+                      {selectedStudent.full_name || "-"}
                     </Typography>
                   </Box>
                   <Box>
-                    <Typography variant="caption" color="text.secondary">Current Country</Typography>
-                    <Typography variant="body1">{selectedStudent.current_country || '-'}</Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      Email
+                    </Typography>
+                    <Typography variant="body1">
+                      {selectedStudent.email || "-"}
+                    </Typography>
+                  </Box>
+                  <Box>
+                    <Typography variant="caption" color="text.secondary">
+                      Phone Number
+                    </Typography>
+                    <Typography variant="body1">
+                      {selectedStudent.phone_number || "-"}
+                    </Typography>
+                  </Box>
+                  <Box>
+                    <Typography variant="caption" color="text.secondary">
+                      Gender
+                    </Typography>
+                    <Typography variant="body1">
+                      {selectedStudent.gender || "-"}
+                    </Typography>
+                  </Box>
+                  <Box>
+                    <Typography variant="caption" color="text.secondary">
+                      Date of Birth
+                    </Typography>
+                    <Typography variant="body1">
+                      {selectedStudent.date_of_birth
+                        ? new Date(
+                            selectedStudent.date_of_birth,
+                          ).toLocaleDateString()
+                        : "-"}
+                    </Typography>
+                  </Box>
+                  <Box>
+                    <Typography variant="caption" color="text.secondary">
+                      Current Country
+                    </Typography>
+                    <Typography variant="body1">
+                      {selectedStudent.current_country || "-"}
+                    </Typography>
                   </Box>
                 </Stack>
               </Box>
 
               <Box>
-                <Typography variant="overline" color="text.secondary">Nursing Information</Typography>
+                <Typography variant="overline" color="text.secondary">
+                  Nursing Information
+                </Typography>
                 <Divider sx={{ my: 1 }} />
                 <Stack spacing={1.5}>
                   <Box>
-                    <Typography variant="caption" color="text.secondary">NMC Attempts</Typography>
-                    <Typography variant="body1">{selectedStudent.nmc_attempts || 0}</Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      NMC Attempts
+                    </Typography>
+                    <Typography variant="body1">
+                      {selectedStudent.nmc_attempts || 0}
+                    </Typography>
                   </Box>
                   <Box>
-                    <Typography variant="caption" color="text.secondary">Using Coaching</Typography>
-                    <Typography variant="body1">{selectedStudent.uses_coaching ? 'Yes' : 'No'}</Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      Using Coaching
+                    </Typography>
+                    <Typography variant="body1">
+                      {selectedStudent.uses_coaching ? "Yes" : "No"}
+                    </Typography>
                   </Box>
                 </Stack>
               </Box>
 
               <Box>
-                <Typography variant="overline" color="text.secondary">Account Information</Typography>
+                <Typography variant="overline" color="text.secondary">
+                  Account Information
+                </Typography>
                 <Divider sx={{ my: 1 }} />
                 <Stack spacing={1.5}>
                   <Box>
-                    <Typography variant="caption" color="text.secondary">OAuth Provider</Typography>
-                    <Chip 
-                      label={selectedStudent.oauth_provider || 'email'} 
-                      size="small" 
+                    <Typography variant="caption" color="text.secondary">
+                      OAuth Provider
+                    </Typography>
+                    <Chip
+                      label={selectedStudent.oauth_provider || "email"}
+                      size="small"
                       sx={{ mt: 0.5 }}
                     />
                   </Box>
                   <Box>
-                    <Typography variant="caption" color="text.secondary">Profile Status</Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      Profile Status
+                    </Typography>
                     <Chip
-                      label={selectedStudent.profile_completed ? 'Completed' : 'Incomplete'}
+                      label={
+                        selectedStudent.profile_completed
+                          ? "Completed"
+                          : "Incomplete"
+                      }
                       size="small"
-                      color={selectedStudent.profile_completed ? 'success' : 'warning'}
+                      color={
+                        selectedStudent.profile_completed
+                          ? "success"
+                          : "warning"
+                      }
                       sx={{ mt: 0.5 }}
                     />
                   </Box>
                   <Box>
-                    <Typography variant="caption" color="text.secondary">Subscription Status</Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      Subscription Status
+                    </Typography>
                     <Chip
-                      label={selectedStudent.subscription_status || 'trial'}
+                      label={selectedStudent.subscription_status || "trial"}
                       size="small"
-                      color={getSubscriptionStatusColor(selectedStudent.subscription_status)}
+                      color={getSubscriptionStatusColor(
+                        selectedStudent.subscription_status,
+                      )}
                       sx={{ mt: 0.5 }}
                     />
                   </Box>
                   {selectedStudent.subscription_end_date && (
                     <Box>
-                      <Typography variant="caption" color="text.secondary">Subscription Ends</Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        Subscription Ends
+                      </Typography>
                       <Typography variant="body1">
-                        {new Date(selectedStudent.subscription_end_date).toLocaleDateString()}
+                        {new Date(
+                          selectedStudent.subscription_end_date,
+                        ).toLocaleDateString()}
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
                         ({selectedStudent.days_remaining} days remaining)
@@ -520,9 +678,14 @@ export const StudentsPage: React.FC = () => {
                     </Box>
                   )}
                   <Box>
-                    <Typography variant="caption" color="text.secondary">Registered</Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      Registered
+                    </Typography>
                     <Typography variant="body1">
-                      {formatDistanceToNow(new Date(selectedStudent.created_at), { addSuffix: true })}
+                      {formatDistanceToNow(
+                        new Date(selectedStudent.created_at),
+                        { addSuffix: true },
+                      )}
                     </Typography>
                   </Box>
                 </Stack>
@@ -530,23 +693,33 @@ export const StudentsPage: React.FC = () => {
 
               {/* Payment Information - Requirements 5.1, 5.2 */}
               <Box>
-                <Typography variant="overline" color="text.secondary">Payment Information</Typography>
+                <Typography variant="overline" color="text.secondary">
+                  Payment Information
+                </Typography>
                 <Divider sx={{ my: 1 }} />
                 <Stack spacing={1.5}>
                   <Box>
-                    <Typography variant="caption" color="text.secondary">Last Payment</Typography>
-                    {selectedStudent.last_payment_amount !== null && selectedStudent.last_payment_currency ? (
+                    <Typography variant="caption" color="text.secondary">
+                      Last Payment
+                    </Typography>
+                    {selectedStudent.last_payment_amount !== null &&
+                    selectedStudent.last_payment_currency ? (
                       <Typography variant="body1">
-                        {selectedStudent.last_payment_currency.toUpperCase()} {selectedStudent.last_payment_amount.toFixed(2)}
+                        {selectedStudent.last_payment_currency.toUpperCase()}{" "}
+                        {selectedStudent.last_payment_amount.toFixed(2)}
                       </Typography>
                     ) : (
-                      <Typography variant="body2" color="text.secondary">No payments recorded</Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        No payments recorded
+                      </Typography>
                     )}
                   </Box>
                   <Box>
-                    <Typography variant="caption" color="text.secondary">Payment Source</Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      Payment Source
+                    </Typography>
                     {selectedStudent.last_payment_source ? (
-                      <Chip 
+                      <Chip
                         icon={<PaymentIcon fontSize="small" />}
                         label={selectedStudent.last_payment_source}
                         size="small"
@@ -555,7 +728,9 @@ export const StudentsPage: React.FC = () => {
                         sx={{ mt: 0.5 }}
                       />
                     ) : (
-                      <Typography variant="body2" color="text.secondary">-</Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        -
+                      </Typography>
                     )}
                   </Box>
                 </Stack>
@@ -565,7 +740,7 @@ export const StudentsPage: React.FC = () => {
         )}
       </Drawer>
     </Box>
-  )
-}
+  );
+};
 
-export default StudentsPage
+export default StudentsPage;

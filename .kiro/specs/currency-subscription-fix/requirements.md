@@ -3,6 +3,7 @@
 ## Introduction
 
 This feature addresses two critical issues in the Jeeva Admin Portal:
+
 1. **Currency Inconsistency**: The application defaults to USD ($) in various places, but the primary currency should be GBP (£) for UK-based users.
 2. **Subscription Status Not Updating**: After a successful payment, the user's subscription status, payment history, and student status are not being updated in the database, causing the admin portal to show incorrect subscription information.
 

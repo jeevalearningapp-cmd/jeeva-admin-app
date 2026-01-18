@@ -13,6 +13,7 @@ This document provides detailed feature specifications for the Jeeva Learning mo
 ## 🎯 Feature Priority Matrix
 
 ### Phase 1: MVP (Must Have)
+
 1. Authentication & Onboarding
 2. Content Browsing (Modules, Topics, Lessons)
 3. Lesson Viewer
@@ -21,6 +22,7 @@ This document provides detailed feature specifications for the Jeeva Learning mo
 6. User Profile
 
 ### Phase 2: Enhanced Learning
+
 1. Audio Lessons (Podcast Mode)
 2. Flashcard System
 3. Mock Exams
@@ -28,6 +30,7 @@ This document provides detailed feature specifications for the Jeeva Learning mo
 5. Bookmarks & Notes
 
 ### Phase 3: Advanced Features
+
 1. AI Recommendations
 2. Offline Mode
 3. Push Notifications
@@ -41,9 +44,10 @@ This document provides detailed feature specifications for the Jeeva Learning mo
 ### 1.1 User Registration
 
 **User Story:**  
-*As a new user, I want to create an account so that I can access learning content and track my progress.*
+_As a new user, I want to create an account so that I can access learning content and track my progress._
 
 **Acceptance Criteria:**
+
 - [ ] User can sign up with email and password
 - [ ] Password must be minimum 8 characters with 1 uppercase, 1 lowercase, 1 number
 - [ ] Email validation before submission
@@ -54,6 +58,7 @@ This document provides detailed feature specifications for the Jeeva Learning mo
 - [ ] Success message after registration
 
 **UI Components:**
+
 - Full name text input
 - Email text input
 - Password text input (with show/hide toggle)
@@ -63,6 +68,7 @@ This document provides detailed feature specifications for the Jeeva Learning mo
 - Link to login page
 
 **Technical Implementation:**
+
 ```typescript
 // Required fields
 interface SignUpData {
@@ -81,6 +87,7 @@ supabase.auth.signUp()
 ```
 
 **Validation Rules:**
+
 - Email: Valid format (regex)
 - Password: 8+ chars, 1 uppercase, 1 lowercase, 1 number
 - Full name: 2-50 characters
@@ -91,9 +98,10 @@ supabase.auth.signUp()
 ### 1.2 Email Verification
 
 **User Story:**  
-*As a new user, I want to verify my email so that I can access my account.*
+_As a new user, I want to verify my email so that I can access my account._
 
 **Acceptance Criteria:**
+
 - [ ] Verification email sent immediately after signup
 - [ ] Email contains verification link
 - [ ] Deep link opens app and verifies account
@@ -102,11 +110,13 @@ supabase.auth.signUp()
 - [ ] Redirect to dashboard after verification
 
 **UI Components:**
+
 - Verification pending screen
 - Resend email button
 - Email verification success screen
 
 **Technical Implementation:**
+
 ```typescript
 // Email verification
 supabase.auth.verifyOtp({
@@ -123,9 +133,10 @@ jeevalearning://auth/callback?token_hash=xxx&type=signup
 ### 1.3 Login
 
 **User Story:**  
-*As a registered user, I want to log in to my account so that I can access my learning content.*
+_As a registered user, I want to log in to my account so that I can access my learning content._
 
 **Acceptance Criteria:**
+
 - [ ] User can login with email and password
 - [ ] Remember me option saves session
 - [ ] Error message for incorrect credentials
@@ -134,6 +145,7 @@ jeevalearning://auth/callback?token_hash=xxx&type=signup
 - [ ] Auto-redirect to dashboard on success
 
 **UI Components:**
+
 - Email input
 - Password input (with show/hide)
 - Login button
@@ -142,12 +154,13 @@ jeevalearning://auth/callback?token_hash=xxx&type=signup
 - Sign up link
 
 **Technical Implementation:**
+
 ```typescript
-POST /auth/login
+POST / auth / login;
 supabase.auth.signInWithPassword({
   email,
-  password
-})
+  password,
+});
 ```
 
 ---
@@ -155,9 +168,10 @@ supabase.auth.signInWithPassword({
 ### 1.4 Social Login (Google & Apple)
 
 **User Story:**  
-*As a user, I want to sign in with Google/Apple so that I can quickly access my account.*
+_As a user, I want to sign in with Google/Apple so that I can quickly access my account._
 
 **Acceptance Criteria:**
+
 - [ ] Google sign-in button available
 - [ ] Apple sign-in button available
 - [ ] OAuth flow completes successfully
@@ -165,18 +179,20 @@ supabase.auth.signInWithPassword({
 - [ ] Auto-redirect after successful auth
 
 **UI Components:**
+
 - "Continue with Google" button
 - "Continue with Apple" button
 - OAuth loading screen
 
 **Technical Implementation:**
+
 ```typescript
 supabase.auth.signInWithOAuth({
-  provider: 'google' | 'apple',
+  provider: "google" | "apple",
   options: {
-    redirectTo: 'jeevalearning://auth/callback'
-  }
-})
+    redirectTo: "jeevalearning://auth/callback",
+  },
+});
 ```
 
 ---
@@ -184,9 +200,10 @@ supabase.auth.signInWithOAuth({
 ### 1.5 Onboarding Flow
 
 **User Story:**  
-*As a first-time user, I want to see an introduction to the app so that I understand its features.*
+_As a first-time user, I want to see an introduction to the app so that I understand its features._
 
 **Acceptance Criteria:**
+
 - [ ] Onboarding shown only on first launch
 - [ ] 3-5 slides explaining key features
 - [ ] Skip option available
@@ -194,6 +211,7 @@ supabase.auth.signInWithOAuth({
 - [ ] Never show again after completion
 
 **UI Components:**
+
 - Intro slides with images
 - Progress indicator dots
 - Skip button
@@ -201,6 +219,7 @@ supabase.auth.signInWithOAuth({
 - Get Started button
 
 **Content Slides:**
+
 1. Welcome to Jeeva Learning
 2. Browse courses and lessons
 3. Practice with questions
@@ -214,9 +233,10 @@ supabase.auth.signInWithOAuth({
 ### 2.1 Module List
 
 **User Story:**  
-*As a user, I want to browse available modules so that I can choose what to learn.*
+_As a user, I want to browse available modules so that I can choose what to learn._
 
 **Acceptance Criteria:**
+
 - [ ] Display all active modules
 - [ ] Show module thumbnail, title, description
 - [ ] Display topic count per module
@@ -227,6 +247,7 @@ supabase.auth.signInWithOAuth({
 - [ ] Search functionality
 
 **UI Components:**
+
 - Module card with:
   - Thumbnail image
   - Title
@@ -238,24 +259,27 @@ supabase.auth.signInWithOAuth({
 - Pull-to-refresh
 
 **Data Model:**
+
 ```typescript
 interface Module {
-  id: string
-  title: string
-  description: string
-  thumbnailUrl: string
-  topicCount: number
-  progress?: number // 0-100
+  id: string;
+  title: string;
+  description: string;
+  thumbnailUrl: string;
+  topicCount: number;
+  progress?: number; // 0-100
 }
 ```
 
 **API Endpoint:**
+
 ```typescript
-GET /modules
-supabase.from('modules')
-  .select('*')
-  .eq('is_active', true)
-  .order('display_order')
+GET / modules;
+supabase
+  .from("modules")
+  .select("*")
+  .eq("is_active", true)
+  .order("display_order");
 ```
 
 ---
@@ -263,9 +287,10 @@ supabase.from('modules')
 ### 2.2 Topic List
 
 **User Story:**  
-*As a user, I want to view topics within a module so that I can navigate to specific content.*
+_As a user, I want to view topics within a module so that I can navigate to specific content._
 
 **Acceptance Criteria:**
+
 - [ ] Display topics for selected module
 - [ ] Show topic title and description
 - [ ] Display lesson count per topic
@@ -274,6 +299,7 @@ supabase.from('modules')
 - [ ] Breadcrumb navigation (Module > Topics)
 
 **UI Components:**
+
 - Topic card with:
   - Title
   - Description
@@ -284,19 +310,21 @@ supabase.from('modules')
 - Progress summary
 
 **Data Model:**
+
 ```typescript
 interface Topic {
-  id: string
-  moduleId: string
-  title: string
-  description: string
-  lessonCount: number
-  completedLessons: number
-  isPremium?: boolean
+  id: string;
+  moduleId: string;
+  title: string;
+  description: string;
+  lessonCount: number;
+  completedLessons: number;
+  isPremium?: boolean;
 }
 ```
 
 **API Endpoint:**
+
 ```typescript
 GET /topics?moduleId={id}
 supabase.from('topics')
@@ -310,9 +338,10 @@ supabase.from('topics')
 ### 2.3 Lesson List
 
 **User Story:**  
-*As a user, I want to see all lessons in a topic so that I can choose what to study.*
+_As a user, I want to see all lessons in a topic so that I can choose what to study._
 
 **Acceptance Criteria:**
+
 - [ ] Display lessons in sequential order
 - [ ] Show lesson title and duration
 - [ ] Display completion status (checkmark)
@@ -322,6 +351,7 @@ supabase.from('topics')
 - [ ] Current lesson highlighted
 
 **UI Components:**
+
 - Lesson card with:
   - Lesson number
   - Title
@@ -333,22 +363,24 @@ supabase.from('topics')
 - Continue learning button
 
 **Data Model:**
+
 ```typescript
 interface Lesson {
-  id: string
-  topicId: string
-  title: string
-  content: string
-  videoUrl?: string
-  audioUrl?: string
-  duration: number // seconds
-  displayOrder: number
-  isCompleted: boolean
-  isLocked: boolean
+  id: string;
+  topicId: string;
+  title: string;
+  content: string;
+  videoUrl?: string;
+  audioUrl?: string;
+  duration: number; // seconds
+  displayOrder: number;
+  isCompleted: boolean;
+  isLocked: boolean;
 }
 ```
 
 **API Endpoint:**
+
 ```typescript
 GET /lessons?topicId={id}
 supabase.from('lessons')
@@ -365,9 +397,10 @@ supabase.from('lessons')
 ### 3.1 Text Lessons
 
 **User Story:**  
-*As a user, I want to read text-based lessons so that I can learn new concepts.*
+_As a user, I want to read text-based lessons so that I can learn new concepts._
 
 **Acceptance Criteria:**
+
 - [ ] Display formatted lesson content
 - [ ] Support rich text (bold, italic, lists)
 - [ ] Render images inline
@@ -378,6 +411,7 @@ supabase.from('lessons')
 - [ ] Next lesson button
 
 **UI Components:**
+
 - Lesson header (title, topic breadcrumb)
 - Rich text content viewer
 - Image viewer (zoomable)
@@ -388,9 +422,10 @@ supabase.from('lessons')
 - Bookmark button
 
 **Technical Implementation:**
+
 ```typescript
 // Rich text rendering
-<RenderHTML 
+<RenderHTML
   source={{ html: lesson.content }}
   contentWidth={width}
 />
@@ -408,9 +443,10 @@ supabase.from('learning_completions')
 ### 3.2 Video Lessons
 
 **User Story:**  
-*As a user, I want to watch video lessons so that I can learn visually.*
+_As a user, I want to watch video lessons so that I can learn visually._
 
 **Acceptance Criteria:**
+
 - [ ] Play video inline
 - [ ] Video controls (play, pause, seek)
 - [ ] Fullscreen mode
@@ -421,6 +457,7 @@ supabase.from('learning_completions')
 - [ ] Picture-in-picture support
 
 **UI Components:**
+
 - Video player with controls
 - Progress bar
 - Play/Pause button
@@ -430,6 +467,7 @@ supabase.from('learning_completions')
 - Timestamp display
 
 **Technical Implementation:**
+
 ```typescript
 import { Video } from 'expo-av'
 
@@ -449,9 +487,10 @@ AsyncStorage.setItem(`video_${lessonId}`, position)
 ### 3.3 Audio Lessons (Podcast Mode)
 
 **User Story:**  
-*As a user, I want to listen to audio lessons so that I can learn while multitasking.*
+_As a user, I want to listen to audio lessons so that I can learn while multitasking._
 
 **Acceptance Criteria:**
+
 - [ ] Play audio in background
 - [ ] Playback controls in notification (iOS/Android)
 - [ ] Seek forward/backward (15s)
@@ -462,6 +501,7 @@ AsyncStorage.setItem(`video_${lessonId}`, position)
 - [ ] Show waveform visualization
 
 **UI Components:**
+
 - Audio player UI with:
   - Waveform visualization
   - Play/Pause button
@@ -474,21 +514,22 @@ AsyncStorage.setItem(`video_${lessonId}`, position)
 - Background play notification
 
 **Technical Implementation:**
+
 ```typescript
-import { Audio } from 'expo-av'
+import { Audio } from "expo-av";
 
 // Background audio
 await Audio.setAudioModeAsync({
   allowsRecordingIOS: false,
   playsInSilentModeIOS: true,
   shouldDuckAndroid: true,
-  playThroughEarpieceAndroid: false
-})
+  playThroughEarpieceAndroid: false,
+});
 
 const { sound } = await Audio.Sound.createAsync(
   { uri: lesson.audioUrl },
-  { shouldPlay: true }
-)
+  { shouldPlay: true },
+);
 ```
 
 ---
@@ -498,9 +539,10 @@ const { sound } = await Audio.Sound.createAsync(
 ### 4.1 Practice Questions
 
 **User Story:**  
-*As a user, I want to practice questions so that I can test my knowledge.*
+_As a user, I want to practice questions so that I can test my knowledge._
 
 **Acceptance Criteria:**
+
 - [ ] Display questions one at a time
 - [ ] Show all answer options
 - [ ] Highlight selected answer
@@ -513,6 +555,7 @@ const { sound } = await Audio.Sound.createAsync(
 - [ ] Results summary at end
 
 **UI Components:**
+
 - Question card:
   - Question text
   - Question image (if any)
@@ -525,33 +568,35 @@ const { sound } = await Audio.Sound.createAsync(
 - Quit practice button
 
 **Data Model:**
+
 ```typescript
 interface Question {
-  id: string
-  questionText: string
-  imageUrl?: string
-  questionType: 'multiple_choice' | 'true_false'
-  difficulty: 'easy' | 'medium' | 'hard'
-  explanation: string
-  options: QuestionOption[]
+  id: string;
+  questionText: string;
+  imageUrl?: string;
+  questionType: "multiple_choice" | "true_false";
+  difficulty: "easy" | "medium" | "hard";
+  explanation: string;
+  options: QuestionOption[];
 }
 
 interface QuestionOption {
-  id: string
-  optionText: string
-  isCorrect: boolean
+  id: string;
+  optionText: string;
+  isCorrect: boolean;
 }
 
 interface PracticeSession {
-  id: string
-  userId: string
-  answers: Answer[]
-  score: number
-  totalQuestions: number
+  id: string;
+  userId: string;
+  answers: Answer[];
+  score: number;
+  totalQuestions: number;
 }
 ```
 
 **API Endpoints:**
+
 ```typescript
 // Get questions
 GET /questions?lessonId={id}&limit=10
@@ -572,6 +617,7 @@ POST /practice-sessions
 ```
 
 **Practice Flow:**
+
 1. Select topic/lesson for practice
 2. Fetch 10 random questions
 3. Show questions one by one
@@ -586,9 +632,10 @@ POST /practice-sessions
 ### 4.2 Mock Exams
 
 **User Story:**  
-*As a user, I want to take mock exams so that I can prepare for real tests.*
+_As a user, I want to take mock exams so that I can prepare for real tests._
 
 **Acceptance Criteria:**
+
 - [ ] Timed exam mode (configurable duration)
 - [ ] All questions displayed
 - [ ] Cannot go back after submit
@@ -599,6 +646,7 @@ POST /practice-sessions
 - [ ] Compare with previous attempts
 
 **UI Components:**
+
 - Exam setup screen:
   - Topic selection
   - Number of questions
@@ -617,32 +665,34 @@ POST /practice-sessions
   - Review answers button
 
 **Data Model:**
+
 ```typescript
 interface MockExam {
-  id: string
-  userId: string
-  topicId: string
-  duration: number // minutes
-  questionsCount: number
-  status: 'in_progress' | 'completed'
-  startedAt: string
-  completedAt?: string
+  id: string;
+  userId: string;
+  topicId: string;
+  duration: number; // minutes
+  questionsCount: number;
+  status: "in_progress" | "completed";
+  startedAt: string;
+  completedAt?: string;
 }
 
 interface MockExamResult {
-  examId: string
-  score: number
-  totalQuestions: number
-  correctAnswers: number
-  timeTaken: number
+  examId: string;
+  score: number;
+  totalQuestions: number;
+  correctAnswers: number;
+  timeTaken: number;
   topicPerformance: {
-    topicId: string
-    score: number
-  }[]
+    topicId: string;
+    score: number;
+  }[];
 }
 ```
 
 **Exam Flow:**
+
 1. Configure exam (topic, duration, questions)
 2. Start timer
 3. Answer questions
@@ -657,9 +707,10 @@ interface MockExamResult {
 ### 4.3 Flashcards
 
 **User Story:**  
-*As a user, I want to study flashcards so that I can quickly review key concepts.*
+_As a user, I want to study flashcards so that I can quickly review key concepts._
 
 **Acceptance Criteria:**
+
 - [ ] Display card front initially
 - [ ] Tap to flip to back
 - [ ] Swipe right for "Got it"
@@ -671,6 +722,7 @@ interface MockExamResult {
 - [ ] Review statistics
 
 **UI Components:**
+
 - Flashcard:
   - Front side (question/concept)
   - Back side (answer/explanation)
@@ -684,31 +736,33 @@ interface MockExamResult {
 - Statistics panel
 
 **Data Model:**
+
 ```typescript
 interface Flashcard {
-  id: string
-  lessonId: string
-  front: string
-  back: string
-  imageUrl?: string
-  masteryLevel: number // 0-5
-  nextReviewDate: string
+  id: string;
+  lessonId: string;
+  front: string;
+  back: string;
+  imageUrl?: string;
+  masteryLevel: number; // 0-5
+  nextReviewDate: string;
 }
 
 interface FlashcardSession {
-  userId: string
-  flashcardId: string
-  wasCorrect: boolean
-  reviewedAt: string
+  userId: string;
+  flashcardId: string;
+  wasCorrect: boolean;
+  reviewedAt: string;
 }
 ```
 
 **Spaced Repetition Algorithm:**
+
 ```typescript
 // Update next review date based on mastery
-const intervals = [1, 3, 7, 14, 30, 90] // days
-const nextInterval = intervals[masteryLevel]
-const nextReviewDate = addDays(new Date(), nextInterval)
+const intervals = [1, 3, 7, 14, 30, 90]; // days
+const nextInterval = intervals[masteryLevel];
+const nextReviewDate = addDays(new Date(), nextInterval);
 ```
 
 ---
@@ -718,9 +772,10 @@ const nextReviewDate = addDays(new Date(), nextInterval)
 ### 5.1 Learning Dashboard
 
 **User Story:**  
-*As a user, I want to view my learning progress so that I can track my achievements.*
+_As a user, I want to view my learning progress so that I can track my achievements._
 
 **Acceptance Criteria:**
+
 - [ ] Display total lessons completed
 - [ ] Show current streak (days)
 - [ ] Display total study time
@@ -731,6 +786,7 @@ const nextReviewDate = addDays(new Date(), nextInterval)
 - [ ] Recommended next lessons
 
 **UI Components:**
+
 - Stats cards:
   - Lessons completed
   - Current streak 🔥
@@ -742,35 +798,37 @@ const nextReviewDate = addDays(new Date(), nextInterval)
 - Recommended section
 
 **Data Model:**
+
 ```typescript
 interface UserStats {
-  lessonsCompleted: number
-  currentStreak: number
-  totalStudyTime: number // minutes
-  averageScore: number
+  lessonsCompleted: number;
+  currentStreak: number;
+  totalStudyTime: number; // minutes
+  averageScore: number;
   weeklyActivity: {
-    date: string
-    lessonsCompleted: number
-  }[]
-  achievements: Achievement[]
+    date: string;
+    lessonsCompleted: number;
+  }[];
+  achievements: Achievement[];
 }
 
 interface Achievement {
-  id: string
-  title: string
-  description: string
-  icon: string
-  unlockedAt?: string
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+  unlockedAt?: string;
 }
 ```
 
 **API Endpoint:**
+
 ```typescript
-GET /users/{id}/stats
-// Aggregates data from:
-- learning_completions
-- practice_sessions
-- mock_exams
+GET / users / { id } / stats -
+  // Aggregates data from:
+  learning_completions -
+  practice_sessions -
+  mock_exams;
 ```
 
 ---
@@ -778,9 +836,10 @@ GET /users/{id}/stats
 ### 5.2 Topic Progress
 
 **User Story:**  
-*As a user, I want to see my progress in each topic so that I know what to focus on.*
+_As a user, I want to see my progress in each topic so that I know what to focus on._
 
 **Acceptance Criteria:**
+
 - [ ] Show lessons completed / total
 - [ ] Display progress percentage
 - [ ] Show last studied date
@@ -790,6 +849,7 @@ GET /users/{id}/stats
 - [ ] Time spent on topic
 
 **UI Components:**
+
 - Progress bar (visual %)
 - Stats summary:
   - X/Y lessons completed
@@ -801,10 +861,11 @@ GET /users/{id}/stats
 - Continue learning button
 
 **Calculation:**
+
 ```typescript
-const progress = (completedLessons / totalLessons) * 100
-const averageScore = totalScore / attemptedQuestions
-const timeSpent = sum(lessonDurations)
+const progress = (completedLessons / totalLessons) * 100;
+const averageScore = totalScore / attemptedQuestions;
+const timeSpent = sum(lessonDurations);
 ```
 
 ---
@@ -812,9 +873,10 @@ const timeSpent = sum(lessonDurations)
 ### 5.3 Streak Tracking
 
 **User Story:**  
-*As a user, I want to maintain a daily learning streak so that I stay motivated.*
+_As a user, I want to maintain a daily learning streak so that I stay motivated._
 
 **Acceptance Criteria:**
+
 - [ ] Track daily learning activity
 - [ ] Display current streak count
 - [ ] Show streak calendar view
@@ -824,6 +886,7 @@ const timeSpent = sum(lessonDurations)
 - [ ] Celebrate milestone streaks
 
 **UI Components:**
+
 - Streak counter with fire icon 🔥
 - Calendar view (30 days):
   - Green dot: activity
@@ -834,23 +897,22 @@ const timeSpent = sum(lessonDurations)
 - Milestone notifications
 
 **Streak Logic:**
+
 ```typescript
 // Calculate streak
-const sortedDates = completions
-  .map(c => c.completed_at)
-  .sort()
+const sortedDates = completions.map((c) => c.completed_at).sort();
 
-let streak = 0
-let currentDate = today
+let streak = 0;
+let currentDate = today;
 
 for (const date of sortedDates.reverse()) {
-  const daysDiff = differenceInDays(currentDate, date)
-  
+  const daysDiff = differenceInDays(currentDate, date);
+
   if (daysDiff === 0 || daysDiff === 1) {
-    streak++
-    currentDate = date
+    streak++;
+    currentDate = date;
   } else {
-    break
+    break;
   }
 }
 ```
@@ -862,9 +924,10 @@ for (const date of sortedDates.reverse()) {
 ### 6.1 User Profile
 
 **User Story:**  
-*As a user, I want to manage my profile so that I can keep my information up to date.*
+_As a user, I want to manage my profile so that I can keep my information up to date._
 
 **Acceptance Criteria:**
+
 - [ ] View profile information
 - [ ] Edit full name
 - [ ] Update phone number
@@ -875,6 +938,7 @@ for (const date of sortedDates.reverse()) {
 - [ ] Validation for all fields
 
 **UI Components:**
+
 - Profile picture (with edit icon)
 - Text inputs:
   - Full name
@@ -885,25 +949,27 @@ for (const date of sortedDates.reverse()) {
 - Loading state
 
 **Data Model:**
+
 ```typescript
 interface UserProfile {
-  id: string
-  userId: string
-  fullName: string
-  phoneNumber?: string
-  dateOfBirth?: string
-  profilePictureUrl?: string
+  id: string;
+  userId: string;
+  fullName: string;
+  phoneNumber?: string;
+  dateOfBirth?: string;
+  profilePictureUrl?: string;
 }
 ```
 
 **API Endpoint:**
+
 ```typescript
-GET /user-profiles/{userId}
-PUT /user-profiles/{userId}
+GET / user - profiles / { userId };
+PUT / user - profiles / { userId };
 {
-  full_name: string
-  phone_number: string
-  date_of_birth: string
+  full_name: string;
+  phone_number: string;
+  date_of_birth: string;
 }
 ```
 
@@ -912,9 +978,10 @@ PUT /user-profiles/{userId}
 ### 6.2 App Settings
 
 **User Story:**  
-*As a user, I want to customize app settings so that I can personalize my experience.*
+_As a user, I want to customize app settings so that I can personalize my experience._
 
 **Acceptance Criteria:**
+
 - [ ] Toggle dark mode
 - [ ] Change language (if multi-language)
 - [ ] Notification preferences
@@ -924,6 +991,7 @@ PUT /user-profiles/{userId}
 - [ ] Clear cache option
 
 **UI Components:**
+
 - Settings list with:
   - Dark mode toggle
   - Language selector
@@ -934,14 +1002,15 @@ PUT /user-profiles/{userId}
   - Clear cache button
 
 **Settings Storage:**
+
 ```typescript
 // AsyncStorage
 await AsyncStorage.multiSet([
-  ['theme', 'dark'],
-  ['language', 'en'],
-  ['autoplay', 'true'],
-  ['fontSize', '16']
-])
+  ["theme", "dark"],
+  ["language", "en"],
+  ["autoplay", "true"],
+  ["fontSize", "16"],
+]);
 ```
 
 ---
@@ -949,9 +1018,10 @@ await AsyncStorage.multiSet([
 ### 6.3 Change Password
 
 **User Story:**  
-*As a user, I want to change my password so that I can keep my account secure.*
+_As a user, I want to change my password so that I can keep my account secure._
 
 **Acceptance Criteria:**
+
 - [ ] Require current password
 - [ ] Enter new password
 - [ ] Confirm new password
@@ -960,6 +1030,7 @@ await AsyncStorage.multiSet([
 - [ ] Auto logout after change
 
 **UI Components:**
+
 - Current password input
 - New password input
 - Confirm password input
@@ -967,11 +1038,12 @@ await AsyncStorage.multiSet([
 - Update password button
 
 **API Endpoint:**
+
 ```typescript
-POST /auth/update-password
+POST / auth / update - password;
 supabase.auth.updateUser({
-  password: newPassword
-})
+  password: newPassword,
+});
 ```
 
 ---
@@ -981,31 +1053,36 @@ supabase.auth.updateUser({
 ### 7.1 Push Notifications
 
 **User Story:**  
-*As a user, I want to receive notifications so that I stay engaged with learning.*
+_As a user, I want to receive notifications so that I stay engaged with learning._
 
 **Notification Types:**
 
 **1. Study Reminders**
+
 - Daily reminder at set time
 - Custom schedule (Mon-Fri, weekends)
 - Streak reminder (if about to break)
 
 **2. Content Updates**
+
 - New lesson available
 - New topic added to module
 - Course completion
 
 **3. Achievement Notifications**
+
 - Milestone reached (10, 50, 100 lessons)
 - Streak milestones (7, 30, 100 days)
 - Perfect score on practice
 
 **4. Subscription Alerts**
+
 - Trial expiring soon
 - Subscription renewal
 - Payment failed
 
 **UI Components:**
+
 - Notification preferences screen:
   - Study reminders toggle
   - Reminder time picker
@@ -1016,11 +1093,12 @@ supabase.auth.updateUser({
 - Badge count on notifications icon
 
 **Technical Implementation:**
+
 ```typescript
-import * as Notifications from 'expo-notifications'
+import * as Notifications from "expo-notifications";
 
 // Request permission
-await Notifications.requestPermissionsAsync()
+await Notifications.requestPermissionsAsync();
 
 // Schedule notification
 await Notifications.scheduleNotificationAsync({
@@ -1031,9 +1109,9 @@ await Notifications.scheduleNotificationAsync({
   trigger: {
     hour: 19,
     minute: 0,
-    repeats: true
-  }
-})
+    repeats: true,
+  },
+});
 ```
 
 ---
@@ -1041,9 +1119,10 @@ await Notifications.scheduleNotificationAsync({
 ### 7.2 In-App Notifications
 
 **User Story:**  
-*As a user, I want to see in-app notifications so that I don't miss important updates.*
+_As a user, I want to see in-app notifications so that I don't miss important updates._
 
 **Acceptance Criteria:**
+
 - [ ] Notification bell icon with badge
 - [ ] List of recent notifications
 - [ ] Mark as read functionality
@@ -1052,6 +1131,7 @@ await Notifications.scheduleNotificationAsync({
 - [ ] Delete individual notifications
 
 **UI Components:**
+
 - Notification icon with badge count
 - Notification list:
   - Icon (type indicator)
@@ -1069,9 +1149,10 @@ await Notifications.scheduleNotificationAsync({
 ### 8.1 Subscription Plans
 
 **User Story:**  
-*As a user, I want to view subscription plans so that I can upgrade to premium.*
+_As a user, I want to view subscription plans so that I can upgrade to premium._
 
 **Acceptance Criteria:**
+
 - [ ] Display all available plans
 - [ ] Show plan features
 - [ ] Display pricing (monthly/yearly)
@@ -1081,6 +1162,7 @@ await Notifications.scheduleNotificationAsync({
 - [ ] Free trial badge (if applicable)
 
 **UI Components:**
+
 - Plan cards:
   - Plan name
   - Price
@@ -1092,16 +1174,17 @@ await Notifications.scheduleNotificationAsync({
 - Compare plans table
 
 **Data Model:**
+
 ```typescript
 interface SubscriptionPlan {
-  id: string
-  name: string
-  description: string
-  price: number
-  billingCycle: 'monthly' | 'yearly'
-  features: string[]
-  isCurrent?: boolean
-  isRecommended?: boolean
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  billingCycle: "monthly" | "yearly";
+  features: string[];
+  isCurrent?: boolean;
+  isRecommended?: boolean;
 }
 ```
 
@@ -1110,9 +1193,10 @@ interface SubscriptionPlan {
 ### 8.2 Payment Integration
 
 **User Story:**  
-*As a user, I want to purchase a subscription so that I can access premium content.*
+_As a user, I want to purchase a subscription so that I can access premium content._
 
 **Acceptance Criteria:**
+
 - [ ] Select subscription plan
 - [ ] Enter payment details (Stripe/in-app purchase)
 - [ ] Review order summary
@@ -1121,6 +1205,7 @@ interface SubscriptionPlan {
 - [ ] Instant premium access
 
 **Payment Flow:**
+
 1. Select plan
 2. Choose payment method (card/app store)
 3. Enter payment details
@@ -1131,17 +1216,18 @@ interface SubscriptionPlan {
 8. Grant access
 
 **Technical Implementation:**
+
 ```typescript
 // iOS/Android in-app purchase
-import * as InAppPurchases from 'expo-in-app-purchases'
+import * as InAppPurchases from "expo-in-app-purchases";
 
-await InAppPurchases.connectAsync()
+await InAppPurchases.connectAsync();
 const products = await InAppPurchases.getProductsAsync([
-  'premium_monthly',
-  'premium_yearly'
-])
+  "premium_monthly",
+  "premium_yearly",
+]);
 
-const purchase = await InAppPurchases.purchaseItemAsync('premium_monthly')
+const purchase = await InAppPurchases.purchaseItemAsync("premium_monthly");
 ```
 
 ---
@@ -1149,9 +1235,10 @@ const purchase = await InAppPurchases.purchaseItemAsync('premium_monthly')
 ### 8.3 Manage Subscription
 
 **User Story:**  
-*As a subscriber, I want to manage my subscription so that I can control my plan.*
+_As a subscriber, I want to manage my subscription so that I can control my plan._
 
 **Acceptance Criteria:**
+
 - [ ] View current subscription details
 - [ ] See next billing date
 - [ ] Change payment method
@@ -1161,6 +1248,7 @@ const purchase = await InAppPurchases.purchaseItemAsync('premium_monthly')
 - [ ] View billing history
 
 **UI Components:**
+
 - Subscription details card:
   - Current plan name
   - Status (active/cancelled/expired)
@@ -1180,9 +1268,10 @@ const purchase = await InAppPurchases.purchaseItemAsync('premium_monthly')
 ### 9.1 AI Assistant Chat Interface
 
 **User Story:**  
-*As a student, I want to chat with an AI assistant so that I can get instant help with my studies and doubts.*
+_As a student, I want to chat with an AI assistant so that I can get instant help with my studies and doubts._
 
 **Acceptance Criteria:**
+
 - [ ] Access chat from anywhere in the app
 - [ ] Send text messages to JeevaBot
 - [ ] Receive AI-generated responses
@@ -1194,6 +1283,7 @@ const purchase = await InAppPurchases.purchaseItemAsync('premium_monthly')
 - [ ] Error handling with friendly messages
 
 **UI Components:**
+
 - Chat screen with message list
 - Message input field
 - User message bubble (blue, right-aligned)
@@ -1205,36 +1295,37 @@ const purchase = await InAppPurchases.purchaseItemAsync('premium_monthly')
 - Error banner for failures
 
 **Technical Implementation:**
+
 ```typescript
 // Chat Message Interface
 interface ChatMessage {
-  id: string
-  conversation_id: string
-  role: 'user' | 'assistant'
-  content: string
+  id: string;
+  conversation_id: string;
+  role: "user" | "assistant";
+  content: string;
   metadata?: {
-    model: string
-    tokensUsed: number
-    responseTime: number
-  }
-  created_at: string
+    model: string;
+    tokensUsed: number;
+    responseTime: number;
+  };
+  created_at: string;
 }
 
 // Conversation Interface
 interface ChatConversation {
-  id: string
-  user_id: string
-  title: string
+  id: string;
+  user_id: string;
+  title: string;
   context_data: {
     currentLesson?: {
-      id: string
-      title: string
-    }
-    userLevel?: string
-    recentTopics?: string[]
-  }
-  created_at: string
-  updated_at: string
+      id: string;
+      title: string;
+    };
+    userLevel?: string;
+    recentTopics?: string[];
+  };
+  created_at: string;
+  updated_at: string;
 }
 ```
 
@@ -1243,9 +1334,10 @@ interface ChatConversation {
 ### 9.2 Context-Aware AI Responses
 
 **User Story:**  
-*As a student, I want the AI to understand my current learning context so that it gives relevant help.*
+_As a student, I want the AI to understand my current learning context so that it gives relevant help._
 
 **Acceptance Criteria:**
+
 - [ ] AI knows which lesson user is currently studying
 - [ ] AI references recent practice performance
 - [ ] AI suggests relevant practice topics
@@ -1255,29 +1347,30 @@ interface ChatConversation {
 - [ ] Response length under 200 words (concise)
 
 **Context Building:**
+
 ```typescript
 // AI Context Builder
 const buildContext = async (userId: string) => {
   // Get current lesson
-  const currentLesson = await getCurrentLesson(userId)
-  
+  const currentLesson = await getCurrentLesson(userId);
+
   // Get recent practice scores
-  const recentPractice = await getRecentPractice(userId, 5)
-  
+  const recentPractice = await getRecentPractice(userId, 5);
+
   // Build AI prompt
   return `You are JeevaBot, an AI tutor for medical students.
   
 Student Context:
 - Currently studying: ${currentLesson?.title}
-- Recent scores: ${recentPractice.map(p => p.score).join(', ')}
+- Recent scores: ${recentPractice.map((p) => p.score).join(", ")}
 
 Instructions:
 1. Give clear medical exam-focused explanations
 2. Reference current lesson when relevant
 3. Encourage if student is struggling
 4. Keep responses under 200 words
-`
-}
+`;
+};
 ```
 
 **AI Prompt Examples:**
@@ -1291,9 +1384,10 @@ Instructions:
 ### 9.3 Rate Limiting & Cost Control
 
 **User Story:**  
-*As a platform owner, I want to control AI costs so that the service remains sustainable.*
+_As a platform owner, I want to control AI costs so that the service remains sustainable._
 
 **Acceptance Criteria:**
+
 - [ ] 50 messages per user per day limit
 - [ ] Track daily usage in database
 - [ ] Show remaining messages to user
@@ -1303,29 +1397,31 @@ Instructions:
 - [ ] Cost estimation tracking (tokens used)
 
 **Daily Limit Implementation:**
+
 ```typescript
 const checkDailyLimit = async (userId: string): Promise<boolean> => {
-  const today = new Date().toISOString().split('T')[0]
-  
+  const today = new Date().toISOString().split("T")[0];
+
   const stats = await supabase
-    .from('ai_usage_stats')
-    .select('message_count')
-    .eq('user_id', userId)
-    .eq('date', today)
-    .single()
-  
-  const maxMessages = 50
-  const currentCount = stats?.message_count || 0
-  
+    .from("ai_usage_stats")
+    .select("message_count")
+    .eq("user_id", userId)
+    .eq("date", today)
+    .single();
+
+  const maxMessages = 50;
+  const currentCount = stats?.message_count || 0;
+
   if (currentCount >= maxMessages) {
-    throw new Error('Daily message limit reached. Try again tomorrow!')
+    throw new Error("Daily message limit reached. Try again tomorrow!");
   }
-  
-  return true
-}
+
+  return true;
+};
 ```
 
 **Cost Tracking:**
+
 - Track tokens used per message
 - Calculate daily costs (tokens × price)
 - Admin view: total costs per day/month
@@ -1336,9 +1432,10 @@ const checkDailyLimit = async (userId: string): Promise<boolean> => {
 ### 9.4 Error Handling & Fallbacks
 
 **User Story:**  
-*As a student, I want helpful messages when the AI isn't working so that I know what to do.*
+_As a student, I want helpful messages when the AI isn't working so that I know what to do._
 
 **Acceptance Criteria:**
+
 - [ ] Graceful degradation when AI API fails
 - [ ] Fallback response shown to user
 - [ ] Retry logic (max 3 attempts)
@@ -1349,11 +1446,12 @@ const checkDailyLimit = async (userId: string): Promise<boolean> => {
 **Fallback Responses:**
 
 **API Failure:**
+
 ```
 I'm currently experiencing technical difficulties. Here are alternatives:
 
 1. Check the lesson content for answers
-2. Review practice question explanations  
+2. Review practice question explanations
 3. Contact support for personalized help
 4. Try again in a few moments
 
@@ -1361,6 +1459,7 @@ Sorry for the inconvenience!
 ```
 
 **Rate Limit Reached:**
+
 ```
 You've reached your daily message limit (50 messages).
 
@@ -1373,6 +1472,7 @@ See you tomorrow! 😊
 ```
 
 **Network Error:**
+
 ```
 Connection issue detected. Please check your internet and try again.
 ```
@@ -1382,9 +1482,10 @@ Connection issue detected. Please check your internet and try again.
 ### 9.5 Chat History & Conversations
 
 **User Story:**  
-*As a student, I want to review past conversations so that I can revisit AI explanations.*
+_As a student, I want to review past conversations so that I can revisit AI explanations._
 
 **Acceptance Criteria:**
+
 - [ ] Save all conversations to database
 - [ ] List of past conversations with titles
 - [ ] Tap to open conversation history
@@ -1394,6 +1495,7 @@ Connection issue detected. Please check your internet and try again.
 - [ ] Persist across app restarts
 
 **UI Components:**
+
 - Chat history screen
 - Conversation list with:
   - Title (first 50 chars of first message)
@@ -1404,6 +1506,7 @@ Connection issue detected. Please check your internet and try again.
 - Empty state: "No conversations yet"
 
 **Database Schema:**
+
 ```sql
 -- Conversations table
 CREATE TABLE chat_conversations (
@@ -1449,23 +1552,25 @@ CREATE TABLE ai_usage_stats (
 **Daily Budget:** ~$10 (20,000 messages)
 
 **Configuration:**
-```typescript
-import { GoogleGenerativeAI } from '@google/generative-ai'
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)  // Backend only!
+```typescript
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY); // Backend only!
 
 const chatModel = genAI.getGenerativeModel({
-  model: 'gemini-1.5-flash',
+  model: "gemini-1.5-flash",
   generationConfig: {
-    temperature: 0.7,    // Balanced creativity
-    topK: 40,           // Diverse responses
-    topP: 0.95,         // High quality
-    maxOutputTokens: 1024  // ~200 words max
-  }
-})
+    temperature: 0.7, // Balanced creativity
+    topK: 40, // Diverse responses
+    topP: 0.95, // High quality
+    maxOutputTokens: 1024, // ~200 words max
+  },
+});
 ```
 
 **Environment Variables:**
+
 ```env
 # Backend (Admin Portal) ONLY:
 GEMINI_API_KEY=AIza...
@@ -1517,9 +1622,10 @@ EXPO_PUBLIC_BACKEND_URL=https://your-backend.replit.app
 ### 10.1 Personalized Learning Path
 
 **User Story:**  
-*As a user, I want AI-powered recommendations so that I know what to study next.*
+_As a user, I want AI-powered recommendations so that I know what to study next._
 
 **Acceptance Criteria:**
+
 - [ ] Analyze user performance
 - [ ] Identify weak areas
 - [ ] Suggest relevant topics
@@ -1531,21 +1637,25 @@ EXPO_PUBLIC_BACKEND_URL=https://your-backend.replit.app
 **Recommendation Types:**
 
 **1. Weak Topic Recommendations**
+
 - Based on low practice scores
 - Suggest focused revision
 - Provide extra resources
 
 **2. Next Lesson Suggestions**
+
 - Sequential learning path
 - Based on prerequisites
 - Consider user pace
 
 **3. Practice Recommendations**
+
 - Target weak areas
 - Adaptive difficulty
 - Optimal review timing
 
 **UI Components:**
+
 - "Recommended for You" section on dashboard
 - Recommendation cards:
   - Type (weak area/next lesson/practice)
@@ -1555,34 +1665,36 @@ EXPO_PUBLIC_BACKEND_URL=https://your-backend.replit.app
 - AI insights panel
 
 **Data Model:**
+
 ```typescript
 interface AIRecommendation {
-  id: string
-  userId: string
-  type: 'weak_topic' | 'next_lesson' | 'practice'
-  resourceId: string
-  resourceTitle: string
-  reason: string
-  confidence: number // 0-1
-  createdAt: string
+  id: string;
+  userId: string;
+  type: "weak_topic" | "next_lesson" | "practice";
+  resourceId: string;
+  resourceTitle: string;
+  reason: string;
+  confidence: number; // 0-1
+  createdAt: string;
 }
 ```
 
 **Algorithm:**
+
 ```typescript
 // Identify weak topics
-const weakTopics = topics.filter(topic => {
-  const avgScore = getAverageScore(topic.id, userId)
-  return avgScore < 70
-})
+const weakTopics = topics.filter((topic) => {
+  const avgScore = getAverageScore(topic.id, userId);
+  return avgScore < 70;
+});
 
 // Calculate recommendation
 const recommendation = {
-  type: 'weak_topic',
+  type: "weak_topic",
   topicId: weakTopics[0].id,
   reason: `Your average score in ${topic.title} is ${avgScore}%. Let's strengthen this.`,
-  confidence: 0.85
-}
+  confidence: 0.85,
+};
 ```
 
 ---
@@ -1592,9 +1704,10 @@ const recommendation = {
 ### 10.1 Download Content
 
 **User Story:**  
-*As a user, I want to download lessons so that I can learn offline.*
+_As a user, I want to download lessons so that I can learn offline._
 
 **Acceptance Criteria:**
+
 - [ ] Download individual lessons
 - [ ] Download entire topics
 - [ ] Show download progress
@@ -1604,6 +1717,7 @@ const recommendation = {
 - [ ] Storage usage display
 
 **UI Components:**
+
 - Download button on lessons/topics
 - Download manager screen:
   - Downloaded content list
@@ -1613,21 +1727,19 @@ const recommendation = {
 - Settings: Wi-Fi only toggle
 
 **Technical Implementation:**
+
 ```typescript
-import * as FileSystem from 'expo-file-system'
+import * as FileSystem from "expo-file-system";
 
 // Download lesson
 const downloadLesson = async (lesson: Lesson) => {
-  const uri = FileSystem.documentDirectory + `lesson_${lesson.id}.json`
-  
-  await FileSystem.downloadAsync(
-    lesson.contentUrl,
-    uri
-  )
-  
+  const uri = FileSystem.documentDirectory + `lesson_${lesson.id}.json`;
+
+  await FileSystem.downloadAsync(lesson.contentUrl, uri);
+
   // Save to AsyncStorage
-  await AsyncStorage.setItem(`downloaded_${lesson.id}`, 'true')
-}
+  await AsyncStorage.setItem(`downloaded_${lesson.id}`, "true");
+};
 ```
 
 ---
@@ -1635,9 +1747,10 @@ const downloadLesson = async (lesson: Lesson) => {
 ### 10.2 Offline Access
 
 **User Story:**  
-*As a user, I want to access downloaded content offline so that I can learn without internet.*
+_As a user, I want to access downloaded content offline so that I can learn without internet._
 
 **Acceptance Criteria:**
+
 - [ ] View downloaded lessons offline
 - [ ] Practice with downloaded questions
 - [ ] Track progress offline (sync later)
@@ -1646,24 +1759,25 @@ const downloadLesson = async (lesson: Lesson) => {
 - [ ] Conflict resolution
 
 **Sync Strategy:**
+
 ```typescript
 // Queue offline actions
 const queueAction = async (action: OfflineAction) => {
-  const queue = await getOfflineQueue()
-  queue.push(action)
-  await saveOfflineQueue(queue)
-}
+  const queue = await getOfflineQueue();
+  queue.push(action);
+  await saveOfflineQueue(queue);
+};
 
 // Sync when online
 const syncOfflineData = async () => {
-  const queue = await getOfflineQueue()
-  
+  const queue = await getOfflineQueue();
+
   for (const action of queue) {
-    await executeAction(action)
+    await executeAction(action);
   }
-  
-  await clearOfflineQueue()
-}
+
+  await clearOfflineQueue();
+};
 ```
 
 ---
@@ -1673,6 +1787,7 @@ const syncOfflineData = async () => {
 ### User Activity Tracking
 
 **Events to Track:**
+
 - App opens
 - Lesson views
 - Lesson completions
@@ -1683,6 +1798,7 @@ const syncOfflineData = async () => {
 - Drop-off points
 
 **Analytics Dashboard (Admin Portal):**
+
 - Daily active users
 - Popular content
 - Completion rates
@@ -1697,9 +1813,10 @@ const syncOfflineData = async () => {
 ### Dual Payment Gateway Support
 
 **User Story:**  
-*As a user, I want to purchase a subscription using my preferred payment method so that I can access premium content.*
+_As a user, I want to purchase a subscription using my preferred payment method so that I can access premium content._
 
 **Acceptance Criteria:**
+
 - [ ] Stripe integration for international students
 - [ ] Razorpay integration for Indian students
 - [ ] Auto-select gateway based on user's country
@@ -1709,30 +1826,33 @@ const syncOfflineData = async () => {
 - [ ] Transaction receipt generation
 
 **Payment Gateway Routing:**
+
 ```typescript
 function selectGateway(country: string) {
-  return country === 'India' ? 'razorpay' : 'stripe'
+  return country === "India" ? "razorpay" : "stripe";
 }
 ```
 
 **Subscription Plans:**
+
 - 30 Days Access: $49 USD
-- 60 Days Access: $89 USD  
+- 60 Days Access: $89 USD
 - 90 Days Access: $119 USD (Most Popular)
 - 120 Days Access: $149 USD
 
 **Technical Implementation:**
+
 ```typescript
 // Stripe
-import { StripeProvider } from '@stripe/stripe-react-native'
+import { StripeProvider } from "@stripe/stripe-react-native";
 
 // Razorpay
-import RazorpayCheckout from 'react-native-razorpay'
+import RazorpayCheckout from "react-native-razorpay";
 
 // Backend endpoints
-POST /api/stripe/create-checkout
-POST /api/razorpay/create-order
-POST /api/razorpay/verify-payment
+POST / api / stripe / create - checkout;
+POST / api / razorpay / create - order;
+POST / api / razorpay / verify - payment;
 ```
 
 ---
@@ -1740,9 +1860,10 @@ POST /api/razorpay/verify-payment
 ### Discount & Coupon System
 
 **User Story:**  
-*As a user, I want to apply a discount code during checkout so that I can save money on my subscription.*
+_As a user, I want to apply a discount code during checkout so that I can save money on my subscription._
 
 **Acceptance Criteria:**
+
 - [ ] Coupon code input field on payment screen
 - [ ] Real-time validation of coupon codes
 - [ ] Display discount amount before payment
@@ -1752,10 +1873,12 @@ POST /api/razorpay/verify-payment
 - [ ] Usage limit tracking
 
 **Coupon Types:**
+
 1. Percentage Discount (e.g., FIRST20 = 20% off)
 2. Fixed Amount Discount (e.g., SAVE10 = $10 off)
 
 **UI Components:**
+
 - Coupon code input field
 - "Apply" button
 - Discount success message
@@ -1763,6 +1886,7 @@ POST /api/razorpay/verify-payment
 - Remove coupon button
 
 **Validation Rules:**
+
 - Active coupon (is_active = true)
 - Valid date range (NOW BETWEEN valid_from AND valid_until)
 - Usage limit not exceeded
@@ -1773,11 +1897,12 @@ POST /api/razorpay/verify-payment
 ### Trial Mode & Content Gating
 
 **User Story:**  
-*As a new user, I want to try the app for free so that I can decide if it's worth purchasing.*
+_As a new user, I want to try the app for free so that I can decide if it's worth purchasing._
 
 **Acceptance Criteria:**
+
 - [ ] Free trial on signup (no payment required)
-- [ ] Access to 1 learning module  
+- [ ] Access to 1 learning module
 - [ ] Access to 1 practice module
 - [ ] Mock exams locked (premium only)
 - [ ] Clear upgrade prompts on locked content
@@ -1785,16 +1910,18 @@ POST /api/razorpay/verify-payment
 - [ ] "Upgrade" CTA throughout app
 
 **Free Trial Access:**
+
 ```typescript
 trial_features = {
   learning_modules: 1,
   practice_modules: 1,
   mock_exams: 0,
-  ai_chatbot: 10 // messages per day
-}
+  ai_chatbot: 10, // messages per day
+};
 ```
 
 **Content Lock UI:**
+
 - 🔒 Lock icon on premium content
 - "Upgrade to Unlock" overlay
 - Benefits of upgrading
@@ -1805,9 +1932,10 @@ trial_features = {
 ### Profile Completion Flow
 
 **User Story:**  
-*As a first-time user, I want to complete my profile so that I can personalize my experience.*
+_As a first-time user, I want to complete my profile so that I can personalize my experience._
 
 **Acceptance Criteria:**
+
 - [ ] Mandatory after first signup
 - [ ] Cannot access app until completed
 - [ ] Collect essential information
@@ -1817,6 +1945,7 @@ trial_features = {
 - [ ] Save and continue
 
 **Required Fields:**
+
 - Full Name (text)
 - Phone Number (with country code picker)
 - Current Country (dropdown - determines payment gateway)
@@ -1826,6 +1955,7 @@ trial_features = {
 - Using Coaching? (toggle: Yes/No)
 
 **Flow:**
+
 ```
 Signup → Email Verification → Profile Completion → Dashboard
                                      ↓
@@ -1833,9 +1963,10 @@ Signup → Email Verification → Profile Completion → Dashboard
 ```
 
 **UI Screens:**
+
 1. Welcome screen ("Let's personalize your experience")
 2. Personal details form
-3. Preferences form  
+3. Preferences form
 4. Completion success ("You're all set!")
 
 ---
@@ -1845,9 +1976,10 @@ Signup → Email Verification → Profile Completion → Dashboard
 ### Performance Analysis & Recommendations
 
 **User Story:**  
-*As a student, I want AI-generated study recommendations so that I can improve efficiently.*
+_As a student, I want AI-generated study recommendations so that I can improve efficiently._
 
 **Acceptance Criteria:**
+
 - [ ] Weekly personalized study plan generated
 - [ ] Exam readiness score displayed (0-100%)
 - [ ] Weak areas automatically identified
@@ -1857,6 +1989,7 @@ Signup → Email Verification → Profile Completion → Dashboard
 - [ ] "Generate New Plan" button
 
 **Recommendation Components:**
+
 1. **Exam Readiness Score:** Overall preparedness percentage
 2. **Urgent Topics:** Top 3 weak areas (< 70% accuracy)
 3. **Strong Areas:** Topics performing well (> 85%)
@@ -1865,6 +1998,7 @@ Signup → Email Verification → Profile Completion → Dashboard
 6. **Motivational Message:** Personalized encouragement
 
 **Data Sources:**
+
 - Practice session results (topic-wise accuracy)
 - Mock exam scores
 - Learning completions
@@ -1872,6 +2006,7 @@ Signup → Email Verification → Profile Completion → Dashboard
 - Days until subscription expires
 
 **UI Component:**
+
 ```
 ┌────────────────────────────┐
 │ 🤖 Your Study Plan         │
@@ -1896,12 +2031,13 @@ Signup → Email Verification → Profile Completion → Dashboard
 ```
 
 **Technical Implementation:**
+
 ```typescript
 POST /api/ai/generate-recommendations
 
 // Uses Gemini AI to analyze:
 - practice_sessions
-- mock_exams  
+- mock_exams
 - learning_completions
 - subscription end date
 
@@ -1909,6 +2045,7 @@ POST /api/ai/generate-recommendations
 ```
 
 **Frequency:**
+
 - Auto-generated weekly (Sundays at 6 AM)
 - On-demand: User clicks "Generate New Plan"
 - After completing mock exam
@@ -1918,9 +2055,10 @@ POST /api/ai/generate-recommendations
 ### JeevaBot Chatbot Integration
 
 **User Story:**  
-*As a student, I want to ask questions to an AI tutor so that I can get instant help.*
+_As a student, I want to ask questions to an AI tutor so that I can get instant help._
 
 **Acceptance Criteria:**
+
 - [ ] Floating "Ask JeevaBot" button on all screens
 - [ ] Chat interface with message history
 - [ ] Context-aware responses (knows current lesson)
@@ -1930,6 +2068,7 @@ POST /api/ai/generate-recommendations
 - [ ] Error handling with friendly messages
 
 **Use Cases:**
+
 1. Clinical doubt clearing
 2. NMC Code explanations
 3. Practice question help
@@ -1937,6 +2076,7 @@ POST /api/ai/generate-recommendations
 5. Motivation and encouragement
 
 **Context Data Provided to AI:**
+
 - Current lesson being studied
 - Recent practice performance
 - Weak topics
@@ -1949,9 +2089,10 @@ POST /api/ai/generate-recommendations
 ### Student User Management
 
 **User Story:**  
-*As an admin, I want to view and manage all student users so that I can support them effectively.*
+_As an admin, I want to view and manage all student users so that I can support them effectively._
 
 **Acceptance Criteria:**
+
 - [ ] View all registered students in table
 - [ ] Search by name, email, phone
 - [ ] Filter by: Profile completion, OAuth provider, subscription status
@@ -1962,6 +2103,7 @@ POST /api/ai/generate-recommendations
 - [ ] Export student data to CSV
 
 **Table Columns:**
+
 - Name
 - Email
 - Country
@@ -1973,6 +2115,7 @@ POST /api/ai/generate-recommendations
 - Actions (View Details)
 
 **Student Detail View:**
+
 - Personal information
 - Subscription history
 - Learning progress
@@ -1981,6 +2124,7 @@ POST /api/ai/generate-recommendations
 - AI chat usage stats
 
 **Technical Implementation:**
+
 ```typescript
 // API endpoint
 GET /api/admin/students
@@ -1995,9 +2139,10 @@ GET /api/admin/students/:id
 ### Discount/Coupon Management
 
 **User Story:**  
-*As an admin, I want to create and manage discount codes so that I can run promotions.*
+_As an admin, I want to create and manage discount codes so that I can run promotions._
 
 **Acceptance Criteria:**
+
 - [ ] Create new coupon codes
 - [ ] Edit existing coupons
 - [ ] Activate/deactivate coupons
@@ -2008,6 +2153,7 @@ GET /api/admin/students/:id
 - [ ] Delete unused coupons
 
 **Coupon Form Fields:**
+
 - Code (e.g., "FIRST20")
 - Description
 - Discount Type (Percentage/Fixed Amount)
@@ -2019,6 +2165,7 @@ GET /api/admin/students/:id
 - Active Status (toggle)
 
 **Coupon Management Table:**
+
 - Code
 - Type
 - Value
@@ -2028,6 +2175,7 @@ GET /api/admin/students/:id
 - Actions (Edit, Delete, View Stats)
 
 **Analytics Dashboard:**
+
 - Total coupons created
 - Active vs inactive
 - Most used coupons
@@ -2035,6 +2183,7 @@ GET /api/admin/students/:id
 - Conversion rate with coupons
 
 **Technical Implementation:**
+
 ```typescript
 // API endpoints
 GET /api/admin/coupons
@@ -2050,9 +2199,10 @@ DELETE /api/admin/coupons/:id
 ### Dashboard Hero Management
 
 **User Story:**  
-*As an admin, I want to manage dashboard hero sections so that I can promote content in the mobile app.*
+_As an admin, I want to manage dashboard hero sections so that I can promote content in the mobile app._
 
 **Acceptance Criteria:**
+
 - [ ] Create new hero sections
 - [ ] Upload hero images
 - [ ] Set title and subtitle
@@ -2063,6 +2213,7 @@ DELETE /api/admin/coupons/:id
 - [ ] Delete heroes
 
 **Hero Form Fields:**
+
 - Title (text)
 - Subtitle (textarea)
 - Image Upload (JPG/PNG, max 2MB)
@@ -2072,16 +2223,18 @@ DELETE /api/admin/coupons/:id
 - Active Status (toggle)
 
 **Mobile App Display:**
+
 - Shown at top of dashboard/home screen
 - Swipeable carousel if multiple active
 - First hero (lowest display_order) shown by default
 
 **Technical Implementation:**
+
 ```typescript
 // Table: hero_sections
 GET /api/admin/hero-sections
 POST /api/admin/hero-sections
-PUT /api/admin/hero-sections/:id  
+PUT /api/admin/hero-sections/:id
 DELETE /api/admin/hero-sections/:id
 
 // Mobile app fetches active heroes
@@ -2093,6 +2246,7 @@ GET /api/hero-sections?is_active=true&order=display_order.asc
 ## 🔐 Security & Privacy
 
 ### Data Protection
+
 - End-to-end encryption for sensitive data
 - Secure API communication (HTTPS)
 - JWT token authentication
@@ -2100,6 +2254,7 @@ GET /api/hero-sections?is_active=true&order=display_order.asc
 - Secure storage for credentials
 
 ### Privacy Features
+
 - GDPR compliance
 - Data deletion on request
 - Privacy policy
@@ -2112,18 +2267,21 @@ GET /api/hero-sections?is_active=true&order=display_order.asc
 ## 🧪 Testing Requirements
 
 ### Unit Tests
+
 - Authentication flows
 - Business logic
 - Utility functions
 - State management
 
 ### Integration Tests
+
 - API integration
 - Database operations
 - Payment flows
 - Notification system
 
 ### E2E Tests
+
 - User registration → lesson completion
 - Practice session flow
 - Subscription purchase
@@ -2134,6 +2292,7 @@ GET /api/hero-sections?is_active=true&order=display_order.asc
 ## 📱 Platform-Specific Features
 
 ### iOS
+
 - Face ID/Touch ID authentication
 - 3D Touch quick actions
 - Siri Shortcuts
@@ -2141,6 +2300,7 @@ GET /api/hero-sections?is_active=true&order=display_order.asc
 - SharePlay for group study (Phase 4)
 
 ### Android
+
 - Fingerprint authentication
 - Home screen widgets
 - Android Auto support (Phase 4)
@@ -2151,6 +2311,7 @@ GET /api/hero-sections?is_active=true&order=display_order.asc
 ## 🎨 Accessibility
 
 ### Requirements
+
 - Screen reader support (VoiceOver/TalkBack)
 - Minimum touch target size (44x44pt)
 - Color contrast ratio (WCAG AA)
@@ -2164,6 +2325,7 @@ GET /api/hero-sections?is_active=true&order=display_order.asc
 ## 🚀 Performance Targets
 
 ### Key Metrics
+
 - App launch time < 2s
 - Time to interactive < 3s
 - Screen transition < 300ms
@@ -2177,6 +2339,7 @@ GET /api/hero-sections?is_active=true&order=display_order.asc
 ## 📋 Success Metrics
 
 ### User Engagement
+
 - Daily active users (DAU)
 - Weekly active users (WAU)
 - Average session duration > 10 min
@@ -2184,12 +2347,14 @@ GET /api/hero-sections?is_active=true&order=display_order.asc
 - Lesson completion rate > 60%
 
 ### Learning Outcomes
+
 - Average quiz score > 75%
 - Practice completion rate > 70%
 - Streak maintenance > 7 days (30% of users)
 - Content consumption rate
 
 ### Business Metrics
+
 - Free to paid conversion > 5%
 - Subscription retention > 80%
 - Average revenue per user (ARPU)
@@ -2211,6 +2376,7 @@ GET /api/hero-sections?is_active=true&order=display_order.asc
 **Author:** vollstek@gmail.com
 
 **Recent Updates (v2.0):**
+
 - Added OAuth authentication (Google & Apple Sign-In)
 - Added profile completion flow for new users
 - Added dual payment gateway integration (Stripe & Razorpay)

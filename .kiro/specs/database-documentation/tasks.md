@@ -225,4 +225,3 @@
     - Add navigation to all new files
     - Mark SCHEMA.md as legacy
     - _Requirements: 1.1_
-

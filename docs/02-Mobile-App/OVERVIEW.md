@@ -5,6 +5,7 @@
 The Jeeva Learning mobile app is a comprehensive educational platform designed to provide students with an engaging, personalized learning experience. Built with Expo and React Native, it connects to the same Supabase backend used by the admin portal, creating a unified ecosystem for content management and student learning.
 
 ### Mission Statement
+
 To democratize quality education by providing accessible, interactive, and adaptive learning experiences that help students master concepts at their own pace.
 
 ---
@@ -12,6 +13,7 @@ To democratize quality education by providing accessible, interactive, and adapt
 ## 👥 Target Users
 
 ### Primary Users: Students & Learners
+
 - **Age Range**: 15-35 years old
 - **Education Level**: High school to professional certification seekers
 - **Learning Goals**: Exam preparation, skill development, concept mastery
@@ -19,6 +21,7 @@ To democratize quality education by providing accessible, interactive, and adapt
 - **Usage Pattern**: Daily practice sessions, on-the-go learning
 
 ### Use Cases
+
 1. **Exam Preparation**: Students preparing for competitive exams
 2. **Concept Mastery**: Learners wanting to strengthen fundamentals
 3. **Quick Revision**: Using flashcards for rapid recall
@@ -41,6 +44,7 @@ To democratize quality education by providing accessible, interactive, and adapt
 ### 2. 🎓 Learning Modes
 
 #### Study Mode
+
 - Sequential lesson progression
 - Rich text content with images
 - Audio lessons for auditory learners
@@ -48,18 +52,21 @@ To democratize quality education by providing accessible, interactive, and adapt
 - Bookmark important content
 
 #### Practice Mode
+
 - Multiple choice questions
 - Instant feedback with explanations
 - Performance analytics
 - Adaptive difficulty
 
 #### Mock Exam Mode
+
 - Timed assessments
 - Exam-like environment
 - Comprehensive scoring
 - Detailed performance reports
 
 #### Flashcard Mode
+
 - Spaced repetition learning
 - Quick revision
 - Custom card sets
@@ -105,6 +112,7 @@ To democratize quality education by providing accessible, interactive, and adapt
 ## 🛠️ Tech Stack
 
 ### Frontend - Mobile App
+
 - **Framework**: Expo (Managed Workflow)
 - **UI Library**: React Native
 - **Language**: TypeScript
@@ -116,6 +124,7 @@ To democratize quality education by providing accessible, interactive, and adapt
 - **Icons**: Expo Vector Icons
 
 ### Backend & Services
+
 - **Database**: Supabase PostgreSQL (Shared with Admin Portal)
 - **Authentication**: Supabase Auth
 - **Storage**: Supabase Storage (for media files)
@@ -123,6 +132,7 @@ To democratize quality education by providing accessible, interactive, and adapt
 - **Push Notifications**: Expo Notifications + Supabase Edge Functions
 
 ### Development Tools
+
 - **Package Manager**: npm/yarn
 - **Code Quality**: ESLint, Prettier
 - **Testing**: Jest, React Native Testing Library
@@ -138,6 +148,7 @@ To democratize quality education by providing accessible, interactive, and adapt
 The mobile app leverages the **same Supabase backend** as the admin portal:
 
 **Database Tables Used:**
+
 - `users` - User accounts and profiles
 - `user_profiles` - Extended user information
 - `modules` - Course modules
@@ -153,12 +164,14 @@ The mobile app leverages the **same Supabase backend** as the admin portal:
 - `subscriptions` - User subscription data
 
 **Authentication:**
+
 - Supabase Auth with email/password
 - Social login support (Google, Apple)
 - JWT token-based sessions
 - Row Level Security (RLS) policies
 
 **Storage:**
+
 - Lesson images and audio files
 - User profile pictures
 - Media content for flashcards
@@ -168,18 +181,21 @@ The mobile app leverages the **same Supabase backend** as the admin portal:
 ## 📱 Platform Support
 
 ### iOS
+
 - **Minimum Version**: iOS 13+
 - **Target Devices**: iPhone, iPad
 - **App Store**: Submission ready
 - **Features**: Push notifications, Face ID/Touch ID
 
 ### Android
+
 - **Minimum Version**: Android 5.0 (API 21)+
 - **Target Devices**: Smartphones, Tablets
 - **Play Store**: Submission ready
 - **Features**: Push notifications, Biometric authentication
 
 ### Responsive Design
+
 - Adapts to different screen sizes
 - Portrait and landscape support
 - Tablet-optimized layouts
@@ -189,6 +205,7 @@ The mobile app leverages the **same Supabase backend** as the admin portal:
 ## 🎨 Design System
 
 ### Based on Figma Design
+
 - **Design Tool**: Figma (provided by user)
 - **Color Palette**: Consistent with brand identity
 - **Typography**: Custom font family
@@ -197,6 +214,7 @@ The mobile app leverages the **same Supabase backend** as the admin portal:
 - **Icons**: Vector-based icon set
 
 ### Key UI Patterns
+
 - **Bottom Tab Navigation**: Main app sections
 - **Stack Navigation**: Nested screens
 - **Cards**: Content presentation
@@ -209,26 +227,31 @@ The mobile app leverages the **same Supabase backend** as the admin portal:
 ## 🚀 User Flows
 
 ### 1. Onboarding & Authentication
+
 ```
 Splash Screen → Welcome/Intro Slides → Sign Up/Login → Email Verification → Profile Setup → Dashboard
 ```
 
 ### 2. Learning Journey
+
 ```
 Dashboard → Browse Modules → Select Topic → View Lessons → Complete Lesson → Mark Progress → Practice Questions → Review Results
 ```
 
 ### 3. Practice Session
+
 ```
 Dashboard → Practice Mode → Select Topic → Answer Questions → Get Instant Feedback → View Score → Retry/Continue
 ```
 
 ### 4. Mock Exam
+
 ```
 Dashboard → Mock Exams → Choose Exam → Start Timed Test → Submit Answers → View Detailed Report → Review Solutions
 ```
 
 ### 5. Flashcard Study
+
 ```
 Dashboard → Flashcards → Select Deck → Study Cards → Mark Difficulty → Track Progress → Repeat
 ```
@@ -238,6 +261,7 @@ Dashboard → Flashcards → Select Deck → Study Cards → Mark Difficulty →
 ## 📈 Key Metrics & Analytics
 
 ### App Performance Metrics
+
 - Daily Active Users (DAU)
 - Monthly Active Users (MAU)
 - Session Duration
@@ -245,6 +269,7 @@ Dashboard → Flashcards → Select Deck → Study Cards → Mark Difficulty →
 - Crash-free Rate
 
 ### Learning Metrics
+
 - Lessons Completed
 - Practice Sessions per User
 - Average Score
@@ -252,12 +277,14 @@ Dashboard → Flashcards → Select Deck → Study Cards → Mark Difficulty →
 - Topic Completion Rate
 
 ### Engagement Metrics
+
 - Streak Maintenance
 - Daily Login Rate
 - Feature Usage (Practice vs Lessons vs Flashcards)
 - Content Interaction
 
 ### Subscription Metrics
+
 - Conversion Rate (Free → Premium)
 - Churn Rate
 - Lifetime Value (LTV)
@@ -268,18 +295,21 @@ Dashboard → Flashcards → Select Deck → Study Cards → Mark Difficulty →
 ## 🔒 Security & Privacy
 
 ### Data Protection
+
 - End-to-end encryption for sensitive data
 - Secure API communication (HTTPS)
 - JWT token authentication
 - Row Level Security (RLS) in Supabase
 
 ### User Privacy
+
 - GDPR compliance ready
 - Privacy policy implementation
 - Data deletion on request
 - Minimal data collection
 
 ### Content Security
+
 - Protected premium content
 - Secure media delivery
 - DRM for paid resources (if needed)
@@ -289,6 +319,7 @@ Dashboard → Flashcards → Select Deck → Study Cards → Mark Difficulty →
 ## 🎯 Development Roadmap
 
 ### Phase 1: MVP (Core Features)
+
 - [ ] Authentication (Sign up, Login, Password Reset)
 - [ ] Browse Modules & Topics
 - [ ] View Lessons (Text + Images)
@@ -297,6 +328,7 @@ Dashboard → Flashcards → Select Deck → Study Cards → Mark Difficulty →
 - [ ] User Profile
 
 ### Phase 2: Enhanced Learning
+
 - [ ] Audio Lessons (Podcast mode)
 - [ ] Flashcards System
 - [ ] Mock Exams
@@ -304,6 +336,7 @@ Dashboard → Flashcards → Select Deck → Study Cards → Mark Difficulty →
 - [ ] Bookmarks & Notes
 
 ### Phase 3: Advanced Features
+
 - [ ] AI Recommendations
 - [ ] Offline Mode
 - [ ] Push Notifications
@@ -311,6 +344,7 @@ Dashboard → Flashcards → Select Deck → Study Cards → Mark Difficulty →
 - [ ] Subscription Integration
 
 ### Phase 4: Optimization
+
 - [ ] Performance Optimization
 - [ ] Accessibility Features
 - [ ] Multi-language Support
@@ -348,12 +382,14 @@ jeeva-mobile-app/
 ## 🔄 Sync with Admin Portal
 
 ### Shared Resources
+
 - **Database**: Same Supabase instance
 - **Authentication**: Unified user system
 - **Content**: Admin creates → Students consume
 - **Analytics**: Mobile data visible in admin dashboard
 
 ### Data Flow
+
 1. Admin portal creates/updates content
 2. Changes sync to Supabase database
 3. Mobile app fetches updated content
@@ -364,6 +400,7 @@ jeeva-mobile-app/
 ## 🚀 Getting Started
 
 ### Prerequisites
+
 - Node.js 18+
 - npm or yarn
 - Expo CLI
@@ -371,6 +408,7 @@ jeeva-mobile-app/
 - Supabase project credentials
 
 ### Environment Setup
+
 ```bash
 # Clone repository
 git clone https://github.com/Jeeva-Edtech-app/jeeva-mobile-app.git
@@ -386,6 +424,7 @@ npx expo start
 ```
 
 ### Required Environment Variables
+
 ```env
 EXPO_PUBLIC_SUPABASE_URL=your_supabase_url
 EXPO_PUBLIC_SUPABASE_ANON_KEY=your_anon_key

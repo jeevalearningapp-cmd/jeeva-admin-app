@@ -7,6 +7,7 @@ This document provides visual entity-relationship diagrams for the Jeeva Learnin
 **Total Tables:** 53  
 **Schema:** public  
 **Diagram Notation:**
+
 - `||--o{` : One-to-many (one required, many optional)
 - `||--|{` : One-to-many (one required, many required)
 - `||--||` : One-to-one
@@ -480,8 +481,6 @@ erDiagram
     users ||--o{ analytics_sessions : "has sessions"
 ```
 
-
-
 ---
 
 ## 2. Authentication & Users
@@ -558,11 +557,11 @@ erDiagram
 
 **Relationship Details:**
 
-| Parent Table | Child Table | Cardinality | ON DELETE | Description |
-|--------------|-------------|-------------|-----------|-------------|
-| users | user_profiles | 1:1 | CASCADE | Each user has exactly one profile |
-| users | user_sessions | 1:N | CASCADE | Each user can have multiple active sessions |
-| users | notification_preferences | 1:1 | CASCADE | Each user has one preference record |
+| Parent Table | Child Table              | Cardinality | ON DELETE | Description                                 |
+| ------------ | ------------------------ | ----------- | --------- | ------------------------------------------- |
+| users        | user_profiles            | 1:1         | CASCADE   | Each user has exactly one profile           |
+| users        | user_sessions            | 1:N         | CASCADE   | Each user can have multiple active sessions |
+| users        | notification_preferences | 1:1         | CASCADE   | Each user has one preference record         |
 
 ---
 
@@ -711,13 +710,13 @@ erDiagram
     topics ||--o{ questions : "has questions"
     topics ||--o{ flashcards : "has flashcards"
     subtopics ||--o{ lessons : "contains many"
-    
+
     %% Lesson relationships
     lessons ||--o{ lesson_content : "has content blocks"
     lessons ||--o{ lesson_quizzes : "has quiz mappings"
     lessons ||--o{ questions : "has questions"
     lessons ||--o{ flashcards : "has flashcards"
-    
+
     %% Question relationships
     questions ||--o{ question_options : "has options"
     questions ||--o{ question_media : "has media"
@@ -726,24 +725,22 @@ erDiagram
 
 **Relationship Details:**
 
-| Parent Table | Child Table | Cardinality | ON DELETE | Description |
-|--------------|-------------|-------------|-----------|-------------|
-| modules | topics | 1:N | CASCADE | Module contains many topics |
-| modules | module_access_rules | 1:N | CASCADE | Module has access rules |
-| topics | subtopics | 1:N | CASCADE | Topic contains subtopics |
-| topics | lessons | 1:N | CASCADE | Topic contains lessons |
-| topics | questions | 1:N | SET NULL | Topic has questions |
-| topics | flashcards | 1:N | SET NULL | Topic has flashcards |
-| subtopics | lessons | 1:N | SET NULL | Subtopic contains lessons |
-| lessons | lesson_content | 1:N | CASCADE | Lesson has content blocks |
-| lessons | lesson_quizzes | 1:N | CASCADE | Lesson has quiz mappings |
-| lessons | questions | 1:N | SET NULL | Lesson has questions |
-| lessons | flashcards | 1:N | CASCADE | Lesson has flashcards |
-| questions | question_options | 1:N | CASCADE | Question has options |
-| questions | question_media | 1:N | CASCADE | Question has media |
-| questions | lesson_quizzes | 1:N | CASCADE | Question in quizzes |
-
-
+| Parent Table | Child Table         | Cardinality | ON DELETE | Description                 |
+| ------------ | ------------------- | ----------- | --------- | --------------------------- |
+| modules      | topics              | 1:N         | CASCADE   | Module contains many topics |
+| modules      | module_access_rules | 1:N         | CASCADE   | Module has access rules     |
+| topics       | subtopics           | 1:N         | CASCADE   | Topic contains subtopics    |
+| topics       | lessons             | 1:N         | CASCADE   | Topic contains lessons      |
+| topics       | questions           | 1:N         | SET NULL  | Topic has questions         |
+| topics       | flashcards          | 1:N         | SET NULL  | Topic has flashcards        |
+| subtopics    | lessons             | 1:N         | SET NULL  | Subtopic contains lessons   |
+| lessons      | lesson_content      | 1:N         | CASCADE   | Lesson has content blocks   |
+| lessons      | lesson_quizzes      | 1:N         | CASCADE   | Lesson has quiz mappings    |
+| lessons      | questions           | 1:N         | SET NULL  | Lesson has questions        |
+| lessons      | flashcards          | 1:N         | CASCADE   | Lesson has flashcards       |
+| questions    | question_options    | 1:N         | CASCADE   | Question has options        |
+| questions    | question_media      | 1:N         | CASCADE   | Question has media          |
+| questions    | lesson_quizzes      | 1:N         | CASCADE   | Question in quizzes         |
 
 ---
 
@@ -942,30 +939,30 @@ erDiagram
 
 **Relationship Details:**
 
-| Parent Table | Child Table | Cardinality | ON DELETE | Description |
-|--------------|-------------|-------------|-----------|-------------|
-| users | learning_completions | 1:N | CASCADE | User completes many lessons |
-| users | learning_progress | 1:N | CASCADE | User has progress records |
-| users | learning_paths | 1:N | CASCADE | User has learning paths |
-| users | lesson_quiz_results | 1:N | CASCADE | User takes many quizzes |
-| users | practice_sessions | 1:N | CASCADE | User has practice sessions |
-| users | mock_exams | 1:N | CASCADE | User takes mock exams |
-| users | ai_recommendations | 1:N | CASCADE | User receives recommendations |
-| users | user_analytics | 1:N | CASCADE | User has analytics |
-| lessons | learning_completions | 1:N | CASCADE | Lesson completed by users |
-| lessons | lesson_quiz_results | 1:N | CASCADE | Lesson has quiz results |
-| modules | learning_progress | 1:N | CASCADE | Module progress tracked |
-| topics | learning_progress | 1:N | CASCADE | Topic progress tracked |
-| topics | practice_sessions | 1:N | SET NULL | Topic practiced |
-| subtopics | learning_progress | 1:N | CASCADE | Subtopic progress tracked |
-| practice_sessions | practice_results | 1:N | CASCADE | Session has results |
-| questions | practice_results | 1:N | SET NULL | Question answered |
-| question_options | practice_results | 1:N | SET NULL | Option selected |
-| mock_exam_config | mock_exams | 1:N | SET NULL | Config creates exams |
-| mock_exams | mock_results | 1:N | CASCADE | Exam has results |
-| mock_exams | mock_sessions | 1:1 | CASCADE | Exam has session |
-| questions | mock_results | 1:N | SET NULL | Question answered |
-| question_options | mock_results | 1:N | SET NULL | Option selected |
+| Parent Table      | Child Table          | Cardinality | ON DELETE | Description                   |
+| ----------------- | -------------------- | ----------- | --------- | ----------------------------- |
+| users             | learning_completions | 1:N         | CASCADE   | User completes many lessons   |
+| users             | learning_progress    | 1:N         | CASCADE   | User has progress records     |
+| users             | learning_paths       | 1:N         | CASCADE   | User has learning paths       |
+| users             | lesson_quiz_results  | 1:N         | CASCADE   | User takes many quizzes       |
+| users             | practice_sessions    | 1:N         | CASCADE   | User has practice sessions    |
+| users             | mock_exams           | 1:N         | CASCADE   | User takes mock exams         |
+| users             | ai_recommendations   | 1:N         | CASCADE   | User receives recommendations |
+| users             | user_analytics       | 1:N         | CASCADE   | User has analytics            |
+| lessons           | learning_completions | 1:N         | CASCADE   | Lesson completed by users     |
+| lessons           | lesson_quiz_results  | 1:N         | CASCADE   | Lesson has quiz results       |
+| modules           | learning_progress    | 1:N         | CASCADE   | Module progress tracked       |
+| topics            | learning_progress    | 1:N         | CASCADE   | Topic progress tracked        |
+| topics            | practice_sessions    | 1:N         | SET NULL  | Topic practiced               |
+| subtopics         | learning_progress    | 1:N         | CASCADE   | Subtopic progress tracked     |
+| practice_sessions | practice_results     | 1:N         | CASCADE   | Session has results           |
+| questions         | practice_results     | 1:N         | SET NULL  | Question answered             |
+| question_options  | practice_results     | 1:N         | SET NULL  | Option selected               |
+| mock_exam_config  | mock_exams           | 1:N         | SET NULL  | Config creates exams          |
+| mock_exams        | mock_results         | 1:N         | CASCADE   | Exam has results              |
+| mock_exams        | mock_sessions        | 1:1         | CASCADE   | Exam has session              |
+| questions         | mock_results         | 1:N         | SET NULL  | Question answered             |
+| question_options  | mock_results         | 1:N         | SET NULL  | Option selected               |
 
 ---
 
@@ -1094,20 +1091,18 @@ erDiagram
 
 **Relationship Details:**
 
-| Parent Table | Child Table | Cardinality | ON DELETE | Description |
-|--------------|-------------|-------------|-----------|-------------|
-| modules | trial_mock_exams | 1:N | CASCADE | Module has trial exams |
-| modules | trial_attempt_records | 1:N | CASCADE | Module has attempt records |
-| user_profiles | trial_exam_attempts | 1:N | CASCADE | User attempts exams |
-| user_profiles | trial_learning_progress | 1:N | CASCADE | User tracks progress |
-| user_profiles | trial_attempt_records | 1:N | CASCADE | User has records |
-| trial_mock_exams | trial_exam_attempts | 1:N | CASCADE | Exam has attempts |
-| topics | trial_learning_progress | 1:N | CASCADE | Topic progress tracked |
-| lessons | trial_learning_progress | 1:N | CASCADE | Lesson progress tracked |
+| Parent Table     | Child Table             | Cardinality | ON DELETE | Description                |
+| ---------------- | ----------------------- | ----------- | --------- | -------------------------- |
+| modules          | trial_mock_exams        | 1:N         | CASCADE   | Module has trial exams     |
+| modules          | trial_attempt_records   | 1:N         | CASCADE   | Module has attempt records |
+| user_profiles    | trial_exam_attempts     | 1:N         | CASCADE   | User attempts exams        |
+| user_profiles    | trial_learning_progress | 1:N         | CASCADE   | User tracks progress       |
+| user_profiles    | trial_attempt_records   | 1:N         | CASCADE   | User has records           |
+| trial_mock_exams | trial_exam_attempts     | 1:N         | CASCADE   | Exam has attempts          |
+| topics           | trial_learning_progress | 1:N         | CASCADE   | Topic progress tracked     |
+| lessons          | trial_learning_progress | 1:N         | CASCADE   | Lesson progress tracked    |
 
 **Note:** Trial tables reference `user_profiles.id` instead of `users.id` for user identification.
-
-
 
 ---
 
@@ -1200,12 +1195,12 @@ erDiagram
 
 **Relationship Details:**
 
-| Parent Table | Child Table | Cardinality | ON DELETE | Description |
-|--------------|-------------|-------------|-----------|-------------|
-| users | subscriptions | 1:N | CASCADE | User has subscriptions |
-| subscription_plans | subscriptions | 1:N | RESTRICT | Plan purchased by users |
-| subscriptions | subscription_usage | 1:N | CASCADE | Subscription tracks usage |
-| discount_coupons | subscriptions | 1:N | SET NULL | Coupon applied to subscriptions |
+| Parent Table       | Child Table        | Cardinality | ON DELETE | Description                     |
+| ------------------ | ------------------ | ----------- | --------- | ------------------------------- |
+| users              | subscriptions      | 1:N         | CASCADE   | User has subscriptions          |
+| subscription_plans | subscriptions      | 1:N         | RESTRICT  | Plan purchased by users         |
+| subscriptions      | subscription_usage | 1:N         | CASCADE   | Subscription tracks usage       |
+| discount_coupons   | subscriptions      | 1:N         | SET NULL  | Coupon applied to subscriptions |
 
 **Trigger:** `increment_coupon_on_subscription` → `increment_coupon_usage` - Automatically increments coupon usage count when a subscription is created with a coupon code.
 
@@ -1302,18 +1297,19 @@ erDiagram
 
 **Relationship Details:**
 
-| Parent Table | Child Table | Cardinality | ON DELETE | Description |
-|--------------|-------------|-------------|-----------|-------------|
-| admin_users | notifications | 1:N | SET NULL | Admin creates notifications |
-| notifications | notification_queue | 1:N | CASCADE | Notification queued for delivery |
-| notifications | notification_targets | 1:N | CASCADE | Notification targets users |
-| notifications | user_notification_reads | 1:N | CASCADE | Notification read by users |
-| users | notification_queue | 1:N | CASCADE | User receives notifications |
-| users | notification_targets | 1:N | CASCADE | User targeted by notifications |
-| users | push_tokens | 1:N | CASCADE | User has device tokens |
-| users | user_notification_reads | 1:N | CASCADE | User reads notifications |
+| Parent Table  | Child Table             | Cardinality | ON DELETE | Description                      |
+| ------------- | ----------------------- | ----------- | --------- | -------------------------------- |
+| admin_users   | notifications           | 1:N         | SET NULL  | Admin creates notifications      |
+| notifications | notification_queue      | 1:N         | CASCADE   | Notification queued for delivery |
+| notifications | notification_targets    | 1:N         | CASCADE   | Notification targets users       |
+| notifications | user_notification_reads | 1:N         | CASCADE   | Notification read by users       |
+| users         | notification_queue      | 1:N         | CASCADE   | User receives notifications      |
+| users         | notification_targets    | 1:N         | CASCADE   | User targeted by notifications   |
+| users         | push_tokens             | 1:N         | CASCADE   | User has device tokens           |
+| users         | user_notification_reads | 1:N         | CASCADE   | User reads notifications         |
 
 **Triggers:**
+
 - `notifications_updated_at` → `update_notifications_updated_at`
 - `notification_queue_updated_at` → `update_notification_queue_updated_at`
 - `notification_targets_updated_at` → `update_notification_targets_updated_at`
@@ -1370,19 +1366,21 @@ erDiagram
 
 **Relationship Details:**
 
-| Parent Table | Child Table | Cardinality | ON DELETE | Description |
-|--------------|-------------|-------------|-----------|-------------|
-| users | chat_conversations | 1:N | CASCADE | User has conversations |
-| users | ai_usage_stats | 1:N | CASCADE | User usage tracked |
-| chat_conversations | chat_messages | 1:N | CASCADE | Conversation has messages |
+| Parent Table       | Child Table        | Cardinality | ON DELETE | Description               |
+| ------------------ | ------------------ | ----------- | --------- | ------------------------- |
+| users              | chat_conversations | 1:N         | CASCADE   | User has conversations    |
+| users              | ai_usage_stats     | 1:N         | CASCADE   | User usage tracked        |
+| chat_conversations | chat_messages      | 1:N         | CASCADE   | Conversation has messages |
 
 **Triggers:**
+
 - `chat_conversation_updated_at` → `update_chat_conversation_timestamp`
 - `ai_usage_updated_at` → `update_ai_usage_timestamp`
 
 **JSONB Structures:**
 
 `context_data` (chat_conversations):
+
 ```json
 {
   "currentLesson": {
@@ -1396,6 +1394,7 @@ erDiagram
 ```
 
 `metadata` (chat_messages):
+
 ```json
 {
   "model": "gemini-1.5-flash",
@@ -1533,13 +1532,14 @@ erDiagram
 
 **Relationship Details:**
 
-| Parent Table | Child Table | Cardinality | ON DELETE | Description |
-|--------------|-------------|-------------|-----------|-------------|
-| admin_users | content_approvals (submitted_by) | 1:N | SET NULL | Admin submits content |
-| admin_users | content_approvals (reviewed_by) | 1:N | SET NULL | Admin reviews content |
-| users | analytics_sessions | 1:N | SET NULL | User has sessions |
+| Parent Table | Child Table                      | Cardinality | ON DELETE | Description           |
+| ------------ | -------------------------------- | ----------- | --------- | --------------------- |
+| admin_users  | content_approvals (submitted_by) | 1:N         | SET NULL  | Admin submits content |
+| admin_users  | content_approvals (reviewed_by)  | 1:N         | SET NULL  | Admin reviews content |
+| users        | analytics_sessions               | 1:N         | SET NULL  | User has sessions     |
 
 **Standalone Tables (No Foreign Keys):**
+
 - `app_settings` - Application configuration key-value pairs
 - `dashboard_hero` - Mobile app dashboard banners
 - `email_templates` - Email template storage
@@ -1549,6 +1549,7 @@ erDiagram
 - `questions_backup` - Question backup data
 
 **Trigger:**
+
 - `content_approvals_updated_at` → `update_content_approvals_updated_at`
 
 ---
@@ -1557,32 +1558,31 @@ erDiagram
 
 ### Notation Guide
 
-| Symbol | Meaning | Example |
-|--------|---------|---------|
-| `\|\|--o{` | One (required) to Many (optional) | One user has zero or more sessions |
-| `\|\|--\|{` | One (required) to Many (required) | One order has one or more items |
-| `\|\|--o\|` | One (required) to One (optional) | One user has zero or one profile |
-| `\|\|--\|\|` | One (required) to One (required) | One person has exactly one passport |
-| `}o--o{` | Many (optional) to Many (optional) | Students and courses (via junction) |
+| Symbol       | Meaning                            | Example                             |
+| ------------ | ---------------------------------- | ----------------------------------- |
+| `\|\|--o{`   | One (required) to Many (optional)  | One user has zero or more sessions  |
+| `\|\|--\|{`  | One (required) to Many (required)  | One order has one or more items     |
+| `\|\|--o\|`  | One (required) to One (optional)   | One user has zero or one profile    |
+| `\|\|--\|\|` | One (required) to One (required)   | One person has exactly one passport |
+| `}o--o{`     | Many (optional) to Many (optional) | Students and courses (via junction) |
 
 ### Cardinality Summary by Domain
 
-| Domain | 1:1 Relationships | 1:N Relationships | Notes |
-|--------|-------------------|-------------------|-------|
-| Auth & Users | 2 | 1 | user_profiles, notification_preferences are 1:1 |
-| Learning Content | 0 | 14 | Hierarchical structure |
-| Progress & Practice | 1 | 21 | mock_sessions is 1:1 with mock_exams |
-| Trial Module | 0 | 8 | All 1:N relationships |
-| Subscriptions | 0 | 4 | All 1:N relationships |
-| Notifications | 0 | 8 | All 1:N relationships |
-| AI & Chat | 0 | 3 | All 1:N relationships |
-| System & Analytics | 0 | 3 | Mostly standalone tables |
+| Domain              | 1:1 Relationships | 1:N Relationships | Notes                                           |
+| ------------------- | ----------------- | ----------------- | ----------------------------------------------- |
+| Auth & Users        | 2                 | 1                 | user_profiles, notification_preferences are 1:1 |
+| Learning Content    | 0                 | 14                | Hierarchical structure                          |
+| Progress & Practice | 1                 | 21                | mock_sessions is 1:1 with mock_exams            |
+| Trial Module        | 0                 | 8                 | All 1:N relationships                           |
+| Subscriptions       | 0                 | 4                 | All 1:N relationships                           |
+| Notifications       | 0                 | 8                 | All 1:N relationships                           |
+| AI & Chat           | 0                 | 3                 | All 1:N relationships                           |
+| System & Analytics  | 0                 | 3                 | Mostly standalone tables                        |
 
 ### Foreign Key ON DELETE Behaviors
 
-| Behavior | Count | Usage |
-|----------|-------|-------|
-| CASCADE | 52 | Most relationships - delete children when parent deleted |
-| SET NULL | 12 | Optional relationships - set to NULL when parent deleted |
-| RESTRICT | 1 | subscription_plans → subscriptions - prevent deletion |
-
+| Behavior | Count | Usage                                                    |
+| -------- | ----- | -------------------------------------------------------- |
+| CASCADE  | 52    | Most relationships - delete children when parent deleted |
+| SET NULL | 12    | Optional relationships - set to NULL when parent deleted |
+| RESTRICT | 1     | subscription_plans → subscriptions - prevent deletion    |

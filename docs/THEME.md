@@ -112,4 +112,3 @@ import { ThemeProvider } from '@mui/material/styles';
 import theme from './theme/theme';
 
 \<ThemeProvider theme={theme}\> {/\* app/components \*/} \</ThemeProvider\> \`\`\` \- Never mutate theme file structure or import path—only edit values/colors here as brand changes. \- Always use MUI’s built-in components and theme variables to ensure consistent rendering on Replit and in local dev.
-

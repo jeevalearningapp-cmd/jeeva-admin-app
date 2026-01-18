@@ -10,6 +10,7 @@ If you want to run the complete migration in one go:
 ```
 
 This single script will:
+
 1. ✅ Create all new tables (practice_questions, learning_questions)
 2. ✅ Rename questions → mock_exam_questions
 3. ✅ Migrate practice questions to practice_questions table
@@ -25,6 +26,7 @@ This single script will:
 ## What This Fixes
 
 The error you encountered:
+
 ```
 ERROR: 42P01: relation "mock_exam_questions" does not exist
 ```
@@ -48,8 +50,8 @@ supabase db dump -f backup_$(date +%Y%m%d_%H%M%S).sql
 
 ```sql
 -- Check if questions table exists
-SELECT table_name 
-FROM information_schema.tables 
+SELECT table_name
+FROM information_schema.tables
 WHERE table_name IN ('questions', 'mock_exam_questions', 'practice_questions', 'learning_questions');
 
 -- Count current questions
@@ -128,24 +130,24 @@ NOTICE: === MIGRATION COMPLETE ===
 
 ```sql
 -- Check all tables exist
-SELECT table_name, 
+SELECT table_name,
        (SELECT COUNT(*) FROM information_schema.columns WHERE table_name = t.table_name) as column_count
 FROM information_schema.tables t
 WHERE table_name IN ('practice_questions', 'learning_questions', 'mock_exam_questions')
 ORDER BY table_name;
 
 -- Verify question counts
-SELECT 
+SELECT
   'practice_questions' as table_name,
   COUNT(*) as count
 FROM practice_questions
 UNION ALL
-SELECT 
+SELECT
   'learning_questions' as table_name,
   COUNT(*) as count
 FROM learning_questions
 UNION ALL
-SELECT 
+SELECT
   'mock_exam_questions' as table_name,
   COUNT(*) as count
 FROM mock_exam_questions;
@@ -157,7 +159,7 @@ FROM mock_exam_questions;
 
 ```sql
 -- Test practice questions query
-SELECT 
+SELECT
   category,
   subdivision,
   COUNT(*) as question_count
@@ -167,7 +169,7 @@ GROUP BY category, subdivision
 ORDER BY category, subdivision;
 
 -- Test learning questions query
-SELECT 
+SELECT
   t.title as topic,
   COUNT(lq.id) as question_count
 FROM learning_questions lq
@@ -177,7 +179,7 @@ GROUP BY t.title
 ORDER BY t.title;
 
 -- Test mock exam questions query
-SELECT 
+SELECT
   difficulty,
   COUNT(*) as question_count
 FROM mock_exam_questions
@@ -198,6 +200,7 @@ ORDER BY difficulty;
 ```
 
 This will:
+
 - Copy all questions back to mock_exam_questions
 - Preserve all data
 - Allow you to investigate the issue
@@ -205,14 +208,17 @@ This will:
 ### Common Issues
 
 **Issue**: "Some questions have no options"
+
 - **Cause**: Data integrity issue in original data
 - **Fix**: Check original questions table for questions without options
 
 **Issue**: "Foreign key violation"
+
 - **Cause**: Referenced topics or lessons don't exist
 - **Fix**: Ensure all lessons and topics exist before migration
 
 **Issue**: Transaction timeout
+
 - **Cause**: Too many questions to migrate at once
 - **Fix**: Run individual migration scripts instead of master script
 
@@ -256,6 +262,7 @@ After successful migration:
 ## Support
 
 If you need help:
+
 - Check the detailed guide: `README_DATA_MIGRATION.md`
 - Review the design document: `.kiro/specs/learning-module-restructure/design.md`
 - Check Supabase logs for detailed error messages
@@ -265,6 +272,7 @@ If you need help:
 ## Summary
 
 **One command to rule them all:**
+
 ```sql
 \i jeeva-admin-portal/database/migrations/run_complete_migration.sql
 ```

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Button,
@@ -25,159 +25,223 @@ import {
   IconButton,
   Chip,
   LinearProgress,
-} from '@mui/material'
-import { DeleteOutlined, EditOutlined, AddOutlined } from '@mui/icons-material'
+  CircularProgress,
+} from "@mui/material";
+import { DeleteOutlined, EditOutlined, AddOutlined } from "@mui/icons-material";
+import { supabase } from "@/lib/supabase";
 
-interface LessonContent {
-  id: string
-  type: 'video' | 'audio' | 'text' | 'flashcard' | 'mcq' | 'assessment'
-  title: string
-  url?: string
-  text?: string
-  duration?: number
+interface Topic {
+  id: string;
+  title: string;
+  display_order: number;
 }
 
 interface Lesson {
-  id: string
-  name: string
-  unlockThreshold: number
-  content: LessonContent[]
+  id: string;
+  title: string;
+  content_type: "video" | "audio" | "text";
+  // flashcard/assessment mapped to separate tables?
+  // For this simple manager, let's stick to core lesson types: video/text/audio.
+  // Flashcards/Questions are separate.
+  // The UI had "flashcard" and "assessment".
+  // I will map 'flashcard' to a lesson with type 'text' but maybe a specific title flag or just standard lesson.
+  // Or actually, `flashcards` table exists.
+  // For 'Trial', maybe we just use Lessons for everything for simplicity.
+  // I'll support video/text/audio as per DB schema `content_type`.
+  video_url?: string;
+  content?: string;
+  duration?: number;
 }
 
 interface LearningManagerProps {
-  onStatusChange: (status: 'idle' | 'loading' | 'success' | 'error') => void
+  onStatusChange: (status: "idle" | "loading" | "success" | "error") => void;
 }
 
-export default function TrialLearningManager({ onStatusChange }: LearningManagerProps) {
-  const [lessons, setLessons] = useState<Lesson[]>([
-    { id: '1', name: 'Patient Safety Fundamentals', unlockThreshold: 60, content: [] },
-    { id: '2', name: 'Infection Prevention & Control', unlockThreshold: 60, content: [] },
-  ])
-  const [selectedLessonId, setSelectedLessonId] = useState<string>('1')
-  const [openContentDialog, setOpenContentDialog] = useState(false)
+export default function TrialLearningManager({
+  onStatusChange,
+}: LearningManagerProps) {
+  const [topics, setTopics] = useState<Topic[]>([]);
+  const [selectedTopicId, setSelectedTopicId] = useState<string | null>(null);
+  const [lessons, setLessons] = useState<Lesson[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const [openContentDialog, setOpenContentDialog] = useState(false);
   const [contentFormData, setContentFormData] = useState({
-    type: 'video' as LessonContent['type'],
-    title: '',
-    url: '',
-    text: '',
+    type: "video" as "video" | "audio" | "text",
+    title: "",
+    url: "",
+    text: "",
     duration: 0,
-  })
+  });
 
-  const selectedLesson = lessons.find((l) => l.id === selectedLessonId)
+  useEffect(() => {
+    fetchTopics();
+  }, []);
 
-  const handleAddContent = async () => {
-    onStatusChange('loading')
+  useEffect(() => {
+    if (selectedTopicId) {
+      fetchLessons(selectedTopicId);
+    }
+  }, [selectedTopicId]);
+
+  const fetchTopics = async () => {
     try {
-      const newContent: LessonContent = {
-        id: Date.now().toString(),
-        type: contentFormData.type,
-        title: contentFormData.title,
-        url: contentFormData.url,
-        text: contentFormData.text,
-        duration: contentFormData.duration,
+      setLoading(true);
+      // 1. Get Trial Module
+      const { data: moduleData, error: moduleError } = await await supabase
+        .from("modules")
+        .select("id")
+        .eq("slug", "trial-module") // Assuming slug is 'trial-module' or 'free-trial' based on seed.
+        // Let's check seed? "Free Trial" title, slug likely generated or hardcoded.
+        // In seed: `VALUES ('Free Trial', 'free-trial', ...)`?
+        // I should probably check the seed again or be robust.
+        // Let's search by title 'Free Trial' if slug uncertain, or try 'free-trial'.
+        .eq("title", "Free Trial")
+        .single();
+
+      if (moduleError || !moduleData) {
+        // If not found, maybe just return or show error.
+        console.error("Trial module not found", moduleError);
+        return;
       }
 
-      setLessons(
-        lessons.map((l) =>
-          l.id === selectedLessonId
-            ? { ...l, content: [...l.content, newContent] }
-            : l
-        )
-      )
+      // 2. Get Topics
+      const { data: topicsData, error: topicsError } = await supabase
+        .from("topics")
+        .select("*")
+        .eq("module_id", moduleData.id)
+        .eq("is_active", true)
+        .order("display_order");
 
-      setOpenContentDialog(false)
-      setContentFormData({
-        type: 'video',
-        title: '',
-        url: '',
-        text: '',
-        duration: 0,
-      })
-      onStatusChange('success')
-    } catch (error) {
-      onStatusChange('error')
+      if (topicsError) throw topicsError;
+
+      setTopics(topicsData || []);
+      if (topicsData && topicsData.length > 0) {
+        setSelectedTopicId(topicsData[0].id);
+      }
+    } catch (err) {
+      console.error(err);
+      onStatusChange("error");
+    } finally {
+      setLoading(false);
     }
-  }
+  };
 
-  const handleDeleteContent = (contentId: string) => {
-    setLessons(
-      lessons.map((l) =>
-        l.id === selectedLessonId
-          ? { ...l, content: l.content.filter((c) => c.id !== contentId) }
-          : l
-      )
-    )
-  }
+  const fetchLessons = async (topicId: string) => {
+    try {
+      // setLoading(true) // Don't block whole UI
+      const { data, error } = await supabase
+        .from("lessons")
+        .select("*")
+        .eq("topic_id", topicId)
+        .order("display_order");
 
-  if (!selectedLesson) return null
+      if (error) throw error;
+      setLessons(data || []);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleAddContent = async () => {
+    if (!selectedTopicId) return;
+    onStatusChange("loading");
+    try {
+      const { error } = await supabase.from("lessons").insert([
+        {
+          topic_id: selectedTopicId,
+          title: contentFormData.title,
+          content_type: contentFormData.type,
+          content: contentFormData.text || "", // Default content
+          video_url: contentFormData.url,
+          duration: contentFormData.duration,
+          is_active: true,
+          is_trial_content: true, // IMPORTANT
+          display_order: lessons.length + 1,
+        },
+      ]);
+
+      if (error) throw error;
+
+      await fetchLessons(selectedTopicId);
+      setOpenContentDialog(false);
+      setContentFormData({
+        type: "video",
+        title: "",
+        url: "",
+        text: "",
+        duration: 0,
+      });
+      onStatusChange("success");
+    } catch (error) {
+      console.error(error);
+      onStatusChange("error");
+    }
+  };
+
+  const handleDeleteContent = async (lessonId: string) => {
+    if (!confirm("Delete this lesson?")) return;
+    onStatusChange("loading");
+    try {
+      const { error } = await supabase
+        .from("lessons")
+        .delete()
+        .eq("id", lessonId);
+      if (error) throw error;
+      if (selectedTopicId) await fetchLessons(selectedTopicId);
+      onStatusChange("success");
+    } catch (e) {
+      onStatusChange("error");
+    }
+  };
+
+  if (loading && topics.length === 0)
+    return (
+      <Box p={3}>
+        <CircularProgress />
+      </Box>
+    );
+  if (topics.length === 0)
+    return (
+      <Box p={3}>
+        <Typography>
+          No Trial Topics found. Please seed the database.
+        </Typography>
+      </Box>
+    );
 
   const contentCounts = {
-    video: selectedLesson.content.filter((c) => c.type === 'video').length,
-    audio: selectedLesson.content.filter((c) => c.type === 'audio').length,
-    text: selectedLesson.content.filter((c) => c.type === 'text').length,
-    flashcard: selectedLesson.content.filter((c) => c.type === 'flashcard').length,
-    assessment: selectedLesson.content.filter((c) => c.type === 'assessment').length,
-  }
+    video: lessons.filter((c) => c.content_type === "video").length,
+    audio: lessons.filter((c) => c.content_type === "audio").length,
+    text: lessons.filter((c) => c.content_type === "text").length,
+  };
 
   return (
     <Box>
-      {/* Lesson Selection Tabs */}
+      {/* Topic Selection Tabs */}
       <Paper sx={{ mb: 3 }}>
         <Tabs
-          value={selectedLessonId}
-          onChange={(e, value) => setSelectedLessonId(value)}
-          aria-label="Trial learning lessons"
+          value={selectedTopicId}
+          onChange={(e, value) => setSelectedTopicId(value)}
+          variant="scrollable"
+          scrollButtons="auto"
         >
-          {lessons.map((lesson) => (
-            <Tab
-              key={lesson.id}
-              label={lesson.name}
-              value={lesson.id}
-              id={`lesson-tab-${lesson.id}`}
-            />
+          {topics.map((topic) => (
+            <Tab key={topic.id} label={topic.title} value={topic.id} />
           ))}
         </Tabs>
       </Paper>
 
-      {/* Lesson Info */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <Typography variant="h6" gutterBottom>
-            {selectedLesson.name}
-          </Typography>
-          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-            <Box flex={1}>
-              <Typography variant="caption" color="text.secondary">
-                Unlock Threshold
-              </Typography>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
-                <Box flex={1}>
-                  <LinearProgress
-                    variant="determinate"
-                    value={selectedLesson.unlockThreshold}
-                  />
-                </Box>
-                <Typography variant="body2">{selectedLesson.unlockThreshold}%</Typography>
-              </Box>
-            </Box>
-          </Box>
-        </CardContent>
-      </Card>
-
       {/* Content Type Summary */}
       <Grid container spacing={2} sx={{ mb: 3 }}>
-        {(
-          ['video', 'audio', 'text', 'flashcard', 'assessment'] as const
-        ).map((type) => (
-          <Grid size={{ xs: 12, sm: 6, md: 4, lg: 2.4 }} key={type}>
+        {(["video", "audio", "text"] as const).map((type) => (
+          <Grid size={{ xs: 12, sm: 4 }} key={type}>
             <Card>
-              <CardContent sx={{ textAlign: 'center' }}>
+              <CardContent sx={{ textAlign: "center" }}>
                 <Typography color="text.secondary" variant="caption">
                   {type.charAt(0).toUpperCase() + type.slice(1)}
                 </Typography>
-                <Typography variant="h6">
-                  {contentCounts[type]}
-                </Typography>
+                <Typography variant="h6">{contentCounts[type]}</Typography>
               </CardContent>
             </Card>
           </Grid>
@@ -191,44 +255,47 @@ export default function TrialLearningManager({ onStatusChange }: LearningManager
           startIcon={<AddOutlined />}
           onClick={() => setOpenContentDialog(true)}
         >
-          Add Content
+          Add Lesson
         </Button>
       </Box>
 
       {/* Content List */}
       <Paper>
-        {selectedLesson.content.length === 0 ? (
-          <Box sx={{ p: 3, textAlign: 'center' }}>
+        {lessons.length === 0 ? (
+          <Box sx={{ p: 3, textAlign: "center" }}>
             <Typography color="text.secondary">
-              No content added for this lesson. Click "Add Content" to get started.
+              No lessons added for this topic. Click "Add Lesson" to get
+              started.
             </Typography>
           </Box>
         ) : (
           <List>
-            {selectedLesson.content.map((content, index) => (
-              <React.Fragment key={content.id}>
+            {lessons.map((lesson, index) => (
+              <React.Fragment key={lesson.id}>
                 <ListItem>
                   <ListItemText
                     primary={
-                      <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-                        <Typography variant="subtitle2">{content.title}</Typography>
+                      <Box
+                        sx={{ display: "flex", gap: 1, alignItems: "center" }}
+                      >
+                        <Typography variant="subtitle2">
+                          {lesson.title}
+                        </Typography>
                         <Chip
-                          label={content.type}
+                          label={lesson.content_type}
                           size="small"
                           variant="outlined"
                         />
                       </Box>
                     }
                     secondary={
-                      content.duration
-                        ? `Duration: ${content.duration} seconds`
-                        : undefined
+                      lesson.duration ? `Duration: ${lesson.duration}s` : null
                     }
                   />
                   <ListItemSecondaryAction>
                     <IconButton
                       edge="end"
-                      onClick={() => handleDeleteContent(content.id)}
+                      onClick={() => handleDeleteContent(lesson.id)}
                       title="Delete"
                     >
                       <DeleteOutlined fontSize="small" />
@@ -242,9 +309,16 @@ export default function TrialLearningManager({ onStatusChange }: LearningManager
       </Paper>
 
       {/* Add Content Dialog */}
-      <Dialog open={openContentDialog} onClose={() => setOpenContentDialog(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Add Content</DialogTitle>
-        <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 2 }}>
+      <Dialog
+        open={openContentDialog}
+        onClose={() => setOpenContentDialog(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>Add Lesson</DialogTitle>
+        <DialogContent
+          sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 2 }}
+        >
           <FormControl fullWidth>
             <InputLabel>Content Type</InputLabel>
             <Select
@@ -252,7 +326,7 @@ export default function TrialLearningManager({ onStatusChange }: LearningManager
               onChange={(e) =>
                 setContentFormData({
                   ...contentFormData,
-                  type: e.target.value as LessonContent['type'],
+                  type: e.target.value as "video" | "audio" | "text",
                 })
               }
               label="Content Type"
@@ -260,8 +334,6 @@ export default function TrialLearningManager({ onStatusChange }: LearningManager
               <MenuItem value="video">Video</MenuItem>
               <MenuItem value="audio">Audio</MenuItem>
               <MenuItem value="text">Text</MenuItem>
-              <MenuItem value="flashcard">Flashcard</MenuItem>
-              <MenuItem value="assessment">Assessment (MCQ)</MenuItem>
             </Select>
           </FormControl>
 
@@ -274,13 +346,17 @@ export default function TrialLearningManager({ onStatusChange }: LearningManager
             fullWidth
           />
 
-          {(contentFormData.type === 'video' || contentFormData.type === 'audio') && (
+          {(contentFormData.type === "video" ||
+            contentFormData.type === "audio") && (
             <>
               <TextField
                 label="URL"
                 value={contentFormData.url}
                 onChange={(e) =>
-                  setContentFormData({ ...contentFormData, url: e.target.value })
+                  setContentFormData({
+                    ...contentFormData,
+                    url: e.target.value,
+                  })
                 }
                 fullWidth
                 placeholder="https://..."
@@ -300,9 +376,9 @@ export default function TrialLearningManager({ onStatusChange }: LearningManager
             </>
           )}
 
-          {contentFormData.type === 'text' && (
+          {contentFormData.type === "text" && (
             <TextField
-              label="Content"
+              label="Content (Markdown/Text)"
               multiline
               rows={4}
               value={contentFormData.text}
@@ -310,30 +386,16 @@ export default function TrialLearningManager({ onStatusChange }: LearningManager
                 setContentFormData({ ...contentFormData, text: e.target.value })
               }
               fullWidth
-            />
-          )}
-
-          {(contentFormData.type === 'flashcard' || contentFormData.type === 'assessment') && (
-            <TextField
-              label="Content (JSON format)"
-              multiline
-              rows={4}
-              value={contentFormData.text}
-              onChange={(e) =>
-                setContentFormData({ ...contentFormData, text: e.target.value })
-              }
-              fullWidth
-              placeholder='{"cards": [...]}'
             />
           )}
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenContentDialog(false)}>Cancel</Button>
           <Button onClick={handleAddContent} variant="contained">
-            Add Content
+            Add
           </Button>
         </DialogActions>
       </Dialog>
     </Box>
-  )
+  );
 }

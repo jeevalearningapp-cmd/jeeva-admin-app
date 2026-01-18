@@ -103,4 +103,3 @@ This specification defines the comprehensive database documentation for the Jeev
 2. WHEN a developer views a migration THEN the Database_Documentation SHALL summarize the changes made
 3. WHEN a developer needs to rollback THEN the Database_Documentation SHALL indicate which migrations are reversible
 4. WHEN schema conflicts exist THEN the Database_Documentation SHALL document resolution strategies
-

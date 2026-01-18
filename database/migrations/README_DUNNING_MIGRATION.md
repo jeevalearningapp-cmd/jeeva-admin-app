@@ -103,8 +103,8 @@ You can also test individual functions:
 
 ```sql
 -- Check the summary
-SELECT * FROM information_schema.tables 
-WHERE table_schema = 'public' 
+SELECT * FROM information_schema.tables
+WHERE table_schema = 'public'
   AND table_name IN ('payment_retries', 'grace_periods', 'alert_logs');
 
 -- Test the failure classification function
@@ -124,21 +124,22 @@ SELECT * FROM get_recovery_stats();
 
 ### New Columns in `payments` Table
 
-| Column | Type | Description |
-|--------|------|-------------|
-| `failure_type` | VARCHAR(20) | 'soft_decline' or 'hard_decline' |
-| `failed_at` | TIMESTAMPTZ | When payment failed |
-| `retry_count` | INTEGER | Number of retry attempts |
-| `last_retry_at` | TIMESTAMPTZ | Last retry timestamp |
-| `next_retry_at` | TIMESTAMPTZ | Next scheduled retry |
-| `recovered_at` | TIMESTAMPTZ | When payment was recovered |
+| Column                  | Type        | Description                       |
+| ----------------------- | ----------- | --------------------------------- |
+| `failure_type`          | VARCHAR(20) | 'soft_decline' or 'hard_decline'  |
+| `failed_at`             | TIMESTAMPTZ | When payment failed               |
+| `retry_count`           | INTEGER     | Number of retry attempts          |
+| `last_retry_at`         | TIMESTAMPTZ | Last retry timestamp              |
+| `next_retry_at`         | TIMESTAMPTZ | Next scheduled retry              |
+| `recovered_at`          | TIMESTAMPTZ | When payment was recovered        |
 | `permanently_failed_at` | TIMESTAMPTZ | When marked as permanently failed |
-| `reviewed_by` | UUID | Admin who reviewed |
-| `reviewed_at` | TIMESTAMPTZ | When reviewed |
+| `reviewed_by`           | UUID        | Admin who reviewed                |
+| `reviewed_at`           | TIMESTAMPTZ | When reviewed                     |
 
 ### New Table: `payment_retries`
 
 Tracks all retry attempts (manual and automated):
+
 - Retry scheduling and execution
 - Success/failure tracking
 - Admin audit trail for manual retries
@@ -146,6 +147,7 @@ Tracks all retry attempts (manual and automated):
 ### New Table: `grace_periods`
 
 Manages grace periods for failed payments:
+
 - Start and end dates
 - Status tracking (active/expired/cancelled)
 - Subscription linkage
@@ -153,6 +155,7 @@ Manages grace periods for failed payments:
 ### New Table: `alert_logs`
 
 Logs admin alerts:
+
 - High-value failures
 - Fraud alerts
 - High failure rate alerts
@@ -209,6 +212,7 @@ SELECT * FROM get_recovery_stats(
 ```
 
 Returns:
+
 - Total failed payments
 - Total recovered payments
 - Recovery rate percentage
@@ -234,21 +238,21 @@ The migration sets up automatic triggers:
 
 ```sql
 -- Update an existing payment to failed status
-UPDATE payments 
-SET 
+UPDATE payments
+SET
   status = 'failed',
   failure_code = 'insufficient_funds',
   failure_message = 'Insufficient funds in account'
 WHERE id = 'your-payment-id';
 
 -- Check if failed_at and failure_type were set automatically
-SELECT 
-  id, 
-  status, 
-  failure_code, 
-  failure_type, 
-  failed_at 
-FROM payments 
+SELECT
+  id,
+  status,
+  failure_code,
+  failure_type,
+  failed_at
+FROM payments
 WHERE id = 'your-payment-id';
 ```
 
@@ -320,7 +324,7 @@ DROP FUNCTION IF EXISTS set_payment_failed_at();
 DROP FUNCTION IF EXISTS set_payment_recovered_at();
 
 -- Remove columns from payments table
-ALTER TABLE payments 
+ALTER TABLE payments
   DROP COLUMN IF EXISTS failure_type,
   DROP COLUMN IF EXISTS failed_at,
   DROP COLUMN IF EXISTS retry_count,
@@ -381,7 +385,7 @@ The grace_periods table requires a subscriptions table. Make sure it exists:
 ```sql
 -- Check if subscriptions table exists
 SELECT EXISTS (
-  SELECT 1 FROM information_schema.tables 
+  SELECT 1 FROM information_schema.tables
   WHERE table_schema = 'public' AND table_name = 'subscriptions'
 );
 ```
@@ -391,8 +395,8 @@ SELECT EXISTS (
 ## Support
 
 If you encounter any issues:
+
 1. Check the verification output at the end of the migration
 2. Run `check_dunning_schema.sql` to see what's installed
 3. Review the error messages carefully
 4. Check that all prerequisite tables exist (admin_users, subscriptions)
-

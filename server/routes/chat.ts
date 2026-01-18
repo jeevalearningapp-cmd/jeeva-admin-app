@@ -1,182 +1,176 @@
-import { Router } from 'express'
-import { supabase } from '../lib/supabase.js'
-import { generateAIResponse } from '../lib/gemini.js'
-import { buildChatContext } from '../utils/chatContext.js'
-import { checkAIRateLimit, updateAIUsageStats } from '../utils/rateLimiter.js'
+import express from "express";
+import { getModelResponse } from "../lib/gemini.js";
+import { buildChatContext } from "../utils/chatContext.js";
+import { supabase } from "../lib/supabase.js";
 
-const router = Router()
+const router = express.Router();
 
-router.post('/send', async (req, res) => {
+// Helper to check message limits
+const checkMessageLimit = async (userId: string): Promise<boolean> => {
+  const today = new Date().toISOString().split("T")[0];
+
+  const { data, error } = await supabase
+    .from("ai_usage_stats")
+    .select("message_count")
+    .eq("user_id", userId)
+    .eq("date", today)
+    .single();
+
+  if (error && error.code !== "PGRST116") {
+    // PGRST116 is "no rows returned"
+    console.error("Error checking limits:", error);
+    return true; // Fail open if error
+  }
+
+  // limit is 50 messages per day
+  return (data?.message_count || 0) < 50;
+};
+
+// Helper to update usage stats
+const updateUsageStats = async (userId: string, tokens: number) => {
+  const today = new Date().toISOString().split("T")[0];
+
+  // Upsert usage stats
+  // First try to get existing row
+  const { data } = await supabase
+    .from("ai_usage_stats")
+    .select("*")
+    .eq("user_id", userId)
+    .eq("date", today)
+    .single();
+
+  if (data) {
+    await supabase
+      .from("ai_usage_stats")
+      .update({
+        message_count: data.message_count + 1,
+        total_tokens: data.total_tokens + tokens,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", data.id);
+  } else {
+    await supabase.from("ai_usage_stats").insert({
+      user_id: userId,
+      date: today,
+      message_count: 1,
+      total_tokens: tokens,
+    });
+  }
+};
+
+// Helper to get conversation history
+const getConversationHistory = async (conversationId: string) => {
+  const { data } = await supabase
+    .from("chat_messages")
+    .select("role, content")
+    .eq("conversation_id", conversationId)
+    .order("created_at", { ascending: true }) // Oldest first for context
+    .limit(20); // Limit context window
+
+  return data || [];
+};
+
+// POST /api/chat/send
+router.post("/send", async (req, res) => {
   try {
-    const { userId, content, conversationId } = req.body
+    const { userId, conversationId, content } = req.body;
 
-    if (!userId || !content) {
-      return res.status(400).json({
-        error: 'Missing required fields: userId, content',
-      })
+    // Verify user authentication (simplified verification via headers or body for now,
+    // ideally should use Supabase auth token from headers)
+    const token = req.headers.authorization?.replace("Bearer ", "");
+    if (!token) {
+      return res.status(401).json({ error: "Unauthorized: No token provided" });
     }
 
-    const rateLimit = await checkAIRateLimit(userId)
-    if (!rateLimit.allowed) {
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser(token);
+
+    if (authError || !user || user.id !== userId) {
+      return res
+        .status(401)
+        .json({ error: "Unauthorized: Invalid token or user mismatch" });
+    }
+
+    // Check rate limit
+    const canSend = await checkMessageLimit(userId);
+    if (!canSend) {
       return res.status(429).json({
-        error: `Daily AI message limit reached (${rateLimit.limit} messages/day)`,
-        limit: rateLimit.limit,
-        current: rateLimit.current,
-        remaining: 0,
-      })
+        error: "Daily message limit reached (50 messages/day)",
+      });
     }
 
-    let activeConversationId = conversationId
-
-    if (!activeConversationId) {
-      const { data: newConv, error: convError } = await supabase
-        .from('chat_conversations')
-        .insert({
-          user_id: userId,
-          title: content.substring(0, 50) + (content.length > 50 ? '...' : ''),
-        })
-        .select()
-        .single()
-
-      if (convError) throw convError
-      activeConversationId = newConv.id
-    }
-
-    const { data: userMsg, error: userMsgError } = await supabase
-      .from('chat_messages')
+    // Save user message
+    const { data: userMsg, error: msgError } = await supabase
+      .from("chat_messages")
       .insert({
-        conversation_id: activeConversationId,
-        role: 'user',
+        conversation_id: conversationId,
+        role: "user",
         content,
       })
       .select()
-      .single()
+      .single();
 
-    if (userMsgError) throw userMsgError
+    if (msgError) {
+      throw msgError;
+    }
 
-    const { data: history } = await supabase
-      .from('chat_messages')
-      .select('role, content')
-      .eq('conversation_id', activeConversationId)
-      .order('created_at', { ascending: true })
-      .limit(10)
+    // Build context and get AI response
+    const context = await buildChatContext(userId);
+    const history = await getConversationHistory(conversationId);
 
-    const conversationHistory =
-      history?.map((msg) => ({
-        role: msg.role as 'user' | 'assistant',
-        content: msg.content,
-      })) || []
+    // Prepend context to the prompt or history?
+    // Usually system instructions are top level.
+    // getModelResponse takes (prompt, history).
+    // prompt is the new message? No, prompt is usually the full logical prompt.
+    // If using chat mode, the prompt is the new user input, and context should be system instruction.
+    // The gemini.ts wrapper uses `chat.sendMessage(prompt)`.
+    // And `history` is passed to `startChat`.
+    // We should add the context as a system instruction or the first message in history.
+    // Since `gemini.ts` expects `history` as array of messages, we can prepend a system message if the model supports it
+    // or just assume `gemini.ts` needs adjustment.
+    // The `gemini.ts` wrapper created earlier creates a chat session.
+    // `gemini-1.5-flash` supports system instructions.
 
-    const context = await buildChatContext(userId)
+    // Let's modify the call to send the context.
+    // Actually, `gemini.ts` wrapper is simple.
+    // Current wrapper: `chatModel.startChat({ history... }).sendMessage(prompt)`
+    // We can inject context into the prompt or valid history.
+    // Let's append context to the prompt for now as a simple solution.
+    // Or better, add it as a 'user' message at the start of history if history is empty.
 
-    const aiResponse = await generateAIResponse(
-      content,
-      context,
-      conversationHistory.slice(0, -1)
-    )
+    let effectivePrompt = content;
+    // If history is empty, this is the first message (or close to it), so include context.
+    // But `buildChatContext` returns a system prompt style string.
+    // Let's prepend it to the current prompt to ensure it's considered.
+    effectivePrompt = `${context}\n\nUser Question: ${content}`;
 
-    const estimatedTokens = Math.ceil((content.length + aiResponse.length) / 4)
+    const aiResponse = await getModelResponse(effectivePrompt, history);
 
-    const { data: aiMsg, error: aiMsgError } = await supabase
-      .from('chat_messages')
+    // Save AI response
+    const { data: aiMsg } = await supabase
+      .from("chat_messages")
       .insert({
-        conversation_id: activeConversationId,
-        role: 'assistant',
+        conversation_id: conversationId,
+        role: "assistant",
         content: aiResponse,
         metadata: {
-          model: 'gemini-2.5-flash',
-          tokensUsed: estimatedTokens,
+          model: "gemini-1.5-flash",
+          tokensUsed: Math.ceil(aiResponse.length / 4),
         },
       })
       .select()
-      .single()
+      .single();
 
-    if (aiMsgError) throw aiMsgError
+    // Update usage stats
+    await updateUsageStats(userId, Math.ceil(aiResponse.length / 4));
 
-    await updateAIUsageStats(userId, estimatedTokens)
-
-    res.json({
-      success: true,
-      conversationId: activeConversationId,
-      userMessage: userMsg,
-      aiMessage: aiMsg,
-      rateLimit: {
-        limit: rateLimit.limit,
-        remaining: rateLimit.remaining - 1,
-      },
-    })
-  } catch (error: any) {
-    console.error('Chat API error:', error)
-    res.status(500).json({
-      error: error.message || 'Failed to send message',
-    })
+    res.json({ userMsg, aiMsg });
+  } catch (error) {
+    console.error("Chat API error:", error);
+    res.status(500).json({ error: "Failed to send message" });
   }
-})
+});
 
-router.get('/conversations/:userId', async (req, res) => {
-  try {
-    const { userId } = req.params
-
-    const { data, error } = await supabase
-      .from('chat_conversations')
-      .select('*')
-      .eq('user_id', userId)
-      .order('updated_at', { ascending: false })
-
-    if (error) throw error
-
-    res.json({
-      success: true,
-      conversations: data || [],
-    })
-  } catch (error: any) {
-    console.error('Error fetching conversations:', error)
-    res.status(500).json({
-      error: error.message || 'Failed to fetch conversations',
-    })
-  }
-})
-
-router.get('/messages/:conversationId', async (req, res) => {
-  try {
-    const { conversationId } = req.params
-
-    const { data, error } = await supabase
-      .from('chat_messages')
-      .select('*')
-      .eq('conversation_id', conversationId)
-      .order('created_at', { ascending: true })
-
-    if (error) throw error
-
-    res.json({
-      success: true,
-      messages: data || [],
-    })
-  } catch (error: any) {
-    console.error('Error fetching messages:', error)
-    res.status(500).json({
-      error: error.message || 'Failed to fetch messages',
-    })
-  }
-})
-
-router.get('/rate-limit/:userId', async (req, res) => {
-  try {
-    const { userId } = req.params
-
-    const rateLimit = await checkAIRateLimit(userId)
-
-    res.json({
-      success: true,
-      rateLimit,
-    })
-  } catch (error: any) {
-    console.error('Error checking rate limit:', error)
-    res.status(500).json({
-      error: error.message || 'Failed to check rate limit',
-    })
-  }
-})
-
-export default router
+export default router;

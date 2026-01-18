@@ -131,8 +131,8 @@ ALTER TABLE questions RENAME TO mock_exam_questions;
 ALTER TABLE question_options RENAME TO mock_exam_question_options;
 
 -- Update foreign key constraint name
-ALTER TABLE mock_exam_question_options 
-  RENAME CONSTRAINT question_options_question_id_fkey 
+ALTER TABLE mock_exam_question_options
+  RENAME CONSTRAINT question_options_question_id_fkey
   TO mock_exam_question_options_question_id_fkey;
 
 -- Existing indexes are preserved with table rename
@@ -271,27 +271,29 @@ CREATE INDEX idx_topic_progress_topic_id ON topic_progress(topic_id);
 // Pseudocode for question migration
 async function migrateQuestions() {
   // Step 1: Rename existing table
-  await db.raw('ALTER TABLE questions RENAME TO mock_exam_questions');
-  await db.raw('ALTER TABLE question_options RENAME TO mock_exam_question_options');
-  
+  await db.raw("ALTER TABLE questions RENAME TO mock_exam_questions");
+  await db.raw(
+    "ALTER TABLE question_options RENAME TO mock_exam_question_options",
+  );
+
   // Step 2: Get all questions from mock_exam_questions
   const allQuestions = await db.mock_exam_questions.findAll();
-  
+
   const practiceQuestionIds = [];
   const learningQuestionIds = [];
-  
+
   for (const question of allQuestions) {
     // Determine if question belongs to Practice or Learning
     if (question.lesson_id) {
       const lesson = await db.lessons.findById(question.lesson_id);
       const topic = await db.topics.findById(lesson.topic_id);
       const module = await db.modules.findById(topic.module_id);
-      
-      if (module.title === 'Practice Module') {
+
+      if (module.title === "Practice Module") {
         // Migrate to practice_questions
         await migrateToPracticeQuestions(question);
         practiceQuestionIds.push(question.id);
-      } else if (module.title === 'Learning Module') {
+      } else if (module.title === "Learning Module") {
         // Migrate to learning_questions
         await migrateToLearningQuestions(question);
         learningQuestionIds.push(question.id);
@@ -299,10 +301,10 @@ async function migrateQuestions() {
     }
     // Questions without lesson_id stay in mock_exam_questions
   }
-  
+
   // Step 3: Delete migrated questions from mock_exam_questions
   await db.mock_exam_questions.deleteMany({
-    id: { in: [...practiceQuestionIds, ...learningQuestionIds] }
+    id: { in: [...practiceQuestionIds, ...learningQuestionIds] },
   });
 }
 ```
@@ -312,6 +314,7 @@ async function migrateQuestions() {
 #### 3.1 Practice Module Management
 
 **Component Structure:**
+
 ```
 PracticeModuleManager
 ├── TopicSelector (Numeracy / Clinical Knowledge)
@@ -323,6 +326,7 @@ PracticeModuleManager
 ```
 
 **Key Features:**
+
 - Fixed topic/subtopic structure (no add/delete)
 - Question CRUD operations
 - Bulk import from CSV
@@ -331,6 +335,7 @@ PracticeModuleManager
 #### 3.2 Learning Module Management
 
 **Component Structure:**
+
 ```
 LearningModuleManager
 ├── TopicList (with Add/Edit/Delete/Reorder)
@@ -345,6 +350,7 @@ LearningModuleManager
 ```
 
 **Key Features:**
+
 - Dynamic topic creation/editing
 - Rich text editor for Core Notes
 - Flash content screen editor (exactly 5)
@@ -355,6 +361,7 @@ LearningModuleManager
 #### 3.3 Mock Exam Module Management
 
 **Component Structure:**
+
 ```
 MockExamModuleManager
 ├── QuestionList
@@ -364,6 +371,7 @@ MockExamModuleManager
 ```
 
 **Key Features:**
+
 - Question CRUD operations
 - Exam configuration (duration, passing score, etc.)
 - Question pool management
@@ -374,6 +382,7 @@ MockExamModuleManager
 #### 4.1 Learning Module Mobile UI
 
 **Main Topic Screen:**
+
 ```
 ┌─────────────────────────────────────┐
 │  Topic: Numeracy                    │
@@ -394,6 +403,7 @@ MockExamModuleManager
 ```
 
 **Subtopic Screen:**
+
 ```
 ┌─────────────────────────────────────┐
 │  1.2 Unit Conversions               │
@@ -415,6 +425,7 @@ MockExamModuleManager
 #### 4.2 Practice Module Mobile UI
 
 **Practice Topic Screen:**
+
 ```
 ┌─────────────────────────────────────┐
 │  Practice: Numeracy                 │
@@ -441,11 +452,11 @@ MockExamModuleManager
 // Practice Question
 interface PracticeQuestion {
   id: string;
-  category: 'Numeracy' | 'Clinical Knowledge';
+  category: "Numeracy" | "Clinical Knowledge";
   subdivision: string;
   questionText: string;
-  questionType: 'multiple_choice' | 'true_false';
-  difficulty: 'easy' | 'medium' | 'hard';
+  questionType: "multiple_choice" | "true_false";
+  difficulty: "easy" | "medium" | "hard";
   points: number;
   explanation: string;
   imageUrl?: string;
@@ -470,8 +481,8 @@ interface LearningQuestion {
   subtopicId: string;
   videoLessonId: string;
   questionText: string;
-  questionType: 'multiple_choice' | 'true_false';
-  difficulty: 'easy' | 'medium' | 'hard';
+  questionType: "multiple_choice" | "true_false";
+  difficulty: "easy" | "medium" | "hard";
   points: number;
   explanation: string;
   imageUrl?: string;
@@ -525,7 +536,7 @@ interface SubtopicProgress {
   userId: string;
   topicId: string;
   subtopicId: string;
-  status: 'locked' | 'in_progress' | 'completed';
+  status: "locked" | "in_progress" | "completed";
   score?: number; // 0-100
   bestScore?: number;
   attempts: number;
@@ -684,24 +695,28 @@ Property tests will be defined after design approval to validate universal corre
 ## Deployment Strategy
 
 ### Phase 1: Database Migration
+
 1. Create new tables
 2. Run migration script
 3. Verify data integrity
 4. Keep old tables for rollback
 
 ### Phase 2: Admin Portal Update
+
 1. Deploy new admin components
 2. Enable feature flag for new UI
 3. Train admins on new interface
 4. Monitor for issues
 
 ### Phase 3: Mobile App Update
+
 1. Deploy new mobile components
 2. Enable feature flag for new UI
 3. Monitor user feedback
 4. Gradual rollout to all users
 
 ### Phase 4: Cleanup
+
 1. Remove old questions table (after verification period)
 2. Remove feature flags
 3. Update documentation

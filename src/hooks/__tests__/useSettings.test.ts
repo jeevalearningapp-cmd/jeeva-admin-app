@@ -1,27 +1,27 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { renderHook, waitFor } from '@testing-library/react'
-import { QueryClientProvider } from '@tanstack/react-query'
-import { createElement } from 'react'
-import { useSettings } from '../useSettings'
-import * as settingsApi from '@/api/settings'
-import { ErrorHandler } from '@/utils/errorHandler'
-import { createTestQueryClient } from '@/__tests__/utils/test-wrapper'
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { renderHook, waitFor } from "@testing-library/react";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { createElement } from "react";
+import { useSettings } from "../useSettings";
+import * as settingsApi from "@/api/settings";
+import { ErrorHandler } from "@/utils/errorHandler";
+import { createTestQueryClient } from "@/__tests__/utils/test-wrapper";
 
 // Mock API and ErrorHandler
-vi.mock('@/api/settings')
-vi.mock('@/utils/errorHandler')
+vi.mock("@/api/settings");
+vi.mock("@/utils/errorHandler");
 
 const mockSettings = {
-  id: 'test-id',
-  siteName: 'Jeeva Learning',
-  siteDescription: 'Learning platform',
-  contactEmail: 'contact@jeeva.com',
-  supportEmail: 'support@jeeva.com',
+  id: "test-id",
+  siteName: "Jeeva Learning",
+  siteDescription: "Learning platform",
+  contactEmail: "contact@jeeva.com",
+  supportEmail: "support@jeeva.com",
   maintenanceMode: false,
   registrationEnabled: true,
   emailVerificationRequired: true,
   maxFileUploadSize: 5,
-  allowedFileTypes: ['image/jpeg', 'image/png'],
+  allowedFileTypes: ["image/jpeg", "image/png"],
   sessionTimeout: 60,
   passwordMinLength: 8,
   passwordRequireUppercase: true,
@@ -36,129 +36,139 @@ const mockSettings = {
   contentRejected: true,
   subscriptionExpiring: true,
   subscriptionRenewed: true,
-  createdAt: '2024-01-01T00:00:00Z',
-  updatedAt: '2024-01-01T00:00:00Z',
-}
+  createdAt: "2024-01-01T00:00:00Z",
+  updatedAt: "2024-01-01T00:00:00Z",
+};
 
-describe('useSettings', () => {
-  let queryClient: ReturnType<typeof createTestQueryClient>
+describe("useSettings", () => {
+  let queryClient: ReturnType<typeof createTestQueryClient>;
 
   beforeEach(() => {
-    queryClient = createTestQueryClient()
-    vi.clearAllMocks()
-  })
+    queryClient = createTestQueryClient();
+    vi.clearAllMocks();
+  });
 
   const createWrapper = () => {
-    return ({ children }: { children: React.ReactNode }) => 
-      createElement(QueryClientProvider, { client: queryClient }, children)
-  }
+    return ({ children }: { children: React.ReactNode }) =>
+      createElement(QueryClientProvider, { client: queryClient }, children);
+  };
 
-  describe('Fetching Settings', () => {
-    it('should fetch settings successfully', async () => {
-      vi.mocked(settingsApi.getSettings).mockResolvedValue(mockSettings)
+  describe("Fetching Settings", () => {
+    it("should fetch settings successfully", async () => {
+      vi.mocked(settingsApi.getSettings).mockResolvedValue(mockSettings);
 
-      const { result } = renderHook(() => useSettings(), { wrapper: createWrapper() })
+      const { result } = renderHook(() => useSettings(), {
+        wrapper: createWrapper(),
+      });
 
-      expect(result.current.isLoading).toBe(true)
-
-      await waitFor(() => {
-        expect(result.current.isLoading).toBe(false)
-      })
-
-      expect(result.current.settings).toEqual(mockSettings)
-      expect(result.current.error).toBeNull()
-    })
-
-    it('should handle fetch error', async () => {
-      const error = new Error('Failed to fetch')
-      vi.mocked(settingsApi.getSettings).mockRejectedValue(error)
-
-      const { result } = renderHook(() => useSettings(), { wrapper: createWrapper() })
+      expect(result.current.isLoading).toBe(true);
 
       await waitFor(() => {
-        expect(result.current.isLoading).toBe(false)
-      })
+        expect(result.current.isLoading).toBe(false);
+      });
 
-      expect(result.current.settings).toBeUndefined()
-      expect(result.current.error).toBeTruthy()
-    })
-  })
+      expect(result.current.settings).toEqual(mockSettings);
+      expect(result.current.error).toBeNull();
+    });
 
-  describe('Updating Settings', () => {
-    it('should update settings successfully', async () => {
-      const updatedSettings = { ...mockSettings, siteName: 'Updated Name' }
-      vi.mocked(settingsApi.getSettings).mockResolvedValue(mockSettings)
-      vi.mocked(settingsApi.updateSettings).mockResolvedValue(updatedSettings)
+    it("should handle fetch error", async () => {
+      const error = new Error("Failed to fetch");
+      vi.mocked(settingsApi.getSettings).mockRejectedValue(error);
 
-      const { result } = renderHook(() => useSettings(), { wrapper: createWrapper() })
+      const { result } = renderHook(() => useSettings(), {
+        wrapper: createWrapper(),
+      });
 
       await waitFor(() => {
-        expect(result.current.settings).toEqual(mockSettings)
-      })
+        expect(result.current.isLoading).toBe(false);
+      });
+
+      expect(result.current.settings).toBeUndefined();
+      expect(result.current.error).toBeTruthy();
+    });
+  });
+
+  describe("Updating Settings", () => {
+    it("should update settings successfully", async () => {
+      const updatedSettings = { ...mockSettings, siteName: "Updated Name" };
+      vi.mocked(settingsApi.getSettings).mockResolvedValue(mockSettings);
+      vi.mocked(settingsApi.updateSettings).mockResolvedValue(updatedSettings);
+
+      const { result } = renderHook(() => useSettings(), {
+        wrapper: createWrapper(),
+      });
+
+      await waitFor(() => {
+        expect(result.current.settings).toEqual(mockSettings);
+      });
 
       result.current.updateSettings({
-        id: 'test-id',
-        input: { siteName: 'Updated Name' },
-      })
+        id: "test-id",
+        input: { siteName: "Updated Name" },
+      });
 
       await waitFor(() => {
-        expect(result.current.isUpdating).toBe(false)
-      })
+        expect(result.current.isUpdating).toBe(false);
+      });
 
-      expect(settingsApi.updateSettings).toHaveBeenCalledWith('test-id', {
-        siteName: 'Updated Name',
-      })
-    })
+      expect(settingsApi.updateSettings).toHaveBeenCalledWith("test-id", {
+        siteName: "Updated Name",
+      });
+    });
 
-    it('should handle update error with ErrorHandler', async () => {
-      const error = new Error('Update failed')
-      vi.mocked(settingsApi.getSettings).mockResolvedValue(mockSettings)
-      vi.mocked(settingsApi.updateSettings).mockRejectedValue(error)
+    it("should handle update error with ErrorHandler", async () => {
+      const error = new Error("Update failed");
+      vi.mocked(settingsApi.getSettings).mockResolvedValue(mockSettings);
+      vi.mocked(settingsApi.updateSettings).mockRejectedValue(error);
 
-      const { result } = renderHook(() => useSettings(), { wrapper: createWrapper() })
+      const { result } = renderHook(() => useSettings(), {
+        wrapper: createWrapper(),
+      });
 
       await waitFor(() => {
-        expect(result.current.settings).toEqual(mockSettings)
-      })
+        expect(result.current.settings).toEqual(mockSettings);
+      });
 
       result.current.updateSettings({
-        id: 'test-id',
-        input: { siteName: 'New Name' },
-      })
+        id: "test-id",
+        input: { siteName: "New Name" },
+      });
 
       await waitFor(() => {
-        expect(result.current.isUpdating).toBe(false)
-      })
+        expect(result.current.isUpdating).toBe(false);
+      });
 
       expect(ErrorHandler.handle).toHaveBeenCalledWith(
         error,
-        'Failed to save settings. Please check your permissions and try again.'
-      )
-    })
+        "Failed to save settings. Please check your permissions and try again.",
+      );
+    });
 
-    it('should invalidate query cache after successful update', async () => {
-      const updatedSettings = { ...mockSettings, siteName: 'Updated Name' }
-      vi.mocked(settingsApi.getSettings).mockResolvedValue(mockSettings)
-      vi.mocked(settingsApi.updateSettings).mockResolvedValue(updatedSettings)
+    it("should invalidate query cache after successful update", async () => {
+      const updatedSettings = { ...mockSettings, siteName: "Updated Name" };
+      vi.mocked(settingsApi.getSettings).mockResolvedValue(mockSettings);
+      vi.mocked(settingsApi.updateSettings).mockResolvedValue(updatedSettings);
 
-      const { result } = renderHook(() => useSettings(), { wrapper: createWrapper() })
+      const { result } = renderHook(() => useSettings(), {
+        wrapper: createWrapper(),
+      });
 
       await waitFor(() => {
-        expect(result.current.settings).toEqual(mockSettings)
-      })
+        expect(result.current.settings).toEqual(mockSettings);
+      });
 
-      const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries')
+      const invalidateSpy = vi.spyOn(queryClient, "invalidateQueries");
 
       result.current.updateSettings({
-        id: 'test-id',
-        input: { siteName: 'Updated Name' },
-      })
+        id: "test-id",
+        input: { siteName: "Updated Name" },
+      });
 
       await waitFor(() => {
-        expect(result.current.isUpdating).toBe(false)
-      })
+        expect(result.current.isUpdating).toBe(false);
+      });
 
-      expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ['settings'] })
-    })
-  })
-})
+      expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ["settings"] });
+    });
+  });
+});

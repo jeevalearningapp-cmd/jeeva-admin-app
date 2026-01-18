@@ -62,13 +62,16 @@ If you prefer command line, you need to get your database password first:
 ## Troubleshooting
 
 **Error: "times_redeemed already exists"**
+
 - This is handled automatically by the migration
 - The script will skip or merge the column
 
 **Error: "permission denied"**
+
 - Make sure you're using the service role key or database password
 - Check your Supabase project permissions
 
 **Need help?**
+
 - Check the full documentation: `COUPON_MANAGEMENT_REWORK.md`
 - Review the migration file: `run_coupon_migration.sql`

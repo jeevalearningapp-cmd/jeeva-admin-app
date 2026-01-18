@@ -12,34 +12,40 @@ This migration implements the database schema changes required for the Learning 
 ## What This Migration Does
 
 ### 1. Creates Practice Questions Tables
+
 - `practice_questions` - Questions for Practice Module with category and subdivision fields
 - `practice_question_options` - Options for practice questions
 - Indexes for efficient querying by category, subdivision, and active status
 
 ### 2. Creates Learning Questions Tables
+
 - `learning_questions` - Questions for Learning Module with topic, subtopic, and video lesson associations
 - `learning_question_options` - Options for learning questions
 - Indexes for efficient querying by topic, subtopic, video lesson, and active status
 
 ### 3. Renames Existing Questions Tables
+
 - Renames `questions` table to `mock_exam_questions`
 - Renames `question_options` table to `mock_exam_question_options`
 - Updates foreign key constraint names
 - Preserves all existing data and indexes
 
 ### 4. Creates Topic Core Notes Table
+
 - `topic_core_notes` - Stores comprehensive readable lessons for entire topics
 - Supports rich text HTML content
 - Includes JSONB field for structured sections
 - One core notes entry per topic (UNIQUE constraint)
 
 ### 5. Creates Topic Flash Content Table
+
 - `topic_flash_content` - Stores quick revision screens (5 per topic)
 - Screen numbers 1-5 with CHECK constraint
 - UNIQUE constraint on (topic_id, screen_number)
 - Supports rich text HTML content and images
 
 ### 6. Creates Progress Tracking Tables
+
 - `subtopic_progress` - Tracks user progress through subtopics
   - Status (locked, in_progress, completed)
   - Score, best score, attempts, time spent
@@ -50,12 +56,14 @@ This migration implements the database schema changes required for the Learning 
   - Overall progress percentage
 
 ### 7. Updates Lessons Table
+
 - Adds `is_mandatory` field (default true)
 - Adds `content_type` field (video, audio, text)
 - Adds `podcast_url` field for optional podcast content
 - Updates existing records with appropriate content_type values
 
 ### 8. Applies Row Level Security (RLS) Policies
+
 - **Superadmins**: Full CRUD access to all tables
 - **Editors**: Create, Read, Update (no delete) on content tables
 - **Moderators**: Read-only access to content tables
@@ -99,9 +107,9 @@ After running the migration, verify the changes:
 
 ```sql
 -- Check that new tables exist
-SELECT table_name 
-FROM information_schema.tables 
-WHERE table_schema = 'public' 
+SELECT table_name
+FROM information_schema.tables
+WHERE table_schema = 'public'
 AND table_name IN (
   'practice_questions',
   'practice_question_options',
@@ -116,15 +124,15 @@ AND table_name IN (
 );
 
 -- Check that lessons table has new columns
-SELECT column_name, data_type 
-FROM information_schema.columns 
-WHERE table_name = 'lessons' 
+SELECT column_name, data_type
+FROM information_schema.columns
+WHERE table_name = 'lessons'
 AND column_name IN ('is_mandatory', 'content_type', 'podcast_url');
 
 -- Check that RLS is enabled
-SELECT tablename, rowsecurity 
-FROM pg_tables 
-WHERE schemaname = 'public' 
+SELECT tablename, rowsecurity
+FROM pg_tables
+WHERE schemaname = 'public'
 AND tablename IN (
   'practice_questions',
   'learning_questions',
@@ -136,9 +144,9 @@ AND tablename IN (
 );
 
 -- Check indexes
-SELECT indexname, tablename 
-FROM pg_indexes 
-WHERE schemaname = 'public' 
+SELECT indexname, tablename
+FROM pg_indexes
+WHERE schemaname = 'public'
 AND tablename IN (
   'practice_questions',
   'learning_questions',
@@ -187,8 +195,8 @@ ALTER TABLE mock_exam_questions RENAME TO questions;
 ALTER TABLE mock_exam_question_options RENAME TO question_options;
 
 -- Rename constraint back
-ALTER TABLE question_options 
-  RENAME CONSTRAINT mock_exam_question_options_question_id_fkey 
+ALTER TABLE question_options
+  RENAME CONSTRAINT mock_exam_question_options_question_id_fkey
   TO question_options_question_id_fkey;
 
 -- Remove new columns from lessons table

@@ -14,6 +14,7 @@ Jeeva Learning is a mobile application for **Indian nurses** preparing for the *
 ## 🎯 Core Value Proposition
 
 **Transform Indian nurses to think and practice like UK nurses** through:
+
 - 🏥 UK-specific clinical scenarios and professional standards (NMC Code)
 - 📚 Multi-format learning (videos, podcasts, text lessons, flashcards)
 - 🎯 Large MCQ database for topic-targeted practice
@@ -26,6 +27,7 @@ Jeeva Learning is a mobile application for **Indian nurses** preparing for the *
 ## 📚 NMC CBT Exam Syllabus
 
 ### Module 1: Numeracy
+
 - Dosage calculations
 - Unit conversions (mg to g, mL to L)
 - IV flow rate calculations
@@ -35,7 +37,8 @@ Jeeva Learning is a mobile application for **Indian nurses** preparing for the *
 
 **Exam:** Part A - 15 questions, 22.5 mins, pass: 13/15 (87%)
 
-### Module 2: Clinical Knowledge  
+### Module 2: Clinical Knowledge
+
 - Medical-Surgical Nursing
 - Pharmacology (UK BNF)
 - Infection Control
@@ -47,6 +50,7 @@ Jeeva Learning is a mobile application for **Indian nurses** preparing for the *
 **Exam:** Part B - 60 questions, 90 mins, pass: ~70%
 
 ### Module 3: Professional Standards (NMC Code)
+
 - **Prioritise People** - Patient autonomy, consent, confidentiality
 - **Practice Effectively** - Evidence-based care, communication, teamwork
 - **Preserve Safety** - Risk management, safeguarding, incident reporting
@@ -86,35 +90,41 @@ Jeeva Learning is a mobile application for **Indian nurses** preparing for the *
 ## 📚 Module 1: Learning Module
 
 ### Purpose
+
 **Structured, sequential learning** to build foundational knowledge and master UK nursing protocols.
 
 ### Content Types
 
 **1. Text Lessons 📖**
+
 - Comprehensive study materials
 - Clinical scenarios with UK context
 - NMC Code explanations
 - Professional standards guidance
 
 **2. Video Lessons 🎬**
+
 - Scenario-based clinical videos
 - Procedural demonstrations
 - Expert nurse explanations
 - Cultural adaptation tips
 
 **3. Audio Podcasts 🎙️**
+
 - Conversational learning format
 - Listen while commuting
 - Clinical case discussions
 - Expert interviews
 
 **4. Flashcards 🃏**
+
 - Quick concept revision
 - Drug interactions
 - Protocols and guidelines
 - Spaced repetition
 
 **5. Embedded Questions ✍️**
+
 - After each lesson
 - Test comprehension
 - Immediate feedback
@@ -125,30 +135,32 @@ Jeeva Learning is a mobile application for **Indian nurses** preparing for the *
 Students must answer **80% of questions correctly** after each lesson to prove understanding before progressing.
 
 **Flow:**
+
 ```
 Read Lesson → Answer Questions → Score < 80% → Review & Retry
                                → Score ≥ 80% → Mark Complete → Next Lesson
 ```
 
 **Implementation:**
+
 ```javascript
 async function checkLessonMastery(userId, lessonId, score) {
-  const masteryThreshold = 0.80; // 80%
-  
+  const masteryThreshold = 0.8; // 80%
+
   if (score >= masteryThreshold) {
     // Mark lesson as completed
     await db.insert(learning_completions).values({
       user_id: userId,
       lesson_id: lessonId,
       score: score,
-      completed_at: new Date()
+      completed_at: new Date(),
     });
-    
-    return { passed: true, message: 'Great job! Lesson completed!' };
+
+    return { passed: true, message: "Great job! Lesson completed!" };
   } else {
-    return { 
-      passed: false, 
-      message: `You scored ${score * 100}%. Review the lesson and try again to reach 80%.` 
+    return {
+      passed: false,
+      message: `You scored ${score * 100}%. Review the lesson and try again to reach 80%.`,
     };
   }
 }
@@ -172,23 +184,27 @@ Lesson (e.g., Anticoagulants)
 ### UI Components
 
 **Module List Screen:**
+
 - Card-based layout
 - Progress indicator per module
 - Thumbnail images
 - "Continue Learning" button
 
 **Topic List Screen:**
+
 - Lessons per topic
 - Completion status (✓ completed, 🔒 locked, ▶️ in progress)
 - Total lessons and progress bar
 
 **Lesson Player:**
+
 - Multi-tab interface: Text | Video | Audio | Flashcards
 - Bookmark lessons
 - Audio controls (play, pause, speed)
 - Video player with subtitles
 
 **Lesson Quiz:**
+
 - MCQ format
 - Progress indicator (Question 3/5)
 - Submit and show score
@@ -199,11 +215,13 @@ Lesson (e.g., Anticoagulants)
 ## 🎯 Module 2: Practice Module
 
 ### Purpose
+
 **On-demand MCQ practice** on any topic, anytime, to reinforce learning and identify weak areas.
 
 ### Features
 
 **1. Topic Selection**
+
 - Students choose which topic to practice
 - No sequential restrictions (practice any topic)
 - Example topics:
@@ -212,18 +230,21 @@ Lesson (e.g., Anticoagulants)
   - Professional Standards → Safeguarding
 
 **2. Practice Session**
+
 - 10-20 questions per session (configurable)
 - Randomized question selection
 - Immediate feedback after each question
 - Explanation for correct/incorrect answers
 
 **3. Session Results**
+
 - Score (e.g., 15/20 = 75%)
 - Time taken
 - Topic-wise breakdown
 - Review incorrect answers
 
 **4. Performance Tracking**
+
 ```javascript
 {
   "topic": "Pharmacology",
@@ -249,6 +270,7 @@ Dashboard → Practice Module → Select Topic → Start Session
 ### Smart Question Selection
 
 **Algorithm:**
+
 1. Fetch questions from selected topic
 2. Prioritize questions user answered incorrectly before
 3. Mix with new questions
@@ -258,10 +280,10 @@ Dashboard → Practice Module → Select Topic → Start Session
 async function getQuestionsForPractice(userId, topicId, count = 20) {
   // Get previously incorrect questions
   const incorrectQuestions = await getIncorrectQuestions(userId, topicId, 10);
-  
+
   // Get new questions
   const newQuestions = await getRandomQuestions(topicId, 10);
-  
+
   // Combine and shuffle
   return shuffle([...incorrectQuestions, ...newQuestions]);
 }
@@ -272,23 +294,27 @@ async function getQuestionsForPractice(userId, topicId, count = 20) {
 ## 📝 Module 3: Mock Exam Module
 
 ### Purpose
+
 **Realistic CBT exam simulation** to prepare students for the actual Pearson VUE testing environment.
 
 ### Exam Structure
 
 **Part A: Numeracy**
+
 - 15 questions
 - 22.5 minutes
 - Pass: 13/15 (87%)
 - Calculator provided
 
 **Part B: Clinical Knowledge**
+
 - 60 questions
 - 90 minutes
 - Pass: ~42/60 (70%)
 - Covers all clinical topics
 
 **Professional Standards**
+
 - 50 questions
 - 75 minutes
 - NMC Code scenarios
@@ -297,24 +323,28 @@ async function getQuestionsForPractice(userId, topicId, count = 20) {
 ### Features
 
 **1. Exam Environment**
+
 - Timer countdown (real-time)
 - Question navigator (flag for review)
 - Review flagged questions
 - Cannot go back after submitting
 
 **2. Results Screen**
+
 - Pass/Fail status
 - Score breakdown by section
 - Correct vs incorrect
 - Time management analysis
 
 **3. Performance Report**
+
 - Compare with previous attempts
 - Weak topics identified
 - Recommended lessons for remediation
 - Score trend graph
 
 **4. Mock Exam History**
+
 - All past attempts
 - Date, score, pass/fail
 - Best score tracking
@@ -322,11 +352,13 @@ async function getQuestionsForPractice(userId, topicId, count = 20) {
 ### UI Components
 
 **Exam List:**
+
 - Part A, Part B, Professional Standards
 - "Start Mock Exam" button
 - Warning: "Cannot pause once started"
 
 **Exam Screen:**
+
 - Timer at top
 - Question number (e.g., 15/60)
 - MCQ options
@@ -334,6 +366,7 @@ async function getQuestionsForPractice(userId, topicId, count = 20) {
 - "Submit" button (with confirmation)
 
 **Results Screen:**
+
 ```
 ┌────────────────────────────┐
 │   Part B: Clinical Knowledge│
@@ -359,28 +392,33 @@ async function getQuestionsForPractice(userId, topicId, count = 20) {
 ## 🤖 AI JeevaBot (Phase 1)
 
 ### Purpose
+
 24/7 AI-powered nursing tutor for **clinical doubts, NMC Code guidance, and exam support**.
 
 ### Capabilities
 
 **1. Clinical Doubt Clearing 🏥**
+
 - "What's the antidote for warfarin overdose?" → Vitamin K explanation
 - "How to manage patient with COPD exacerbation?" → Priority nursing actions
 - "Explain Glasgow Coma Scale" → Detailed breakdown
 
 **2. NMC Code Guidance 📋**
+
 - Professional standards explanations
 - UK vs India nursing practice differences
 - Ethical scenario discussions
 - Safeguarding protocols
 
 **3. Study Support 📚**
+
 - Explains complex concepts
 - Clarifies pharmacology
 - Reviews clinical scenarios
 - Simplifies medical terminology
 
 **4. Exam Preparation 🎯**
+
 - Practice question explanations
 - "Why is this answer correct?"
 - Numeracy problem-solving steps
@@ -389,6 +427,7 @@ async function getQuestionsForPractice(userId, topicId, count = 20) {
 ### Context-Aware Responses
 
 **JeevaBot knows:**
+
 - Current lesson student is studying
 - Weak topics (< 70% accuracy)
 - Recent practice performance
@@ -396,15 +435,16 @@ async function getQuestionsForPractice(userId, topicId, count = 20) {
 - NMC CBT syllabus
 
 **Example:**
+
 ```
 Student: "I keep failing numeracy"
 
-JeevaBot: "I see you've attempted Part A mock 3 times. 
+JeevaBot: "I see you've attempted Part A mock 3 times.
 Your weak area is IV flow rate calculations. Let me help:
 
 Formula: (Volume × Drop factor) ÷ Time in minutes
 
-You're making this common mistake: Forgetting to 
+You're making this common mistake: Forgetting to
 convert hours to minutes!
 
 Want to practice 5 IV calculation questions right now?"
@@ -413,6 +453,7 @@ Want to practice 5 IV calculation questions right now?"
 ### UI Components
 
 **Chat Interface:**
+
 - Floating "Ask JeevaBot" button (bottom-right)
 - Chat screen with bubbles
 - Typing indicator
@@ -420,6 +461,7 @@ Want to practice 5 IV calculation questions right now?"
 - New conversation button
 
 **Rate Limiting:**
+
 - 50 messages/day per user
 - Message count indicator
 - Reset at midnight
@@ -431,6 +473,7 @@ Want to practice 5 IV calculation questions right now?"
 ### Profile Overview
 
 **Personal Information:**
+
 - Full name
 - Email, phone
 - Country
@@ -438,6 +481,7 @@ Want to practice 5 IV calculation questions right now?"
 - NMC exam attempts
 
 **Subscription Details:**
+
 - Current plan (30/60/90/120 days)
 - Days remaining
 - Expiry date
@@ -446,6 +490,7 @@ Want to practice 5 IV calculation questions right now?"
 ### Performance Dashboard 📈
 
 **Overall Progress:**
+
 ```
 ┌────────────────────────────┐
 │  📚 Lessons Completed      │
@@ -463,12 +508,14 @@ Want to practice 5 IV calculation questions right now?"
 ```
 
 **Learning Module Stats:**
+
 - Modules completed
 - Topics in progress
 - 80% mastery achievements
 - Pending lessons
 
 **Practice Module Stats:**
+
 ```
 ┌────────────────────────────┐
 │  Total Questions: 487      │
@@ -484,6 +531,7 @@ Want to practice 5 IV calculation questions right now?"
 ```
 
 **Mock Exam History:**
+
 ```
 ┌────────────────────────────┐
 │  Mock Exam Attempts: 5     │
@@ -527,6 +575,7 @@ Want to practice 5 IV calculation questions right now?"
 **Weekly Personalized Study Plan**
 
 Generated every week based on:
+
 - Practice session performance
 - Mock exam results
 - Learning completions
@@ -564,6 +613,7 @@ Generated every week based on:
 ```
 
 **Recommendation Algorithm:**
+
 ```javascript
 async function generateRecommendations(userId) {
   // Get performance data
@@ -571,17 +621,17 @@ async function generateRecommendations(userId) {
   const mockExams = await getMockExamResults(userId);
   const learningProgress = await getLearningProgress(userId);
   const subscription = await getSubscription(userId);
-  
+
   // Identify weak topics (< 70%)
-  const weakTopics = practiceStats.filter(t => t.accuracy < 0.70);
-  
+  const weakTopics = practiceStats.filter((t) => t.accuracy < 0.7);
+
   // AI prompt
   const prompt = `
 You are an NMC CBT exam preparation expert. Generate a personalized 
 study plan for this nursing student.
 
 STUDENT DATA:
-- Weak topics: ${weakTopics.map(t => `${t.name} (${t.accuracy}%)`)}
+- Weak topics: ${weakTopics.map((t) => `${t.name} (${t.accuracy}%)`)}
 - Mock exam scores: Part A ${mockExams.partA}/15, Part B ${mockExams.partB}/60
 - Days remaining: ${subscription.daysRemaining}
 - Recent activity: ${learningProgress.recentLessons.length} lessons
@@ -593,16 +643,16 @@ Generate:
 4. Exam readiness percentage
 5. Motivational message
   `;
-  
+
   const recommendation = await callGeminiAPI(prompt);
-  
+
   // Save recommendation
   await db.insert(ai_recommendations).values({
     user_id: userId,
     recommendation_data: recommendation,
-    created_at: new Date()
+    created_at: new Date(),
   });
-  
+
   return recommendation;
 }
 ```
@@ -627,12 +677,14 @@ Generate:
 ```
 
 **Features:**
+
 - Swipeable carousel if multiple heroes
 - CTA button links to content/route
 - Image from Supabase storage
 - Admin controls from portal
 
 **Data Source:**
+
 - Fetches from `hero_sections` table
 - Only `is_active = true` heroes shown
 - Ordered by `display_order` (ascending)
@@ -682,16 +734,19 @@ Generate:
 ### Authentication Methods
 
 **1. Email & Password**
+
 - Standard sign up/login
 - Email verification
 - Password reset
 
 **2. Google Sign-In**
+
 - OAuth 2.0
 - One-tap login
 - Auto-fill profile data
 
 **3. Apple ID Sign-In**
+
 - Required for iOS App Store
 - Secure authentication
 - Privacy-focused
@@ -723,6 +778,7 @@ Generate:
 ```
 
 **Profile Completion Screen:**
+
 ```
 ┌────────────────────────────┐
 │  Complete Your Profile     │
@@ -765,6 +821,7 @@ Generate:
 ### Trial Access
 
 **Free Trial Includes:**
+
 - ✅ 1 Learning Module (any one topic, full access)
 - ✅ 1 Practice Module (any one topic, unlimited practice)
 - ❌ Mock Exams (locked)
@@ -772,41 +829,49 @@ Generate:
 - 🔒 AI JeevaBot (10 messages/day or locked - TBD)
 
 **Content Gating Logic:**
+
 ```javascript
 function canAccessContent(subscription, contentType, contentId) {
   // Check active subscription
-  if (subscription.status === 'active' && subscription.end_date > new Date()) {
-    return { access: true, reason: 'Full Access' };
+  if (subscription.status === "active" && subscription.end_date > new Date()) {
+    return { access: true, reason: "Full Access" };
   }
-  
+
   // Trial mode restrictions
-  if (subscription.status === 'trial') {
+  if (subscription.status === "trial") {
     const trialContent = {
-      learning_modules: ['module-id-1'], // First learning module
-      practice_topics: ['topic-id-1'],   // First practice topic
+      learning_modules: ["module-id-1"], // First learning module
+      practice_topics: ["topic-id-1"], // First practice topic
     };
-    
-    if (contentType === 'learning' && trialContent.learning_modules.includes(contentId)) {
-      return { access: true, reason: 'Trial Access' };
+
+    if (
+      contentType === "learning" &&
+      trialContent.learning_modules.includes(contentId)
+    ) {
+      return { access: true, reason: "Trial Access" };
     }
-    
-    if (contentType === 'practice' && trialContent.practice_topics.includes(contentId)) {
-      return { access: true, reason: 'Trial Access' };
+
+    if (
+      contentType === "practice" &&
+      trialContent.practice_topics.includes(contentId)
+    ) {
+      return { access: true, reason: "Trial Access" };
     }
-    
-    if (contentType === 'mock_exam') {
-      return { access: false, reason: 'Upgrade to access Mock Exams' };
+
+    if (contentType === "mock_exam") {
+      return { access: false, reason: "Upgrade to access Mock Exams" };
     }
-    
-    return { access: false, reason: 'Upgrade for full access' };
+
+    return { access: false, reason: "Upgrade for full access" };
   }
-  
+
   // Expired subscription
-  return { access: false, reason: 'Your subscription has expired. Renew now!' };
+  return { access: false, reason: "Your subscription has expired. Renew now!" };
 }
 ```
 
 **UI Indicators:**
+
 ```
 [LOCKED 🔒] → Shows lock icon on locked content
 [TRIAL] → Shows trial badge on free content
@@ -820,6 +885,7 @@ function canAccessContent(subscription, contentType, contentId) {
 ### Design System
 
 **Colors:**
+
 - Primary: #007aff (iOS Blue)
 - Secondary: #34C759 (Success Green)
 - Warning: #FF9500 (Orange)
@@ -828,11 +894,13 @@ function canAccessContent(subscription, contentType, contentId) {
 - Text: #000000 (Black) / #8E8E93 (Gray)
 
 **Typography:**
+
 - Headings: SF Pro Display (iOS) / Roboto (Android)
 - Body: SF Pro Text / Roboto
 - Sizes: 28 (Title), 20 (Heading), 16 (Body), 14 (Caption)
 
 **Components:**
+
 - Cards with shadow
 - Rounded corners (8px radius)
 - Bottom tab navigation
@@ -864,18 +932,22 @@ Stack Navigators:
 ### Push Notifications
 
 **Study Reminders:**
+
 - "Time to study! You're on a 12-day streak 🔥"
 - "Complete today's lesson to maintain your streak"
 
 **Subscription Alerts:**
+
 - "Your subscription expires in 7 days. Renew now!"
 - "Last day of access! Continue your preparation"
 
 **Performance Updates:**
+
 - "You've improved Pharmacology to 78%! 🎉"
 - "New AI study plan generated for you"
 
 **Mock Exam Reminders:**
+
 - "Ready for a mock exam? Test your skills today!"
 
 ---
@@ -885,29 +957,34 @@ Stack Navigators:
 ### Events to Track
 
 **User Engagement:**
+
 - App opens (daily active users)
 - Session duration
 - Features used (learning, practice, mock, chat)
 
 **Learning Metrics:**
+
 - Lessons completed
 - Topics mastered (80%+)
 - Video watch time
 - Podcast listen time
 
 **Practice Metrics:**
+
 - Questions attempted
 - Accuracy per topic
 - Time per question
 - Retry rate
 
 **Mock Exam Metrics:**
+
 - Attempts per user
 - Pass rate
 - Average scores
 - Time management
 
 **Subscription Metrics:**
+
 - Trial → Paid conversion rate
 - Coupon usage
 - Revenue by plan
@@ -918,12 +995,14 @@ Stack Navigators:
 ## 🔒 Security & Privacy
 
 **Data Protection:**
+
 - All API calls authenticated with JWT
 - Supabase RLS policies enforce user data isolation
 - No API keys in mobile app code
 - Secure storage for auth tokens
 
 **Privacy:**
+
 - GDPR compliance
 - User data deletion on request
 - No third-party data sharing
@@ -934,16 +1013,19 @@ Stack Navigators:
 ## 🧪 Testing Strategy
 
 **Unit Tests:**
+
 - Business logic (mastery check, subscription validation)
 - Content gating logic
 - Score calculations
 
 **Integration Tests:**
+
 - API calls to Supabase
 - Authentication flows
 - Payment integration
 
 **E2E Tests:**
+
 - Complete user journeys
 - Registration → Profile → Learning → Practice → Mock
 - Payment flow (Stripe/Razorpay test mode)

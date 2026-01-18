@@ -1,4 +1,4 @@
-import React from 'react'
+import React from "react";
 import {
   Box,
   Typography,
@@ -13,7 +13,7 @@ import {
   Divider,
   CircularProgress,
   Button,
-} from '@mui/material'
+} from "@mui/material";
 import {
   CheckCircleOutlined,
   CancelOutlined,
@@ -25,83 +25,90 @@ import {
   CalendarTodayOutlined,
   AutorenewOutlined,
   SettingsOutlined,
-} from '@mui/icons-material'
-import { useSettings } from '@/hooks/useSettings'
-import { useNavigate } from 'react-router-dom'
+} from "@mui/icons-material";
+import { useSettings } from "@/hooks/useSettings";
+import { useNavigate } from "react-router-dom";
 
 interface AutomationRule {
-  id: string
-  title: string
-  description: string
-  icon: React.ReactNode
-  enabled: boolean
-  trigger: string
+  id: string;
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+  enabled: boolean;
+  trigger: string;
 }
 
 export const AutomationTab: React.FC = () => {
-  const { settings, isLoading } = useSettings()
-  const navigate = useNavigate()
+  const { settings, isLoading } = useSettings();
+  const navigate = useNavigate();
 
   if (isLoading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '400px' }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "400px",
+        }}
+      >
         <CircularProgress />
       </Box>
-    )
+    );
   }
 
   const automationRules: AutomationRule[] = [
     {
-      id: 'new_user_signup',
-      title: 'Welcome New Users',
-      description: 'Send a welcome notification when a new user signs up',
+      id: "new_user_signup",
+      title: "Welcome New Users",
+      description: "Send a welcome notification when a new user signs up",
       icon: <PersonAddOutlined />,
       enabled: settings?.newUserSignup ?? false,
-      trigger: 'User Registration',
+      trigger: "User Registration",
     },
     {
-      id: 'content_submitted',
-      title: 'Content Submitted',
-      description: 'Notify admins when new content is submitted for review',
+      id: "content_submitted",
+      title: "Content Submitted",
+      description: "Notify admins when new content is submitted for review",
       icon: <NotificationsActiveOutlined />,
       enabled: settings?.contentSubmitted ?? false,
-      trigger: 'Content Submission',
+      trigger: "Content Submission",
     },
     {
-      id: 'content_approved',
-      title: 'Content Approved',
-      description: 'Notify users when their content is approved',
+      id: "content_approved",
+      title: "Content Approved",
+      description: "Notify users when their content is approved",
       icon: <DoneOutlined />,
       enabled: settings?.contentApproved ?? false,
-      trigger: 'Content Approval',
+      trigger: "Content Approval",
     },
     {
-      id: 'content_rejected',
-      title: 'Content Rejected',
-      description: 'Notify users when their content is rejected',
+      id: "content_rejected",
+      title: "Content Rejected",
+      description: "Notify users when their content is rejected",
       icon: <CloseOutlined />,
       enabled: settings?.contentRejected ?? false,
-      trigger: 'Content Rejection',
+      trigger: "Content Rejection",
     },
     {
-      id: 'subscription_expiring',
-      title: 'Subscription Expiring',
-      description: 'Notify users 7, 3, and 1 day before subscription expires',
+      id: "subscription_expiring",
+      title: "Subscription Expiring",
+      description: "Notify users 7, 3, and 1 day before subscription expires",
       icon: <CalendarTodayOutlined />,
       enabled: settings?.subscriptionExpiring ?? false,
-      trigger: 'Subscription Status Check',
+      trigger: "Subscription Status Check",
     },
     {
-      id: 'subscription_renewed',
-      title: 'Subscription Renewed',
-      description: 'Send confirmation when subscription is renewed',
+      id: "subscription_renewed",
+      title: "Subscription Renewed",
+      description: "Send confirmation when subscription is renewed",
       icon: <AutorenewOutlined />,
       enabled: settings?.subscriptionRenewed ?? false,
-      trigger: 'Subscription Renewal',
+      trigger: "Subscription Renewal",
     },
-  ]
+  ];
 
-  const enabledCount = automationRules.filter((rule) => rule.enabled).length
+  const enabledCount = automationRules.filter((rule) => rule.enabled).length;
 
   return (
     <Box>
@@ -115,10 +122,17 @@ export const AutomationTab: React.FC = () => {
       </Box>
 
       <Alert severity="info" sx={{ mb: 3, borderRadius: 0 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
           <Box>
             <Typography variant="body2" fontWeight={500}>
-              {enabledCount} of {automationRules.length} automation rules are active
+              {enabledCount} of {automationRules.length} automation rules are
+              active
             </Typography>
             <Typography variant="caption" color="text.secondary">
               Manage automation settings in Platform Settings → Notifications
@@ -128,7 +142,7 @@ export const AutomationTab: React.FC = () => {
             variant="outlined"
             size="small"
             startIcon={<SettingsOutlined />}
-            onClick={() => navigate('/settings')}
+            onClick={() => navigate("/settings")}
             sx={{ borderRadius: 0 }}
           >
             Settings
@@ -145,12 +159,12 @@ export const AutomationTab: React.FC = () => {
                   sx={{
                     width: 40,
                     height: 40,
-                    borderRadius: '50%',
-                    bgcolor: rule.enabled ? 'success.light' : 'grey.200',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: rule.enabled ? 'success.dark' : 'grey.600',
+                    borderRadius: "50%",
+                    bgcolor: rule.enabled ? "success.light" : "grey.200",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: rule.enabled ? "success.dark" : "grey.600",
                   }}
                 >
                   {rule.icon}
@@ -158,14 +172,20 @@ export const AutomationTab: React.FC = () => {
               </ListItemIcon>
               <ListItemText
                 primary={
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                     <Typography variant="body1" fontWeight={500}>
                       {rule.title}
                     </Typography>
                     <Chip
-                      icon={rule.enabled ? <CheckCircleOutlined /> : <CancelOutlined />}
-                      label={rule.enabled ? 'Active' : 'Disabled'}
-                      color={rule.enabled ? 'success' : 'default'}
+                      icon={
+                        rule.enabled ? (
+                          <CheckCircleOutlined />
+                        ) : (
+                          <CancelOutlined />
+                        )
+                      }
+                      label={rule.enabled ? "Active" : "Disabled"}
+                      color={rule.enabled ? "success" : "default"}
                       size="small"
                       sx={{ ml: 1 }}
                     />
@@ -176,7 +196,14 @@ export const AutomationTab: React.FC = () => {
                     <Typography variant="body2" color="text.secondary">
                       {rule.description}
                     </Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                        mt: 1,
+                      }}
+                    >
                       {settings?.pushNotifications ? (
                         <Chip
                           icon={<NotificationsActiveOutlined />}
@@ -186,9 +213,18 @@ export const AutomationTab: React.FC = () => {
                         />
                       ) : null}
                       {settings?.emailNotifications ? (
-                        <Chip icon={<EmailOutlined />} label="Email" size="small" variant="outlined" />
+                        <Chip
+                          icon={<EmailOutlined />}
+                          label="Email"
+                          size="small"
+                          variant="outlined"
+                        />
                       ) : null}
-                      <Typography variant="caption" color="text.secondary" sx={{ ml: 'auto' }}>
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{ ml: "auto" }}
+                      >
                         Trigger: {rule.trigger}
                       </Typography>
                     </Box>
@@ -207,7 +243,8 @@ export const AutomationTab: React.FC = () => {
           Note: Automation Features Coming Soon
         </Typography>
         <Typography variant="caption">
-          The automation rules are displayed here for visibility. To activate them, you'll need to:
+          The automation rules are displayed here for visibility. To activate
+          them, you'll need to:
           <br />
           1. Create Supabase Edge Functions to handle the triggers
           <br />
@@ -216,10 +253,11 @@ export const AutomationTab: React.FC = () => {
           3. Configure notification templates for each rule
           <br />
           <br />
-          These settings control whether automated notifications can be sent. The actual automation
-          logic will be implemented in Phase 4 (Supabase Edge Functions).
+          These settings control whether automated notifications can be sent.
+          The actual automation logic will be implemented in Phase 4 (Supabase
+          Edge Functions).
         </Typography>
       </Alert>
     </Box>
-  )
-}
+  );
+};

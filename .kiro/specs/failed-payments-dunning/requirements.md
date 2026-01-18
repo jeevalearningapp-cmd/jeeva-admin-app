@@ -161,4 +161,3 @@ This document specifies the requirements for implementing a Failed Payments & Du
 3. WHEN a payment method is updated after a failure THEN the System SHALL automatically trigger a retry attempt within 1 hour
 4. WHEN generating recovery reports THEN the System SHALL show the percentage of customers who updated payment methods after receiving notifications
 5. WHEN a payment method is updated THEN the System SHALL cancel any pending grace period suspension
-

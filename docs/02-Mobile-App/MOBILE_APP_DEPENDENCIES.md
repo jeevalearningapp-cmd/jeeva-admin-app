@@ -3,6 +3,7 @@
 ## Required Dependencies for React Native/Expo App
 
 ### Core Navigation
+
 ```json
 {
   "@react-navigation/native": "^6.1.9",
@@ -13,6 +14,7 @@
 ```
 
 ### State Management & Data Fetching
+
 ```json
 {
   "@tanstack/react-query": "^5.17.0",
@@ -21,6 +23,7 @@
 ```
 
 ### Supabase & API
+
 ```json
 {
   "@supabase/supabase-js": "^2.38.4",
@@ -29,6 +32,7 @@
 ```
 
 ### UI Components & Icons
+
 ```json
 {
   "react-native-vector-icons": "^10.0.3",
@@ -37,6 +41,7 @@
 ```
 
 ### Media Players
+
 ```json
 {
   "expo-av": "^13.10.4",
@@ -45,6 +50,7 @@
 ```
 
 ### Flashcards & Animations
+
 ```json
 {
   "react-native-reanimated": "^3.6.1",
@@ -53,6 +59,7 @@
 ```
 
 ### Utilities
+
 ```json
 {
   "date-fns": "^3.0.6",
@@ -63,6 +70,7 @@
 ## Installation Commands
 
 ### Using Expo (Recommended)
+
 ```bash
 npx expo install @react-navigation/native @react-navigation/native-stack
 npx expo install react-native-screens react-native-safe-area-context
@@ -76,17 +84,20 @@ npm install date-fns clsx
 ### Additional Dependencies for Features
 
 #### For Rich Text Display (Lesson Content)
+
 ```bash
 npm install react-native-render-html
 ```
 
 #### For Progress Tracking
+
 ```bash
 npm install react-native-circular-progress
 npm install react-native-progress
 ```
 
 #### For Authentication (Google/Apple Sign-In)
+
 ```bash
 npx expo install expo-auth-session expo-web-browser
 npx expo install @react-native-google-signin/google-signin
@@ -94,12 +105,14 @@ npx expo install expo-apple-authentication
 ```
 
 #### For Payment Integration
+
 ```bash
 npm install @stripe/stripe-react-native
 npm install react-native-razorpay
 ```
 
 #### For Notifications
+
 ```bash
 npx expo install expo-notifications
 ```
@@ -107,19 +120,19 @@ npx expo install expo-notifications
 ## Configuration Files
 
 ### babel.config.js
+
 ```javascript
-module.exports = function(api) {
+module.exports = function (api) {
   api.cache(true);
   return {
-    presets: ['babel-preset-expo'],
-    plugins: [
-      'react-native-reanimated/plugin',
-    ],
+    presets: ["babel-preset-expo"],
+    plugins: ["react-native-reanimated/plugin"],
   };
 };
 ```
 
 ### app.json / app.config.js
+
 ```json
 {
   "expo": {
@@ -139,6 +152,7 @@ module.exports = function(api) {
 ## Environment Variables
 
 Create `.env` file:
+
 ```
 EXPO_PUBLIC_SUPABASE_URL=your_supabase_url
 EXPO_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
@@ -149,6 +163,7 @@ EXPO_PUBLIC_RAZORPAY_KEY_ID=your_razorpay_key
 ## TypeScript Types
 
 Ensure `tsconfig.json` includes:
+
 ```json
 {
   "extends": "expo/tsconfig.base",
@@ -164,7 +179,9 @@ Ensure `tsconfig.json` includes:
 ## iOS Specific
 
 ### Podfile Configuration
+
 After installing dependencies, run:
+
 ```bash
 cd ios && pod install && cd ..
 ```
@@ -172,13 +189,16 @@ cd ios && pod install && cd ..
 ## Android Specific
 
 ### android/app/build.gradle
+
 Ensure minimum SDK version:
+
 ```gradle
 minSdkVersion = 21
 targetSdkVersion = 33
 ```
 
 ## Testing Dependencies
+
 ```bash
 npm install --save-dev @testing-library/react-native jest-expo
 ```
@@ -237,6 +257,7 @@ npm install --save-dev @testing-library/react-native jest-expo
 ## Troubleshooting
 
 ### iOS Build Issues
+
 ```bash
 cd ios
 rm -rf Pods Podfile.lock
@@ -246,6 +267,7 @@ cd ..
 ```
 
 ### Android Build Issues
+
 ```bash
 cd android
 ./gradlew clean
@@ -253,6 +275,7 @@ cd ..
 ```
 
 ### Metro Bundler Cache
+
 ```bash
 npx expo start --clear
 ```

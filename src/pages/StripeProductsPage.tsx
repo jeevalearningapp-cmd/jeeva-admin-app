@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -26,123 +26,123 @@ import {
   Card,
   CardContent,
   Tooltip,
-} from '@mui/material'
-import { 
-  AddOutlined as AddIcon, 
+} from "@mui/material";
+import {
+  AddOutlined as AddIcon,
   DeleteOutlined as DeleteIcon,
   PreviewOutlined as PreviewIcon,
   WarningAmberOutlined as WarningIcon,
-} from '@mui/icons-material'
-import { useSnackbar } from 'notistack'
-import { getApiUrl } from '@/config/api'
+} from "@mui/icons-material";
+import { useSnackbar } from "notistack";
+import { getApiUrl } from "@/config/api";
 
 interface Price {
-  id: string
-  stripe_product_id: string
-  stripe_price_id: string
-  currency: string
-  amount: number
-  country_code: string
-  plan_name: string
-  plan_duration_days: number
-  is_active: boolean
+  id: string;
+  stripe_product_id: string;
+  stripe_price_id: string;
+  currency: string;
+  amount: number;
+  country_code: string;
+  plan_name: string;
+  plan_duration_days: number;
+  is_active: boolean;
 }
 
 interface StripeProduct {
-  id: string
-  name: string
-  description?: string
+  id: string;
+  name: string;
+  description?: string;
 }
 
 export const StripeProductsPage: React.FC = () => {
-  const [prices, setPrices] = useState<Price[]>([])
-  const [stripeProducts, setStripeProducts] = useState<StripeProduct[]>([])
-  const [loading, setLoading] = useState(true)
-  const [submitting, setSubmitting] = useState(false)
-  const [previewLoading, setPreviewLoading] = useState(false)
-  const [dialogOpen, setDialogOpen] = useState(false)
-  const [createProductDialogOpen, setCreateProductDialogOpen] = useState(false)
+  const [prices, setPrices] = useState<Price[]>([]);
+  const [stripeProducts, setStripeProducts] = useState<StripeProduct[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [previewLoading, setPreviewLoading] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [createProductDialogOpen, setCreateProductDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
-    stripe_product_id: '',
-    amount: '',
-    plan_name: '',
-    plan_duration_days: '30',
-  })
+    stripe_product_id: "",
+    amount: "",
+    plan_name: "",
+    plan_duration_days: "30",
+  });
   const [productFormData, setProductFormData] = useState({
-    name: '',
-    description: '',
-  })
-  const { enqueueSnackbar } = useSnackbar()
-  const apiUrl = getApiUrl()
+    name: "",
+    description: "",
+  });
+  const { enqueueSnackbar } = useSnackbar();
+  const apiUrl = getApiUrl();
 
   useEffect(() => {
-    fetchInitialData()
-  }, [])
+    fetchInitialData();
+  }, []);
 
   const fetchInitialData = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
-      await Promise.all([fetchPrices(), fetchStripeProducts()])
+      await Promise.all([fetchPrices(), fetchStripeProducts()]);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const fetchPrices = async () => {
     try {
-      const response = await fetch(`${apiUrl}/stripe-admin/prices`)
-      if (!response.ok) throw new Error('Failed to fetch prices')
-      const data = await response.json()
-      setPrices(data || [])
+      const response = await fetch(`${apiUrl}/stripe-admin/prices`);
+      if (!response.ok) throw new Error("Failed to fetch prices");
+      const data = await response.json();
+      setPrices(data || []);
     } catch (err: any) {
-      enqueueSnackbar('Failed to load prices', { variant: 'error' })
+      enqueueSnackbar("Failed to load prices", { variant: "error" });
     }
-  }
+  };
 
   const fetchStripeProducts = async () => {
     try {
-      const response = await fetch(`${apiUrl}/stripe-admin/products`)
-      if (!response.ok) throw new Error('Failed to fetch products')
-      const data = await response.json()
-      setStripeProducts(data || [])
+      const response = await fetch(`${apiUrl}/stripe-admin/products`);
+      if (!response.ok) throw new Error("Failed to fetch products");
+      const data = await response.json();
+      setStripeProducts(data || []);
     } catch (err: any) {
-      console.error('Failed to load Stripe products:', err)
+      console.error("Failed to load Stripe products:", err);
     }
-  }
+  };
 
   const handleCreateProduct = async () => {
     try {
       if (!productFormData.name.trim()) {
-        enqueueSnackbar('Product name is required', { variant: 'warning' })
-        return
+        enqueueSnackbar("Product name is required", { variant: "warning" });
+        return;
       }
 
-      setSubmitting(true)
+      setSubmitting(true);
       const response = await fetch(`${apiUrl}/stripe-admin/products`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: productFormData.name,
           description: productFormData.description,
         }),
-      })
+      });
 
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || 'Failed to create product')
+        const error = await response.json();
+        throw new Error(error.error || "Failed to create product");
       }
 
-      const result = await response.json()
-      enqueueSnackbar('Product created successfully', { variant: 'success' })
-      setProductFormData({ name: '', description: '' })
-      setCreateProductDialogOpen(false)
-      await fetchStripeProducts()
+      const result = await response.json();
+      enqueueSnackbar("Product created successfully", { variant: "success" });
+      setProductFormData({ name: "", description: "" });
+      setCreateProductDialogOpen(false);
+      await fetchStripeProducts();
     } catch (err: any) {
-      enqueueSnackbar(`Error: ${err.message}`, { variant: 'error' })
+      enqueueSnackbar(`Error: ${err.message}`, { variant: "error" });
     } finally {
-      setSubmitting(false)
+      setSubmitting(false);
     }
-  }
+  };
 
   const handleSubmit = async () => {
     try {
@@ -151,115 +151,141 @@ export const StripeProductsPage: React.FC = () => {
         !formData.amount ||
         !formData.plan_name
       ) {
-        enqueueSnackbar('Please fill all required fields', { variant: 'warning' })
-        return
+        enqueueSnackbar("Please fill all required fields", {
+          variant: "warning",
+        });
+        return;
       }
 
-      setSubmitting(true)
+      setSubmitting(true);
       const response = await fetch(`${apiUrl}/stripe-admin/prices`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           stripe_product_id: formData.stripe_product_id,
-          currency: 'gbp', // GBP-only for Adaptive Pricing
+          currency: "gbp", // GBP-only for Adaptive Pricing
           amount: parseFloat(formData.amount),
           plan_name: formData.plan_name,
           plan_duration_days: parseInt(formData.plan_duration_days),
         }),
-      })
+      });
 
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || 'Failed to add price')
+        const error = await response.json();
+        throw new Error(error.error || "Failed to add price");
       }
 
-      const result = await response.json()
-      enqueueSnackbar('Price added successfully to Stripe & database', { variant: 'success' })
-      setDialogOpen(false)
+      const result = await response.json();
+      enqueueSnackbar("Price added successfully to Stripe & database", {
+        variant: "success",
+      });
+      setDialogOpen(false);
       setFormData({
-        stripe_product_id: '',
-        amount: '',
-        plan_name: '',
-        plan_duration_days: '30',
-      })
-      await fetchPrices()
+        stripe_product_id: "",
+        amount: "",
+        plan_name: "",
+        plan_duration_days: "30",
+      });
+      await fetchPrices();
     } catch (err: any) {
-      enqueueSnackbar(`Error: ${err.message}`, { variant: 'error' })
+      enqueueSnackbar(`Error: ${err.message}`, { variant: "error" });
     } finally {
-      setSubmitting(false)
+      setSubmitting(false);
     }
-  }
+  };
 
   const handlePreviewAdaptivePricing = async () => {
     // Find the first active GBP price to use for preview
-    const gbpPrice = prices.find(p => p.currency.toUpperCase() === 'GBP' && p.is_active)
-    
+    const gbpPrice = prices.find(
+      (p) => p.currency.toUpperCase() === "GBP" && p.is_active,
+    );
+
     if (!gbpPrice) {
-      enqueueSnackbar('No active GBP price found. Create a GBP price first to preview Adaptive Pricing.', { variant: 'warning' })
-      return
+      enqueueSnackbar(
+        "No active GBP price found. Create a GBP price first to preview Adaptive Pricing.",
+        { variant: "warning" },
+      );
+      return;
     }
 
     try {
-      setPreviewLoading(true)
+      setPreviewLoading(true);
       const response = await fetch(`${apiUrl}/checkout/create-session`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           planPriceIdGbp: gbpPrice.stripe_price_id,
-          userId: 'preview-test-user',
-          customerEmail: 'test+adaptive_preview@jeeva-app.com',
+          userId: "preview-test-user",
+          customerEmail: "test+adaptive_preview@jeeva-app.com",
           successUrl: `${window.location.origin}/stripe-products?preview=success`,
           cancelUrl: `${window.location.origin}/stripe-products?preview=cancelled`,
         }),
-      })
+      });
 
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || 'Failed to create preview session')
+        const error = await response.json();
+        throw new Error(error.error || "Failed to create preview session");
       }
 
-      const { sessionUrl } = await response.json()
-      
+      const { sessionUrl } = await response.json();
+
       // Open checkout in new tab for preview
-      window.open(sessionUrl, '_blank')
-      enqueueSnackbar('Preview checkout opened in new tab. Stripe will show local currency based on your location.', { variant: 'info' })
+      window.open(sessionUrl, "_blank");
+      enqueueSnackbar(
+        "Preview checkout opened in new tab. Stripe will show local currency based on your location.",
+        { variant: "info" },
+      );
     } catch (err: any) {
-      enqueueSnackbar(`Error: ${err.message}`, { variant: 'error' })
+      enqueueSnackbar(`Error: ${err.message}`, { variant: "error" });
     } finally {
-      setPreviewLoading(false)
+      setPreviewLoading(false);
     }
-  }
+  };
 
   const handleDeletePrice = async (priceId: string) => {
-    if (!window.confirm('Are you sure you want to deactivate this price?')) return
+    if (!window.confirm("Are you sure you want to deactivate this price?"))
+      return;
 
     try {
       const response = await fetch(`${apiUrl}/stripe-admin/prices/${priceId}`, {
-        method: 'DELETE',
-      })
+        method: "DELETE",
+      });
 
-      if (!response.ok) throw new Error('Failed to delete price')
+      if (!response.ok) throw new Error("Failed to delete price");
 
-      enqueueSnackbar('Price deactivated successfully', { variant: 'success' })
-      await fetchPrices()
+      enqueueSnackbar("Price deactivated successfully", { variant: "success" });
+      await fetchPrices();
     } catch (err: any) {
-      enqueueSnackbar(`Error: ${err.message}`, { variant: 'error' })
+      enqueueSnackbar(`Error: ${err.message}`, { variant: "error" });
     }
-  }
+  };
 
-  if (loading) return <CircularProgress />
+  if (loading) return <CircularProgress />;
 
   return (
     <Box sx={{ p: 3 }}>
       {/* Header */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 3,
+        }}
+      >
         <Typography variant="h5">Stripe Products & Prices</Typography>
         <Stack direction="row" spacing={2}>
           <Tooltip title="Preview how Adaptive Pricing displays to customers">
             <Button
               variant="outlined"
               color="info"
-              startIcon={previewLoading ? <CircularProgress size={18} /> : <PreviewIcon />}
+              startIcon={
+                previewLoading ? (
+                  <CircularProgress size={18} />
+                ) : (
+                  <PreviewIcon />
+                )
+              }
               onClick={handlePreviewAdaptivePricing}
               disabled={previewLoading}
             >
@@ -284,16 +310,14 @@ export const StripeProductsPage: React.FC = () => {
       </Box>
 
       {/* Adaptive Pricing Warning Banner */}
-      <Alert 
-        severity="warning" 
-        icon={<WarningIcon />}
-        sx={{ mb: 3 }}
-      >
+      <Alert severity="warning" icon={<WarningIcon />} sx={{ mb: 3 }}>
         <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
           Adaptive Pricing Enabled
         </Typography>
         <Typography variant="body2">
-          Do not create INR/USD Prices manually. Stripe Adaptive Pricing automatically converts GBP prices to local currencies (INR, USD, etc.) at checkout based on customer location.
+          Do not create INR/USD Prices manually. Stripe Adaptive Pricing
+          automatically converts GBP prices to local currencies (INR, USD, etc.)
+          at checkout based on customer location.
         </Typography>
       </Alert>
 
@@ -304,7 +328,7 @@ export const StripeProductsPage: React.FC = () => {
       <TableContainer component={Paper} sx={{ mb: 4 }}>
         <Table>
           <TableHead>
-            <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
+            <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
               <TableCell>Product ID</TableCell>
               <TableCell>Plan Name</TableCell>
               <TableCell>Country</TableCell>
@@ -319,13 +343,17 @@ export const StripeProductsPage: React.FC = () => {
             {prices.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={8} align="center" sx={{ py: 3 }}>
-                  <Typography color="textSecondary">No prices configured yet</Typography>
+                  <Typography color="textSecondary">
+                    No prices configured yet
+                  </Typography>
                 </TableCell>
               </TableRow>
             ) : (
               prices.map((price) => (
                 <TableRow key={price.id}>
-                  <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.85rem' }}>
+                  <TableCell
+                    sx={{ fontFamily: "monospace", fontSize: "0.85rem" }}
+                  >
                     {price.stripe_product_id.slice(0, 12)}...
                   </TableCell>
                   <TableCell>{price.plan_name}</TableCell>
@@ -335,8 +363,8 @@ export const StripeProductsPage: React.FC = () => {
                   <TableCell>{price.plan_duration_days} days</TableCell>
                   <TableCell>
                     <Chip
-                      label={price.is_active ? 'Active' : 'Inactive'}
-                      color={price.is_active ? 'success' : 'default'}
+                      label={price.is_active ? "Active" : "Inactive"}
+                      color={price.is_active ? "success" : "default"}
                       size="small"
                     />
                   </TableCell>
@@ -363,18 +391,31 @@ export const StripeProductsPage: React.FC = () => {
           <Typography variant="h6" sx={{ mb: 2 }}>
             Available Stripe Products ({stripeProducts.length})
           </Typography>
-          <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 2, mb: 4 }}>
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
+              gap: 2,
+              mb: 4,
+            }}
+          >
             {stripeProducts.map((product) => (
               <Card key={product.id}>
                 <CardContent>
                   <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
                     {product.name}
                   </Typography>
-                  <Typography variant="caption" sx={{ fontFamily: 'monospace', color: 'textSecondary' }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ fontFamily: "monospace", color: "textSecondary" }}
+                  >
                     {product.id}
                   </Typography>
                   {product.description && (
-                    <Typography variant="body2" sx={{ mt: 1, color: 'textSecondary' }}>
+                    <Typography
+                      variant="body2"
+                      sx={{ mt: 1, color: "textSecondary" }}
+                    >
                       {product.description}
                     </Typography>
                   )}
@@ -386,17 +427,25 @@ export const StripeProductsPage: React.FC = () => {
       )}
 
       {/* Add Price Dialog */}
-      <Dialog open={dialogOpen} onClose={() => !submitting && setDialogOpen(false)} maxWidth="sm" fullWidth>
+      <Dialog
+        open={dialogOpen}
+        onClose={() => !submitting && setDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+      >
         <DialogTitle>Add New GBP Price</DialogTitle>
         <DialogContent sx={{ pt: 2 }}>
           <Alert severity="info" sx={{ mb: 2 }}>
-            Prices are created in GBP only. Stripe Adaptive Pricing will automatically convert to local currencies at checkout.
+            Prices are created in GBP only. Stripe Adaptive Pricing will
+            automatically convert to local currencies at checkout.
           </Alert>
           <FormControl fullWidth margin="normal">
             <InputLabel>Stripe Product</InputLabel>
             <Select
               value={formData.stripe_product_id}
-              onChange={(e) => setFormData({ ...formData, stripe_product_id: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, stripe_product_id: e.target.value })
+              }
               label="Stripe Product"
             >
               {stripeProducts.map((p) => (
@@ -411,7 +460,9 @@ export const StripeProductsPage: React.FC = () => {
             label="Plan Name"
             margin="normal"
             value={formData.plan_name}
-            onChange={(e) => setFormData({ ...formData, plan_name: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, plan_name: e.target.value })
+            }
             placeholder="Premium Monthly"
           />
           <TextField
@@ -427,9 +478,11 @@ export const StripeProductsPage: React.FC = () => {
             label="Amount (GBP)"
             margin="normal"
             type="number"
-            inputProps={{ step: '0.01', min: '0' }}
+            inputProps={{ step: "0.01", min: "0" }}
             value={formData.amount}
-            onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, amount: e.target.value })
+            }
             placeholder="25.00"
             helperText="Enter amount in GBP (e.g., 25.00 for £25)"
           />
@@ -437,7 +490,9 @@ export const StripeProductsPage: React.FC = () => {
             <InputLabel>Duration</InputLabel>
             <Select
               value={formData.plan_duration_days}
-              onChange={(e) => setFormData({ ...formData, plan_duration_days: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, plan_duration_days: e.target.value })
+              }
               label="Duration"
             >
               <MenuItem value="30">30 Days (1 Month)</MenuItem>
@@ -450,8 +505,13 @@ export const StripeProductsPage: React.FC = () => {
           <Button onClick={() => setDialogOpen(false)} disabled={submitting}>
             Cancel
           </Button>
-          <Button onClick={handleSubmit} variant="contained" disabled={submitting} sx={{ minWidth: '100px' }}>
-            {submitting ? <CircularProgress size={24} /> : 'Add GBP Price'}
+          <Button
+            onClick={handleSubmit}
+            variant="contained"
+            disabled={submitting}
+            sx={{ minWidth: "100px" }}
+          >
+            {submitting ? <CircularProgress size={24} /> : "Add GBP Price"}
           </Button>
         </DialogActions>
       </Dialog>
@@ -470,7 +530,9 @@ export const StripeProductsPage: React.FC = () => {
             label="Product Name"
             margin="normal"
             value={productFormData.name}
-            onChange={(e) => setProductFormData({ ...productFormData, name: e.target.value })}
+            onChange={(e) =>
+              setProductFormData({ ...productFormData, name: e.target.value })
+            }
             placeholder="Premium Plan"
           />
           <TextField
@@ -480,24 +542,32 @@ export const StripeProductsPage: React.FC = () => {
             multiline
             rows={3}
             value={productFormData.description}
-            onChange={(e) => setProductFormData({ ...productFormData, description: e.target.value })}
+            onChange={(e) =>
+              setProductFormData({
+                ...productFormData,
+                description: e.target.value,
+              })
+            }
             placeholder="Add product description..."
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setCreateProductDialogOpen(false)} disabled={submitting}>
+          <Button
+            onClick={() => setCreateProductDialogOpen(false)}
+            disabled={submitting}
+          >
             Cancel
           </Button>
           <Button
             onClick={handleCreateProduct}
             variant="contained"
             disabled={submitting}
-            sx={{ minWidth: '100px' }}
+            sx={{ minWidth: "100px" }}
           >
-            {submitting ? <CircularProgress size={24} /> : 'Create'}
+            {submitting ? <CircularProgress size={24} /> : "Create"}
           </Button>
         </DialogActions>
       </Dialog>
     </Box>
-  )
-}
+  );
+};

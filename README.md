@@ -9,12 +9,14 @@ The Jeeva Admin Portal is a full-featured web application designed to manage all
 ## ✨ Key Features
 
 ### 🔐 Authentication & Authorization
+
 - Secure login with Supabase authentication
 - Role-based access control (Superadmin, Editor, Moderator)
 - Protected routes with permission validation
 - Admin user management
 
 ### 📚 Content Management
+
 - **Hierarchical Content Structure**: Modules → Topics → Lessons → Questions/Flashcards
 - **CRUD Operations**: Create, read, update, and delete all content types
 - **CSV Bulk Upload**: Mass import lessons, questions, and flashcards with validation
@@ -22,6 +24,7 @@ The Jeeva Admin Portal is a full-featured web application designed to manage all
 - **Content Approvals**: Workflow system for reviewing and approving content
 
 ### 👥 User Management
+
 - User profile management
 - User activity tracking
 - Search and pagination
@@ -29,6 +32,7 @@ The Jeeva Admin Portal is a full-featured web application designed to manage all
 - Admin user role assignment
 
 ### 💳 Subscription Management
+
 - Subscription plans CRUD
 - User subscription tracking
 - Payment analytics
@@ -36,6 +40,7 @@ The Jeeva Admin Portal is a full-featured web application designed to manage all
 - Expiring subscription reminders
 
 ### 📊 Analytics & Dashboard
+
 - Real-time metrics and KPIs
 - Data visualizations with charts
 - Date-range filtering
@@ -44,6 +49,7 @@ The Jeeva Admin Portal is a full-featured web application designed to manage all
 - System status monitoring
 
 ### 📧 Email System
+
 - Brevo integration for transactional emails
 - Welcome emails with confirmation links
 - Subscription confirmations
@@ -52,6 +58,7 @@ The Jeeva Admin Portal is a full-featured web application designed to manage all
 - Email testing interface
 
 ### ⚙️ Settings & Configuration
+
 - Platform settings management
 - Email template configuration
 - Security settings
@@ -60,6 +67,7 @@ The Jeeva Admin Portal is a full-featured web application designed to manage all
 ## 🛠️ Tech Stack
 
 ### Frontend
+
 - **Framework**: React 18 with TypeScript
 - **Build Tool**: Vite 5
 - **UI Library**: Material-UI (MUI) v7
@@ -72,11 +80,13 @@ The Jeeva Admin Portal is a full-featured web application designed to manage all
 - **Utilities**: date-fns, clsx
 
 ### Backend
+
 - **BaaS**: Supabase (PostgreSQL, Auth, Storage)
 - **Email API**: Express.js server with Brevo
 - **Authentication**: Supabase Auth with RLS policies
 
 ### Development Tools
+
 - **Language**: TypeScript
 - **Testing**: Vitest, React Testing Library
 - **Code Quality**: ESLint, TypeScript strict mode
@@ -84,6 +94,7 @@ The Jeeva Admin Portal is a full-featured web application designed to manage all
 ## 🚀 Getting Started
 
 ### Prerequisites
+
 - Node.js 18+ and npm
 - Supabase account and project
 - Brevo API key & SMTP credentials (for email functionality)
@@ -91,19 +102,22 @@ The Jeeva Admin Portal is a full-featured web application designed to manage all
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/Jeeva-Edtech-app/jeeva-admin-portal.git
    cd jeeva-admin-portal
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
 
 3. **Set up environment variables**
-   
+
    Create a `.env` file in the root directory:
+
    ```env
    VITE_SUPABASE_URL=your_supabase_project_url
    VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
@@ -116,10 +130,11 @@ The Jeeva Admin Portal is a full-featured web application designed to manage all
    - Follow instructions in `database/migrations/SETUP_INSTRUCTIONS.md`
 
 5. **Run the development servers**
+
    ```bash
    npm run dev
    ```
-   
+
    This starts:
    - Vite dev server on port 5000 (frontend)
    - Express API server on port 3001 (email service)
@@ -174,16 +189,17 @@ jeeva-admin-portal/
 
 ## 🔑 Environment Variables
 
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `VITE_SUPABASE_URL` | Your Supabase project URL | Yes |
-| `VITE_SUPABASE_ANON_KEY` | Your Supabase anonymous key | Yes |
-| `BREVO_API_KEY` | Your Brevo API key for emails | Yes |
-| `BREVO_SMTP_KEY` | Your Brevo SMTP key for emails | Yes |
+| Variable                 | Description                    | Required |
+| ------------------------ | ------------------------------ | -------- |
+| `VITE_SUPABASE_URL`      | Your Supabase project URL      | Yes      |
+| `VITE_SUPABASE_ANON_KEY` | Your Supabase anonymous key    | Yes      |
+| `BREVO_API_KEY`          | Your Brevo API key for emails  | Yes      |
+| `BREVO_SMTP_KEY`         | Your Brevo SMTP key for emails | Yes      |
 
 ## 🎨 Features in Detail
 
 ### Content Management System
+
 - **Modules**: Top-level course modules with descriptions and icons
 - **Topics**: Organized topics within modules
 - **Lessons**: Rich content lessons with text, audio, and media
@@ -191,12 +207,14 @@ jeeva-admin-portal/
 - **Flashcards**: Study flashcards with front/back content
 
 ### Email Integration
+
 - Backend API server securely handles email sending
 - Vite proxy configuration for seamless frontend-backend communication
 - Template-based email system stored in Supabase
 - Test interface at `/email-test` (Superadmin only)
 
 ### Role-Based Access
+
 - **Superadmin**: Full system access
 - **Editor**: Content and user management
 - **Moderator**: Content approval and review
@@ -211,11 +229,13 @@ jeeva-admin-portal/
 ## 🧪 Testing
 
 Run the test suite:
+
 ```bash
 npm test
 ```
 
 Run tests with UI:
+
 ```bash
 npm run test:ui
 ```
@@ -227,7 +247,6 @@ npm run test:ui
 - Audio setup guide in `database/migrations/AUDIO_SETUP_INSTRUCTIONS.md`
 
 ## 🚢 Deployment
-
 
 ## 👨‍💻 Developer
 

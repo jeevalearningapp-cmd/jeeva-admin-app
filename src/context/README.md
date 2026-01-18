@@ -9,33 +9,29 @@ The AuthContext manages authentication state throughout the application using Su
 Already configured in `App.tsx`:
 
 ```tsx
-import { AuthProvider } from './context'
+import { AuthProvider } from "./context";
 
 <AuthProvider>
   <YourApp />
-</AuthProvider>
+</AuthProvider>;
 ```
 
 ### Usage
 
 ```tsx
-import { useAuth } from '@/context'
+import { useAuth } from "@/context";
 
 function MyComponent() {
-  const { 
-    user,        // Supabase user object
-    adminUser,   // Admin user from admin_users table
-    session,     // Current session
-    loading,     // Auth loading state
-    login,       // Login function
-    logout       // Logout function
-  } = useAuth()
+  const {
+    user, // Supabase user object
+    adminUser, // Admin user from admin_users table
+    session, // Current session
+    loading, // Auth loading state
+    login, // Login function
+    logout, // Logout function
+  } = useAuth();
 
-  return (
-    <div>
-      {adminUser && <p>Role: {adminUser.role}</p>}
-    </div>
-  )
+  return <div>{adminUser && <p>Role: {adminUser.role}</p>}</div>;
 }
 ```
 

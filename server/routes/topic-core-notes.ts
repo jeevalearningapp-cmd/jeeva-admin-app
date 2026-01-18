@@ -1,5 +1,5 @@
-import express, { Request, Response } from 'express';
-import { supabase } from '../lib/supabase.js';
+import express, { Request, Response } from "express";
+import { supabase } from "../lib/supabase.js";
 
 const router = express.Router();
 
@@ -7,26 +7,26 @@ const router = express.Router();
  * GET /api/topics/:topicId/core-notes
  * Get core notes for a specific topic
  */
-router.get('/:topicId/core-notes', async (req: Request, res: Response) => {
+router.get("/:topicId/core-notes", async (req: Request, res: Response) => {
   try {
     const { topicId } = req.params;
 
     const { data, error } = await supabase
-      .from('topic_core_notes')
-      .select('*')
-      .eq('topic_id', topicId)
+      .from("topic_core_notes")
+      .select("*")
+      .eq("topic_id", topicId)
       .single();
 
     if (error) {
-      if (error.code === 'PGRST116') {
+      if (error.code === "PGRST116") {
         // No rows returned
         res.status(404).json({
           success: false,
-          error: 'Core notes not found for this topic',
+          error: "Core notes not found for this topic",
         });
         return;
       }
-      console.error('Error fetching topic core notes:', error);
+      console.error("Error fetching topic core notes:", error);
       res.status(500).json({
         success: false,
         error: error.message,
@@ -39,10 +39,13 @@ router.get('/:topicId/core-notes', async (req: Request, res: Response) => {
       data,
     });
   } catch (error) {
-    console.error('Error in GET /:topicId/core-notes:', error);
+    console.error("Error in GET /:topicId/core-notes:", error);
     res.status(500).json({
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to fetch topic core notes',
+      error:
+        error instanceof Error
+          ? error.message
+          : "Failed to fetch topic core notes",
     });
   }
 });
@@ -51,7 +54,7 @@ router.get('/:topicId/core-notes', async (req: Request, res: Response) => {
  * POST /api/topics/:topicId/core-notes (admin only)
  * Create core notes for a topic
  */
-router.post('/:topicId/core-notes', async (req: Request, res: Response) => {
+router.post("/:topicId/core-notes", async (req: Request, res: Response) => {
   try {
     const { topicId } = req.params;
     const { content, sections, isActive } = req.body;
@@ -60,44 +63,44 @@ router.post('/:topicId/core-notes', async (req: Request, res: Response) => {
     if (!content) {
       res.status(400).json({
         success: false,
-        error: 'Content is required',
+        error: "Content is required",
       });
       return;
     }
 
     // Check if topic exists
     const { data: topic, error: topicError } = await supabase
-      .from('topics')
-      .select('id')
-      .eq('id', topicId)
+      .from("topics")
+      .select("id")
+      .eq("id", topicId)
       .single();
 
     if (topicError || !topic) {
       res.status(404).json({
         success: false,
-        error: 'Topic not found',
+        error: "Topic not found",
       });
       return;
     }
 
     // Check if core notes already exist for this topic
     const { data: existing } = await supabase
-      .from('topic_core_notes')
-      .select('id')
-      .eq('topic_id', topicId)
+      .from("topic_core_notes")
+      .select("id")
+      .eq("topic_id", topicId)
       .single();
 
     if (existing) {
       res.status(409).json({
         success: false,
-        error: 'Core notes already exist for this topic. Use PUT to update.',
+        error: "Core notes already exist for this topic. Use PUT to update.",
       });
       return;
     }
 
     // Insert core notes
     const { data, error } = await supabase
-      .from('topic_core_notes')
+      .from("topic_core_notes")
       .insert({
         topic_id: topicId,
         content,
@@ -108,7 +111,7 @@ router.post('/:topicId/core-notes', async (req: Request, res: Response) => {
       .single();
 
     if (error) {
-      console.error('Error creating topic core notes:', error);
+      console.error("Error creating topic core notes:", error);
       res.status(500).json({
         success: false,
         error: error.message,
@@ -121,10 +124,13 @@ router.post('/:topicId/core-notes', async (req: Request, res: Response) => {
       data,
     });
   } catch (error) {
-    console.error('Error in POST /:topicId/core-notes:', error);
+    console.error("Error in POST /:topicId/core-notes:", error);
     res.status(500).json({
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to create topic core notes',
+      error:
+        error instanceof Error
+          ? error.message
+          : "Failed to create topic core notes",
     });
   }
 });
@@ -133,22 +139,22 @@ router.post('/:topicId/core-notes', async (req: Request, res: Response) => {
  * PUT /api/topics/:topicId/core-notes (admin only)
  * Update core notes for a topic
  */
-router.put('/:topicId/core-notes', async (req: Request, res: Response) => {
+router.put("/:topicId/core-notes", async (req: Request, res: Response) => {
   try {
     const { topicId } = req.params;
     const { content, sections, isActive } = req.body;
 
     // Check if core notes exist
     const { data: existing, error: fetchError } = await supabase
-      .from('topic_core_notes')
-      .select('id')
-      .eq('topic_id', topicId)
+      .from("topic_core_notes")
+      .select("id")
+      .eq("topic_id", topicId)
       .single();
 
     if (fetchError || !existing) {
       res.status(404).json({
         success: false,
-        error: 'Core notes not found for this topic',
+        error: "Core notes not found for this topic",
       });
       return;
     }
@@ -161,14 +167,14 @@ router.put('/:topicId/core-notes', async (req: Request, res: Response) => {
     updateData.updated_at = new Date().toISOString();
 
     const { data, error } = await supabase
-      .from('topic_core_notes')
+      .from("topic_core_notes")
       .update(updateData)
-      .eq('topic_id', topicId)
+      .eq("topic_id", topicId)
       .select()
       .single();
 
     if (error) {
-      console.error('Error updating topic core notes:', error);
+      console.error("Error updating topic core notes:", error);
       res.status(500).json({
         success: false,
         error: error.message,
@@ -181,10 +187,13 @@ router.put('/:topicId/core-notes', async (req: Request, res: Response) => {
       data,
     });
   } catch (error) {
-    console.error('Error in PUT /:topicId/core-notes:', error);
+    console.error("Error in PUT /:topicId/core-notes:", error);
     res.status(500).json({
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to update topic core notes',
+      error:
+        error instanceof Error
+          ? error.message
+          : "Failed to update topic core notes",
     });
   }
 });

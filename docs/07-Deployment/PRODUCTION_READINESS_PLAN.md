@@ -1,4 +1,5 @@
 # Production Readiness Implementation Plan
+
 ## SettingsPage Test & Component Provider Issues
 
 **Created:** November 23, 2025  
@@ -16,20 +17,23 @@ The SettingsPage component (and likely others) fail tests because they use TanSt
 ## Phase 1: Root Cause & Impact Analysis
 
 ### Current State
+
 - ✗ SettingsPage test throwing "No QueryClient set" error
 - ✗ Any component using `useEmailTemplates` (or other Query hooks) fails in tests
 - ✗ Cannot deploy with failing tests
 - ✗ Indicates missing provider setup pattern across tests
 
 ### Components Affected
+
 1. **SettingsPage** - uses `useEmailTemplates` hook
 2. **Any admin page using React Query hooks** (potential)
 3. **All feature pages with @tanstack/react-query** (potential)
 
 ### Why It Fails
+
 ```
-Test Render → SettingsPage mounts → useEmailTemplates runs 
-→ Hook calls useQueryClient() → No QueryClientProvider in tree 
+Test Render → SettingsPage mounts → useEmailTemplates runs
+→ Hook calls useQueryClient() → No QueryClientProvider in tree
 → Error: "No QueryClient set"
 ```
 
@@ -50,6 +54,7 @@ Test Wrapper Component
 ```
 
 ### Why This Works
+
 - Single source of truth for test setup
 - Consistent across all component tests
 - Easy to maintain and extend
@@ -60,6 +65,7 @@ Test Wrapper Component
 ## Phase 3: Implementation Steps
 
 ### Step 1: Create Test Utilities
+
 **File:** `src/__tests__/utils/test-wrapper.tsx`
 
 ```typescript
@@ -102,9 +108,11 @@ export function renderWithProviders(
 ```
 
 ### Step 2: Fix SettingsPage Test
+
 **File:** `src/pages/__tests__/SettingsPage.test.tsx`
 
 Change from:
+
 ```typescript
 import { render, screen } from '@testing-library/react';
 import SettingsPage from '../SettingsPage';
@@ -118,6 +126,7 @@ describe('SettingsPage', () => {
 ```
 
 To:
+
 ```typescript
 import { screen } from '@testing-library/react';
 import { renderWithProviders } from '../../__tests__/utils/test-wrapper';
@@ -132,6 +141,7 @@ describe('SettingsPage', () => {
 ```
 
 ### Step 3: Scan & Fix Other Tests
+
 Find all test files using React Query or routing:
 
 ```bash
@@ -142,6 +152,7 @@ grep -r "useQuery\|useMutation\|useEmailTemplates\|useNavigate" \
 Apply the same wrapper fix to all found tests.
 
 ### Step 4: Run Full Test Suite
+
 ```bash
 npm test -- --passWithNoTests
 ```
@@ -149,9 +160,11 @@ npm test -- --passWithNoTests
 Expected: All tests pass, no provider errors
 
 ### Step 5: Add Test Guidelines
+
 **File:** `TESTING_GUIDELINES.md`
 
 Document best practices:
+
 - Always use `renderWithProviders` for components with hooks
 - Update wrapper utility when adding new providers
 - Keep test utilities in single location
@@ -173,27 +186,30 @@ Document best practices:
 
 ## Phase 5: Implementation Timeline
 
-| Phase | Task | Time | Status |
-|-------|------|------|--------|
-| 1 | Create test wrapper utility | 10 min | Ready |
-| 2 | Fix SettingsPage test | 5 min | Ready |
-| 3 | Scan & fix other tests | 15 min | Ready |
-| 4 | Run full test suite | 5 min | Ready |
-| 5 | Update documentation | 5 min | Ready |
-| 6 | Code review & validation | 10 min | Ready |
-| **Total** | | **50 min** | |
+| Phase     | Task                        | Time       | Status |
+| --------- | --------------------------- | ---------- | ------ |
+| 1         | Create test wrapper utility | 10 min     | Ready  |
+| 2         | Fix SettingsPage test       | 5 min      | Ready  |
+| 3         | Scan & fix other tests      | 15 min     | Ready  |
+| 4         | Run full test suite         | 5 min      | Ready  |
+| 5         | Update documentation        | 5 min      | Ready  |
+| 6         | Code review & validation    | 10 min     | Ready  |
+| **Total** |                             | **50 min** |        |
 
 ---
 
 ## Phase 6: Risk Mitigation
 
 ### Risk 1: Other Tests Also Failing
+
 **Mitigation:** Wrapper utility makes fixes consistent and quick
 
 ### Risk 2: Missing Provider Causes Production Error
+
 **Mitigation:** Tests now validate all components have required providers
 
 ### Risk 3: Tests Become Slow
+
 **Mitigation:** Test QueryClient has retry: false for faster tests
 
 ---
@@ -201,6 +217,7 @@ Document best practices:
 ## Phase 7: Success Criteria
 
 ✅ **Production Ready When:**
+
 1. All tests pass (100% pass rate)
 2. No "No QueryClient set" errors
 3. No console errors in test output
@@ -213,11 +230,13 @@ Document best practices:
 ## Phase 8: Post-Deployment
 
 ### Monitor
+
 - ✓ Check staging environment for errors
 - ✓ Verify SettingsPage works with real data
 - ✓ Monitor error logs for any provider issues
 
 ### Maintain
+
 - ✓ Use wrapper utility for all new component tests
 - ✓ Update wrapper when adding new providers
 - ✓ Document any new context providers added

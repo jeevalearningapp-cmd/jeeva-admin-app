@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState } from "react";
 import {
   Box,
   Typography,
@@ -14,119 +14,104 @@ import {
   CircularProgress,
   Paper,
   Divider,
-} from '@mui/material'
+} from "@mui/material";
 import {
   SendOutlined,
-  ScheduleOutlined,
   PeopleOutlined,
-} from '@mui/icons-material'
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker'
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
-import { useCreateNotification } from '@/hooks/useNotifications'
-import { useUserTargetingOptions } from '@/hooks/useNotifications'
-import type { CreateNotificationInput, AudienceFilter } from '@/types/notifications'
+  PhoneAndroidOutlined,
+} from "@mui/icons-material";
+import {
+  useSendDirectPush,
+  useUserTargetingOptions,
+} from "@/hooks/useNotifications";
 
 export const ComposeTab: React.FC = () => {
-  const [title, setTitle] = useState('')
-  const [body, setBody] = useState('')
-  const [imageUrl, setImageUrl] = useState('')
-  const [targetingType, setTargetingType] = useState<string>('all')
-  const [scheduledFor, setScheduledFor] = useState<Date | null>(null)
+  const [title, setTitle] = useState("");
+  const [body, setBody] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
+  const [targetingType, setTargetingType] = useState<string>("all");
+  const [lastResult, setLastResult] = useState<{
+    sent: number;
+    failed: number;
+    errors: string[];
+  } | null>(null);
 
-  const { data: targetingOptions, isLoading: loadingOptions } = useUserTargetingOptions()
-  const createMutation = useCreateNotification()
+  const { data: targetingOptions, isLoading: loadingOptions } =
+    useUserTargetingOptions();
+  const directPushMutation = useSendDirectPush();
 
-  const handleSendNow = () => {
+  const handleSendPush = () => {
     if (!title || !body) {
-      return
+      return;
     }
 
-    const audienceFilter: AudienceFilter = getAudienceFilter()
+    const audienceFilter = getAudienceFilter();
 
-    const input: CreateNotificationInput = {
-      title,
-      body,
-      imageUrl: imageUrl || undefined,
-      audienceFilter,
-      notificationType: 'manual',
-    }
-
-    createMutation.mutate(input, {
-      onSuccess: () => {
-        setTitle('')
-        setBody('')
-        setImageUrl('')
-        setTargetingType('all')
+    directPushMutation.mutate(
+      {
+        title,
+        body,
+        imageUrl: imageUrl || undefined,
+        audienceFilter,
+        data: {
+          type: "manual",
+        },
       },
-    })
-  }
-
-  const handleSchedule = () => {
-    if (!title || !body || !scheduledFor) {
-      return
-    }
-
-    const audienceFilter: AudienceFilter = getAudienceFilter()
-
-    const input: CreateNotificationInput = {
-      title,
-      body,
-      imageUrl: imageUrl || undefined,
-      audienceFilter,
-      scheduledFor: scheduledFor.toISOString(),
-      notificationType: 'manual',
-    }
-
-    createMutation.mutate(input, {
-      onSuccess: () => {
-        setTitle('')
-        setBody('')
-        setImageUrl('')
-        setTargetingType('all')
-        setScheduledFor(null)
+      {
+        onSuccess: (result) => {
+          setLastResult(result);
+          if (result.sent > 0) {
+            // Clear form on success
+            setTitle("");
+            setBody("");
+            setImageUrl("");
+            setTargetingType("all");
+          }
+        },
       },
-    })
-  }
+    );
+  };
 
-  const getAudienceFilter = (): AudienceFilter => {
-    if (targetingType === 'all') {
-      return { type: 'all' }
+  const getAudienceFilter = () => {
+    if (targetingType === "all") {
+      return { type: "all" as const };
     }
-    
-    if (targetingType.startsWith('subscription_')) {
-      const planName = targetingType.replace('subscription_', '')
+
+    if (targetingType.startsWith("subscription_")) {
+      const planName = targetingType.replace("subscription_", "");
       return {
-        type: 'subscription_tier',
+        type: "subscription_tier" as const,
         subscriptionTier: planName,
-      }
+      };
     }
 
-    if (targetingType === 'active_30_days') {
-      return { type: 'active_users' }
+    if (targetingType === "active_30_days") {
+      return { type: "active_users" as const };
     }
 
-    return { type: 'all' }
-  }
+    return { type: "all" as const };
+  };
 
   const getRecipientCount = () => {
-    if (loadingOptions || !targetingOptions) return 0
-    const option = targetingOptions.find(opt => {
-      if (targetingType === 'all') return opt.id === 'all'
-      return opt.id === targetingType
-    })
-    return option?.count || 0
-  }
+    if (loadingOptions || !targetingOptions) return 0;
+    const option = targetingOptions.find((opt) => {
+      if (targetingType === "all") return opt.id === "all";
+      return opt.id === targetingType;
+    });
+    return option?.count || 0;
+  };
 
-  const isFormValid = title && body
+  const isFormValid = title && body;
+  const isPending = directPushMutation.isPending;
 
   return (
     <Box>
       <Typography variant="h6" gutterBottom>
-        Compose New Notification
+        Send Push Notification
       </Typography>
       <Typography variant="body2" color="text.secondary" gutterBottom>
-        Create and send push notifications to your mobile app users
+        Send push notifications directly to mobile devices. Notifications are
+        stored on devices, not in the database.
       </Typography>
       <Divider sx={{ my: 3 }} />
 
@@ -140,7 +125,7 @@ export const ComposeTab: React.FC = () => {
           placeholder="Welcome to Jeeva Learning!"
           inputProps={{ maxLength: 65 }}
           helperText={`${title.length}/65 characters`}
-          sx={{ '& .MuiOutlinedInput-root': { borderRadius: 0 } }}
+          sx={{ "& .MuiOutlinedInput-root": { borderRadius: 0 } }}
         />
 
         <TextField
@@ -154,7 +139,7 @@ export const ComposeTab: React.FC = () => {
           placeholder="Start your journey to becoming a certified nurse in the UK!"
           inputProps={{ maxLength: 240 }}
           helperText={`${body.length}/240 characters`}
-          sx={{ '& .MuiOutlinedInput-root': { borderRadius: 0 } }}
+          sx={{ "& .MuiOutlinedInput-root": { borderRadius: 0 } }}
         />
 
         <TextField
@@ -164,7 +149,7 @@ export const ComposeTab: React.FC = () => {
           fullWidth
           placeholder="https://example.com/image.jpg"
           helperText="Image will be displayed in the notification (recommended: 1024x500px)"
-          sx={{ '& .MuiOutlinedInput-root': { borderRadius: 0 } }}
+          sx={{ "& .MuiOutlinedInput-root": { borderRadius: 0 } }}
         />
 
         <FormControl fullWidth>
@@ -180,7 +165,13 @@ export const ComposeTab: React.FC = () => {
             ) : (
               targetingOptions?.map((option) => (
                 <MenuItem key={option.id} value={option.id}>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      width: "100%",
+                    }}
+                  >
                     <span>{option.label}</span>
                     <Chip label={`${option.count} users`} size="small" />
                   </Box>
@@ -190,30 +181,55 @@ export const ComposeTab: React.FC = () => {
           </Select>
         </FormControl>
 
-        <Paper sx={{ p: 2, bgcolor: 'grey.50', borderRadius: 0 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <Paper sx={{ p: 2, bgcolor: "grey.50", borderRadius: 0 }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <PeopleOutlined color="primary" />
             <Typography variant="body2" color="text.secondary">
-              This notification will be sent to <strong>{getRecipientCount()} users</strong>
+              This notification will be sent to{" "}
+              <strong>{getRecipientCount()} users</strong>
             </Typography>
           </Box>
         </Paper>
 
-        <LocalizationProvider dateAdapter={AdapterDateFns}>
-          <DateTimePicker
-            label="Schedule For (Optional)"
-            value={scheduledFor}
-            onChange={(newValue) => setScheduledFor(newValue)}
-            slotProps={{
-              textField: {
-                fullWidth: true,
-                helperText: 'Leave empty to send immediately',
-                sx: { '& .MuiOutlinedInput-root': { borderRadius: 0 } },
-              },
-            }}
-            minDateTime={new Date()}
-          />
-        </LocalizationProvider>
+        <Alert
+          severity="info"
+          sx={{ borderRadius: 0 }}
+          icon={<PhoneAndroidOutlined />}
+        >
+          <Typography variant="body2">
+            <strong>Direct Push Mode:</strong> Notifications are sent
+            immediately via Expo Push API and stored locally on user devices. No
+            database storage means faster delivery but no delivery analytics.
+          </Typography>
+        </Alert>
+
+        {lastResult && (
+          <Alert
+            severity={lastResult.sent > 0 ? "success" : "warning"}
+            sx={{ borderRadius: 0 }}
+            onClose={() => setLastResult(null)}
+          >
+            <Typography variant="body2">
+              <strong>Last send:</strong> {lastResult.sent} delivered,{" "}
+              {lastResult.failed} failed
+              {lastResult.errors.length > 0 && (
+                <Box
+                  component="span"
+                  sx={{
+                    display: "block",
+                    mt: 1,
+                    fontSize: "0.85em",
+                    opacity: 0.8,
+                  }}
+                >
+                  {lastResult.errors.slice(0, 3).join(", ")}
+                  {lastResult.errors.length > 3 &&
+                    ` and ${lastResult.errors.length - 3} more...`}
+                </Box>
+              )}
+            </Typography>
+          </Alert>
+        )}
 
         {!isFormValid && (
           <Alert severity="info" sx={{ borderRadius: 0 }}>
@@ -221,37 +237,24 @@ export const ComposeTab: React.FC = () => {
           </Alert>
         )}
 
-        <Stack direction="row" spacing={2}>
-          <Button
-            variant="contained"
-            size="large"
-            startIcon={<SendOutlined />}
-            onClick={handleSendNow}
-            disabled={!isFormValid || createMutation.isPending || !!scheduledFor}
-            sx={{ borderRadius: 0, flex: 1 }}
-          >
-            {createMutation.isPending ? (
-              <>
-                <CircularProgress size={20} sx={{ mr: 1 }} />
-                Sending...
-              </>
-            ) : (
-              'Send Now'
-            )}
-          </Button>
-
-          <Button
-            variant="outlined"
-            size="large"
-            startIcon={<ScheduleOutlined />}
-            onClick={handleSchedule}
-            disabled={!isFormValid || !scheduledFor || createMutation.isPending}
-            sx={{ borderRadius: 0, flex: 1 }}
-          >
-            {createMutation.isPending ? 'Scheduling...' : 'Schedule'}
-          </Button>
-        </Stack>
+        <Button
+          variant="contained"
+          size="large"
+          startIcon={<SendOutlined />}
+          onClick={handleSendPush}
+          disabled={!isFormValid || isPending}
+          sx={{ borderRadius: 0 }}
+        >
+          {isPending ? (
+            <>
+              <CircularProgress size={20} sx={{ mr: 1 }} color="inherit" />
+              Sending to Devices...
+            </>
+          ) : (
+            "Send Push Now"
+          )}
+        </Button>
       </Stack>
     </Box>
-  )
-}
+  );
+};

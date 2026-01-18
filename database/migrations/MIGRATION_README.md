@@ -7,23 +7,28 @@ This migration transforms the Jeeva Learning admin portal from a fully dynamic c
 ## Changes Summary
 
 ### 1. **Fixed 3 Modules**
+
 - **Practice Module** - Topic-wise practice questions (Numeracy & Clinical Knowledge)
 - **Learning Module** - Structured lessons with multimedia content
 - **Mock Exams** - Full exam simulator with realistic timing
 
 ### 2. **Question Tagging System**
+
 Questions now have additional metadata:
+
 - `module_type`: 'practice', 'learning', or 'mock_exam'
 - `category`: Main category (e.g., 'Numeracy', 'Clinical Knowledge')
 - `subdivision`: Sub-category (e.g., 'Dosage Calculations', 'Pharmacology')
 - `exam_part`: 'part_a' or 'part_b' (for mock exams only)
 
 ### 3. **Learning Module Enhancements**
+
 - Lessons can be: video, audio, text, or quiz
 - Quiz lessons require 80% passing score to progress
 - New `lesson_quiz_results` table tracks student progress
 
 ### 4. **Mock Exam Configuration**
+
 - Configurable question counts and time limits
 - Part A: 15 questions, 30 minutes, no calculator
 - Part B: 120 questions, 150 minutes
@@ -32,12 +37,15 @@ Questions now have additional metadata:
 ## Migration Steps
 
 ### Step 1: Run the Main Migration
+
 Execute in Supabase SQL Editor:
+
 ```sql
 -- File: restructure_for_nmc_modules.sql
 ```
 
 This will:
+
 - Add new columns to `questions` and `lessons` tables
 - Create `mock_exam_config` and `lesson_quiz_results` tables
 - Seed the 3 fixed modules
@@ -45,14 +53,18 @@ This will:
 - Add helper function for random question selection
 
 ### Step 2: Update Admin Panel
+
 The admin panel will be updated to:
+
 - Remove module creation/deletion (3 modules are fixed)
 - Add question management with filtering by module/category/subdivision
 - Support bulk CSV upload for questions
 - Manage lesson content (video URLs, audio URLs, text)
 
 ### Step 3: Verify Data
+
 Check that modules and topics were created:
+
 ```sql
 SELECT * FROM modules ORDER BY display_order;
 SELECT * FROM topics ORDER BY module_id, display_order;
@@ -61,18 +73,22 @@ SELECT * FROM topics ORDER BY module_id, display_order;
 ## Question Management
 
 ### Practice Module Questions
+
 Tag questions with:
+
 - `module_type`: 'practice'
 - `category`: 'Numeracy' or 'Clinical Knowledge'
 - `subdivision`: One of the predefined subdivisions
 
 **Numeracy Subdivisions:**
+
 - Dosage Calculations
 - Unit Conversions
 - IV Flow Rate Calculations
 - Fluid Balance
 
 **Clinical Knowledge Subdivisions:**
+
 - Medical-Surgical Nursing
 - Pharmacology
 - Infection Control
@@ -80,13 +96,17 @@ Tag questions with:
 - Palliative Care
 
 ### Learning Module Questions
+
 Tag questions with:
+
 - `module_type`: 'learning'
 - `category`: Topic name (e.g., 'The NMC Code')
 - Associate with a lesson via `lesson_id`
 
 ### Mock Exam Questions
+
 Tag questions with:
+
 - `module_type`: 'mock_exam'
 - `exam_part`: 'part_a' (Numeracy) or 'part_b' (Clinical)
 - `lesson_id`: NULL (not tied to specific lessons)
@@ -94,12 +114,14 @@ Tag questions with:
 ## CSV Bulk Upload Format
 
 ### Practice/Learning Questions CSV:
+
 ```csv
 module_type,category,subdivision,question_text,difficulty,explanation,option_1,option_2,option_3,option_4,correct_option
 practice,Numeracy,Dosage Calculations,"A patient needs 500mg of medication...",medium,"To calculate...",250mg,500mg,750mg,1000mg,2
 ```
 
 ### Mock Exam Questions CSV:
+
 ```csv
 module_type,exam_part,question_text,difficulty,explanation,option_1,option_2,option_3,option_4,correct_option
 mock_exam,part_a,"Calculate the drip rate...",hard,"First convert...",15 drops/min,20 drops/min,25 drops/min,30 drops/min,3
@@ -108,6 +130,7 @@ mock_exam,part_a,"Calculate the drip rate...",hard,"First convert...",15 drops/m
 ## Data Model Reference
 
 ### Practice Module Structure
+
 ```
 Practice Module (fixed)
 ├── Numeracy
@@ -124,6 +147,7 @@ Practice Module (fixed)
 ```
 
 ### Learning Module Structure
+
 ```
 Learning Module (fixed)
 ├── Numeracy (video + audio + text + quiz)
@@ -137,6 +161,7 @@ Learning Module (fixed)
 ```
 
 ### Mock Exam Structure
+
 ```
 Mock Exams (fixed)
 ├── Part A: Numeracy (15 random questions, 30 min)
@@ -146,6 +171,7 @@ Mock Exams (fixed)
 ## Rollback (if needed)
 
 If you need to revert:
+
 ```sql
 -- Remove new columns
 ALTER TABLE questions DROP COLUMN IF EXISTS module_type;
@@ -166,6 +192,7 @@ DROP FUNCTION IF EXISTS get_random_mock_exam_questions;
 ## Support
 
 After migration, update the admin panel UI to:
+
 1. Show module selector (3 fixed options)
 2. Show category/subdivision selectors (dynamic based on selected module)
 3. Question management interface with filters

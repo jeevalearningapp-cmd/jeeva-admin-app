@@ -73,11 +73,13 @@ psql "$SUPABASE_DB_URL" -f jeeva-admin-portal/database/migrations/backup_questio
 #### Step 3: Verify Backup
 
 The script will output a summary report showing:
+
 - Number of rows backed up
 - Backup locations
 - Verification status
 
 **Expected Output:**
+
 ```
 ============================================================================
 BACKUP SUMMARY REPORT
@@ -99,13 +101,13 @@ If you prefer manual control or the automated script fails:
 -- Export questions table
 COPY (
   SELECT * FROM questions ORDER BY created_at
-) TO '/tmp/questions_backup.csv' 
+) TO '/tmp/questions_backup.csv'
 WITH (FORMAT CSV, HEADER true);
 
 -- Export question_options table
 COPY (
   SELECT * FROM question_options ORDER BY question_id, display_order
-) TO '/tmp/question_options_backup.csv' 
+) TO '/tmp/question_options_backup.csv'
 WITH (FORMAT CSV, HEADER true);
 ```
 
@@ -123,13 +125,13 @@ WITH (FORMAT CSV, HEADER true);
 
 ### Primary Backup Locations
 
-| Backup Type | Location | Description |
-|-------------|----------|-------------|
-| CSV Files | `/tmp/questions_backup.csv` | Server file system export |
-| CSV Files | `/tmp/question_options_backup.csv` | Server file system export |
-| Database Tables | `questions_backup` | In-database backup table |
-| Database Tables | `question_options_backup` | In-database backup table |
-| Metadata | `backup_metadata` table | Backup tracking information |
+| Backup Type     | Location                           | Description                 |
+| --------------- | ---------------------------------- | --------------------------- |
+| CSV Files       | `/tmp/questions_backup.csv`        | Server file system export   |
+| CSV Files       | `/tmp/question_options_backup.csv` | Server file system export   |
+| Database Tables | `questions_backup`                 | In-database backup table    |
+| Database Tables | `question_options_backup`          | In-database backup table    |
+| Metadata        | `backup_metadata` table            | Backup tracking information |
 
 ### Recommended Storage
 
@@ -162,6 +164,7 @@ supabase storage upload backups question_options_backup.csv
 ### When to Restore
 
 Restore from backup if:
+
 - Migration fails and data is corrupted
 - Need to rollback to pre-migration state
 - Testing restore procedures on development
@@ -217,7 +220,7 @@ CREATE TABLE questions (
 );
 
 -- Import from CSV
-COPY questions FROM '/tmp/questions_backup.csv' 
+COPY questions FROM '/tmp/questions_backup.csv'
 WITH (FORMAT CSV, HEADER true);
 
 -- Recreate question_options table structure
@@ -231,7 +234,7 @@ CREATE TABLE question_options (
 );
 
 -- Import from CSV
-COPY question_options FROM '/tmp/question_options_backup.csv' 
+COPY question_options FROM '/tmp/question_options_backup.csv'
 WITH (FORMAT CSV, HEADER true);
 
 -- Recreate indexes
@@ -277,7 +280,7 @@ SELECT COUNT(*) FROM questions;
 SELECT COUNT(*) FROM question_options;
 
 -- Check data integrity
-SELECT 
+SELECT
   q.id,
   q.question_text,
   COUNT(qo.id) as option_count
@@ -287,7 +290,7 @@ GROUP BY q.id, q.question_text
 HAVING COUNT(qo.id) = 0;  -- Should return 0 rows (no questions without options)
 
 -- Check foreign key integrity
-SELECT COUNT(*) 
+SELECT COUNT(*)
 FROM question_options qo
 LEFT JOIN questions q ON q.id = qo.question_id
 WHERE q.id IS NULL;  -- Should return 0 (no orphaned options)
@@ -311,23 +314,23 @@ Run these checks after creating a backup:
 
 ```sql
 -- 1. Verify row counts match
-SELECT 
+SELECT
   (SELECT COUNT(*) FROM questions) as original_questions,
   (SELECT COUNT(*) FROM questions_backup) as backup_questions,
   (SELECT COUNT(*) FROM question_options) as original_options,
   (SELECT COUNT(*) FROM question_options_backup) as backup_options;
 
 -- 2. Verify data integrity
-SELECT 
+SELECT
   COUNT(*) as questions_with_options
 FROM questions q
 WHERE EXISTS (
-  SELECT 1 FROM question_options qo 
+  SELECT 1 FROM question_options qo
   WHERE qo.question_id = q.id
 );
 
 -- 3. Check backup metadata
-SELECT * FROM backup_metadata 
+SELECT * FROM backup_metadata
 WHERE backup_name = 'pre_migration_backup'
 ORDER BY backup_date DESC;
 
@@ -346,14 +349,14 @@ Run these checks after restoring from backup:
 \d question_options
 
 -- 2. Verify constraints
-SELECT 
+SELECT
   conname as constraint_name,
   contype as constraint_type
 FROM pg_constraint
 WHERE conrelid IN ('questions'::regclass, 'question_options'::regclass);
 
 -- 3. Verify indexes
-SELECT 
+SELECT
   tablename,
   indexname,
   indexdef
@@ -361,7 +364,7 @@ FROM pg_indexes
 WHERE tablename IN ('questions', 'question_options');
 
 -- 4. Verify RLS policies
-SELECT 
+SELECT
   schemaname,
   tablename,
   policyname,
@@ -385,6 +388,7 @@ SELECT * FROM question_options LIMIT 5;
 **Error:** `ERROR: could not open file "/tmp/questions_backup.csv" for writing: Permission denied`
 
 **Solution:**
+
 ```sql
 -- Use a different directory with write permissions
 COPY questions TO '/var/tmp/questions_backup.csv' WITH CSV HEADER;
@@ -398,6 +402,7 @@ COPY questions TO '/var/tmp/questions_backup.csv' WITH CSV HEADER;
 **Error:** `ERROR: relation "questions_backup" already exists`
 
 **Solution:**
+
 ```sql
 -- Drop existing backup tables first
 DROP TABLE IF EXISTS questions_backup CASCADE;
@@ -411,6 +416,7 @@ DROP TABLE IF EXISTS question_options_backup CASCADE;
 **Error:** `ERROR: insert or update on table "question_options" violates foreign key constraint`
 
 **Solution:**
+
 ```sql
 -- Disable foreign key checks temporarily
 ALTER TABLE question_options DISABLE TRIGGER ALL;
@@ -432,6 +438,7 @@ WHERE q.id IS NULL;
 **Problem:** Restored table has fewer rows than backup
 
 **Solution:**
+
 ```sql
 -- Check for import errors in PostgreSQL logs
 SELECT * FROM pg_stat_activity WHERE state = 'active';
@@ -440,9 +447,9 @@ SELECT * FROM pg_stat_activity WHERE state = 'active';
 \copy questions FROM '/tmp/questions_backup.csv' WITH (FORMAT CSV, HEADER true, VERBOSE true);
 
 -- Check for duplicate IDs
-SELECT id, COUNT(*) 
-FROM questions_backup 
-GROUP BY id 
+SELECT id, COUNT(*)
+FROM questions_backup
+GROUP BY id
 HAVING COUNT(*) > 1;
 ```
 
@@ -451,6 +458,7 @@ HAVING COUNT(*) > 1;
 **Error:** `ERROR: relation "backup_metadata" does not exist`
 
 **Solution:**
+
 ```sql
 -- Create backup metadata table
 CREATE TABLE backup_metadata (

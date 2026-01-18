@@ -15,6 +15,7 @@ This document explains what data is required for Phase 1 AI implementation (Jeev
 JeevaBot retrieves relevant educational content from Supabase to provide context-aware responses:
 
 **Primary Tables:**
+
 ```sql
 -- Core educational hierarchy
 modules (id, title, description, exam_type, difficulty_level, is_active)
@@ -26,6 +27,7 @@ question_options (id, question_id, option_text, is_correct)
 ```
 
 **Student Progress Tables:**
+
 ```sql
 learning_completions (user_id, lesson_id, completed_at, time_spent_seconds)
 practice_sessions (user_id, topic_id, score, total_questions, session_type)
@@ -33,6 +35,7 @@ mock_exams (user_id, exam_type, score, total_questions, time_taken_seconds)
 ```
 
 **User Context:**
+
 ```sql
 users (id, email, full_name, phone_number, created_at)
 user_profiles (user_id, preferred_language, learning_goals, weak_topics)
@@ -52,28 +55,30 @@ When a student asks a question, retrieve relevant educational content:
 ```typescript
 // Step 1: Identify relevant topics using keyword matching
 const relevantTopics = await supabase
-  .from('topics')
-  .select(`
+  .from("topics")
+  .select(
+    `
     id, title, description,
     modules!inner(title, exam_type),
     lessons(id, title, content, lesson_type)
-  `)
-  .ilike('title', '%newton%')
-  .eq('is_active', true)
-  .limit(3)
+  `,
+  )
+  .ilike("title", "%newton%")
+  .eq("is_active", true)
+  .limit(3);
 
 // Step 2: Fetch related lessons and flashcards
 const lessonContent = await supabase
-  .from('lessons')
-  .select('title, content, lesson_type')
-  .in('topic_id', topicIds)
-  .limit(5)
+  .from("lessons")
+  .select("title, content, lesson_type")
+  .in("topic_id", topicIds)
+  .limit(5);
 
 const flashcards = await supabase
-  .from('flashcards')
-  .select('front_text, back_text')
-  .in('topic_id', topicIds)
-  .limit(10)
+  .from("flashcards")
+  .select("front_text, back_text")
+  .in("topic_id", topicIds)
+  .limit(10);
 
 // Step 3: Build context string for Gemini prompt
 const educationalContext = `
@@ -82,11 +87,11 @@ Topic: ${topic.title} (${module.title})
 Description: ${topic.description}
 
 LESSON CONTENT:
-${lessonContent.map(l => `${l.title}: ${l.content}`).join('\n\n')}
+${lessonContent.map((l) => `${l.title}: ${l.content}`).join("\n\n")}
 
 KEY CONCEPTS (Flashcards):
-${flashcards.map(f => `Q: ${f.front_text}\nA: ${f.back_text}`).join('\n')}
-`
+${flashcards.map((f) => `Q: ${f.front_text}\nA: ${f.back_text}`).join("\n")}
+`;
 ```
 
 ### 2.2 Student Progress Context
@@ -96,19 +101,19 @@ Include student's learning history for personalized responses:
 ```typescript
 // Fetch student's weak areas
 const weakTopics = await supabase
-  .from('practice_sessions')
-  .select('topic_id, score')
-  .eq('user_id', studentId)
-  .lt('score', 60)
-  .order('created_at', { ascending: false })
-  .limit(5)
+  .from("practice_sessions")
+  .select("topic_id, score")
+  .eq("user_id", studentId)
+  .lt("score", 60)
+  .order("created_at", { ascending: false })
+  .limit(5);
 
 // Get completed lessons
 const completedLessons = await supabase
-  .from('learning_completions')
-  .select('lesson_id, lessons(title, topic_id)')
-  .eq('user_id', studentId)
-  .order('completed_at', { ascending: false })
+  .from("learning_completions")
+  .select("lesson_id, lessons(title, topic_id)")
+  .eq("user_id", studentId)
+  .order("completed_at", { ascending: false });
 
 // Build student context
 const studentContext = `
@@ -118,11 +123,11 @@ Learning Goals: ${profile.learning_goals}
 Preferred Language: ${profile.preferred_language}
 
 WEAK AREAS (needs focus):
-${weakTopics.map(t => `- ${t.topics.title} (${t.score}% score)`).join('\n')}
+${weakTopics.map((t) => `- ${t.topics.title} (${t.score}% score)`).join("\n")}
 
 RECENTLY COMPLETED:
-${completedLessons.map(l => `✓ ${l.lessons.title}`).join('\n')}
-`
+${completedLessons.map((l) => `✓ ${l.lessons.title}`).join("\n")}
+`;
 ```
 
 ---
@@ -161,7 +166,7 @@ LIMITATIONS:
 - Redirect off-topic questions politely
 - Admit when you don't have information
 - Encourage practicing with flashcards and questions
-`
+`;
 ```
 
 ### 3.2 User Query Processing
@@ -173,21 +178,24 @@ STUDENT QUESTION:
 "${studentMessage}"
 
 CONVERSATION HISTORY:
-${conversationHistory.map(msg => 
-  `${msg.role}: ${msg.content}`
-).join('\n')}
+${conversationHistory.map((msg) => `${msg.role}: ${msg.content}`).join("\n")}
 
 Please provide a helpful, personalized response based on the educational content and student context provided.
-`
+`;
 
 // Call Gemini API
 const response = await chatModel.generateContent({
   contents: [
-    { role: 'user', parts: [{ text: systemPrompt }] },
-    { role: 'model', parts: [{ text: 'I understand. I will help students learn effectively.' }] },
-    { role: 'user', parts: [{ text: userPrompt }] }
-  ]
-})
+    { role: "user", parts: [{ text: systemPrompt }] },
+    {
+      role: "model",
+      parts: [
+        { text: "I understand. I will help students learn effectively." },
+      ],
+    },
+    { role: "user", parts: [{ text: userPrompt }] },
+  ],
+});
 ```
 
 ---
@@ -201,36 +209,36 @@ Prioritize most relevant content to stay within token limits:
 ```typescript
 // Score topics by relevance
 function scoreTopicRelevance(topic: Topic, query: string): number {
-  let score = 0
-  
+  let score = 0;
+
   // Exact title match
   if (topic.title.toLowerCase().includes(query.toLowerCase())) {
-    score += 10
+    score += 10;
   }
-  
+
   // Description match
   if (topic.description.toLowerCase().includes(query.toLowerCase())) {
-    score += 5
+    score += 5;
   }
-  
+
   // Recent student activity
   if (studentRecentTopics.includes(topic.id)) {
-    score += 3
+    score += 3;
   }
-  
+
   // Weak area (needs focus)
   if (studentWeakTopics.includes(topic.id)) {
-    score += 2
+    score += 2;
   }
-  
-  return score
+
+  return score;
 }
 
 // Use top 3 most relevant topics
 const rankedTopics = topics
-  .map(t => ({ topic: t, score: scoreTopicRelevance(t, query) }))
+  .map((t) => ({ topic: t, score: scoreTopicRelevance(t, query) }))
   .sort((a, b) => b.score - a.score)
-  .slice(0, 3)
+  .slice(0, 3);
 ```
 
 ### 4.2 Token Budget Management
@@ -239,21 +247,24 @@ Gemini has input token limits (30K for Flash, 1M for Pro):
 
 ```typescript
 const TOKEN_BUDGET = {
-  systemPrompt: 2000,      // Educational context + guidelines
-  studentContext: 500,      // Student profile + progress
+  systemPrompt: 2000, // Educational context + guidelines
+  studentContext: 500, // Student profile + progress
   conversationHistory: 1500, // Last 5-10 messages
-  userQuery: 500,          // Current question
-  responseBuffer: 1000      // Reserve for response
-}
+  userQuery: 500, // Current question
+  responseBuffer: 1000, // Reserve for response
+};
 
 function truncateContext(context: string, maxTokens: number): string {
   // Rough estimate: 1 token ≈ 4 characters
-  const maxChars = maxTokens * 4
-  
-  if (context.length <= maxChars) return context
-  
+  const maxChars = maxTokens * 4;
+
+  if (context.length <= maxChars) return context;
+
   // Truncate and add indicator
-  return context.substring(0, maxChars - 50) + '\n[...content truncated for length...]'
+  return (
+    context.substring(0, maxChars - 50) +
+    "\n[...content truncated for length...]"
+  );
 }
 ```
 
@@ -310,24 +321,24 @@ Return to Student
 export async function sendMessage(req: Request, res: Response) {
   const { message, conversationId } = req.body
   const userId = req.user.id
-  
+
   // Step 1: Extract keywords
   const keywords = extractKeywords(message)
-  
+
   // Step 2: Retrieve educational content
   const relevantContent = await retrieveEducationalContent(keywords)
-  
+
   // Step 3: Get student context
   const studentContext = await getStudentContext(userId)
-  
+
   // Step 4: Build context string
   const educationalContext = buildEducationalContext(relevantContent)
   const studentInfo = buildStudentContext(studentContext)
-  
+
   // Step 5: Construct prompt
   const systemPrompt = buildSystemPrompt(educationalContext, studentInfo)
   const conversationHistory = await getConversationHistory(conversationId, limit: 10)
-  
+
   // Step 6: Call Gemini
   const response = await chatModel.generateContent({
     contents: [
@@ -336,16 +347,16 @@ export async function sendMessage(req: Request, res: Response) {
       { role: 'user', parts: [{ text: message }] }
     ]
   })
-  
+
   // Step 7: Process response
   const botMessage = response.response.text()
-  
+
   // Step 8: Store conversation
   await supabase.from('chat_messages').insert([
     { conversation_id: conversationId, role: 'user', content: message },
     { conversation_id: conversationId, role: 'assistant', content: botMessage }
   ])
-  
+
   return res.json({ message: botMessage })
 }
 ```
@@ -359,21 +370,25 @@ export async function sendMessage(req: Request, res: Response) {
 For JeevaBot to work effectively, ensure:
 
 **✅ Modules & Topics:**
+
 - All active modules have descriptive titles and descriptions
 - Topics are properly linked to modules
 - Hierarchy is logically structured (Module → Topic → Lesson)
 
 **✅ Lessons:**
+
 - Content is well-written and informative (not just placeholders)
 - Lesson types are correctly categorized (video, text, audio)
 - Order index is set for sequential learning
 
 **✅ Flashcards:**
+
 - Front/back text is concise and clear
 - Cover key concepts from lessons
 - Difficulty levels are assigned
 
 **✅ Questions:**
+
 - Question text is clear and unambiguous
 - All options have is_correct flag set properly
 - Explanations are provided for learning
@@ -381,6 +396,7 @@ For JeevaBot to work effectively, ensure:
 ### 6.2 Content Quality Standards
 
 **Good Example (Rich Context):**
+
 ```json
 {
   "topic": {
@@ -399,6 +415,7 @@ For JeevaBot to work effectively, ensure:
 ```
 
 **Poor Example (Insufficient Context):**
+
 ```json
 {
   "topic": {
@@ -423,48 +440,54 @@ For JeevaBot to work effectively, ensure:
 
 export async function retrieveEducationalContent(keywords: string[]) {
   const topics = await supabase
-    .from('topics')
-    .select(`
+    .from("topics")
+    .select(
+      `
       id, title, description,
       modules(title, exam_type),
       lessons(title, content, lesson_type),
       flashcards(front_text, back_text),
       questions(question_text, explanation)
-    `)
-    .or(keywords.map(k => `title.ilike.%${k}%`).join(','))
-    .eq('is_active', true)
-    .limit(5)
-    
-  return topics.data
+    `,
+    )
+    .or(keywords.map((k) => `title.ilike.%${k}%`).join(","))
+    .eq("is_active", true)
+    .limit(5);
+
+  return topics.data;
 }
 
 export async function getStudentContext(userId: string) {
   const [profile, weakAreas, recentProgress] = await Promise.all([
     // User profile
     supabase
-      .from('user_profiles')
-      .select('preferred_language, learning_goals, weak_topics')
-      .eq('user_id', userId)
+      .from("user_profiles")
+      .select("preferred_language, learning_goals, weak_topics")
+      .eq("user_id", userId)
       .single(),
-      
+
     // Weak performance areas
     supabase
-      .from('practice_sessions')
-      .select('topic_id, topics(title), score')
-      .eq('user_id', userId)
-      .lt('score', 60)
+      .from("practice_sessions")
+      .select("topic_id, topics(title), score")
+      .eq("user_id", userId)
+      .lt("score", 60)
       .limit(5),
-      
+
     // Recent completions
     supabase
-      .from('learning_completions')
-      .select('lessons(title)')
-      .eq('user_id', userId)
-      .order('completed_at', { ascending: false })
-      .limit(10)
-  ])
-  
-  return { profile: profile.data, weakAreas: weakAreas.data, recentProgress: recentProgress.data }
+      .from("learning_completions")
+      .select("lessons(title)")
+      .eq("user_id", userId)
+      .order("completed_at", { ascending: false })
+      .limit(10),
+  ]);
+
+  return {
+    profile: profile.data,
+    weakAreas: weakAreas.data,
+    recentProgress: recentProgress.data,
+  };
 }
 ```
 
@@ -475,11 +498,13 @@ export async function getStudentContext(userId: string) {
 ### 8.1 Why No Model Training?
 
 **Google AI Studio (Gemini) uses:**
+
 - ✅ Pre-trained foundation models (Gemini 1.5 Flash/Pro)
 - ✅ Prompt engineering with dynamic context
 - ✅ Zero-shot/few-shot learning
 
 **NOT required:**
+
 - ❌ Custom dataset preparation
 - ❌ Model fine-tuning
 - ❌ GPU/TPU training infrastructure
@@ -501,17 +526,20 @@ export async function getStudentContext(userId: string) {
 Before launching JeevaBot, test:
 
 **✅ Content Retrieval:**
+
 - Query returns relevant topics for test questions
 - Lessons contain sufficient detail for explanations
 - Flashcards provide quick concept review
 - Questions offer practice examples
 
 **✅ Student Context:**
+
 - Weak areas are correctly identified
 - Recent progress is accurately tracked
 - Learning goals are considered in responses
 
 **✅ Response Quality:**
+
 - Bot explains concepts clearly
 - Uses educational content from database
 - Personalizes based on student context
@@ -547,14 +575,15 @@ Before launching JeevaBot, test:
 
 **Phase 1 AI (JeevaBot) Data Requirements:**
 
-| Component | Data Source | Purpose |
-|-----------|-------------|---------|
-| **Educational Context** | modules, topics, lessons, flashcards, questions | Provide accurate subject matter for explanations |
-| **Student Progress** | learning_completions, practice_sessions, mock_exams | Personalize responses based on performance |
-| **User Profile** | users, user_profiles, subscriptions | Adapt language, difficulty, and focus areas |
-| **Conversation History** | chat_conversations, chat_messages | Maintain context across chat session |
+| Component                | Data Source                                         | Purpose                                          |
+| ------------------------ | --------------------------------------------------- | ------------------------------------------------ |
+| **Educational Context**  | modules, topics, lessons, flashcards, questions     | Provide accurate subject matter for explanations |
+| **Student Progress**     | learning_completions, practice_sessions, mock_exams | Personalize responses based on performance       |
+| **User Profile**         | users, user_profiles, subscriptions                 | Adapt language, difficulty, and focus areas      |
+| **Conversation History** | chat_conversations, chat_messages                   | Maintain context across chat session             |
 
 **Key Takeaway:** No traditional ML training needed. Success depends on:
+
 1. ✅ High-quality educational content in database
 2. ✅ Smart context retrieval queries
 3. ✅ Well-crafted prompt engineering
@@ -565,6 +594,7 @@ The AI becomes smarter as your educational content grows richer!
 ---
 
 **Next Steps:**
+
 1. Ensure database has comprehensive lesson content (not placeholders)
 2. Implement context retrieval functions in backend
 3. Test prompt templates with sample queries

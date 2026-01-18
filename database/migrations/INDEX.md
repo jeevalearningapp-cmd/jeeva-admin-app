@@ -42,6 +42,7 @@
 ### Recommended Approach
 
 **[run_complete_migration.sql](./run_complete_migration.sql)** ⭐ **USE THIS**
+
 - Complete migration in one transaction
 - Handles schema + data migration
 - Built-in verification
@@ -105,16 +106,19 @@ Use these if you need step-by-step control:
 ### By Role
 
 **Database Administrator**
+
 - [QUICK_START.md](./QUICK_START.md) - Quick execution
 - [run_complete_migration.sql](./run_complete_migration.sql) - Master script
 - [rollback_question_migration.sql](./rollback_question_migration.sql) - Rollback
 
 **Developer**
+
 - [TASK_2_COMPLETION_SUMMARY.md](./TASK_2_COMPLETION_SUMMARY.md) - Implementation details
 - [README_DATA_MIGRATION.md](./README_DATA_MIGRATION.md) - Technical details
 - Individual migration scripts - Step-by-step control
 
 **Project Manager**
+
 - [MIGRATION_EXECUTION_GUIDE.md](./MIGRATION_EXECUTION_GUIDE.md) - Timeline and checklist
 - [TASK_2_COMPLETION_SUMMARY.md](./TASK_2_COMPLETION_SUMMARY.md) - Deliverables
 
@@ -223,17 +227,20 @@ Located in `database/`:
 ## 🎓 Learning Path
 
 **Beginner**: Just want to run the migration
+
 1. [QUICK_START.md](./QUICK_START.md)
 2. Run `run_complete_migration.sql`
 3. Done!
 
 **Intermediate**: Want to understand the process
+
 1. [QUICK_START.md](./QUICK_START.md)
 2. [TASK_2_COMPLETION_SUMMARY.md](./TASK_2_COMPLETION_SUMMARY.md)
 3. [README_DATA_MIGRATION.md](./README_DATA_MIGRATION.md)
 4. Run `run_complete_migration.sql`
 
 **Advanced**: Need full control
+
 1. Read all documentation
 2. Review individual scripts
 3. Run scripts step-by-step

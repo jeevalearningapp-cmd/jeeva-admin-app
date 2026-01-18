@@ -169,6 +169,7 @@ SELECT * FROM cron.job;
 ```
 
 You should see 4 scheduled jobs:
+
 - `process-notification-queue` (every minute)
 - `track-notification-receipts` (every 5 minutes)
 - `process-automated-notifications` (daily at 10 AM)
@@ -189,6 +190,7 @@ You should see 4 scheduled jobs:
 3. Click **Run**
 
 This creates triggers for:
+
 - 👋 Welcome notifications (new user signup)
 - ✅ Content approved/rejected notifications
 - 💳 Subscription activation notifications
@@ -216,6 +218,7 @@ AND trigger_name LIKE '%notification%';
 ### 6.2 Get Your User ID
 
 In Supabase Dashboard:
+
 1. Go to **Authentication → Users**
 2. Find your user and copy the **User UID**
 
@@ -255,6 +258,7 @@ VALUES (
 ### 7.1 Configure Expo Push Notifications
 
 Follow the mobile app guide to:
+
 1. Install Expo notification packages
 2. Request push notification permissions
 3. Register device tokens with backend
@@ -269,12 +273,14 @@ Follow the mobile app guide to:
    - Click "Send Now"
 
 2. **Verify in database:**
+
    ```sql
    SELECT * FROM notifications ORDER BY created_at DESC LIMIT 1;
    SELECT * FROM notification_queue ORDER BY created_at DESC LIMIT 1;
    ```
 
 3. **Wait for cron job (1 minute) or trigger manually:**
+
    ```bash
    curl -X POST https://YOUR-PROJECT-REF.supabase.co/functions/v1/send-notification \
      -H "Authorization: Bearer YOUR-SERVICE-ROLE-KEY"
@@ -293,7 +299,7 @@ Your platform is now fully deployed with:
 ✅ Automated jobs for scheduled tasks  
 ✅ Database triggers for real-time events  
 ✅ Admin portal for content and user management  
-✅ Mobile app integration ready  
+✅ Mobile app integration ready
 
 ---
 
@@ -303,7 +309,7 @@ Your platform is now fully deployed with:
 
 ```sql
 -- Notification delivery stats
-SELECT 
+SELECT
   status,
   COUNT(*) as total,
   SUM(total_delivered) as delivered,
@@ -343,6 +349,7 @@ Or in Supabase Dashboard: **Edge Functions → [function name] → Logs**
 ### Issue: "Notifications not sending"
 
 **Check:**
+
 1. Queue has items: `SELECT * FROM notification_queue WHERE status = 'pending';`
 2. Cron jobs running: `SELECT * FROM cron.job_run_details;`
 3. Push tokens exist: `SELECT COUNT(*) FROM push_tokens WHERE is_active = true;`

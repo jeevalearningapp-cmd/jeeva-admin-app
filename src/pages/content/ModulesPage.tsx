@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState } from "react";
 import {
   Box,
   Typography,
@@ -20,126 +20,148 @@ import {
   FormControlLabel,
   Chip,
   Avatar,
-  InputAdornment
-} from '@mui/material'
+  InputAdornment,
+} from "@mui/material";
 import {
   AddOutlined,
   EditOutlined,
   DeleteOutlined,
   ImageOutlined,
-  SearchOutlined
-} from '@mui/icons-material'
-import { useModules, useCreateModule, useUpdateModule, useDeleteModule, useUploadThumbnail } from '@/hooks/useModules'
-import { PageLoader } from '@/components/common'
-import { Module, CreateModuleInput } from '@/types/content'
+  SearchOutlined,
+} from "@mui/icons-material";
+import {
+  useModules,
+  useCreateModule,
+  useUpdateModule,
+  useDeleteModule,
+  useUploadThumbnail,
+} from "@/hooks/useModules";
+import { PageLoader } from "@/components/common";
+import { Module, CreateModuleInput } from "@/types/content";
 
 export const ModulesPage: React.FC = () => {
-  const [dialogOpen, setDialogOpen] = useState(false)
-  const [editingModule, setEditingModule] = useState<Module | null>(null)
-  const [searchQuery, setSearchQuery] = useState('')
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingModule, setEditingModule] = useState<Module | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
   const [formData, setFormData] = useState<CreateModuleInput>({
-    title: '',
-    description: '',
-    thumbnailUrl: '',
+    title: "",
+    description: "",
+    thumbnailUrl: "",
     isActive: true,
-    displayOrder: 0
-  })
-  const [uploading, setUploading] = useState(false)
-  const [initialLoad, setInitialLoad] = useState(true)
+    displayOrder: 0,
+  });
+  const [uploading, setUploading] = useState(false);
+  const [initialLoad, setInitialLoad] = useState(true);
 
-  const { data: modules, isLoading } = useModules()
-  const createMutation = useCreateModule()
-  const updateMutation = useUpdateModule()
-  const deleteMutation = useDeleteModule()
-  const uploadMutation = useUploadThumbnail()
+  const { data: modules, isLoading } = useModules();
+  const createMutation = useCreateModule();
+  const updateMutation = useUpdateModule();
+  const deleteMutation = useDeleteModule();
+  const uploadMutation = useUploadThumbnail();
 
   React.useEffect(() => {
     if (!isLoading && initialLoad) {
-      setInitialLoad(false)
+      setInitialLoad(false);
     }
-  }, [isLoading, initialLoad])
+  }, [isLoading, initialLoad]);
 
   if (isLoading && initialLoad) {
-    return <PageLoader />
+    return <PageLoader />;
   }
 
-  const filteredModules = modules?.filter(module =>
-    module.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    module.description.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+  const filteredModules = modules?.filter(
+    (module) =>
+      module.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      module.description.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
 
   const handleOpenDialog = (module?: Module) => {
     if (module) {
-      setEditingModule(module)
+      setEditingModule(module);
       setFormData({
         title: module.title,
         description: module.description,
         thumbnailUrl: module.thumbnailUrl,
         isActive: module.isActive,
-        displayOrder: module.displayOrder
-      })
+        displayOrder: module.displayOrder,
+      });
     } else {
-      setEditingModule(null)
+      setEditingModule(null);
       setFormData({
-        title: '',
-        description: '',
-        thumbnailUrl: '',
+        title: "",
+        description: "",
+        thumbnailUrl: "",
         isActive: true,
-        displayOrder: 0
-      })
+        displayOrder: 0,
+      });
     }
-    setDialogOpen(true)
-  }
+    setDialogOpen(true);
+  };
 
   const handleCloseDialog = () => {
-    setDialogOpen(false)
-    setEditingModule(null)
-  }
+    setDialogOpen(false);
+    setEditingModule(null);
+  };
 
-  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (!file) return
+  const handleImageUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
 
-    setUploading(true)
+    setUploading(true);
     try {
-      const url = await uploadMutation.mutateAsync(file)
-      setFormData({ ...formData, thumbnailUrl: url })
+      const url = await uploadMutation.mutateAsync(file);
+      setFormData({ ...formData, thumbnailUrl: url });
     } finally {
-      setUploading(false)
+      setUploading(false);
     }
-  }
+  };
 
   const handleSubmit = async () => {
     if (editingModule) {
       await updateMutation.mutateAsync({
         id: editingModule.id,
-        input: formData
-      })
+        input: formData,
+      });
     } else {
-      await createMutation.mutateAsync(formData)
+      await createMutation.mutateAsync(formData);
     }
-    handleCloseDialog()
-  }
+    handleCloseDialog();
+  };
 
   const handleDelete = async (id: string) => {
-    if (window.confirm('Are you sure you want to delete this module? This will also delete all related topics and lessons.')) {
-      await deleteMutation.mutateAsync(id)
+    if (
+      window.confirm(
+        "Are you sure you want to delete this module? This will also delete all related topics and lessons.",
+      )
+    ) {
+      await deleteMutation.mutateAsync(id);
     }
-  }
+  };
 
   const handleToggleActive = async (module: Module) => {
     await updateMutation.mutateAsync({
       id: module.id,
-      input: { isActive: !module.isActive }
-    })
-  }
+      input: { isActive: !module.isActive },
+    });
+  };
 
   return (
     <Box>
       {/* Header */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 3,
+        }}
+      >
         <Box>
-          <Typography variant="h4" gutterBottom>Modules</Typography>
+          <Typography variant="h4" gutterBottom>
+            Modules
+          </Typography>
           <Typography variant="body2" color="text.secondary">
             Manage learning modules and course content
           </Typography>
@@ -172,7 +194,7 @@ export const ModulesPage: React.FC = () => {
       </Box>
 
       {/* Modules Table */}
-      <TableContainer component={Paper} sx={{ bgcolor: 'background.paper' }}>
+      <TableContainer component={Paper} sx={{ bgcolor: "background.paper" }}>
         <Table>
           <TableHead>
             <TableRow>
@@ -202,7 +224,11 @@ export const ModulesPage: React.FC = () => {
                   </Typography>
                 </TableCell>
                 <TableCell>
-                  <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 400 }}>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ maxWidth: 400 }}
+                  >
                     {module.description}
                   </Typography>
                 </TableCell>
@@ -238,7 +264,9 @@ export const ModulesPage: React.FC = () => {
               <TableRow>
                 <TableCell colSpan={6} align="center" sx={{ py: 4 }}>
                   <Typography variant="body2" color="text.secondary">
-                    {searchQuery ? 'No modules found matching your search.' : 'No modules yet. Click "Add Module" to create one.'}
+                    {searchQuery
+                      ? "No modules found matching your search."
+                      : 'No modules yet. Click "Add Module" to create one.'}
                   </Typography>
                 </TableCell>
               </TableRow>
@@ -248,42 +276,51 @@ export const ModulesPage: React.FC = () => {
       </TableContainer>
 
       {/* Add/Edit Dialog */}
-      <Dialog open={dialogOpen} onClose={handleCloseDialog} maxWidth="md" fullWidth>
+      <Dialog
+        open={dialogOpen}
+        onClose={handleCloseDialog}
+        maxWidth="md"
+        fullWidth
+      >
         <DialogTitle>
-          {editingModule ? 'Edit Module' : 'Add Module'}
+          {editingModule ? "Edit Module" : "Add Module"}
         </DialogTitle>
         <DialogContent>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 2 }}>
             <TextField
               label="Title"
               value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, title: e.target.value })
+              }
               fullWidth
               required
             />
             <TextField
               label="Description"
               value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, description: e.target.value })
+              }
               fullWidth
               multiline
               rows={4}
               required
             />
-            
+
             {/* Thumbnail Upload */}
             <Box>
               <Typography variant="body2" gutterBottom>
                 Module Thumbnail
               </Typography>
-              <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+              <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
                 <Button
                   variant="outlined"
                   component="label"
                   startIcon={<ImageOutlined />}
                   disabled={uploading}
                 >
-                  {uploading ? 'Uploading...' : 'Upload Image'}
+                  {uploading ? "Uploading..." : "Upload Image"}
                   <input
                     type="file"
                     hidden
@@ -301,8 +338,10 @@ export const ModulesPage: React.FC = () => {
               </Box>
               <TextField
                 label="Or enter image URL"
-                value={formData.thumbnailUrl || ''}
-                onChange={(e) => setFormData({ ...formData, thumbnailUrl: e.target.value })}
+                value={formData.thumbnailUrl || ""}
+                onChange={(e) =>
+                  setFormData({ ...formData, thumbnailUrl: e.target.value })
+                }
                 fullWidth
                 size="small"
                 sx={{ mt: 1 }}
@@ -313,7 +352,12 @@ export const ModulesPage: React.FC = () => {
               label="Display Order"
               type="number"
               value={formData.displayOrder}
-              onChange={(e) => setFormData({ ...formData, displayOrder: parseInt(e.target.value) || 0 })}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  displayOrder: parseInt(e.target.value) || 0,
+                })
+              }
               fullWidth
               helperText="Lower numbers appear first"
             />
@@ -321,7 +365,9 @@ export const ModulesPage: React.FC = () => {
               control={
                 <Switch
                   checked={formData.isActive}
-                  onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, isActive: e.target.checked })
+                  }
                 />
               }
               label="Active"
@@ -335,10 +381,10 @@ export const ModulesPage: React.FC = () => {
             variant="contained"
             disabled={!formData.title || !formData.description}
           >
-            {editingModule ? 'Update' : 'Create'}
+            {editingModule ? "Update" : "Create"}
           </Button>
         </DialogActions>
       </Dialog>
     </Box>
-  )
-}
+  );
+};

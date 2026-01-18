@@ -1,4 +1,4 @@
-import React from 'react'
+import React from "react";
 import {
   Box,
   Card,
@@ -13,8 +13,19 @@ import {
   TableHead,
   TableRow,
   LinearProgress,
-} from '@mui/material'
-import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
+} from "@mui/material";
+import {
+  BarChart,
+  Bar,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 
 export default function TrialAnalyticsDashboard() {
   // Mock data
@@ -27,28 +38,28 @@ export default function TrialAnalyticsDashboard() {
     avgScore: 72.5,
     conversionRate: 8.5,
     trialToPaidUsers: 106,
-  }
+  };
 
   const dailyTrends = [
-    { date: 'Nov 25', starts: 120, completions: 45 },
-    { date: 'Nov 26', starts: 135, completions: 52 },
-    { date: 'Nov 27', starts: 180, completions: 78 },
-    { date: 'Nov 28', starts: 220, completions: 95 },
-    { date: 'Nov 29', starts: 240, completions: 108 },
-    { date: 'Nov 30', starts: 250, completions: 120 },
-  ]
+    { date: "Nov 25", starts: 120, completions: 45 },
+    { date: "Nov 26", starts: 135, completions: 52 },
+    { date: "Nov 27", starts: 180, completions: 78 },
+    { date: "Nov 28", starts: 220, completions: 95 },
+    { date: "Nov 29", starts: 240, completions: 108 },
+    { date: "Nov 30", starts: 250, completions: 120 },
+  ];
 
   const sectionPerformance = [
-    { section: 'Practice', users: 980, avgScore: 75, completionRate: 82 },
-    { section: 'Learning', users: 750, avgScore: 71, completionRate: 65 },
-    { section: 'Mock Exam', users: 620, avgScore: 68, completionRate: 45 },
-  ]
+    { section: "Practice", users: 980, avgScore: 75, completionRate: 82 },
+    { section: "Learning", users: 750, avgScore: 71, completionRate: 65 },
+    { section: "Mock Exam", users: 620, avgScore: 68, completionRate: 45 },
+  ];
 
   const conversionFunnel = [
-    { stage: 'Trial Started', users: 1250, percentage: 100 },
-    { stage: 'Completed All 3 Sections', users: 562, percentage: 45 },
-    { stage: 'Converted to Paid', users: 106, percentage: 8.5 },
-  ]
+    { stage: "Trial Started", users: 1250, percentage: 100 },
+    { stage: "Completed All 3 Sections", users: 562, percentage: 45 },
+    { stage: "Converted to Paid", users: 106, percentage: 8.5 },
+  ];
 
   return (
     <Box>
@@ -60,7 +71,9 @@ export default function TrialAnalyticsDashboard() {
               <Typography color="text.secondary" gutterBottom>
                 Total Trial Users
               </Typography>
-              <Typography variant="h5">{analyticsData.totalTrialUsers.toLocaleString()}</Typography>
+              <Typography variant="h5">
+                {analyticsData.totalTrialUsers.toLocaleString()}
+              </Typography>
               <Typography variant="caption" color="success.main">
                 ↑ +12% this week
               </Typography>
@@ -74,9 +87,14 @@ export default function TrialAnalyticsDashboard() {
               <Typography color="text.secondary" gutterBottom>
                 Completion Rate
               </Typography>
-              <Typography variant="h5">{analyticsData.completionRate}%</Typography>
+              <Typography variant="h5">
+                {analyticsData.completionRate}%
+              </Typography>
               <Box sx={{ mt: 1 }}>
-                <LinearProgress variant="determinate" value={analyticsData.completionRate} />
+                <LinearProgress
+                  variant="determinate"
+                  value={analyticsData.completionRate}
+                />
               </Box>
             </CardContent>
           </Card>
@@ -102,7 +120,9 @@ export default function TrialAnalyticsDashboard() {
               <Typography color="text.secondary" gutterBottom>
                 Trial to Paid
               </Typography>
-              <Typography variant="h5">{analyticsData.conversionRate}%</Typography>
+              <Typography variant="h5">
+                {analyticsData.conversionRate}%
+              </Typography>
               <Typography variant="caption" color="success.main">
                 {analyticsData.trialToPaidUsers} users converted
               </Typography>
@@ -151,12 +171,33 @@ export default function TrialAnalyticsDashboard() {
               <BarChart data={sectionPerformance}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="section" />
-                <YAxis yAxisId="left" label={{ value: 'Users', angle: -90, position: 'insideLeft' }} />
-                <YAxis yAxisId="right" orientation="right" label={{ value: 'Avg Score', angle: 90, position: 'insideRight' }} />
+                <YAxis
+                  yAxisId="left"
+                  label={{ value: "Users", angle: -90, position: "insideLeft" }}
+                />
+                <YAxis
+                  yAxisId="right"
+                  orientation="right"
+                  label={{
+                    value: "Avg Score",
+                    angle: 90,
+                    position: "insideRight",
+                  }}
+                />
                 <Tooltip />
                 <Legend />
-                <Bar yAxisId="left" dataKey="users" fill="#2196f3" name="Users" />
-                <Bar yAxisId="right" dataKey="avgScore" fill="#ff9800" name="Avg Score" />
+                <Bar
+                  yAxisId="left"
+                  dataKey="users"
+                  fill="#2196f3"
+                  name="Users"
+                />
+                <Bar
+                  yAxisId="right"
+                  dataKey="avgScore"
+                  fill="#ff9800"
+                  name="Avg Score"
+                />
               </BarChart>
             </ResponsiveContainer>
           </Paper>
@@ -164,14 +205,14 @@ export default function TrialAnalyticsDashboard() {
       </Grid>
 
       {/* Section Breakdown Table */}
-      <Paper sx={{ mb: 3, overflow: 'auto' }}>
+      <Paper sx={{ mb: 3, overflow: "auto" }}>
         <Typography variant="h6" sx={{ p: 2, pb: 0 }}>
           Detailed Section Breakdown
         </Typography>
         <TableContainer>
           <Table>
             <TableHead>
-              <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
+              <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
                 <TableCell>Section</TableCell>
                 <TableCell align="right">Users</TableCell>
                 <TableCell align="right">Avg Score</TableCell>
@@ -182,14 +223,21 @@ export default function TrialAnalyticsDashboard() {
               {sectionPerformance.map((row) => (
                 <TableRow key={row.section}>
                   <TableCell>{row.section}</TableCell>
-                  <TableCell align="right">{row.users.toLocaleString()}</TableCell>
+                  <TableCell align="right">
+                    {row.users.toLocaleString()}
+                  </TableCell>
                   <TableCell align="right">{row.avgScore}/100</TableCell>
                   <TableCell align="right">
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                       <Box sx={{ flex: 1, mr: 1 }}>
-                        <LinearProgress variant="determinate" value={row.completionRate} />
+                        <LinearProgress
+                          variant="determinate"
+                          value={row.completionRate}
+                        />
                       </Box>
-                      <Typography variant="caption">{row.completionRate}%</Typography>
+                      <Typography variant="caption">
+                        {row.completionRate}%
+                      </Typography>
                     </Box>
                   </TableCell>
                 </TableRow>
@@ -206,7 +254,9 @@ export default function TrialAnalyticsDashboard() {
         </Typography>
         {conversionFunnel.map((stage, index) => (
           <Box key={stage.stage} sx={{ mb: 2 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+            <Box
+              sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}
+            >
               <Typography variant="subtitle2">{stage.stage}</Typography>
               <Typography variant="caption" color="text.secondary">
                 {stage.users.toLocaleString()} users ({stage.percentage}%)
@@ -217,5 +267,5 @@ export default function TrialAnalyticsDashboard() {
         ))}
       </Paper>
     </Box>
-  )
+  );
 }

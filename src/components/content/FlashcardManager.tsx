@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Button,
@@ -20,119 +20,129 @@ import {
   Typography,
   Paper,
   Alert,
-  CircularProgress
-} from '@mui/material'
+  CircularProgress,
+} from "@mui/material";
 import {
   EditOutlined,
   DeleteOutlined,
   AddOutlined,
-  FlipOutlined
-} from '@mui/icons-material'
-import { Flashcard, CreateFlashcardInput } from '@/types/content'
+  FlipOutlined,
+} from "@mui/icons-material";
+import { Flashcard, CreateFlashcardInput } from "@/types/content";
 import {
   useFlashcardsByCategory,
   useCreateFlashcard,
   useUpdateFlashcard,
-  useDeleteFlashcard
-} from '@/hooks/useFlashcards'
+  useDeleteFlashcard,
+} from "@/hooks/useFlashcards";
 
 interface FlashcardManagerProps {
-  category: string
-  onFlashcardAdded?: () => void
+  category: string;
+  onFlashcardAdded?: () => void;
 }
 
 export const FlashcardManager: React.FC<FlashcardManagerProps> = ({
   category,
-  onFlashcardAdded
+  onFlashcardAdded,
 }) => {
-  const [dialogOpen, setDialogOpen] = useState(false)
-  const [editingFlashcard, setEditingFlashcard] = useState<Flashcard | null>(null)
-  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
-  const [flashcardToDelete, setFlashcardToDelete] = useState<string | null>(null)
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingFlashcard, setEditingFlashcard] = useState<Flashcard | null>(
+    null,
+  );
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [flashcardToDelete, setFlashcardToDelete] = useState<string | null>(
+    null,
+  );
   const [formData, setFormData] = useState<CreateFlashcardInput>({
     category,
-    front: '',
-    back: '',
-    imageUrl: '',
+    front: "",
+    back: "",
+    imageUrl: "",
     isActive: true,
-    displayOrder: 0
-  })
+    displayOrder: 0,
+  });
 
-  const { data: flashcards = [], isLoading } = useFlashcardsByCategory(category)
-  const createMutation = useCreateFlashcard()
-  const updateMutation = useUpdateFlashcard()
-  const deleteMutation = useDeleteFlashcard()
+  const { data: flashcards = [], isLoading } =
+    useFlashcardsByCategory(category);
+  const createMutation = useCreateFlashcard();
+  const updateMutation = useUpdateFlashcard();
+  const deleteMutation = useDeleteFlashcard();
 
   useEffect(() => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      category
-    }))
-  }, [category])
+      category,
+    }));
+  }, [category]);
 
   const handleOpenDialog = (flashcard?: Flashcard) => {
     if (flashcard) {
-      setEditingFlashcard(flashcard)
+      setEditingFlashcard(flashcard);
       setFormData({
         category: flashcard.category || category,
         front: flashcard.front,
         back: flashcard.back,
         imageUrl: flashcard.imageUrl,
         isActive: flashcard.isActive,
-        displayOrder: flashcard.displayOrder
-      })
+        displayOrder: flashcard.displayOrder,
+      });
     } else {
-      setEditingFlashcard(null)
+      setEditingFlashcard(null);
       setFormData({
         category,
-        front: '',
-        back: '',
-        imageUrl: '',
+        front: "",
+        back: "",
+        imageUrl: "",
         isActive: true,
-        displayOrder: flashcards.length
-      })
+        displayOrder: flashcards.length,
+      });
     }
-    setDialogOpen(true)
-  }
+    setDialogOpen(true);
+  };
 
   const handleCloseDialog = () => {
-    setDialogOpen(false)
-    setEditingFlashcard(null)
-  }
+    setDialogOpen(false);
+    setEditingFlashcard(null);
+  };
 
   const handleSubmit = async () => {
     if (editingFlashcard) {
       await updateMutation.mutateAsync({
         id: editingFlashcard.id,
-        input: formData
-      })
+        input: formData,
+      });
     } else {
-      await createMutation.mutateAsync(formData)
+      await createMutation.mutateAsync(formData);
     }
-    handleCloseDialog()
-    onFlashcardAdded?.()
-  }
+    handleCloseDialog();
+    onFlashcardAdded?.();
+  };
 
   const handleDeleteClick = (flashcardId: string) => {
-    setFlashcardToDelete(flashcardId)
-    setDeleteConfirmOpen(true)
-  }
+    setFlashcardToDelete(flashcardId);
+    setDeleteConfirmOpen(true);
+  };
 
   const handleDeleteConfirm = async () => {
     if (flashcardToDelete) {
-      await deleteMutation.mutateAsync(flashcardToDelete)
-      setDeleteConfirmOpen(false)
-      setFlashcardToDelete(null)
+      await deleteMutation.mutateAsync(flashcardToDelete);
+      setDeleteConfirmOpen(false);
+      setFlashcardToDelete(null);
     }
-  }
+  };
 
   return (
     <Box>
-      <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <Box
+        sx={{
+          mb: 3,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
         <Box>
-          <Typography variant="h6">
-            Flashcards for {category}
-          </Typography>
+          <Typography variant="h6">Flashcards for {category}</Typography>
           <Typography variant="body2" color="text.secondary">
             Create memorization cards to help students review key concepts
           </Typography>
@@ -147,14 +157,15 @@ export const FlashcardManager: React.FC<FlashcardManagerProps> = ({
       </Box>
 
       {isLoading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
+        <Box sx={{ display: "flex", justifyContent: "center", p: 3 }}>
           <CircularProgress />
         </Box>
       ) : flashcards.length === 0 ? (
         <Alert severity="info" icon={<FlipOutlined />}>
           No flashcards found for this topic.
           <br />
-          Click "Add Flashcard" to create your first flashcard or use bulk upload to add multiple at once.
+          Click "Add Flashcard" to create your first flashcard or use bulk
+          upload to add multiple at once.
         </Alert>
       ) : (
         <TableContainer component={Paper}>
@@ -182,16 +193,23 @@ export const FlashcardManager: React.FC<FlashcardManagerProps> = ({
                   </TableCell>
                   <TableCell>
                     <Chip
-                      label={flashcard.isActive ? 'Active' : 'Inactive'}
+                      label={flashcard.isActive ? "Active" : "Inactive"}
                       size="small"
-                      color={flashcard.isActive ? 'success' : 'default'}
+                      color={flashcard.isActive ? "success" : "default"}
                     />
                   </TableCell>
                   <TableCell align="right">
-                    <IconButton size="small" onClick={() => handleOpenDialog(flashcard)}>
+                    <IconButton
+                      size="small"
+                      onClick={() => handleOpenDialog(flashcard)}
+                    >
                       <EditOutlined />
                     </IconButton>
-                    <IconButton size="small" color="error" onClick={() => handleDeleteClick(flashcard.id)}>
+                    <IconButton
+                      size="small"
+                      color="error"
+                      onClick={() => handleDeleteClick(flashcard.id)}
+                    >
                       <DeleteOutlined />
                     </IconButton>
                   </TableCell>
@@ -203,15 +221,22 @@ export const FlashcardManager: React.FC<FlashcardManagerProps> = ({
       )}
 
       {/* Add/Edit Flashcard Dialog */}
-      <Dialog open={dialogOpen} onClose={handleCloseDialog} maxWidth="md" fullWidth>
+      <Dialog
+        open={dialogOpen}
+        onClose={handleCloseDialog}
+        maxWidth="md"
+        fullWidth
+      >
         <DialogTitle>
-          {editingFlashcard ? 'Edit Flashcard' : 'Add New Flashcard'}
+          {editingFlashcard ? "Edit Flashcard" : "Add New Flashcard"}
         </DialogTitle>
         <DialogContent>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 2 }}>
             <Alert severity="info">
-              <strong>Front:</strong> The question or term students see first<br />
-              <strong>Back:</strong> The answer or definition revealed when flipped
+              <strong>Front:</strong> The question or term students see first
+              <br />
+              <strong>Back:</strong> The answer or definition revealed when
+              flipped
             </Alert>
 
             <TextField
@@ -219,7 +244,9 @@ export const FlashcardManager: React.FC<FlashcardManagerProps> = ({
               multiline
               rows={3}
               value={formData.front}
-              onChange={(e) => setFormData({ ...formData, front: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, front: e.target.value })
+              }
               fullWidth
               required
               placeholder="e.g., What is the NMC Code?"
@@ -230,7 +257,9 @@ export const FlashcardManager: React.FC<FlashcardManagerProps> = ({
               multiline
               rows={4}
               value={formData.back}
-              onChange={(e) => setFormData({ ...formData, back: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, back: e.target.value })
+              }
               fullWidth
               required
               placeholder="e.g., A set of professional standards that nurses must uphold..."
@@ -239,7 +268,9 @@ export const FlashcardManager: React.FC<FlashcardManagerProps> = ({
             <TextField
               label="Image URL (Optional)"
               value={formData.imageUrl}
-              onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, imageUrl: e.target.value })
+              }
               fullWidth
               placeholder="https://example.com/image.png"
               helperText="Add an image to make the flashcard more memorable"
@@ -249,7 +280,9 @@ export const FlashcardManager: React.FC<FlashcardManagerProps> = ({
               control={
                 <Switch
                   checked={formData.isActive}
-                  onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, isActive: e.target.checked })
+                  }
                 />
               }
               label="Active (visible to students)"
@@ -263,26 +296,34 @@ export const FlashcardManager: React.FC<FlashcardManagerProps> = ({
             variant="contained"
             disabled={!formData.front || !formData.back}
           >
-            {editingFlashcard ? 'Update' : 'Create'} Flashcard
+            {editingFlashcard ? "Update" : "Create"} Flashcard
           </Button>
         </DialogActions>
       </Dialog>
 
       {/* Delete Confirmation Dialog */}
-      <Dialog open={deleteConfirmOpen} onClose={() => setDeleteConfirmOpen(false)}>
+      <Dialog
+        open={deleteConfirmOpen}
+        onClose={() => setDeleteConfirmOpen(false)}
+      >
         <DialogTitle>Confirm Delete</DialogTitle>
         <DialogContent>
           <Typography>
-            Are you sure you want to delete this flashcard? This action cannot be undone.
+            Are you sure you want to delete this flashcard? This action cannot
+            be undone.
           </Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setDeleteConfirmOpen(false)}>Cancel</Button>
-          <Button onClick={handleDeleteConfirm} color="error" variant="contained">
+          <Button
+            onClick={handleDeleteConfirm}
+            color="error"
+            variant="contained"
+          >
             Delete
           </Button>
         </DialogActions>
       </Dialog>
     </Box>
-  )
-}
+  );
+};

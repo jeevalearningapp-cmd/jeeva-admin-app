@@ -550,4 +550,3 @@
 
 - [ ] 34. Final Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
-

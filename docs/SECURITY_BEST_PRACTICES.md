@@ -7,6 +7,7 @@ This document outlines security measures and best practices implemented in the J
 ## 🔒 Authentication & Authorization
 
 ### Implemented
+
 - ✅ Supabase Authentication with JWT tokens
 - ✅ Role-based access control (RBAC) - Superadmin, Editor, Moderator
 - ✅ Protected routes with role verification
@@ -14,6 +15,7 @@ This document outlines security measures and best practices implemented in the J
 - ✅ Automatic token refresh
 
 ### Best Practices
+
 - Always verify user roles on both frontend and backend
 - Use Supabase RLS (Row Level Security) policies for database access
 - Never expose sensitive operations to unauthorized roles
@@ -22,20 +24,23 @@ This document outlines security measures and best practices implemented in the J
 ## 🛡️ XSS Protection
 
 ### Implemented
+
 - ✅ Input sanitization utilities (`sanitizeHTML`)
 - ✅ React's built-in XSS protection (JSX escaping)
 - ✅ Dangerous pattern detection
 - ✅ Content Security Policy (CSP) headers
 
 ### Code Example
+
 ```typescript
-import { sanitizeHTML } from '@/utils/security'
+import { sanitizeHTML } from "@/utils/security";
 
 // Sanitize user input before display
-const safeContent = sanitizeHTML(userInput)
+const safeContent = sanitizeHTML(userInput);
 ```
 
 ### Recommendations
+
 - Always sanitize user input before rendering
 - Use `dangerouslySetInnerHTML` only when absolutely necessary
 - Implement CSP headers in production
@@ -44,39 +49,43 @@ const safeContent = sanitizeHTML(userInput)
 ## 🔐 SQL Injection Prevention
 
 ### Implemented
+
 - ✅ Supabase client uses parameterized queries by default
 - ✅ SQL sanitization utility for edge cases
 - ✅ Input validation on all database operations
 
 ### Best Practices
+
 ```typescript
 // ✅ GOOD - Parameterized query (Supabase handles this)
 const { data } = await supabase
-  .from('users')
-  .select('*')
-  .eq('email', userEmail)
+  .from("users")
+  .select("*")
+  .eq("email", userEmail);
 
 // ❌ BAD - Never concatenate user input into queries
-const query = `SELECT * FROM users WHERE email = '${userEmail}'`
+const query = `SELECT * FROM users WHERE email = '${userEmail}'`;
 ```
 
 ## 🚦 Rate Limiting
 
 ### Client-Side Implementation
-```typescript
-import { ClientRateLimiter } from '@/utils/security'
 
-const rateLimiter = new ClientRateLimiter()
+```typescript
+import { ClientRateLimiter } from "@/utils/security";
+
+const rateLimiter = new ClientRateLimiter();
 
 // Allow max 5 attempts in 1 minute
-if (rateLimiter.isAllowed('login', 5, 60000)) {
-  await login(email, password)
+if (rateLimiter.isAllowed("login", 5, 60000)) {
+  await login(email, password);
 } else {
-  showError('Too many attempts. Please try again later.')
+  showError("Too many attempts. Please try again later.");
 }
 ```
 
 ### Server-Side (Supabase)
+
 - Configure rate limiting in Supabase dashboard
 - Set limits for:
   - Login attempts (5 per minute)
@@ -86,12 +95,15 @@ if (rateLimiter.isAllowed('login', 5, 60000)) {
 ## 🔑 CSRF Protection
 
 ### Implemented for Supabase
+
 Supabase handles CSRF protection automatically through:
+
 - Same-site cookies
 - Token-based authentication
 - Origin validation
 
 ### Additional Measures
+
 - Verify request origin in critical operations
 - Use anti-CSRF tokens for state-changing operations
 - Validate referer headers
@@ -99,45 +111,50 @@ Supabase handles CSRF protection automatically through:
 ## 📝 Input Validation
 
 ### Implemented
+
 - ✅ Email validation
-- ✅ URL validation  
+- ✅ URL validation
 - ✅ Phone number validation
 - ✅ File name sanitization
 - ✅ Password strength validation
 
 ### Form Validation Example
+
 ```typescript
-import { isValidEmail, validatePasswordStrength } from '@/utils/security'
+import { isValidEmail, validatePasswordStrength } from "@/utils/security";
 
 const validate = () => {
-  const errors: string[] = []
-  
+  const errors: string[] = [];
+
   if (!isValidEmail(email)) {
-    errors.push('Invalid email format')
+    errors.push("Invalid email format");
   }
-  
-  const passwordCheck = validatePasswordStrength(password)
+
+  const passwordCheck = validatePasswordStrength(password);
   if (!passwordCheck.isValid) {
-    errors.push(...passwordCheck.errors)
+    errors.push(...passwordCheck.errors);
   }
-  
-  return errors
-}
+
+  return errors;
+};
 ```
 
 ## 🔒 Data Encryption
 
 ### At Rest
+
 - ✅ Supabase encrypts data at rest using AES-256
 - ✅ Passwords hashed with bcrypt
 
 ### In Transit
+
 - ✅ All API calls use HTTPS/TLS
 - ✅ Supabase enforces SSL connections
 
 ## 🎯 Content Security Policy (CSP)
 
 ### Recommended Headers
+
 ```typescript
 Content-Security-Policy:
   default-src 'self';
@@ -152,30 +169,34 @@ Content-Security-Policy:
 ```
 
 ### Implementation (Replit Deployment)
+
 Configure in deployment settings or add to server response headers.
 
 ## 🚨 Error Handling
 
 ### Implemented
+
 - ✅ Global error boundary for React errors
 - ✅ API error interceptor
 - ✅ User-friendly error messages
 - ✅ Error logging service integration ready
 
 ### Best Practices
+
 ```typescript
-import { ErrorHandler } from '@/utils/errorHandler'
+import { ErrorHandler } from "@/utils/errorHandler";
 
 try {
-  await riskyOperation()
+  await riskyOperation();
 } catch (error) {
-  ErrorHandler.handle(error, 'Failed to complete operation')
+  ErrorHandler.handle(error, "Failed to complete operation");
 }
 ```
 
 ## 🔍 Security Headers
 
 ### Recommended Headers for Production
+
 ```
 X-Content-Type-Options: nosniff
 X-Frame-Options: DENY
@@ -188,12 +209,14 @@ Permissions-Policy: geolocation=(), microphone=(), camera=()
 ## 📊 Audit Logging
 
 ### Recommended Implementation
+
 - Log all admin actions (create, update, delete)
 - Track user authentication events
 - Monitor failed login attempts
 - Record permission changes
 
 ### Database Table
+
 ```sql
 CREATE TABLE audit_logs (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -211,11 +234,13 @@ CREATE TABLE audit_logs (
 ## 🔐 Secrets Management
 
 ### Environment Variables
+
 - ✅ Use Replit Secrets for sensitive data
 - ✅ Never commit secrets to git
 - ✅ Rotate API keys regularly
 
 ### Required Secrets
+
 ```
 VITE_SUPABASE_URL=your-supabase-url
 VITE_SUPABASE_ANON_KEY=your-anon-key
@@ -225,34 +250,37 @@ VITE_SUPABASE_ANON_KEY=your-anon-key
 ## 🎯 File Upload Security
 
 ### Implemented
+
 - ✅ File name sanitization
 - ✅ File type validation
 - ✅ Size limits
 
 ### Best Practices
+
 ```typescript
-import { sanitizeFileName } from '@/utils/security'
+import { sanitizeFileName } from "@/utils/security";
 
 const handleFileUpload = (file: File) => {
   // Validate file type
-  const allowedTypes = ['image/jpeg', 'image/png', 'image/gif']
+  const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
   if (!allowedTypes.includes(file.type)) {
-    throw new Error('Invalid file type')
+    throw new Error("Invalid file type");
   }
-  
+
   // Validate file size (5MB max)
   if (file.size > 5 * 1024 * 1024) {
-    throw new Error('File too large')
+    throw new Error("File too large");
   }
-  
+
   // Sanitize file name
-  const safeName = sanitizeFileName(file.name)
-}
+  const safeName = sanitizeFileName(file.name);
+};
 ```
 
 ## ✅ Security Checklist for Production
 
 ### Pre-Launch
+
 - [ ] Enable Supabase RLS on all tables
 - [ ] Configure rate limiting
 - [ ] Set up error monitoring (Sentry/LogRocket)
@@ -265,6 +293,7 @@ const handleFileUpload = (file: File) => {
 - [ ] Check file upload restrictions
 
 ### Post-Launch
+
 - [ ] Monitor error logs daily
 - [ ] Review audit logs weekly
 - [ ] Update dependencies monthly
@@ -276,6 +305,7 @@ const handleFileUpload = (file: File) => {
 ## 🚀 Deployment Security
 
 ### Replit Deployment
+
 1. Configure environment secrets
 2. Enable automatic HTTPS
 3. Set up custom domain with SSL
@@ -283,6 +313,7 @@ const handleFileUpload = (file: File) => {
 5. Enable deployment logs
 
 ### Database Security
+
 1. Enable Supabase RLS policies
 2. Use connection pooling
 3. Enable audit logging
@@ -292,6 +323,7 @@ const handleFileUpload = (file: File) => {
 ## 📞 Incident Response
 
 ### In Case of Security Breach
+
 1. Immediately disable affected accounts
 2. Rotate all API keys and secrets
 3. Review audit logs for suspicious activity

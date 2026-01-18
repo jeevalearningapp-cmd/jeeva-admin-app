@@ -5,6 +5,7 @@ This document provides a comprehensive reference for all database migrations in 
 ## Overview
 
 The Jeeva Learning platform uses two migration directories:
+
 - `database/migrations/` - Manual SQL migrations for Supabase SQL Editor
 - `supabase/migrations/` - Timestamped migrations for Supabase CLI
 
@@ -14,55 +15,55 @@ All migrations are designed to be idempotent using `IF NOT EXISTS` and `ON CONFL
 
 ### Core Content Management
 
-| File | Summary | Tables Created/Modified |
-|------|---------|------------------------|
-| `create_content_tables.sql` | Creates core content management tables with RLS policies | modules, topics, lessons, flashcards, questions, question_options |
-| `create_app_settings.sql` | Creates platform configuration table | app_settings |
-| `create_learning_completions.sql` | Creates user progress tracking table | learning_completions |
+| File                              | Summary                                                  | Tables Created/Modified                                           |
+| --------------------------------- | -------------------------------------------------------- | ----------------------------------------------------------------- |
+| `create_content_tables.sql`       | Creates core content management tables with RLS policies | modules, topics, lessons, flashcards, questions, question_options |
+| `create_app_settings.sql`         | Creates platform configuration table                     | app_settings                                                      |
+| `create_learning_completions.sql` | Creates user progress tracking table                     | learning_completions                                              |
 
 ### NMC Course Structure
 
-| File | Summary | Tables Created/Modified |
-|------|---------|------------------------|
-| `restructure_for_nmc_modules.sql` | Converts to fixed 3-module NMC structure | questions (add columns), lessons (add columns), mock_exam_config, lesson_quiz_results |
-| `add_subtopics_to_lessons.sql` | Adds hierarchical subtopic support | lessons (add category column) |
-| `add_category_to_flashcards.sql` | Enables topic-level flashcard organization | flashcards (add category column, make lesson_id nullable) |
-| `add_audio_to_lessons.sql` | Adds audio/podcast support to lessons | lessons (add audio_url column) |
+| File                              | Summary                                    | Tables Created/Modified                                                               |
+| --------------------------------- | ------------------------------------------ | ------------------------------------------------------------------------------------- |
+| `restructure_for_nmc_modules.sql` | Converts to fixed 3-module NMC structure   | questions (add columns), lessons (add columns), mock_exam_config, lesson_quiz_results |
+| `add_subtopics_to_lessons.sql`    | Adds hierarchical subtopic support         | lessons (add category column)                                                         |
+| `add_category_to_flashcards.sql`  | Enables topic-level flashcard organization | flashcards (add category column, make lesson_id nullable)                             |
+| `add_audio_to_lessons.sql`        | Adds audio/podcast support to lessons      | lessons (add audio_url column)                                                        |
 
 ### Trial Module System
 
-| File | Summary | Tables Created/Modified |
-|------|---------|------------------------|
-| `001_create_trial_module_schema.sql` | Creates trial module schema with access rules | modules (add columns), topics (add columns), lessons (add columns), questions (add columns), module_access_rules, lesson_content, trial_attempt_records, trial_learning_progress, trial_mock_exams, trial_exam_attempts |
-| `TRIAL_MODULE_FINAL.sql` | Final trial module schema (fixed column names) | Same as above with corrected column references |
-| `TRIAL_MODULE_SCHEMA_CLEAN.sql` | Clean version of trial module schema | Same as above |
-| `TRIAL_MODULE_SCHEMA_FIXED.sql` | Fixed version addressing schema issues | Same as above |
+| File                                 | Summary                                        | Tables Created/Modified                                                                                                                                                                                                 |
+| ------------------------------------ | ---------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `001_create_trial_module_schema.sql` | Creates trial module schema with access rules  | modules (add columns), topics (add columns), lessons (add columns), questions (add columns), module_access_rules, lesson_content, trial_attempt_records, trial_learning_progress, trial_mock_exams, trial_exam_attempts |
+| `TRIAL_MODULE_FINAL.sql`             | Final trial module schema (fixed column names) | Same as above with corrected column references                                                                                                                                                                          |
+| `TRIAL_MODULE_SCHEMA_CLEAN.sql`      | Clean version of trial module schema           | Same as above                                                                                                                                                                                                           |
+| `TRIAL_MODULE_SCHEMA_FIXED.sql`      | Fixed version addressing schema issues         | Same as above                                                                                                                                                                                                           |
 
 ### Payment System
 
-| File | Summary | Tables Created/Modified |
-|------|---------|------------------------|
+| File                        | Summary                                                 | Tables Created/Modified                                                               |
+| --------------------------- | ------------------------------------------------------- | ------------------------------------------------------------------------------------- |
 | `create_payment_system.sql` | Creates dual payment gateway system (Stripe + Razorpay) | payment_customers, payment_methods, payments, payment_refunds, payment_webhook_events |
 
 ### Notifications System
 
-| File | Summary | Tables Created/Modified |
-|------|---------|------------------------|
+| File                            | Summary                                | Tables Created/Modified                                              |
+| ------------------------------- | -------------------------------------- | -------------------------------------------------------------------- |
 | `create_push_notifications.sql` | Creates Expo Push Notifications system | push_tokens, notifications, notification_targets, notification_queue |
-| `add_inapp_notifications.sql` | Adds in-app notification tracking | user_notification_reads, notification_preferences |
+| `add_inapp_notifications.sql`   | Adds in-app notification tracking      | user_notification_reads, notification_preferences                    |
 
 ### Foreign Key Fixes
 
-| File | Summary | Tables Modified |
-|------|---------|-----------------|
+| File                              | Summary                                                   | Tables Modified      |
+| --------------------------------- | --------------------------------------------------------- | -------------------- |
 | `fix_learning_completions_fk.sql` | Adds missing FK constraint for PostgREST embedded queries | learning_completions |
 
 ### Supabase CLI Migrations
 
-| File | Date | Summary |
-|------|------|---------|
-| `20251204_fix_learning_completions_fk.sql` | 2025-12-04 | Fix learning_completions FK to lessons |
-| `20251116042624_add_inapp_notifications.sql` | 2025-11-16 | In-app notifications (CLI version) |
+| File                                         | Date       | Summary                                |
+| -------------------------------------------- | ---------- | -------------------------------------- |
+| `20251204_fix_learning_completions_fk.sql`   | 2025-12-04 | Fix learning_completions FK to lessons |
+| `20251116042624_add_inapp_notifications.sql` | 2025-11-16 | In-app notifications (CLI version)     |
 | `20251116042936_add_inapp_notifications.sql` | 2025-11-16 | In-app notifications (duplicate/retry) |
 
 ## Recommended Execution Order
@@ -83,8 +84,6 @@ For a fresh database setup, execute migrations in this order:
 11. add_inapp_notifications.sql       # In-app notifications
 ```
 
-
-
 ## Migration Details
 
 ### create_content_tables.sql
@@ -92,6 +91,7 @@ For a fresh database setup, execute migrations in this order:
 **Purpose:** Creates the foundational content management system tables.
 
 **Tables Created:**
+
 - `modules` - Top-level course modules
 - `topics` - Topics within modules
 - `lessons` - Lesson content
@@ -106,6 +106,7 @@ For a fresh database setup, execute migrations in this order:
 **Reversible:** Yes
 
 **Rollback:**
+
 ```sql
 DROP TABLE IF EXISTS question_options CASCADE;
 DROP TABLE IF EXISTS questions CASCADE;
@@ -122,16 +123,19 @@ DROP TABLE IF EXISTS modules CASCADE;
 **Purpose:** Creates platform configuration table with default settings.
 
 **Tables Created:**
+
 - `app_settings` - Application configuration (site name, feature toggles, security settings)
 
 **Dependencies:** Requires `admin_users` table for RLS policies.
 
 **Triggers Created:**
+
 - `app_settings_updated_at` → `update_app_settings_updated_at()`
 
 **Reversible:** Yes
 
 **Rollback:**
+
 ```sql
 DROP TRIGGER IF EXISTS app_settings_updated_at ON app_settings;
 DROP FUNCTION IF EXISTS update_app_settings_updated_at();
@@ -145,9 +149,11 @@ DROP TABLE IF EXISTS app_settings CASCADE;
 **Purpose:** Tracks user progress through lessons for analytics dashboard.
 
 **Tables Created:**
+
 - `learning_completions` - User lesson completion tracking
 
-**Dependencies:** 
+**Dependencies:**
+
 - `auth.users` table
 - `lessons` table
 - `admin_users` table for RLS policies
@@ -155,6 +161,7 @@ DROP TABLE IF EXISTS app_settings CASCADE;
 **Reversible:** Yes
 
 **Rollback:**
+
 ```sql
 DROP TABLE IF EXISTS learning_completions CASCADE;
 ```
@@ -166,22 +173,27 @@ DROP TABLE IF EXISTS learning_completions CASCADE;
 **Purpose:** Converts from dynamic modules to fixed 3-module NMC CBT structure.
 
 **Schema Changes:**
+
 - Adds columns to `questions`: module_type, category, subdivision, exam_part
 - Adds columns to `lessons`: lesson_type, passing_score_percentage
 
 **Tables Created:**
+
 - `mock_exam_config` - Exam configuration (Part A: 15 questions/30 min, Part B: 120 questions/150 min)
 - `lesson_quiz_results` - Quiz attempt results with 80% passing requirement
 
 **Functions Created:**
+
 - `get_random_mock_exam_questions()` - Selects random questions for mock exams
 
 **Seed Data:**
+
 - 3 fixed modules (Practice, Learning, Mock Exams)
 - Topics for Practice and Learning modules
 - 10 sample questions with options
 
 **Dependencies:**
+
 - `modules` table
 - `topics` table
 - `lessons` table
@@ -193,6 +205,7 @@ DROP TABLE IF EXISTS learning_completions CASCADE;
 **Reversible:** Partial (data migrations are not reversible)
 
 **Rollback:**
+
 ```sql
 -- Remove new columns
 ALTER TABLE questions DROP COLUMN IF EXISTS module_type;
@@ -219,12 +232,14 @@ DROP FUNCTION IF EXISTS get_random_mock_exam_questions;
 **Purpose:** Creates comprehensive trial module system with access control.
 
 **Schema Changes:**
+
 - Adds columns to `modules`: is_trial, icon, color, estimated_duration_hours
 - Adds columns to `topics`: is_trial_content
 - Adds columns to `lessons`: is_trial_content, unlock_threshold_percentage, requires_unlocking
 - Adds columns to `questions`: is_trial_content, trial_order, acceptable_range, unit
 
 **Tables Created:**
+
 - `module_access_rules` - Access control per module (free, trial, subscriber)
 - `lesson_content` - Rich lesson content blocks (video, audio, text, flashcard, mcq, assessment)
 - `trial_attempt_records` - Generic trial attempt tracking
@@ -233,9 +248,11 @@ DROP FUNCTION IF EXISTS get_random_mock_exam_questions;
 - `trial_exam_attempts` - Trial exam attempts
 
 **Functions Created:**
+
 - `check_module_access()` - Checks if user can access a module
 
 **Dependencies:**
+
 - `modules` table
 - `topics` table
 - `lessons` table
@@ -248,6 +265,7 @@ DROP FUNCTION IF EXISTS get_random_mock_exam_questions;
 **Reversible:** Partial
 
 **Rollback:**
+
 ```sql
 -- Drop new tables
 DROP TABLE IF EXISTS trial_exam_attempts CASCADE;
@@ -282,12 +300,14 @@ ALTER TABLE questions DROP COLUMN IF EXISTS unit;
 **Purpose:** Creates dual payment gateway system supporting Stripe and Razorpay.
 
 **Enums Created:**
+
 - `payment_gateway` - stripe, razorpay
 - `payment_status` - pending, processing, succeeded, failed, cancelled, refunded
 - `payment_method_type` - card, upi, netbanking, wallet, other
 - `currency_code` - USD, GBP, EUR, INR
 
 **Tables Created:**
+
 - `payment_customers` - Gateway customer IDs
 - `payment_methods` - Saved payment methods
 - `payments` - Main payment records
@@ -295,12 +315,14 @@ ALTER TABLE questions DROP COLUMN IF EXISTS unit;
 - `payment_webhook_events` - Webhook event logging
 
 **Functions Created:**
+
 - `get_payment_gateway_for_user()` - Returns gateway based on country (IN → Razorpay, others → Stripe)
 - `get_user_payment_summary()` - Returns payment statistics for a user
 - `update_payment_timestamp()` - Updates timestamp on record changes
 - `set_payment_completed_at()` - Sets completed_at when status changes to succeeded
 
 **Dependencies:**
+
 - `auth.users` table
 - `subscriptions` table
 - `subscription_plans` table
@@ -310,6 +332,7 @@ ALTER TABLE questions DROP COLUMN IF EXISTS unit;
 **Reversible:** Yes (but data will be lost)
 
 **Rollback:**
+
 ```sql
 DROP TABLE IF EXISTS payment_webhook_events CASCADE;
 DROP TABLE IF EXISTS payment_refunds CASCADE;
@@ -335,28 +358,33 @@ DROP TYPE IF EXISTS currency_code;
 **Purpose:** Creates Expo Push Notifications system for mobile app.
 
 **Tables Created:**
+
 - `push_tokens` - User device push notification tokens
 - `notifications` - Notification campaigns (manual and automated)
 - `notification_targets` - Per-user delivery tracking
 - `notification_queue` - Scheduled notifications and retry logic
 
 **Functions Created:**
+
 - `get_notification_stats()` - Returns delivery statistics for a campaign
 - `mark_inactive_push_tokens()` - Marks tokens inactive after 90 days
 
 **Triggers Created:**
+
 - `push_tokens_updated_at` → `update_push_tokens_updated_at()`
 - `notifications_updated_at` → `update_notifications_updated_at()`
 - `notification_targets_updated_at` → `update_notification_targets_updated_at()`
 - `notification_queue_updated_at` → `update_notification_queue_updated_at()`
 
 **Dependencies:**
+
 - `auth.users` table
 - `admin_users` table
 
 **Reversible:** Yes
 
 **Rollback:**
+
 ```sql
 DROP TABLE IF EXISTS notification_queue CASCADE;
 DROP TABLE IF EXISTS notification_targets CASCADE;
@@ -378,24 +406,29 @@ DROP FUNCTION IF EXISTS update_notification_queue_updated_at;
 **Purpose:** Adds in-app notification tracking and user preferences.
 
 **Tables Created:**
+
 - `user_notification_reads` - Tracks which notifications a user has read
 - `notification_preferences` - User notification settings
 
 **Functions Created:**
+
 - `get_user_notifications_with_read_status()` - Fetches notifications with read status
 - `get_unread_notification_count()` - Returns unread notification count for badge
 
 **Triggers Created:**
+
 - `update_notification_preferences_updated_at` → `update_notification_preferences_timestamp()`
 - `create_notification_preferences_on_signup` → `create_default_notification_preferences()`
 
 **Dependencies:**
+
 - `auth.users` table
 - `notifications` table (from create_push_notifications.sql)
 
 **Reversible:** Yes
 
 **Rollback:**
+
 ```sql
 DROP TRIGGER IF EXISTS create_notification_preferences_on_signup ON auth.users;
 DROP TRIGGER IF EXISTS update_notification_preferences_updated_at ON notification_preferences;
@@ -409,8 +442,6 @@ DROP FUNCTION IF EXISTS update_notification_preferences_timestamp;
 DROP FUNCTION IF EXISTS create_default_notification_preferences;
 ```
 
-
-
 ## Schema Conflict Resolution Strategies
 
 ### Common Conflict Scenarios
@@ -422,12 +453,13 @@ DROP FUNCTION IF EXISTS create_default_notification_preferences;
 **Prevention:** All migrations use `ADD COLUMN IF NOT EXISTS` pattern.
 
 **Resolution:**
+
 ```sql
 -- Check if column exists before adding
-DO $$ 
+DO $$
 BEGIN
   IF NOT EXISTS (
-    SELECT 1 FROM information_schema.columns 
+    SELECT 1 FROM information_schema.columns
     WHERE table_name = 'table_name' AND column_name = 'column_name'
   ) THEN
     ALTER TABLE table_name ADD COLUMN column_name data_type;
@@ -442,6 +474,7 @@ END $$;
 **Prevention:** All migrations use `CREATE TABLE IF NOT EXISTS` pattern.
 
 **Resolution:**
+
 ```sql
 -- Check if table exists before creating
 CREATE TABLE IF NOT EXISTS table_name (
@@ -456,12 +489,13 @@ CREATE TABLE IF NOT EXISTS table_name (
 **Prevention:** Use named constraints and check existence.
 
 **Resolution:**
+
 ```sql
 -- Check if constraint exists before adding
 DO $$
 BEGIN
   IF NOT EXISTS (
-    SELECT 1 FROM information_schema.table_constraints 
+    SELECT 1 FROM information_schema.table_constraints
     WHERE constraint_name = 'constraint_name'
   ) THEN
     ALTER TABLE table_name ADD CONSTRAINT constraint_name ...;
@@ -476,6 +510,7 @@ END $$;
 **Prevention:** All migrations use `CREATE INDEX IF NOT EXISTS` pattern.
 
 **Resolution:**
+
 ```sql
 CREATE INDEX IF NOT EXISTS idx_name ON table_name(column_name);
 ```
@@ -487,6 +522,7 @@ CREATE INDEX IF NOT EXISTS idx_name ON table_name(column_name);
 **Prevention:** Use `CREATE OR REPLACE FUNCTION` pattern.
 
 **Resolution:**
+
 ```sql
 CREATE OR REPLACE FUNCTION function_name()
 RETURNS return_type AS $$
@@ -503,6 +539,7 @@ $$ LANGUAGE plpgsql;
 **Prevention:** Drop trigger before creating.
 
 **Resolution:**
+
 ```sql
 DROP TRIGGER IF EXISTS trigger_name ON table_name;
 CREATE TRIGGER trigger_name
@@ -518,6 +555,7 @@ CREATE TRIGGER trigger_name
 **Prevention:** Check existence before creating.
 
 **Resolution:**
+
 ```sql
 DO $$
 BEGIN
@@ -534,6 +572,7 @@ END $$;
 **Prevention:** Use `CREATE POLICY IF NOT EXISTS` (PostgreSQL 15+) or drop first.
 
 **Resolution:**
+
 ```sql
 -- For PostgreSQL < 15
 DROP POLICY IF EXISTS policy_name ON table_name;
@@ -550,14 +589,16 @@ CREATE POLICY IF NOT EXISTS policy_name ON table_name ...;
 **Prevention:** Ensure migrations run in correct order.
 
 **Resolution:**
+
 1. Check migration execution order
 2. Run prerequisite migrations first
 3. Use deferred constraints if needed:
+
 ```sql
-ALTER TABLE table_name 
-ADD CONSTRAINT fk_name 
-FOREIGN KEY (column_name) 
-REFERENCES other_table(id) 
+ALTER TABLE table_name
+ADD CONSTRAINT fk_name
+FOREIGN KEY (column_name)
+REFERENCES other_table(id)
 DEFERRABLE INITIALLY DEFERRED;
 ```
 
@@ -568,6 +609,7 @@ DEFERRABLE INITIALLY DEFERRED;
 **Prevention:** Always check existing data before type changes.
 
 **Resolution:**
+
 ```sql
 -- Check for incompatible data
 SELECT * FROM table_name WHERE column_name::new_type IS NULL;
@@ -593,6 +635,7 @@ ALTER TABLE table_name ALTER COLUMN column_name TYPE new_type USING column_name:
 3. **Back up the database** before running migrations.
 
 4. **Run migrations in a transaction** when possible:
+
 ```sql
 BEGIN;
 -- migration statements
@@ -613,36 +656,37 @@ After running migrations, verify the schema:
 
 ```sql
 -- Check all tables exist
-SELECT table_name FROM information_schema.tables 
+SELECT table_name FROM information_schema.tables
 WHERE table_schema = 'public' ORDER BY table_name;
 
 -- Check all columns for a table
 SELECT column_name, data_type, is_nullable, column_default
-FROM information_schema.columns 
+FROM information_schema.columns
 WHERE table_name = 'table_name' ORDER BY ordinal_position;
 
 -- Check all indexes
-SELECT indexname, indexdef FROM pg_indexes 
+SELECT indexname, indexdef FROM pg_indexes
 WHERE schemaname = 'public' ORDER BY tablename, indexname;
 
 -- Check all triggers
 SELECT trigger_name, event_object_table, action_timing, event_manipulation
-FROM information_schema.triggers 
+FROM information_schema.triggers
 WHERE trigger_schema = 'public' ORDER BY event_object_table;
 
 -- Check all functions
-SELECT routine_name, routine_type 
-FROM information_schema.routines 
+SELECT routine_name, routine_type
+FROM information_schema.routines
 WHERE routine_schema = 'public' ORDER BY routine_name;
 
 -- Check RLS status
-SELECT tablename, rowsecurity FROM pg_tables 
+SELECT tablename, rowsecurity FROM pg_tables
 WHERE schemaname = 'public' ORDER BY tablename;
 ```
 
 ## Documentation Files
 
 For additional migration guidance, see:
+
 - `database/migrations/README.md` - Basic migration instructions
 - `database/migrations/MIGRATION_README.md` - NMC restructuring guide
 - `database/migrations/SETUP_INSTRUCTIONS.md` - Initial setup guide

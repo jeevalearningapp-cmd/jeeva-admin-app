@@ -29,16 +29,16 @@
 
 `## 🧭 Navigation & Layout`
 
-`- **SidebarNav:**`    
-  `Persistent, vertical; icons+labels; dynamic based on admin role`  
-`- **TopBar:**`    
-  `Global; title, search, profile, notifications`  
-`- **Modals/Drawers:**`    
-  `Used for detail views, create/edit forms; overlays map to URL for deep-link/share`  
-`- **Role-Adaptive Menus:**`    
-  `Sidebar/Topbar hide unavailable links per role`  
-`- **Main Components:**`    
-  `` `<SidebarNav />`, `<TopBar />`, `<UserProfileMenu />`, `<ProtectedRoute />`, `<ModalContainer />`, `<ToastManager />` ``
+`- **SidebarNav:**`  
+ `Persistent, vertical; icons+labels; dynamic based on admin role`  
+`- **TopBar:**`  
+ `Global; title, search, profile, notifications`  
+`- **Modals/Drawers:**`  
+ `Used for detail views, create/edit forms; overlays map to URL for deep-link/share`  
+`- **Role-Adaptive Menus:**`  
+ `Sidebar/Topbar hide unavailable links per role`  
+`- **Main Components:**`  
+ `` `<SidebarNav />`, `<TopBar />`, `<UserProfileMenu />`, `<ProtectedRoute />`, `<ModalContainer />`, `<ToastManager />` ``
 
 `---`
 
@@ -70,18 +70,18 @@ text
 `- SubscriptionsPage.jsx`  
 `- SubscriptionDetailsPage.jsx`  
 `- Content/`  
-  `- ModulesPage.jsx`  
-  `- ModuleDetailsPage.jsx`  
-  `- TopicsPage.jsx`  
-  `- TopicDetailsPage.jsx`  
-  `- SubtopicsPage.jsx`  
-  `- SubtopicDetailsPage.jsx`  
-  `- LessonsPage.jsx`  
-  `- LessonDetailsPage.jsx`  
-  `- QuestionsPage.jsx`  
-  `- QuestionDetailsModal.jsx`  
-  `- FlashcardsPage.jsx`  
-  `- FlashcardDetailsPage.jsx`  
+ `- ModulesPage.jsx`  
+ `- ModuleDetailsPage.jsx`  
+ `- TopicsPage.jsx`  
+ `- TopicDetailsPage.jsx`  
+ `- SubtopicsPage.jsx`  
+ `- SubtopicDetailsPage.jsx`  
+ `- LessonsPage.jsx`  
+ `- LessonDetailsPage.jsx`  
+ `- QuestionsPage.jsx`  
+ `- QuestionDetailsModal.jsx`  
+ `- FlashcardsPage.jsx`  
+ `- FlashcardDetailsPage.jsx`  
 `- ApprovalsPage.jsx`  
 `- ApprovalDetailsModal.jsx`  
 `- SettingsPage.jsx`  
@@ -120,4 +120,3 @@ text
 `---`
 
 `**Keep this file up to date: add new routes, features, modals, and role rules as the admin portal grows.**`
-

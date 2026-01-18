@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState } from "react";
 import {
   Box,
   Button,
@@ -9,34 +9,43 @@ import {
   Alert,
   CircularProgress,
   Divider,
-} from '@mui/material'
-import { Send, Email, CheckCircle } from '@mui/icons-material'
-import { emailAPI } from '@/api/email'
+} from "@mui/material";
+import { Send, Email, CheckCircle } from "@mui/icons-material";
+import { emailAPI } from "@/api/email";
 
 export const EmailTestPage: React.FC = () => {
-  const [testEmail, setTestEmail] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [result, setResult] = useState<{ success: boolean; message: string } | null>(null)
+  const [testEmail, setTestEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<{
+    success: boolean;
+    message: string;
+  } | null>(null);
 
   const handleSendTestEmail = async () => {
     if (!testEmail) {
-      setResult({ success: false, message: 'Please enter an email address' })
-      return
+      setResult({ success: false, message: "Please enter an email address" });
+      return;
     }
 
-    setLoading(true)
-    setResult(null)
+    setLoading(true);
+    setResult(null);
 
     try {
-      await emailAPI.sendTestEmail(testEmail)
-      setResult({ success: true, message: 'Test email sent successfully! Check your inbox.' })
-      setTestEmail('')
+      await emailAPI.sendTestEmail(testEmail);
+      setResult({
+        success: true,
+        message: "Test email sent successfully! Check your inbox.",
+      });
+      setTestEmail("");
     } catch (error: any) {
-      setResult({ success: false, message: error.message || 'Failed to send test email' })
+      setResult({
+        success: false,
+        message: error.message || "Failed to send test email",
+      });
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <Box>
@@ -50,15 +59,15 @@ export const EmailTestPage: React.FC = () => {
       </Box>
 
       {result && (
-        <Alert severity={result.success ? 'success' : 'error'} sx={{ mb: 3 }}>
+        <Alert severity={result.success ? "success" : "error"} sx={{ mb: 3 }}>
           {result.message}
         </Alert>
       )}
 
-      <Card sx={{ maxWidth: 600, mx: 'auto' }}>
+      <Card sx={{ maxWidth: 600, mx: "auto" }}>
         <CardContent>
-          <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-            <Send sx={{ mr: 1, color: 'primary.main' }} />
+          <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+            <Send sx={{ mr: 1, color: "primary.main" }} />
             <Typography variant="h6">Quick Test Email</Typography>
           </Box>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
@@ -82,7 +91,7 @@ export const EmailTestPage: React.FC = () => {
             disabled={loading}
             startIcon={loading ? <CircularProgress size={20} /> : <Send />}
           >
-            {loading ? 'Sending...' : 'Send Test Email'}
+            {loading ? "Sending..." : "Send Test Email"}
           </Button>
         </CardContent>
       </Card>
@@ -91,8 +100,9 @@ export const EmailTestPage: React.FC = () => {
         <Divider sx={{ mb: 2 }} />
         <Alert severity="info">
           <Typography variant="body2">
-            <strong>Note:</strong> Make sure your Brevo account is verified and you're using a verified sender email domain.
-            The API server must be running on port 3001 for these tests to work.
+            <strong>Note:</strong> Make sure your Brevo account is verified and
+            you're using a verified sender email domain. The API server must be
+            running on port 3001 for these tests to work.
           </Typography>
         </Alert>
       </Box>
@@ -102,18 +112,22 @@ export const EmailTestPage: React.FC = () => {
           <Typography variant="body2">
             <strong>✅ Email Templates Available:</strong>
           </Typography>
-          <ul style={{ margin: '8px 0', paddingLeft: '20px' }}>
+          <ul style={{ margin: "8px 0", paddingLeft: "20px" }}>
             <li>Welcome Email (POST /api/email/welcome)</li>
-            <li>Subscription Confirmation (POST /api/email/subscription-confirmation)</li>
+            <li>
+              Subscription Confirmation (POST
+              /api/email/subscription-confirmation)
+            </li>
             <li>Test Email (POST /api/email/test)</li>
           </ul>
           <Typography variant="body2" sx={{ mt: 1 }}>
-            Use the API endpoints directly or integrate them into your application logic.
+            Use the API endpoints directly or integrate them into your
+            application logic.
           </Typography>
         </Alert>
       </Box>
     </Box>
-  )
-}
+  );
+};
 
-export default EmailTestPage
+export default EmailTestPage;

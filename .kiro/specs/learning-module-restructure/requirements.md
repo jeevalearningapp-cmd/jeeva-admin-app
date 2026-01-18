@@ -88,7 +88,7 @@ This document outlines the requirements for restructuring the Learning Module co
 2. WHERE a podcast is available, THE System SHALL display the optional podcast for that subtopic
 3. WHEN a video lesson is displayed, THE System SHALL show associated Video_Mapped_MCQs
 4. WHEN a subtopic contains MCQs, THE System SHALL provide between 5 and 10 questions
-5. WHEN a learner completes subtopic MCQs, THE System SHALL calculate the score as (correct_answers / total_questions) * 100
+5. WHEN a learner completes subtopic MCQs, THE System SHALL calculate the score as (correct_answers / total_questions) \* 100
 6. IF the learner's score is >= 80%, THEN THE System SHALL mark the subtopic as completed and unlock the next subtopic
 7. IF the learner's score is < 80%, THEN THE System SHALL allow unlimited retries until passing
 8. WHEN a learner has not completed a subtopic, THE System SHALL keep subsequent subtopics locked within that topic

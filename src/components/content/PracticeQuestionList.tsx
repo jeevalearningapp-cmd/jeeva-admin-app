@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -21,39 +21,39 @@ import {
   CircularProgress,
   Alert,
   Tooltip,
-  Button
-} from '@mui/material'
+  Button,
+} from "@mui/material";
 import {
   EditOutlined,
   DeleteOutlined,
   SearchOutlined,
   VisibilityOutlined,
-  AddOutlined
-} from '@mui/icons-material'
-import { supabase } from '@/lib/supabase'
+  AddOutlined,
+} from "@mui/icons-material";
+import { supabase } from "@/lib/supabase";
 
 interface PracticeQuestion {
-  id: string
-  category: string
-  subdivision: string
-  question_text: string
-  question_type: 'multiple_choice' | 'true_false'
-  difficulty: 'easy' | 'medium' | 'hard'
-  points: number
-  explanation?: string
-  image_url?: string
-  is_active: boolean
-  created_at: string
-  updated_at: string
+  id: string;
+  category: string;
+  subdivision: string;
+  question_text: string;
+  question_type: "multiple_choice" | "true_false";
+  difficulty: "easy" | "medium" | "hard";
+  points: number;
+  explanation?: string;
+  image_url?: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
 }
 
 interface PracticeQuestionListProps {
-  category: string
-  subdivision: string
-  onEdit: (question: PracticeQuestion) => void
-  onDelete: (questionId: string) => void
-  onCreate: () => void
-  refreshTrigger?: number
+  category: string;
+  subdivision: string;
+  onEdit: (question: PracticeQuestion) => void;
+  onDelete: (questionId: string) => void;
+  onCreate: () => void;
+  refreshTrigger?: number;
 }
 
 export const PracticeQuestionList: React.FC<PracticeQuestionListProps> = ({
@@ -62,120 +62,125 @@ export const PracticeQuestionList: React.FC<PracticeQuestionListProps> = ({
   onEdit,
   onDelete,
   onCreate,
-  refreshTrigger
+  refreshTrigger,
 }) => {
-  const [questions, setQuestions] = useState<PracticeQuestion[]>([])
-  const [filteredQuestions, setFilteredQuestions] = useState<PracticeQuestion[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  
+  const [questions, setQuestions] = useState<PracticeQuestion[]>([]);
+  const [filteredQuestions, setFilteredQuestions] = useState<
+    PracticeQuestion[]
+  >([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   // Pagination
-  const [page, setPage] = useState(0)
-  const [rowsPerPage, setRowsPerPage] = useState(10)
-  
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+
   // Filters
-  const [searchQuery, setSearchQuery] = useState('')
-  const [difficultyFilter, setDifficultyFilter] = useState<string>('all')
-  const [statusFilter, setStatusFilter] = useState<string>('all')
+  const [searchQuery, setSearchQuery] = useState("");
+  const [difficultyFilter, setDifficultyFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
 
   useEffect(() => {
     if (category && subdivision) {
-      fetchQuestions()
+      fetchQuestions();
     }
-  }, [category, subdivision, refreshTrigger])
+  }, [category, subdivision, refreshTrigger]);
 
   useEffect(() => {
-    applyFilters()
-  }, [questions, searchQuery, difficultyFilter, statusFilter])
+    applyFilters();
+  }, [questions, searchQuery, difficultyFilter, statusFilter]);
 
   const fetchQuestions = async () => {
     try {
-      setLoading(true)
-      setError(null)
+      setLoading(true);
+      setError(null);
 
       const { data, error: fetchError } = await supabase
-        .from('practice_questions')
-        .select('*')
-        .eq('category', category)
-        .eq('subdivision', subdivision)
-        .order('created_at', { ascending: false })
+        .from("practice_questions")
+        .select("*")
+        .eq("category", category)
+        .eq("subdivision", subdivision)
+        .order("created_at", { ascending: false });
 
-      if (fetchError) throw fetchError
+      if (fetchError) throw fetchError;
 
-      setQuestions(data || [])
+      setQuestions(data || []);
     } catch (err) {
-      console.error('Error fetching practice questions:', err)
-      setError('Failed to load questions')
+      console.error("Error fetching practice questions:", err);
+      setError("Failed to load questions");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const applyFilters = () => {
-    let filtered = [...questions]
+    let filtered = [...questions];
 
     // Search filter
     if (searchQuery) {
-      const query = searchQuery.toLowerCase()
-      filtered = filtered.filter(q =>
-        q.question_text.toLowerCase().includes(query) ||
-        (q.explanation && q.explanation.toLowerCase().includes(query))
-      )
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(
+        (q) =>
+          q.question_text.toLowerCase().includes(query) ||
+          (q.explanation && q.explanation.toLowerCase().includes(query)),
+      );
     }
 
     // Difficulty filter
-    if (difficultyFilter !== 'all') {
-      filtered = filtered.filter(q => q.difficulty === difficultyFilter)
+    if (difficultyFilter !== "all") {
+      filtered = filtered.filter((q) => q.difficulty === difficultyFilter);
     }
 
     // Status filter
-    if (statusFilter !== 'all') {
-      const isActive = statusFilter === 'active'
-      filtered = filtered.filter(q => q.is_active === isActive)
+    if (statusFilter !== "all") {
+      const isActive = statusFilter === "active";
+      filtered = filtered.filter((q) => q.is_active === isActive);
     }
 
-    setFilteredQuestions(filtered)
-    setPage(0) // Reset to first page when filters change
-  }
+    setFilteredQuestions(filtered);
+    setPage(0); // Reset to first page when filters change
+  };
 
   const handleChangePage = (_event: unknown, newPage: number) => {
-    setPage(newPage)
-  }
+    setPage(newPage);
+  };
 
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(parseInt(event.target.value, 10))
-    setPage(0)
-  }
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
-      case 'easy':
-        return 'success'
-      case 'medium':
-        return 'warning'
-      case 'hard':
-        return 'error'
+      case "easy":
+        return "success";
+      case "medium":
+        return "warning";
+      case "hard":
+        return "error";
       default:
-        return 'default'
+        return "default";
     }
-  }
+  };
 
   const truncateText = (text: string, maxLength: number = 100) => {
-    if (text.length <= maxLength) return text
-    return text.substring(0, maxLength) + '...'
-  }
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + "...";
+  };
 
   const paginatedQuestions = filteredQuestions.slice(
     page * rowsPerPage,
-    page * rowsPerPage + rowsPerPage
-  )
+    page * rowsPerPage + rowsPerPage,
+  );
 
   if (loading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+      <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
         <CircularProgress />
       </Box>
-    )
+    );
   }
 
   if (error) {
@@ -183,16 +188,21 @@ export const PracticeQuestionList: React.FC<PracticeQuestionListProps> = ({
       <Alert severity="error" sx={{ mb: 2 }}>
         {error}
       </Alert>
-    )
+    );
   }
 
   return (
     <Box>
       {/* Header with Create Button */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h6">
-          Questions for {subdivision}
-        </Typography>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 3,
+        }}
+      >
+        <Typography variant="h6">Questions for {subdivision}</Typography>
         <Button
           variant="contained"
           startIcon={<AddOutlined />}
@@ -204,7 +214,7 @@ export const PracticeQuestionList: React.FC<PracticeQuestionListProps> = ({
 
       {/* Filters */}
       <Paper sx={{ p: 2, mb: 2 }}>
-        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+        <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
           <TextField
             placeholder="Search questions..."
             value={searchQuery}
@@ -216,10 +226,10 @@ export const PracticeQuestionList: React.FC<PracticeQuestionListProps> = ({
                 <InputAdornment position="start">
                   <SearchOutlined />
                 </InputAdornment>
-              )
+              ),
             }}
           />
-          
+
           <FormControl size="small" sx={{ minWidth: 150 }}>
             <InputLabel>Difficulty</InputLabel>
             <Select
@@ -248,7 +258,14 @@ export const PracticeQuestionList: React.FC<PracticeQuestionListProps> = ({
           </FormControl>
         </Box>
 
-        <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Box
+          sx={{
+            mt: 2,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
           <Typography variant="body2" color="text.secondary">
             Showing {filteredQuestions.length} of {questions.length} questions
           </Typography>
@@ -273,7 +290,8 @@ export const PracticeQuestionList: React.FC<PracticeQuestionListProps> = ({
               <TableRow>
                 <TableCell colSpan={6} align="center" sx={{ py: 4 }}>
                   <Typography variant="body2" color="text.secondary">
-                    No questions found. Create your first question to get started.
+                    No questions found. Create your first question to get
+                    started.
                   </Typography>
                 </TableCell>
               </TableRow>
@@ -297,7 +315,11 @@ export const PracticeQuestionList: React.FC<PracticeQuestionListProps> = ({
                   </TableCell>
                   <TableCell align="center">
                     <Chip
-                      label={question.question_type === 'multiple_choice' ? 'MCQ' : 'T/F'}
+                      label={
+                        question.question_type === "multiple_choice"
+                          ? "MCQ"
+                          : "T/F"
+                      }
                       size="small"
                       variant="outlined"
                     />
@@ -314,9 +336,9 @@ export const PracticeQuestionList: React.FC<PracticeQuestionListProps> = ({
                   </TableCell>
                   <TableCell align="center">
                     <Chip
-                      label={question.is_active ? 'Active' : 'Inactive'}
+                      label={question.is_active ? "Active" : "Inactive"}
                       size="small"
-                      color={question.is_active ? 'success' : 'default'}
+                      color={question.is_active ? "success" : "default"}
                     />
                   </TableCell>
                   <TableCell align="right">
@@ -355,5 +377,5 @@ export const PracticeQuestionList: React.FC<PracticeQuestionListProps> = ({
         />
       </TableContainer>
     </Box>
-  )
-}
+  );
+};

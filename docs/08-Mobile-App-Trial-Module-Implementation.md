@@ -8,6 +8,7 @@
 ---
 
 ## Table of Contents
+
 1. [Overview](#overview)
 2. [User Flow](#user-flow)
 3. [Feature Implementation](#feature-implementation)
@@ -23,6 +24,7 @@
 The trial module is the gateway to Jeeva Learning Platform. All new users start as **trial users** by default, gaining access to a curated set of practice questions, learning content, and mock exams without payment.
 
 ### Key Principles
+
 - ✅ **Default Trial Access** - Every user begins as trial user upon signup
 - ✅ **Seamless Onboarding** - Profile completion → Dashboard → Trial mode entry
 - ✅ **Easy Entry Point** - "Let's Try" button on NMC CBT course page
@@ -34,6 +36,7 @@ The trial module is the gateway to Jeeva Learning Platform. All new users start 
 ## User Flow
 
 ### Phase 1: Signup & Initial State
+
 ```
 User Signs Up
     ↓
@@ -45,6 +48,7 @@ Redirected to Profile Completion
 ```
 
 ### Phase 2: Profile Completion
+
 ```
 Profile Completion Screen
 ├── Name, Phone, Qualification
@@ -58,6 +62,7 @@ Redirect to Dashboard
 ```
 
 ### Phase 3: Dashboard & Trial Entry
+
 ```
 Dashboard Loads
     ├── Check user.subscription_status === 'trial'
@@ -71,6 +76,7 @@ Navigate to Trial Module
 ```
 
 ### Phase 4: Trial Module Experience
+
 ```
 Trial Module (4 Sections)
 ├── Practice (6 Questions)
@@ -80,6 +86,7 @@ Trial Module (4 Sections)
 ```
 
 ### Phase 5: Conversion
+
 ```
 Trial Completion → Analytics captured
     ↓
@@ -99,6 +106,7 @@ Upgrade Prompt shown with:
 **Location:** Course catalog screen showing NMC CBT course
 
 **Implementation:**
+
 ```typescript
 // courseCard.tsx
 <Button
@@ -117,6 +125,7 @@ Upgrade Prompt shown with:
 ```
 
 **Button Placement:**
+
 - Primary CTA on NMC CBT course card
 - Icon: `<PlayCircleOutlineIcon />` (play icon) for "Let's Try"
 - Color: `#2196F3` (blue) for trial, `#007AFF` for paid
@@ -126,36 +135,37 @@ Upgrade Prompt shown with:
 ### 2. Trial Module Access Control
 
 **Check User Trial Status:**
+
 ```typescript
 // hooks/useTrialAccess.ts
 export const useTrialAccess = () => {
-  const { user } = useAuth()
-  const [canAccessTrial, setCanAccessTrial] = useState(false)
+  const { user } = useAuth();
+  const [canAccessTrial, setCanAccessTrial] = useState(false);
 
   useEffect(() => {
     const checkTrialAccess = async () => {
       // Check if user is trial user
-      if (user?.subscription_status === 'trial') {
+      if (user?.subscription_status === "trial") {
         // Check if trial not expired
         const { data, error } = await supabase
-          .from('user_profiles')
-          .select('trial_started_at, trial_expires_at')
-          .eq('id', user.id)
-          .single()
+          .from("user_profiles")
+          .select("trial_started_at, trial_expires_at")
+          .eq("id", user.id)
+          .single();
 
         if (!error && data) {
-          const now = new Date()
-          const expiresAt = new Date(data.trial_expires_at)
-          setCanAccessTrial(now < expiresAt)
+          const now = new Date();
+          const expiresAt = new Date(data.trial_expires_at);
+          setCanAccessTrial(now < expiresAt);
         }
       }
-    }
+    };
 
-    checkTrialAccess()
-  }, [user?.id])
+    checkTrialAccess();
+  }, [user?.id]);
 
-  return { canAccessTrial }
-}
+  return { canAccessTrial };
+};
 ```
 
 ---
@@ -163,9 +173,11 @@ export const useTrialAccess = () => {
 ### 3. Trial Module Screens
 
 #### Screen 1: Trial Practice Manager
+
 **Path:** `TrialModule/Practice`
 
 **Features:**
+
 - Display 6 random trial questions (3 numerical + 3 clinical)
 - Question navigation with progress indicator
 - Unlimited attempts
@@ -173,6 +185,7 @@ export const useTrialAccess = () => {
 - Track score: X/6
 
 **Implementation:**
+
 ```typescript
 // screens/TrialModule/TrialPracticeScreen.tsx
 const TrialPracticeScreen = () => {
@@ -191,7 +204,7 @@ const TrialPracticeScreen = () => {
       .select('*')
       .eq('is_trial_content', true)
       .limit(6)
-    
+
     setQuestions(data || [])
   }
 
@@ -222,15 +235,18 @@ const TrialPracticeScreen = () => {
 ```
 
 #### Screen 2: Trial Learning Module
+
 **Path:** `TrialModule/Learning`
 
 **Features:**
+
 - 2 pre-selected lessons (Patient Safety, Infection Prevention)
 - 5 content types: Video, Audio, Text, Flashcard, MCQ
 - 60% completion threshold to unlock next lesson
 - Track progress with unlock status
 
 **Implementation:**
+
 ```typescript
 // screens/TrialModule/TrialLearningScreen.tsx
 const TrialLearningScreen = () => {
@@ -311,9 +327,11 @@ const TrialLearningScreen = () => {
 ```
 
 #### Screen 3: Trial Mock Exam
+
 **Path:** `TrialModule/MockExam`
 
 **Features:**
+
 - 20 questions, 30-minute timer
 - Mark for review enabled
 - Answer change allowed
@@ -321,6 +339,7 @@ const TrialLearningScreen = () => {
 - Detailed results with topic breakdown
 
 **Implementation:**
+
 ```typescript
 // screens/TrialModule/TrialMockExamScreen.tsx
 const TrialMockExamScreen = () => {
@@ -405,9 +424,11 @@ const TrialMockExamScreen = () => {
 ```
 
 #### Screen 4: Trial Results & Conversion
+
 **Path:** `TrialModule/Results`
 
 **Features:**
+
 - Pass/fail status
 - Score breakdown by topic
 - Comparison to average user
@@ -464,6 +485,7 @@ export const TrialStatusCard = () => {
 ### Trial Module Endpoints
 
 #### 1. Get Trial Questions
+
 ```
 GET /api/trial/questions
 Query Parameters:
@@ -486,6 +508,7 @@ Response:
 ```
 
 #### 2. Get Trial Lessons
+
 ```
 GET /api/trial/lessons
 Response:
@@ -509,6 +532,7 @@ Response:
 ```
 
 #### 3. Get Trial Mock Exam
+
 ```
 GET /api/trial/mock-exam
 Response:
@@ -525,6 +549,7 @@ Response:
 ```
 
 #### 4. Save Trial Attempt
+
 ```
 POST /api/trial/attempts
 Body:
@@ -546,6 +571,7 @@ Response:
 ```
 
 #### 5. Update Trial Learning Progress
+
 ```
 POST /api/trial/learning-progress
 Body:
@@ -564,6 +590,7 @@ Response:
 ```
 
 #### 6. Submit Trial Exam Attempt
+
 ```
 POST /api/trial/exam-attempts
 Body:
@@ -589,6 +616,7 @@ Response:
 ```
 
 #### 7. Get Trial Analytics
+
 ```
 GET /api/trial/analytics/:userId
 Response:
@@ -609,6 +637,7 @@ Response:
 ## Components & Screens
 
 ### Screen Hierarchy
+
 ```
 Dashboard
 ├── TrialStatusCard (CTA)
@@ -620,6 +649,7 @@ Dashboard
 ```
 
 ### Reusable Components
+
 ```
 TrialModuleNav/
 ├── TrialTabNav.tsx (tab navigation)
@@ -647,16 +677,15 @@ export const useTrialStore = create((set) => ({
   setTrialStatus: (status) => set({ trialStatus: status }),
   setCurrentModule: (module) => set({ currentModule: module }),
   updatePracticeScore: (score) => set({ practiceScore: score }),
-  updateLearningProgress: (progress) => 
-    set({ learningProgress: progress }),
+  updateLearningProgress: (progress) => set({ learningProgress: progress }),
   updateExamScore: (score) => set({ examScore: score }),
 
   // Computed
-  isTrialComplete: (state) => 
+  isTrialComplete: (state) =>
     state.practiceScore > 0 &&
-    Object.values(state.learningProgress).some(p => p.completed) &&
+    Object.values(state.learningProgress).some((p) => p.completed) &&
     state.examScore > 0,
-}))
+}));
 ```
 
 ---
@@ -664,6 +693,7 @@ export const useTrialStore = create((set) => ({
 ## Database Queries
 
 ### 1. Load Trial Questions
+
 ```sql
 SELECT * FROM questions
 WHERE is_trial_content = true
@@ -673,8 +703,9 @@ LIMIT 6;
 ```
 
 ### 2. Load Trial Lessons with Content
+
 ```sql
-SELECT 
+SELECT
   l.id, l.title, l.unlock_threshold_percentage,
   lc.id as content_id, lc.content_type, lc.content_url, lc.content_data
 FROM lessons l
@@ -685,8 +716,9 @@ ORDER BY l.display_order;
 ```
 
 ### 3. Get User Trial Progress
+
 ```sql
-SELECT 
+SELECT
   lesson_id, is_unlocked, assessment_percentage,
   assessment_passed, is_completed
 FROM trial_learning_progress
@@ -694,9 +726,10 @@ WHERE user_id = $1;
 ```
 
 ### 4. Save Trial Attempt
+
 ```sql
 INSERT INTO trial_attempt_records (
-  user_id, module_id, content_type, 
+  user_id, module_id, content_type,
   answers_data, score, percentage_score,
   is_passed, status, started_at, completed_at
 ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
@@ -704,8 +737,9 @@ RETURNING id;
 ```
 
 ### 5. Get Trial Results Summary
+
 ```sql
-SELECT 
+SELECT
   COUNT(*) as total_attempts,
   AVG(percentage_score) as avg_score,
   MAX(percentage_score) as best_score,
@@ -719,6 +753,7 @@ WHERE user_id = $1;
 ## Conversion Tracking
 
 ### Metrics to Track
+
 1. **Trial Start Date** - When user first accesses trial
 2. **Module Access Pattern** - Which sections accessed
 3. **Completion Status** - Sections completed
@@ -727,8 +762,9 @@ WHERE user_id = $1;
 6. **Conversion Event** - When user subscribes
 
 ### Conversion Query
+
 ```sql
-SELECT 
+SELECT
   tp.id as trial_user_id,
   MIN(tar.created_at) as first_trial_access,
   MAX(tar.created_at) as last_trial_access,
@@ -764,30 +800,33 @@ GROUP BY tp.id, s.id;
 
 ## Success Metrics
 
-| Metric | Target | Tool |
-|--------|--------|------|
-| Trial Signup Rate | >70% | Amplitude |
-| Practice Module Completion | >50% | DB query |
-| Learning Unlock Rate | >40% | DB query |
-| Mock Exam Completion | >30% | DB query |
-| Trial-to-Paid Conversion | >8% | DB query |
-| Average Trial Duration | 5-7 days | Analytics |
-| Questions Attempted | >4 per user | DB query |
+| Metric                     | Target      | Tool      |
+| -------------------------- | ----------- | --------- |
+| Trial Signup Rate          | >70%        | Amplitude |
+| Practice Module Completion | >50%        | DB query  |
+| Learning Unlock Rate       | >40%        | DB query  |
+| Mock Exam Completion       | >30%        | DB query  |
+| Trial-to-Paid Conversion   | >8%         | DB query  |
+| Average Trial Duration     | 5-7 days    | Analytics |
+| Questions Attempted        | >4 per user | DB query  |
 
 ---
 
 ## Troubleshooting
 
 **Issue:** Questions not loading
+
 - Check `is_trial_content = true` in database
 - Verify RLS policies allow read access
 
 **Issue:** Progress not saving
+
 - Verify user authentication
 - Check `trial_learning_progress` table RLS
 - Ensure `lesson_id` exists in lessons table
 
 **Issue:** Exam timer not working
+
 - Verify `timeRemaining` state updates
 - Check `setInterval` cleanup
 - Validate `useEffect` dependency array
