@@ -209,6 +209,11 @@ export const PracticeQuestionForm: React.FC<PracticeQuestionFormProps> = ({
       return false;
     }
 
+    if (!formData.explanation?.trim()) {
+      setError("Explanation (Rationale) is required");
+      return false;
+    }
+
     if (formData.question_type === "multiple_choice") {
       // Check if all options have text
       const emptyOptions = options.filter((opt) => !opt.option_text.trim());
@@ -414,7 +419,7 @@ export const PracticeQuestionForm: React.FC<PracticeQuestionFormProps> = ({
 
           {/* Explanation */}
           <TextField
-            label="Explanation (Optional)"
+            label="Explanation (Rationale) - Required"
             multiline
             rows={2}
             value={formData.explanation}

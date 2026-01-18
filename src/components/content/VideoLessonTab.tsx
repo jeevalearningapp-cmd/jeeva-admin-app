@@ -46,6 +46,7 @@ export const VideoLessonTab: React.FC<VideoLessonTabProps> = ({
         await subtopicsAPI.update(subtopic.id, {
           isMandatory,
           contentType: "video",
+          videoUrl, // Sync video URL to subtopics table
         });
       } catch (e) {
         console.warn(
@@ -201,7 +202,7 @@ export const VideoLessonTab: React.FC<VideoLessonTabProps> = ({
             }}
           >
             {videoUrl.includes("youtube.com") ||
-            videoUrl.includes("youtu.be") ? (
+              videoUrl.includes("youtu.be") ? (
               <iframe
                 src={videoUrl.replace("watch?v=", "embed/")}
                 style={{

@@ -5,9 +5,12 @@ export interface Subtopic {
   topicId: string;
   title: string;
   isActive: boolean;
+  videoUrl?: string; // Added field
   displayOrder: number;
   createdAt: string;
   updatedAt: string;
+  isMandatory?: boolean;
+  duration?: number;
 }
 
 export interface CreateSubtopicInput {
@@ -21,6 +24,9 @@ export interface UpdateSubtopicInput {
   title?: string;
   isActive?: boolean;
   displayOrder?: number;
+  videoUrl?: string; // Added field
+  isMandatory?: boolean;
+  contentType?: string;
 }
 
 export interface SubtopicValidationStatus {
@@ -38,6 +44,7 @@ const mapToSubtopic = (data: any): Subtopic => {
     topicId: data.topic_id,
     title: data.title,
     isActive: data.is_active,
+    videoUrl: data.video_url, // Added mapping
     displayOrder: data.display_order,
     createdAt: data.created_at,
     updatedAt: data.updated_at,
@@ -91,6 +98,7 @@ export const subtopicsAPI = {
     if (input.isActive !== undefined) updateData.is_active = input.isActive;
     if (input.displayOrder !== undefined)
       updateData.display_order = input.displayOrder;
+    if (input.videoUrl !== undefined) updateData.video_url = input.videoUrl;
 
     const { data, error } = await supabase
       .from("subtopics")
